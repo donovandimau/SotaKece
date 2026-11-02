@@ -51,12 +51,13 @@
 
   api.feedEnd = function (moments) {
     const s = load(); const r = newSince(moments, s.lastSeen);
-    if (r.newest != null) { s.lastSeen = r.newest; save(s); }
+    // Only ever move forward: a deleted newest post must not make old ones count as new again.
+    if (r.newest != null && (s.lastSeen == null || Number(r.newest) > Number(s.lastSeen))) { s.lastSeen = r.newest; save(s); }
     if (!(moments || []).length) return '';
     return `<div class="glass card sk-caught" role="status"><em aria-hidden="true">🌅</em><b>You're all caught up</b>
       <span>${r.count ? `${r.count} new since your last visit. ` : ''}That is everything from your friends. Nothing else is waiting for you — go and enjoy your day.</span></div>`;
   };
-  api.reachOut = function (friends) {
+  api.reachOutCard = function (friends) {
     const s = load(); const list = reachOut(friends, s.visits, s.snoozed, Date.now());
     if (!list.length) return '';
     return `<div class="glass card sk-reach"><h3>Say bula</h3><div class="sub">Mates you have not visited in a while.</div>

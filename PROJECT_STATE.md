@@ -1,6 +1,6 @@
 ## 2 November 2026 — Connection over scrolling
 
-Owner asked for every app's engagement to reward good behaviour rather than copy social-media tricks. Sota Kece already had no algorithmic feed, so this adds three small things that favour real connection and give the feed an end. New `sota-wellbeing.js` + `.css` (remembered on the device only, `sk.well.v1`; nothing sent anywhere; no streaks, no activity badges, no time counters):
+Owner asked for every app's engagement to reward good behaviour rather than copy social-media tricks. Sota Kece already had no algorithmic feed, so this adds three small things that favour real connection and give the feed an end. New `sota-wellbeing.js` + `.css` (remembered on the device only, `sk.well.v1`; the last-seen marker only moves forward; nothing sent anywhere; no streaks, no activity badges, no time counters):
 - **You're all caught up** at the end of Moments, with how many are new since the last visit ("That is everything from your friends. Nothing else is waiting for you").
 - **Say bula** in the Moments side column: up to two friends whose room you have not visited in 21 days (never-visited first, then oldest), with Visit and Not now (hides that friend for 14 days). `openRoom` records the visit.
 - After 25 minutes in one sitting, one gentle note a day suggesting a break or a call.
