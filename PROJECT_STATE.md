@@ -1,3 +1,12 @@
+## 2 November 2026 — Connection over scrolling
+
+Owner asked for every app's engagement to reward good behaviour rather than copy social-media tricks. Sota Kece already had no algorithmic feed, so this adds three small things that favour real connection and give the feed an end. New `sota-wellbeing.js` + `.css` (remembered on the device only, `sk.well.v1`; nothing sent anywhere; no streaks, no activity badges, no time counters):
+- **You're all caught up** at the end of Moments, with how many are new since the last visit ("That is everything from your friends. Nothing else is waiting for you").
+- **Say bula** in the Moments side column: up to two friends whose room you have not visited in 21 days (never-visited first, then oldest), with Visit and Not now (hides that friend for 14 days). `openRoom` records the visit.
+- After 25 minutes in one sitting, one gentle note a day suggesting a break or a call.
+
+Checks: `node --test tests/*.test.cjs` 316 pass (313 before + 3 new in `tests/wellbeing.test.cjs`). Cards rendered with the app's own styles at 1200px and 390px. Service worker cache `sota-kece-shell-20261102-v123-wellbeing`. No database change.
+
 ## 1 November 2026 — Wallet receipts button removed; Sota Kece Plus pill stays
 
 This corrects the 31 October Plus checkout entry below. The "+ Wallet receipts" button and the dimau-receipts.js script were taken out of index.html (commit 75f9b83) because the wallet stays off until the Reserve Bank of Fiji approves it. No page loads the receipts widget now. The Sota Kece Plus pill (FJ$9.90 / 30 days, product sotakece-plus-30d) was briefly removed in the same commit, then put back (commit a7c31ea) after the owner approved it on 31 October. The pill is loaded on index.html only.
