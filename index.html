@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
+<head><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sota Kece — alive together</title>
@@ -580,9 +580,11 @@ async function viewMoments(){
       </div>
       ${(data||[]).length? (data||[]).map(m=>window.SotaPlus?window.SotaPlus.momentCard(m):`<div class="moment">${esc(m.body||'')}</div>`).join("")
         : `<div class="glass card empty"><em>🐚</em>Nothing yet. Your moments live here — permanently.</div>`}
+      ${window.SotaWell?.feedEnd(data)||''}
     </div>
     <div class="stack" style="align-self:start">
       ${window.SotaPlus?.sidePanel()||''}
+      ${window.SotaWell?.reachOutCard(S.friends)||''}
       <div class="glass card">
         <h3>Moments, not content</h3>
         <div class="sub" style="line-height:1.7;margin-top:8px">
@@ -611,7 +613,7 @@ async function giveLuv(kind,id){
 }
 
 /* ================= ROOM ================= */
-async function openRoom(h){ if(/^#(?:circle-invite|circle-graph|friends-graph)=/.test(location.hash))history.replaceState(null,'',location.pathname+location.search); window.SotaCircles?.stop(); S.tab="room"; S.roomHandle=h; render(); }
+async function openRoom(h){ window.SotaWell?.visited(h); if(/^#(?:circle-invite|circle-graph|friends-graph)=/.test(location.hash))history.replaceState(null,'',location.pathname+location.search); window.SotaCircles?.stop(); S.tab="room"; S.roomHandle=h; render(); }
 async function viewRoom(){
   const run=viewRun();
   const h = S.roomHandle || S.me.handle;
@@ -1138,7 +1140,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/connections.js?v=20261026-spatial-life-1"></script>
 <script src="/icon-controls.js?v=20261027-ui-clarity-3"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261031-activity-1"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261031-activity-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});boot();installAuthLifecycle();</script>
 <script src="/dimau-companion.js?v=20261027-ui-clarity-3" data-app="sota-kece" defer></script>
 <link rel="stylesheet" href="/phone-tidy-20261029.css">

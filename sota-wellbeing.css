@@ -1,0 +1,8 @@
+/* Sota Kece — connection over scrolling (Nov 2026) */
+.sk-caught{display:grid;justify-items:center;text-align:center;gap:4px;padding:18px}
+.sk-caught em{font-style:normal;font-size:28px}.sk-caught b{font-size:16px}.sk-caught span{font-size:14px;opacity:.8;max-width:42ch}
+.sk-reach .sk-reach-row{display:flex;align-items:center;gap:10px;margin-top:10px}
+.sk-reach .av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:rgba(135,206,235,.25)}
+.sk-reach-name{flex:1;min-width:0}.sk-reach-name b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sk-reach-name small{opacity:.75;font-size:12px}
+.sk-break{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);z-index:9999;display:flex;gap:12px;align-items:center;max-width:min(92vw,520px);padding:12px 14px;border-radius:16px;background:rgba(14,28,48,.92);color:#fff;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.sk-break .btn{color:#fff;border-color:rgba(255,255,255,.4)}
