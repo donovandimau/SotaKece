@@ -17,7 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-03 | Claude | Install kit: back to an exact copy of the Dimau master, keeping the Sota glass buttons through its new `data-buttons="glass"` option | `claude/dimau-install-kit` |
+| — | — | nothing claimed | — |
 
 ## Do not change
 - nothing recorded yet
@@ -27,6 +27,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-03 — claude — `dimau-install.js` is again a byte copy of the Dimau master (dimau-platform-standard `install/`). The Sota glass round buttons from #238 now come from the master's `data-buttons="glass"` option, set on the script tag in `index.html` (`?v=20261103-glass-option-1`). Buttons render the same as before. The install note text now uses the shared `--dimau-app-font` default like every other app (29 Oct change). `tests/sota.test.cjs` and `tests/shadow-glass-controls.test.cjs` expect the attribute. With jsdom: the same 462 pass and the same 4 companion/Connect tests fail as on main.
 - 2026-11-01 — claude — Automatically merged revision #332 after technical checks
 - 2026-11-01 — claude — Restore Sota Kece Plus pill (approved 31 Oct, local pricing); receipts button stays removed (1 replacement(s) in index.html on main)
 - 2026-11-01 — claude — Remove paid Plus pill and wallet receipts button (no charging users yet; wallet hidden until RBF approval) (1 replacement(s) in index.html on main)
