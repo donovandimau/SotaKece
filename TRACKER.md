@@ -17,7 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| — | — | nothing claimed | — |
+| 2026-11-03 | Codex | Restore vibrant visual character and surface the fuller social/music experience. | agent/vibrant-social-experience-20261103 |
 
 ## Do not change
 - nothing recorded yet
