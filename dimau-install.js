@@ -15,6 +15,9 @@
  *   data-notify  "off": no "works offline" / "update ready" notes (for pages that show their own status).
  *   data-shared-origin  Present when several installable apps share this origin; the help then explains how an app
  *                installed earlier with a wider scope can hide the install option.
+ *   data-buttons "glass": the note's buttons are Sota glass round icon buttons (translucent dome, chrome rim, one symbol
+ *                per action, the label as their accessible name and tooltip). Pages can tint them with
+ *                --sota-unified-tint. Leave it out for the standard text buttons.
  *
  * Any element with data-dimau-install-button (e.g. a "Get the app" button) installs, or shows the steps, when
  * clicked, and is hidden when the app is already running installed.
@@ -34,11 +37,13 @@
   var APP = (me && me.dataset.app) || 'dimau';
   var LABEL = (me && me.dataset.label) || document.title || 'this app';
   var SW = (me && me.dataset.sw) || '';
-  // Only a path names a worker this script owns; anything else means the site manages its own.
-  var OWN = SW.charAt(0) === '/';
+  // Only a path on this site names a worker this script owns; anything else means the site manages its own.
+  // "//host/x.js" and "/\host/x.js" both point at another host.
+  var OWN = /^\/(?![\/\\])/.test(SW);
   var SHARED = !!(me && me.hasAttribute('data-shared-origin'));
   var MODE = (me && me.dataset.prompt) === 'manual' ? 'manual' : 'auto';
   var NOTIFY = !(me && me.dataset.notify === 'off');
+  var GLASS = !!(me && me.dataset.buttons === 'glass');
   var STORE = 'dimau.install.' + APP;
   var MONTH = 30 * 24 * 3600 * 1000;
   // Embedded in another page (Ops and MyFiji show apps in frames), the browser can only install the page around it,
@@ -48,7 +53,7 @@
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   try { wrapped = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); } catch (e) {}
   if (framed || wrapped) {
-    try { var hideFramed = new CSSStyleSheet(); hideFramed.replaceSync('[data-dimau-install-button]{display:none!important}'); document.adoptedStyleSheets = document.adoptedStyleSheets.concat(hideFramed); } catch (e) {}
+    hideButtons();
     window.DimauInstall = {
       app: APP, label: LABEL, platform: framed ? 'framed' : 'native', standalone: !framed, framed: framed, native: !framed,
       canInstall: function () { return false; },
@@ -101,6 +106,15 @@
     if (document.readyState === 'complete') settle(); else window.addEventListener('load', settle);
   }
 
+  // Hides "Get the app" buttons, including ones a framework renders later. Browsers without constructable stylesheets
+  // (iOS 16.3 and older) get the buttons already on the page hidden instead.
+  function hideButtons() {
+    try { var sheet = new CSSStyleSheet(); sheet.replaceSync('[data-dimau-install-button]{display:none!important}'); document.adoptedStyleSheets = document.adoptedStyleSheets.concat(sheet); }
+    catch (e) {
+      var now = function () { var b = document.querySelectorAll('[data-dimau-install-button]'); for (var i = 0; i < b.length; i++) b[i].style.setProperty('display', 'none', 'important'); };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', now); else now();
+    }
+  }
   function load() { try { return JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (e) { return {}; } }
   function save(patch) { var s = load(); for (var k in patch) s[k] = patch[k]; try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) {} return s; }
   function announce(outcome) {
@@ -111,13 +125,13 @@
   /* ---------- small UI in a shadow root, so host page styles never clash ---------- */
   // The Museum Bula card from the Dimau Kit (shell/dimau-kit.css), redrawn inside the shadow root where the kit cannot reach.
   // Sits above the floating Bula/help launchers: bottom-left on wide screens, raised clear of them on phones.
-  var CSS = ':host{all:initial}.bar{position:fixed;left:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:2147483002;display:flex;align-items:center;gap:12px;width:max-content;max-width:min(560px,calc(100vw - 300px));box-sizing:border-box;padding:14px 16px;border-radius:20px;background:#bae6fd;color:#12354b;box-shadow:0 20px 60px rgba(0,0,0,.35);font:15px/1.4 "Dimau Manrope",Manrope,system-ui,-apple-system,"Segoe UI",sans-serif;animation:in .2s ease-out}' +
+  var CSS = ':host{all:initial}.bar{position:fixed;left:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:2147483002;display:flex;align-items:center;gap:12px;width:max-content;max-width:min(560px,calc(100vw - 300px));box-sizing:border-box;padding:14px 16px;border-radius:20px;background:#bae6fd;color:#12354b;box-shadow:0 20px 60px rgba(0,0,0,.35);font:15px/1.4 var(--dimau-app-font,Arial,Helvetica,sans-serif);animation:in .2s ease-out}' +
     '@media(prefers-reduced-motion:reduce){.bar{animation:none}}@keyframes in{from{opacity:0;transform:translateY(12px)}}' +
     'img{width:44px;height:44px;border-radius:12px;flex:none}.text{flex:1;min-width:0}.text b{display:block;font-size:16px;font-weight:800;letter-spacing:-.01em}.text span{color:#24506e;font-size:14px}' +
-    '.actions{display:flex;gap:8px;flex:none}button{min-height:44px;padding:10px 16px;cursor:pointer;font:700 14px "Dimau Manrope",Manrope,system-ui,sans-serif;color:#000080;background:rgba(240,248,255,.86);border:1px solid #1e90ff;border-radius:4px 16px 4px 16px;box-shadow:0 0 0 1px rgba(135,206,235,.35),0 0 12px rgba(30,144,255,.45),inset 0 0 14px rgba(30,144,255,.18)}button:hover{background:rgba(214,238,250,.95)}button.go{color:#fff;background:linear-gradient(135deg,#012169,#1f8fbf);border:0;border-radius:12px;box-shadow:none;font-size:15px}button.go:hover{filter:brightness(1.08)}button:focus-visible{outline:2px solid #00b4d8;outline-offset:2px}' +
+    '.actions{display:flex;gap:8px;flex:none}button{min-height:44px;padding:10px 16px;cursor:pointer;font:700 14px var(--dimau-app-font,Arial,Helvetica,sans-serif);color:#000080;background:rgba(240,248,255,.86);border:1px solid #1e90ff;border-radius:4px 16px 4px 16px;box-shadow:0 0 0 1px rgba(135,206,235,.35),0 0 12px rgba(30,144,255,.45),inset 0 0 14px rgba(30,144,255,.18)}button:hover{background:rgba(214,238,250,.95)}button.go{color:#fff;background:linear-gradient(135deg,#012169,#1f8fbf);border:0;border-radius:12px;box-shadow:none;font-size:15px}button.go:hover{filter:brightness(1.08)}button:focus-visible{outline:2px solid #00b4d8;outline-offset:2px}' +
     '@media(max-width:760px){.bar{left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;flex-wrap:wrap}.text{flex:1 1 calc(100% - 56px)}.actions{width:100%;justify-content:flex-end}}' +
     '.live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}';
-  CSS += "/* Sota glass controls: translucent domes, chrome rims and action-specific symbols. */\nbutton.dg-action,[data-no-task]{--dg-tint:var(--sota-unified-tint,#aadbf3);position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid #42516c88;border-radius:50%;padding:10px;color:#101924;--dg-bg:radial-gradient(ellipse at 50% 110%,color-mix(in srgb,var(--dg-tint) 80%,#fff) 0%,transparent 64%),linear-gradient(155deg,#ffffffc9 0%,#ffffff29 38%,color-mix(in srgb,var(--dg-tint) 65%,transparent) 72%,#ffffffa6 100%);background:var(--dg-bg);background-color:color-mix(in srgb,var(--dg-tint) 48%,transparent);box-shadow:inset 0 2px 1px #fff,inset 2px 0 2px #d7faffcc,inset -2px 0 2px #ffcdf7a3,inset 0 -3px 2px #62728b88,0 1px 0 #ffffffc9,0 5px 12px #152a4538;backdrop-filter:blur(12px) saturate(1.25);-webkit-backdrop-filter:blur(12px) saturate(1.25);text-shadow:0 1px 0 #ffffff70;cursor:pointer;transition:transform .15s,box-shadow .15s;box-sizing:border-box}\n.dg-action{width:48px;flex:0 0 48px;font-size:0}\n.dg-action::before,[data-no-task]::before{content:'';position:absolute;z-index:-1;left:16%;right:16%;top:5px;height:24%;border-top:4px solid #ffffffe6;border-radius:50%;pointer-events:none}\n.dg-action::after,[data-no-task]::after{content:'';position:absolute;z-index:-1;right:5px;top:27%;height:31%;width:3px;border-radius:50%;background:linear-gradient(#ffffffc7,#ffffff00);pointer-events:none}\n.dg-action:hover:not(:disabled),[data-no-task]:hover:not(:disabled){background:var(--dg-bg);transform:translateY(-1px);box-shadow:inset 0 2px 1px #fff,inset 2px 0 3px #d7faff,inset -2px 0 3px #ffcdf7c7,inset 0 -3px 2px #62728b88,0 6px 15px #152a4550}\n.dg-action:active:not(:disabled),[data-no-task]:active:not(:disabled){transform:translateY(1px)}\n.dg-action:focus-visible,[data-no-task]:focus-visible{outline:3px solid #0a548a;outline-offset:3px}\n.dg-action[hidden]{display:none!important}.dg-action:disabled,[data-no-task]:disabled{opacity:.45;cursor:default;transform:none}\n.dg-symbol{position:relative;display:block;flex:none;width:23px;height:23px;overflow:visible;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;fill:none;filter:drop-shadow(0 1px 0 #ffffff80);pointer-events:none}\n.dg-action[data-glass-action=send]{--dg-tint:var(--sota-unified-tint,#57cec2)}.dg-action[data-glass-action=settings]{--dg-tint:var(--sota-unified-tint,#d5daf0)}.dg-action[data-glass-action=close],.dg-action[data-glass-action=remove]{--dg-tint:var(--sota-unified-tint,#f6a2a8)}.dg-action[data-glass-action=hide]{--dg-tint:var(--sota-unified-tint,#d7c8ec)}.dg-action[data-glass-action=restore]{--dg-tint:var(--sota-unified-tint,#8adbd3)}.dg-action[data-glass-action=attach]{--dg-tint:var(--sota-unified-tint,#8bc8f4)}.dg-action[data-glass-action=read]{--dg-tint:var(--sota-unified-tint,#ffd26a)}.dg-action[data-glass-action=stop]{--dg-tint:var(--sota-unified-tint,#ed7e83)}.dg-action[data-glass-action=clear]{--dg-tint:var(--sota-unified-tint,#f4bb88)}\n@media(prefers-reduced-motion:reduce){.dg-action,[data-no-task]{transition:none}}\n@media(forced-colors:active){.dg-action,[data-no-task]{background:ButtonFace!important;color:ButtonText!important;border:2px solid ButtonText!important;box-shadow:none!important;backdrop-filter:none}.dg-action::before,.dg-action::after,[data-no-task]::before,[data-no-task]::after{display:none}.dg-symbol{filter:none}}\n.actions{gap:10px}.actions .dg-action{--dg-tint:var(--sota-unified-tint,#c6dcf2)}.actions .dg-action.go{--dg-tint:var(--sota-unified-tint,#82cec7);color:#101924;border:1px solid #42516c88;border-radius:50%;font-size:0}.actions .dg-action[data-glass-action=later]{--dg-tint:var(--sota-unified-tint,#f6cf83)}.actions .dg-action[data-glass-action=reload]{--dg-tint:var(--sota-unified-tint,#b9b0eb)}.actions .dg-action[data-glass-action=ok]{--dg-tint:var(--sota-unified-tint,#98d8b5)}";
+  if (GLASS) CSS += "/* Sota glass controls: translucent domes, chrome rims and action-specific symbols. */\nbutton.dg-action,[data-no-task]{--dg-tint:var(--sota-unified-tint,#aadbf3);position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border:1px solid #42516c88;border-radius:50%;padding:10px;color:#101924;--dg-bg:radial-gradient(ellipse at 50% 110%,color-mix(in srgb,var(--dg-tint) 80%,#fff) 0%,transparent 64%),linear-gradient(155deg,#ffffffc9 0%,#ffffff29 38%,color-mix(in srgb,var(--dg-tint) 65%,transparent) 72%,#ffffffa6 100%);background:var(--dg-bg);background-color:color-mix(in srgb,var(--dg-tint) 48%,transparent);box-shadow:inset 0 2px 1px #fff,inset 2px 0 2px #d7faffcc,inset -2px 0 2px #ffcdf7a3,inset 0 -3px 2px #62728b88,0 1px 0 #ffffffc9,0 5px 12px #152a4538;backdrop-filter:blur(12px) saturate(1.25);-webkit-backdrop-filter:blur(12px) saturate(1.25);text-shadow:0 1px 0 #ffffff70;cursor:pointer;transition:transform .15s,box-shadow .15s;box-sizing:border-box}\n.dg-action{width:48px;flex:0 0 48px;font-size:0}\n.dg-action::before,[data-no-task]::before{content:'';position:absolute;z-index:-1;left:16%;right:16%;top:5px;height:24%;border-top:4px solid #ffffffe6;border-radius:50%;pointer-events:none}\n.dg-action::after,[data-no-task]::after{content:'';position:absolute;z-index:-1;right:5px;top:27%;height:31%;width:3px;border-radius:50%;background:linear-gradient(#ffffffc7,#ffffff00);pointer-events:none}\n.dg-action:hover:not(:disabled),[data-no-task]:hover:not(:disabled){background:var(--dg-bg);transform:translateY(-1px);box-shadow:inset 0 2px 1px #fff,inset 2px 0 3px #d7faff,inset -2px 0 3px #ffcdf7c7,inset 0 -3px 2px #62728b88,0 6px 15px #152a4550}\n.dg-action:active:not(:disabled),[data-no-task]:active:not(:disabled){transform:translateY(1px)}\n.dg-action:focus-visible,[data-no-task]:focus-visible{outline:3px solid #0a548a;outline-offset:3px}\n.dg-action[hidden]{display:none!important}.dg-action:disabled,[data-no-task]:disabled{opacity:.45;cursor:default;transform:none}\n.dg-symbol{position:relative;display:block;flex:none;width:23px;height:23px;overflow:visible;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;fill:none;filter:drop-shadow(0 1px 0 #ffffff80);pointer-events:none}\n.dg-action[data-glass-action=send]{--dg-tint:var(--sota-unified-tint,#57cec2)}.dg-action[data-glass-action=settings]{--dg-tint:var(--sota-unified-tint,#d5daf0)}.dg-action[data-glass-action=close],.dg-action[data-glass-action=remove]{--dg-tint:var(--sota-unified-tint,#f6a2a8)}.dg-action[data-glass-action=hide]{--dg-tint:var(--sota-unified-tint,#d7c8ec)}.dg-action[data-glass-action=restore]{--dg-tint:var(--sota-unified-tint,#8adbd3)}.dg-action[data-glass-action=attach]{--dg-tint:var(--sota-unified-tint,#8bc8f4)}.dg-action[data-glass-action=read]{--dg-tint:var(--sota-unified-tint,#ffd26a)}.dg-action[data-glass-action=stop]{--dg-tint:var(--sota-unified-tint,#ed7e83)}.dg-action[data-glass-action=clear]{--dg-tint:var(--sota-unified-tint,#f4bb88)}\n@media(prefers-reduced-motion:reduce){.dg-action,[data-no-task]{transition:none}}\n@media(forced-colors:active){.dg-action,[data-no-task]{background:ButtonFace!important;color:ButtonText!important;border:2px solid ButtonText!important;box-shadow:none!important;backdrop-filter:none}.dg-action::before,.dg-action::after,[data-no-task]::before,[data-no-task]::after{display:none}.dg-symbol{filter:none}}\n.actions{gap:10px}.actions .dg-action{--dg-tint:var(--sota-unified-tint,#c6dcf2)}.actions .dg-action.go{--dg-tint:var(--sota-unified-tint,#82cec7);color:#101924;border:1px solid #42516c88;border-radius:50%;font-size:0}.actions .dg-action[data-glass-action=later]{--dg-tint:var(--sota-unified-tint,#f6cf83)}.actions .dg-action[data-glass-action=reload]{--dg-tint:var(--sota-unified-tint,#b9b0eb)}.actions .dg-action[data-glass-action=ok]{--dg-tint:var(--sota-unified-tint,#98d8b5)}";
   var host, root, live;
   function ui() {
     if (root) return root;
@@ -138,6 +152,13 @@
   }
   // Shows one message at a time. actions: [{label, primary, run}]. A `passing` note never covers a message
   // that is already on screen (e.g. "works offline" arriving while the install offer is shown).
+  // data-buttons="glass": a round icon button whose symbol matches the action; the label stays its name and tooltip.
+  function glassButton(btn, label) {
+    var kind = /install/i.test(label) ? 'install' : /reload/i.test(label) ? 'reload' : /later|not now/i.test(label) ? 'later' : 'ok';
+    var symbols = {"install": "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"3\"/><path d=\"M12 6v9m-4-4 4 4 4-4M10 19h4\"/>", "later": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 6v6l4 2\"/>", "reload": "<path d=\"M20 9a8 8 0 1 0 .2 6M20 3v6h-6\"/>", "ok": "<path d=\"m5 12 4 4L20 5\"/>"};
+    btn.classList.add('dg-action'); btn.dataset.glassAction = kind; btn.setAttribute('aria-label', label); btn.title = label;
+    btn.innerHTML = '<svg class="dg-symbol" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + symbols[kind] + '</svg>';
+  }
   function show(title, body, actions, seconds, passing) {
     var r = ui();
     var old = r.querySelector('.bar');
@@ -152,10 +173,7 @@
     function close() { bar.remove(); }
     (actions || []).forEach(function (a) {
       var btn = document.createElement('button'); btn.type = 'button'; if (a.primary) btn.className = 'go';
-      var kind = /install/i.test(a.label) ? 'install' : /reload/i.test(a.label) ? 'reload' : /later|not now/i.test(a.label) ? 'later' : 'ok';
-      var symbols = {"install": "<rect x=\"5\" y=\"2\" width=\"14\" height=\"20\" rx=\"3\"/><path d=\"M12 6v9m-4-4 4 4 4-4M10 19h4\"/>", "later": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 6v6l4 2\"/>", "reload": "<path d=\"M20 9a8 8 0 1 0 .2 6M20 3v6h-6\"/>", "ok": "<path d=\"m5 12 4 4L20 5\"/>"};
-      btn.classList.add('dg-action'); btn.dataset.glassAction = kind; btn.setAttribute('aria-label', a.label); btn.title = a.label;
-      btn.innerHTML = '<svg class="dg-symbol" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + symbols[kind] + '</svg>';
+      if (GLASS) glassButton(btn, a.label); else btn.textContent = a.label;
       btn.addEventListener('click', function () { close(); if (a.run) a.run(); });
       row.appendChild(btn);
     });
@@ -300,11 +318,8 @@
     e.preventDefault();
     install();
   });
-  if (standalone) {
-    // Already running as the installed app: hide the buttons, including ones a framework renders later.
-    try { var hide = new CSSStyleSheet(); hide.replaceSync(BUTTON + '{display:none!important}'); document.adoptedStyleSheets = document.adoptedStyleSheets.concat(hide); }
-    catch (e) { var hideAll = function () { var b = document.querySelectorAll(BUTTON); for (var i = 0; i < b.length; i++) b[i].hidden = true; }; if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideAll); else hideAll(); }
-  }
+  // Already running as the installed app: hide the buttons.
+  if (standalone) hideButtons();
 
   window.DimauInstall = {
     app: APP, label: LABEL, platform: platform, standalone: standalone, framed: false, native: false,
