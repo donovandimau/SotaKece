@@ -5,22 +5,6 @@
   "optimization": "Proportional resize and WebP encoding only; no retouching.",
   "assets": [
     {
-      "path": "assets/welcome-20261103/friends-768.webp",
-      "width": 768,
-      "height": 512,
-      "bytes": 69518,
-      "sha256": "7d2700a0d133e5dfd685cd3e7125101c04a1d82c075babcf9465dbd1c4357da5",
-      "generatedSource": "exec-2f783dd7-6511-4c23-91bf-554f1d5a3c98.png"
-    },
-    {
-      "path": "assets/welcome-20261103/music-768.webp",
-      "width": 768,
-      "height": 512,
-      "bytes": 64550,
-      "sha256": "88cd0f11182ad0e4e53449c62678512ac397deca46e8cf39d67a8973f62318aa",
-      "generatedSource": "exec-549efa4e-d14b-462d-9e8c-e539b9751dc4.png"
-    },
-    {
       "path": "assets/welcome-20261103/space-768.webp",
       "width": 768,
       "height": 512,
@@ -29,20 +13,37 @@
       "generatedSource": "exec-0fb457a9-518f-4996-888a-0d9da62b1af0.png"
     },
     {
-      "path": "assets/welcome-20261103/talanoa-768.webp",
+      "path": "assets/welcome-20261103/friends-youth-768.webp",
       "width": 768,
       "height": 512,
-      "bytes": 69832,
-      "sha256": "b4a452843c83fabd74153c962f2ac3e2667f9b906fd83b6c71ecfb06572689c2",
-      "generatedSource": "exec-f4e04ee4-e9f7-4970-a051-f8bf1818a3e8.png"
+      "bytes": 71492,
+      "sha256": "ea02abefe65c3e7274b1ae804f21e9af4cd27df82466184916eeee99bbe82cd9",
+      "generatedSource": "exec-ea0ebe53-1cf5-492b-9eb6-f78c4ef1b03d.png"
     },
     {
-      "path": "assets/welcome-20261103/talanoa-1440.webp",
+      "path": "assets/welcome-20261103/music-youth-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 74618,
+      "sha256": "199091998921264622e14ccb7cf164bcb33058a1374e53eaae4218965d242455",
+      "generatedSource": "exec-62c4231f-7e46-4292-ab97-09780d8bbdc4.png"
+    },
+    {
+      "path": "assets/welcome-20261103/talanoa-youth-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 88064,
+      "sha256": "8ee56e55edd03662e0c8023128e02ff78014e9286557e9e6fe03b02e0534e7e5",
+      "generatedSource": "exec-8aad26a9-1fa8-4562-bd1f-757e47f3c9d7.png"
+    },
+    {
+      "path": "assets/welcome-20261103/talanoa-youth-1440.webp",
       "width": 1440,
       "height": 960,
-      "bytes": 177842,
-      "sha256": "efd86879bf52592d04d257da6b8ff10e3d2c19dc7b9a9e076844a09fde93bb7f",
-      "generatedSource": "exec-f4e04ee4-e9f7-4970-a051-f8bf1818a3e8.png"
+      "bytes": 207188,
+      "sha256": "19b4233829064f776dbd7cfe4e432a30cb946fe05ddced86aa42a47278f04522",
+      "generatedSource": "exec-8aad26a9-1fa8-4562-bd1f-757e47f3c9d7.png"
     }
-  ]
+  ],
+  "audience": "Young adult early adopters; all depicted people are fictional adults aged 18\u201325."
 }
