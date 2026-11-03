@@ -5,46 +5,47 @@
   "optimization": "Proportional resize and WebP encoding only; no retouching.",
   "assets": [
     {
-      "path": "assets/welcome-20261103/friends-youth-vivid-768.webp",
+      "path": "assets/welcome-20261103/friends-natural-768.webp",
       "width": 768,
       "height": 512,
-      "bytes": 84014,
-      "sha256": "89bc9649358f0d6c14e67e3b293afcb3b0ef82cd83aec1a24ae80e481e4f5bbe",
-      "generatedSource": "exec-351dae7e-6805-4c5d-ba75-02658ed4bb2c.png"
+      "bytes": 71492,
+      "sha256": "ea02abefe65c3e7274b1ae804f21e9af4cd27df82466184916eeee99bbe82cd9",
+      "generatedSource": "exec-ea0ebe53-1cf5-492b-9eb6-f78c4ef1b03d.png"
     },
     {
-      "path": "assets/welcome-20261103/music-youth-vivid-768.webp",
+      "path": "assets/welcome-20261103/music-natural-768.webp",
       "width": 768,
       "height": 512,
-      "bytes": 84952,
-      "sha256": "38aa4887a1949461326e0fe551ca8d9a6382583c2ad8618bb34b13612ce50604",
-      "generatedSource": "exec-b87fa5e8-939b-40f3-aa01-57411977039b.png"
+      "bytes": 74618,
+      "sha256": "199091998921264622e14ccb7cf164bcb33058a1374e53eaae4218965d242455",
+      "generatedSource": "exec-62c4231f-7e46-4292-ab97-09780d8bbdc4.png"
     },
     {
-      "path": "assets/welcome-20261103/space-vivid-768.webp",
+      "path": "assets/welcome-20261103/talanoa-natural-768.webp",
       "width": 768,
       "height": 512,
-      "bytes": 92084,
-      "sha256": "9c869a8b7d4d3886705cb2b92e1c4dd5e5f0f71ced86112edf71c7823a3620b4",
-      "generatedSource": "exec-51e09eeb-7f2c-44b1-ad9d-637e5ef379c2.png"
+      "bytes": 88064,
+      "sha256": "8ee56e55edd03662e0c8023128e02ff78014e9286557e9e6fe03b02e0534e7e5",
+      "generatedSource": "exec-8aad26a9-1fa8-4562-bd1f-757e47f3c9d7.png"
     },
     {
-      "path": "assets/welcome-20261103/talanoa-youth-vivid-768.webp",
-      "width": 768,
-      "height": 512,
-      "bytes": 99918,
-      "sha256": "17f422b827275345977c140be539f1d7f149da40714ab08a4718702549bff862",
-      "generatedSource": "exec-4bb245ad-2594-4421-bf65-5401c0b0d178.png"
-    },
-    {
-      "path": "assets/welcome-20261103/talanoa-youth-vivid-1440.webp",
+      "path": "assets/welcome-20261103/talanoa-natural-1440.webp",
       "width": 1440,
       "height": 960,
-      "bytes": 239892,
-      "sha256": "b4ce29d4ec81cf09dcf2014f85b2598bc471acc5d0e208370c0b5f263c8e1bae",
-      "generatedSource": "exec-4bb245ad-2594-4421-bf65-5401c0b0d178.png"
+      "bytes": 207188,
+      "sha256": "19b4233829064f776dbd7cfe4e432a30cb946fe05ddced86aa42a47278f04522",
+      "generatedSource": "exec-8aad26a9-1fa8-4562-bd1f-757e47f3c9d7.png"
+    },
+    {
+      "path": "assets/welcome-20261103/space-together-natural-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 77876,
+      "sha256": "7b046e9aa7efb9a85683a6438388e66b3187c6e39fd736ce403330183fdd82cd",
+      "generatedSource": "exec-0f2984e5-3114-43fc-b238-e8ef7fcc4c56.png"
     }
   ],
   "audience": "Young adult early adopters; all depicted people are fictional adults aged 18\u201325.",
-  "lighting": "Brighter tropical daylight, richer turquoise water, fresh foliage and vivid clothing; natural skin tones."
+  "lighting": "Original natural-light images restored after owner feedback on overprocessed colour. No additional saturation or exposure treatment.",
+  "people": "Every new welcome-card image includes fictional young adult friends; no empty-room image remains."
 }
