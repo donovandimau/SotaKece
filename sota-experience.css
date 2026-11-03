@@ -59,28 +59,28 @@ body.sx-enabled #app.sx-app .sx-account-actions #sk-sign-up{background:var(--sx-
 }
 @media(prefers-reduced-motion:reduce){.sx-enabled *{scroll-behavior:auto!important}.sx-postcard,.sx-button,.sx-discover-card{transition:none;transform:none!important}}
 /* Music uses the same controls and library, on a legible paper surface. */
-html body.sx-enabled #app.sx-app .sota-music-views{background:#fffdf7!important;border:1px solid #d6e1d8!important;border-radius:15px!important;box-shadow:none!important;padding:0!important}
-html body.sx-enabled #app.sx-app .sota-music-view-tabs{background:#edf1e6!important;border:0!important;padding:10px!important}
-html body.sx-enabled #app.sx-app .sota-music-view-tabs button{background:transparent!important;color:#52706a!important;border:0!important;border-radius:8px!important;box-shadow:none!important;font-size:12px!important;font-family:Nunito,system-ui,sans-serif!important;min-height:42px!important;padding:10px 20px!important}
-html body.sx-enabled #app.sx-app .sota-music-view-tabs button[aria-selected=true]{background:#fffdf7!important;color:#173e4b!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist{background:#fffdf7!important;color:#173e4b!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:22px!important;gap:16px!important;font-family:Nunito,system-ui,sans-serif!important;max-height:none!important}
+html body.sx-enabled #app.sx-app .sota-music-views{background:#fff8ff!important;border:1px solid #d6e1d8!important;border-radius:15px!important;box-shadow:none!important;padding:0!important}
+html body.sx-enabled #app.sx-app .sota-music-view-tabs{background:#e3d3fc!important;border:0!important;padding:10px!important}
+html body.sx-enabled #app.sx-app .sota-music-view-tabs button{background:transparent!important;color:#625079!important;border:0!important;border-radius:8px!important;box-shadow:none!important;font-size:12px!important;font-family:Nunito,system-ui,sans-serif!important;min-height:42px!important;padding:10px 20px!important}
+html body.sx-enabled #app.sx-app .sota-music-view-tabs button[aria-selected=true]{background:#fff8ff!important;color:#352044!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist{background:#fff8ff!important;color:#352044!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:22px!important;gap:16px!important;font-family:Nunito,system-ui,sans-serif!important;max-height:none!important}
 html body.sx-enabled #app.sx-app #sk-music-playlist:before,html body.sx-enabled #app.sx-app #sk-music-playlist:after{display:none!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist :is(.sk-playlist-head,.sk-playlist-hero,.sk-playlist-search,.sk-playlist-queue){background:transparent!important;color:#173e4b!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:0!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist :is(.sk-playlist-head,.sk-playlist-hero,.sk-playlist-search,.sk-playlist-queue){background:transparent!important;color:#352044!important;box-shadow:none!important;border:0!important;border-radius:0!important;padding:0!important}
 html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-head{padding-bottom:14px!important;border-bottom:1px solid #d9e2df!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist :is(h2,strong,.sk-playlist-title){color:#173e4b!important;text-shadow:none!important;font-family:Nunito,system-ui,sans-serif!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist :is(h2,strong,.sk-playlist-title){color:#352044!important;text-shadow:none!important;font-family:Nunito,system-ui,sans-serif!important}
 html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-hero{min-height:90px!important;gap:18px!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-record{width:76px!important;height:76px!important;min-width:76px!important;box-shadow:none!important;background:repeating-radial-gradient(circle,#173e4b 0 2px,#255560 3px 4px)!important;border:0!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-record-label{background:#b7dccb!important;border:0!important;color:#1d4c42!important;font-size:22px!important;box-shadow:none!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist :is(.sk-playlist-mood,.sk-playlist-subtitle,.sk-playlist-status,.sk-playlist-eyebrow,.sk-playlist-search label){color:#55746b!important;text-shadow:none!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#edf3e9!important;border:1px solid #d6e3d4!important;box-shadow:none!important;border-radius:12px!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck-play{background:#235b58!important;box-shadow:none!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-close{background:#edf3e9!important;color:#173e4b!important;border:1px solid #c9d8cd!important;box-shadow:none!important;width:38px!important;height:38px!important;min-height:38px!important;font-size:18px!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist #sk-playlist-filter{background:#f3f5ed!important;color:#173e4b!important;border:1px solid #cbd8cd!important;border-radius:8px!important;box-shadow:none!important;min-height:44px!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-record{width:76px!important;height:76px!important;min-width:76px!important;box-shadow:none!important;background:repeating-radial-gradient(circle,#352044 0 2px,#65428b 3px 4px)!important;border:0!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-record-label{background:#ffd447!important;border:0!important;color:#4c2773!important;font-size:22px!important;box-shadow:none!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist :is(.sk-playlist-mood,.sk-playlist-subtitle,.sk-playlist-status,.sk-playlist-eyebrow,.sk-playlist-search label){color:#6b577a!important;text-shadow:none!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#f3e8fb!important;border:1px solid #d2b8e7!important;box-shadow:none!important;border-radius:12px!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck-play{background:#782aca!important;box-shadow:none!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-close{background:#f3e8fb!important;color:#352044!important;border:1px solid #d2b8e7!important;box-shadow:none!important;width:38px!important;height:38px!important;min-height:38px!important;font-size:18px!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist #sk-playlist-filter{background:#f9efff!important;color:#352044!important;border:1px solid #d2b8e7!important;border-radius:8px!important;box-shadow:none!important;min-height:44px!important}
 html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;max-height:480px!important}
 html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li{background:transparent!important;border:0!important;border-bottom:1px solid #e3e9df!important;box-shadow:none!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button{background:transparent!important;color:#173e4b!important;border:0!important;border-radius:6px!important;box-shadow:none!important;font:700 13px Nunito,system-ui,sans-serif!important;min-height:53px!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button[aria-current=true]{background:#dfede2!important}
-html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-number{background:#e7eee4!important;color:#42665a!important;box-shadow:none!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button{background:transparent!important;color:#352044!important;border:0!important;border-radius:6px!important;box-shadow:none!important;font:700 13px Nunito,system-ui,sans-serif!important;min-height:53px!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button[aria-current=true]{background:#eddbff!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-number{background:#f2d7ec!important;color:#633a75!important;box-shadow:none!important}
 .sx-music-visuals{border:1px solid #d9e2df;border-radius:10px;padding:12px;font-size:12px;color:#42665a}.sx-music-visuals summary{cursor:pointer;min-height:28px;font-weight:800}.sx-music-visuals[open] summary{margin-bottom:12px}.sx-music-visuals dimau-music-visualiser{display:block}
 .sx-mini-player{position:fixed;z-index:90;bottom:18px;left:50%;transform:translateX(-35%);width:360px;max-width:calc(100vw - 32px);display:flex;align-items:center;gap:12px;padding:12px 16px;background:#173f46;color:#fff8e8;border-radius:12px;box-shadow:0 8px 30px #173f4633;border:1px solid #45716b}.sx-mini-icon{display:flex;color:#b5e6d8}.sx-mini-open{padding:0;display:block;min-width:0;flex:1;text-align:left;border:0;background:none;color:inherit;cursor:pointer}.sx-mini-open small{display:block;font-size:7px;letter-spacing:1.5px;color:#a6d6c3;margin-bottom:4px}.sx-mini-open b{font-size:11px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sx-mini-toggle{border:1px solid #60887c;background:#d9ede0;color:#173f46;border-radius:50%;width:34px;height:34px;flex:none;cursor:pointer}
 @media(max-width:760px){html body.sx-enabled #app.sx-app #sk-music-playlist{padding:16px!important}.sx-mini-player{bottom:calc(79px + env(safe-area-inset-bottom));left:16px;right:16px;transform:none;width:auto;padding:9px 12px}.sx-mini-open b{font-size:10px}html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-record{width:64px!important;height:64px!important;min-width:64px!important}}
@@ -220,3 +220,76 @@ body.sx-enabled #app.sx-app .sx-account-actions button{min-height:44px}
  .sx-together:before{display:none}.sx-together h2{max-width:none;font-size:29px}
 }
 @media(forced-colors:active){.sx-discover-card,.sx-together{border:1px solid CanvasText}.sx-together-photo{display:none}.sx-together:before{display:none}}
+
+/* Expressive social frame: colour belongs to the interface, not photo filters. */
+body.sx-enabled{--sx-ink:#272044;--sx-muted:#625875;--sx-paper:#e1f2ff;--sx-line:#d0bde7;--sx-cyan:#ffd447;background:radial-gradient(ellipse at 4% 8%,#ffc7e5a8,transparent 45%),radial-gradient(ellipse at 92% 36%,#fff2a9a8,transparent 48%),linear-gradient(135deg,#e8f5fff0,#f5e8fff0),url('/assets/masi-band.svg') center/180px 38px repeat,#c4e7ff!important;background-attachment:fixed!important}
+body.sx-enabled .sx-rail{background:linear-gradient(165deg,#f9edfff5,#d9e9fff5 60%,#ffeddbf5);border-right-color:#c8b0e0}
+body.sx-enabled .sx-nav [aria-current=page]{background:#6b35ce;color:white;box-shadow:0 5px 16px #6b35ce28}
+body.sx-enabled .sx-nav [aria-current=page]::after{background:#ffd447}
+body.sx-enabled .sx-nav a:hover,body.sx-enabled .sx-nav button:hover{background:#f5d5ed;color:#4a2168}
+body.sx-enabled #app.sx-app:not([data-space-designed]) .sx-top{--dimau-header-bg:#f7edff;--dimau-header-line:#d0b7eb;background:#f7edff!important}
+body.sx-enabled #app.sx-app .sx-primary{background:#ffd447;border-color:#ffd447;color:#352044;box-shadow:0 4px 0 #dc9547,0 8px 20px #ffb12b38}
+.sx-music-badge{position:relative;display:block;width:48px;height:48px;border-radius:50%;background:#b2e4ff;box-shadow:0 0 0 2px #fff,0 0 14px #f045a74d}
+.sx-music-badge img{position:absolute;inset:0;width:48px;height:48px;display:block;border-radius:50%}
+.sx-music-ring{animation:sx-flag-turn 12s linear infinite}.sx-music-note{z-index:1;pointer-events:none}
+.sota-music-playing .sx-music-ring{animation-duration:2.4s}
+@keyframes sx-flag-turn{to{transform:rotate(360deg)}}
+body.sx-enabled #app.sx-app .sx-hero{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:30px;padding:44px 4% 56px;min-height:680px;overflow:hidden;align-items:center}
+.sx-hero::before{background:linear-gradient(90deg,#341139a8 0%,#3f1a3638 56%,#18233b12 100%)}
+.sx-hero-copy{width:100%;max-width:none}.sx-hero h1{font-size:clamp(44px,4.7vw,76px);text-shadow:0 3px 14px #34204066}.sx-hero h1 em{color:#ffd447}
+.sx-hero-room{min-width:0;border:1px solid #fff8;border-radius:20px;background:#fff8;box-shadow:0 22px 55px #2012374d;backdrop-filter:blur(16px);color:#302343;transform:rotate(1deg);overflow:hidden}
+.sx-hero-room>header,.sx-hero-room>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;background:#fff2e3dc;font-size:12px;font-weight:900}
+.sx-hero-room>header small{font-size:9px;letter-spacing:1px}.sx-hero-room>header span{letter-spacing:1px}
+.sx-hero-room>footer{background:#f6ddf2ed}.sx-hero-room>footer :is(a,button){border:1px solid #9264b3;border-radius:9px;padding:9px 12px;min-height:44px;color:#4d2774;background:#fff6fd;font-size:12px;font-weight:900;cursor:pointer;text-decoration:none}
+.sx-hero-room .sx-room-example{border-radius:0;max-width:none}
+.sx-hero-room small{margin:0!important}
+.sx-hero-room .bv-preview{border:0;border-radius:0;font-size:12px;box-shadow:none}
+body.sx-enabled .sx-hero-room .bv-cover{height:150px!important;min-height:150px!important;padding:18px!important}
+.sx-hero-room .bv-profile-intro{padding:12px 16px!important;min-height:0!important}
+.sx-hero-room .bv-profile-intro{display:grid!important;grid-template-columns:52px minmax(0,1fr)!important;gap:4px 12px!important;align-items:center!important}
+.sx-hero-room .bv-profile-intro>*{min-width:0;max-width:100%}
+.sx-hero-room .bv-profile-avatar{grid-column:1!important;grid-row:1/3!important;align-self:start}
+.sx-hero-room .bv-room-identity{grid-column:2!important;grid-row:1!important}
+.sx-hero-room .bv-room-bio{grid-column:2!important;grid-row:2!important;font-size:12px!important;line-height:1.5!important;margin:0!important;width:auto!important;max-width:none!important}
+.sx-hero-room .bv-room-sticker{display:none!important}.sx-hero-room .bv-interests{grid-column:1/-1!important}
+.sx-hero-room .bv-room-handle{font-size:11px!important;line-height:1.5!important;margin:4px 0!important}
+.sx-hero-room>header small{color:#624d6b!important;margin:0!important}
+.sx-hero-room .bv-profile-avatar{width:52px!important;height:52px!important;margin-top:-30px!important}
+body.sx-enabled .sx-hero-room .bv-room-identity h2{font-size:23px!important}
+.sx-hero-room .bv-preview-columns{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important;padding:10px!important}
+.sx-hero-room .bv-mini-card{padding:10px!important;min-width:0}
+.sx-hero-room .bv-mini-card h3{font-size:15px!important;margin-bottom:9px!important}.sx-hero-room .bv-mini-card h3 small{display:block;font-size:9px!important}
+.sx-hero-room .bv-photo-note{gap:7px!important;margin:6px 0!important}.sx-hero-room .bv-photo-note>svg{width:30px!important;height:30px!important;flex:none}.sx-hero-room .bv-photo-note p{font-size:11px!important;line-height:1.4!important;margin:3px 0!important}
+.sx-hero-room .bv-photo-friends{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}.sx-hero-room .bv-photo-friends>span{max-width:37px!important;border-radius:50%!important;overflow:hidden}
+.sx-hero-room .bv-preview-soundtrack{padding:0 10px 10px!important}.sx-hero-room .bv-skin-player{padding:10px!important;min-height:60px!important}.sx-hero-room .bv-skin-player p{font-size:10px!important;margin:3px 0!important}.sx-hero-room .bv-identity-music{display:none}
+.sx-home-paths{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;padding:14px;border:1px solid #fff;border-radius:16px;background:#ffffffa8;box-shadow:0 7px 20px #5534830d}
+.sx-home-paths a{display:flex;align-items:center;justify-content:center;gap:8px;flex:1;min-width:135px;min-height:48px;padding:10px 12px;border-radius:11px;background:#f7d9ee;color:#51285e;font-size:12px;font-weight:900;text-decoration:none}
+.sx-home-paths a:nth-child(2){background:#ffdbca;color:#672c28}.sx-home-paths a:nth-child(3){background:#ffe991;color:#523c21}.sx-home-paths a:nth-child(4){background:#daccff;color:#4c2779}.sx-home-paths a:nth-child(5){background:#d6f6ad;color:#324f24}
+.sx-discover-people{background:#ffd7e9!important;color:#53213f!important}.sx-discover-music{background:#ffe18c!important;color:#563821!important}.sx-discover-space{background:#d8c5ff!important;color:#43206a!important}
+.sx-discover-card{box-shadow:0 6px 0 #ffffff80,0 10px 28px #59367c12}.sx-discover-card small{font-size:10px!important}.sx-discover-card>span{font-size:13px!important}
+.sx-home-soundtrack{margin:38px 0 0;border:1px solid #b9a2ea;border-radius:20px;overflow:hidden;background:#efe3ff;box-shadow:0 12px 32px #55257812}
+.sx-home-soundtrack>header{display:flex;align-items:center;gap:25px;flex-wrap:wrap;padding:28px;background:linear-gradient(110deg,#502294,#a62d84);color:white}
+.sx-home-soundtrack h2{font-size:32px;margin:10px 0 0;color:white}.sx-home-soundtrack>header p{max-width:260px;flex:1;font-size:14px;color:#fff5fc}.sx-home-soundtrack>header .sx-button{background:#ffd447;color:#352044;border:0}
+html body.sx-enabled #app.sx-app .sota-music-views{background:#fff6ff!important;border-color:#cfb5ed!important}
+html body.sx-enabled #app.sx-app .sota-music-view-tabs{background:#e3d3fc!important}
+html body.sx-enabled #app.sx-app .sota-music-view-tabs button[aria-selected=true]{background:#6b35ce!important;color:#fff!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist{background:#fff8ff!important;color:#352044!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:linear-gradient(115deg,#ffe8a5,#f9d7ed 70%,#dfd0ff)!important;border-color:#d2a5d6!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck-play{background:#782aca!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button[aria-current=true]{background:#eddbff!important}
+.sx-home-soundtrack .sk-playlist-songs{max-height:290px!important}.sx-home-soundtrack .sx-music-visuals{background:#f2e7ff}
+.sx-together{background:#4a246e}.sx-together:before{background:linear-gradient(90deg,#331648ed 0%,#4c2353d9 28%,#4c23533d 58%,transparent 100%)}.sx-together .sx-button{background:#ffd447;color:#352044}
+.sx-side-card{background:linear-gradient(135deg,#fbd4e8,#e6d7ff);border-color:#cba8e1}.sx-side-card h2{color:#542775}.sx-side-card p{color:#634b72}
+.sx-enabled .sx-panel .bv-circle-feature{background:linear-gradient(145deg,#412479,#a33a74);border:1px solid #d6a9de}
+.sx-create-more[open] .sx-create-secondary{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:1100px){body.sx-enabled #app.sx-app .sx-hero{grid-template-columns:1fr 1.1fr;gap:20px;padding:36px 4% 52px}.sx-hero h1{font-size:48px}.sx-hero-room .bv-preview-columns{grid-template-columns:1fr!important}.sx-hero-room .bv-preview-wall{display:none}.sx-hero-room .bv-photo-friends{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
+@media(max-width:760px){
+ body.sx-enabled #app.sx-app .sx-hero{display:flex;flex-direction:column;gap:26px;padding:32px 20px 45px!important;align-items:stretch!important}
+ .sx-hero-room{width:100%;transform:none}.sx-hero-room .bv-preview-columns{grid-template-columns:1fr 1fr!important}.sx-hero-room .bv-preview-wall{display:block}.sx-hero-room .bv-photo-friends{grid-template-columns:repeat(4,minmax(0,1fr))!important}.sx-hero-room>footer{padding:10px;gap:7px}.sx-hero-room>footer :is(a,button){padding:8px;font-size:11px;flex:1;text-align:center}
+ .sx-home-paths{gap:7px;padding:10px}.sx-home-paths a{flex:1 1 45%;min-width:0;font-size:12px;padding:10px 7px}.sx-home-paths a:last-child{flex-basis:100%}
+ .sx-home-soundtrack>header{padding:24px;display:block}.sx-home-soundtrack h2{font-size:29px}.sx-home-soundtrack>header p{max-width:none;margin:18px 0}.sx-home-soundtrack>header .sx-button{width:100%}
+ body.sx-enabled .sx-nav{background:linear-gradient(100deg,#f2defb,#e0edff,#fff0d4)}
+ .sx-together:before{display:none}.sx-mini-player{background:#51258b;border-color:#a379d4}
+}
+@media(prefers-reduced-motion:reduce){.sx-music-ring{animation:none!important}.sx-hero-room{transform:none}}
+@media(forced-colors:active){body.sx-enabled{background:Canvas!important}.sx-home-paths a,.sx-hero-room,.sx-hero-room>header,.sx-hero-room>footer,.sx-home-soundtrack>header,.sx-home-soundtrack,.sx-discover-card,.sx-side-card{background:Canvas!important;color:CanvasText!important;border:1px solid CanvasText}.sx-music-ring{animation:none}.sx-home-soundtrack h2,.sx-home-soundtrack>header p{color:CanvasText}.sx-music-badge{box-shadow:none}}
