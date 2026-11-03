@@ -17,16 +17,18 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-03 | Codex | Add four original photorealistic welcome-page scenes; verify desktop and phone. | agent/photorealistic-scenes-20261103 |
+| — | — | nothing claimed | — |
 
 ## Do not change
 - nothing recorded yet
 
 ## Last handover
+- 2026-11-03 — Codex: four photographic welcome scenes prepared on agent/photorealistic-scenes-20261103 for the existing Ops revision review. No backend or private-media change.
 - 2026-11-02 — GitHub: Merged PR #342: Connection over scrolling: caught-up marker, say bula, break note
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-03 — Codex — Added four original photorealistic Fiji welcome scenes (friends, music, personal space, Talanoa); local lazy-loaded WebP delivery (255 KiB phone / 359 KiB desktop for the four selected images), responsive Talanoa source, truthful generated-scene alt text, explicit offline allowlist and cache update. All five public destinations checked at 1440px and 390px without overflow. Targeted navigation/offline suites: 32/32 pass. Full suite: 527 pass, 14 fail, 4 skipped, identical failure names/counts to unchanged main. Prompts, hashes and source names in docs/welcome-photography*.json. Branch agent/photorealistic-scenes-20261103; publication through the existing Ops review route.
 - 2026-11-03 — claude — `dimau-install.js` is again a byte copy of the Dimau master (dimau-platform-standard `install/`). The Sota glass round buttons from #238 now come from the master's `data-buttons="glass"` option, set on the script tag in `index.html` (`?v=20261103-glass-option-1`). Buttons render the same as before. The install note text now uses the shared `--dimau-app-font` default like every other app (29 Oct change). `tests/sota.test.cjs` and `tests/shadow-glass-controls.test.cjs` expect the attribute. With jsdom: the same 462 pass and the same 4 companion/Connect tests fail as on main.
 - 2026-11-01 — claude — Automatically merged revision #332 after technical checks
 - 2026-11-01 — claude — Restore Sota Kece Plus pill (approved 31 Oct, local pricing); receipts button stays removed (1 replacement(s) in index.html on main)
@@ -42,4 +44,3 @@
 - 2026-10-30 — claude — Dimau Pay: load the widget from a host every app security policy already allows  The Supabase function address was blocked by script-src on the live sites.  Co-Authored-By: Claude Fable 5.1 <noreply@a
 
 _Seeded 2026-11-02 from the Ops Room. From here on, this file is the record for this project._
-
