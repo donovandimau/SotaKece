@@ -1,18 +1,42 @@
-[
-  {
-    "id": "space",
-    "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji community website. One landscape 3:2 photograph, premium natural photography, believable sunlight, fine authentic skin, hair and material textures, real camera colour and depth, contemporary everyday Fiji, candid and unposed. All people fictional adults. No writing, logos, watermark, collage, drawing, CGI, plastic skin, tourist costumes, or beauty retouching. Keep the lower quarter visually calm for a dark gradient and white website caption. Scene: A beautiful real lived-in creative corner in a Fijian home: rattan armchair with an indigo woven cushion, a timber desk with a small open blank notebook and plain headphones, one glass vase with white frangipani, lush green plants by an open louvred window framing a pale turquoise lagoon. Morning light falling across linen and wood, warm ivory, sea green and terracotta details. No people. Tasteful personal room, relaxed and welcoming. Real interior photography 35mm lens. Objects in middle and upper half."
-  },
-  {
-    "id": "friends-youth",
-    "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji social website, aimed at young adult early adopters. One landscape 3:2 photograph, beautiful contemporary natural photography, lifelike skin pores, hair and cloth texture, real camera colour and depth. Every person is a fictional young adult aged 18–25, visibly youthful. Everyday modern Fiji, fresh and relaxed, candid unposed energy, contemporary casual clothes. No older adults, no children, no writing, logos, watermark, collage, drawing, CGI, plastic skin, beauty filter or tourist costumes. Keep the lower quarter visually calm for web captions. Scene: Four young adult Fijian friends aged 18–23 (two indigenous iTaukei Fijian women and one indigenous iTaukei Fijian man, one Indo-Fijian man) laughing and walking together beside a brilliant turquoise lagoon under coconut palms. Youthful natural curly hair, everyday contemporary tees and linen shirts in sea green, pale coral, cream and golden yellow. Sunlit clear water, lush green headland, optimistic spontaneous weekend energy. Medium wide 35mm photo. All four faces in upper-middle with generous margins."
-  },
-  {
-    "id": "music-youth",
-    "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji social website, aimed at young adult early adopters. One landscape 3:2 photograph, beautiful contemporary natural photography, lifelike skin pores, hair and cloth texture, real camera colour and depth. Every person is a fictional young adult aged 18–25, visibly youthful. Everyday modern Fiji, fresh and relaxed, candid unposed energy, contemporary casual clothes. No older adults, no children, no writing, logos, watermark, collage, drawing, CGI, plastic skin, beauty filter or tourist costumes. Keep the lower quarter visually calm for web captions. Scene: Three young adult indigenous iTaukei Fijian friends aged 19–24 sharing an acoustic guitar jam on a simple lived-in timber veranda. Young man with short natural curls in a relaxed navy T-shirt plays a plain acoustic guitar, young woman with natural coily hair in a muted coral tee and young woman in a sage top smiling and singing along. Comfortable youthful casual clothing, greenery outside, warm dappled late afternoon light, tactile wood grain. 50mm medium wide photo, candid small friendship group. Faces all clear in upper-middle."
-  },
-  {
-    "id": "talanoa-youth",
-    "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji social website, aimed at young adult early adopters. One landscape 3:2 photograph, beautiful contemporary natural photography, lifelike skin pores, hair and cloth texture, real camera colour and depth. Every person is a fictional young adult aged 18–25, visibly youthful. Everyday modern Fiji, fresh and relaxed, candid unposed energy, contemporary casual clothes. No older adults, no children, no writing, logos, watermark, collage, drawing, CGI, plastic skin, beauty filter or tourist costumes. Keep the lower quarter visually calm for web captions. Scene: Five young adult Fijian friends aged 18–25 (indigenous iTaukei and Indo-Fijian, women and men) laughing and talking together around a wooden table with iced drinks and sliced papaya on a contemporary everyday coastal home veranda. Young natural curls, relaxed youthful faces, modern casual T-shirts and shirts in cream, coral, indigo and sage. Coconut grove and turquoise ocean beyond. Beautiful late afternoon daylight, lively but believable unposed friendship. Wide 35mm photograph with group clustered on the right half and quiet shaded veranda on the left for website copy. Heads fully inside the frame, no older people, no resort."
+{
+  "originalPrompts": [
+    {
+      "id": "space",
+      "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji community website. One landscape 3:2 photograph, premium natural photography, believable sunlight, fine authentic skin, hair and material textures, real camera colour and depth, contemporary everyday Fiji, candid and unposed. All people fictional adults. No writing, logos, watermark, collage, drawing, CGI, plastic skin, tourist costumes, or beauty retouching. Keep the lower quarter visually calm for a dark gradient and white website caption. Scene: A beautiful real lived-in creative corner in a Fijian home: rattan armchair with an indigo woven cushion, a timber desk with a small open blank notebook and plain headphones, one glass vase with white frangipani, lush green plants by an open louvred window framing a pale turquoise lagoon. Morning light falling across linen and wood, warm ivory, sea green and terracotta details. No people. Tasteful personal room, relaxed and welcoming. Real interior photography 35mm lens. Objects in middle and upper half."
+    },
+    {
+      "id": "friends-youth",
+      "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji social website, aimed at young adult early adopters. One landscape 3:2 photograph, beautiful contemporary natural photography, lifelike skin pores, hair and cloth texture, real camera colour and depth. Every person is a fictional young adult aged 18\u201325, visibly youthful. Everyday modern Fiji, fresh and relaxed, candid unposed energy, contemporary casual clothes. No older adults, no children, no writing, logos, watermark, collage, drawing, CGI, plastic skin, beauty filter or tourist costumes. Keep the lower quarter visually calm for web captions. Scene: Four young adult Fijian friends aged 18\u201323 (two indigenous iTaukei Fijian women and one indigenous iTaukei Fijian man, one Indo-Fijian man) laughing and walking together beside a brilliant turquoise lagoon under coconut palms. Youthful natural curly hair, everyday contemporary tees and linen shirts in sea green, pale coral, cream and golden yellow. Sunlit clear water, lush green headland, optimistic spontaneous weekend energy. Medium wide 35mm photo. All four faces in upper-middle with generous margins."
+    },
+    {
+      "id": "music-youth",
+      "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji social website, aimed at young adult early adopters. One landscape 3:2 photograph, beautiful contemporary natural photography, lifelike skin pores, hair and cloth texture, real camera colour and depth. Every person is a fictional young adult aged 18\u201325, visibly youthful. Everyday modern Fiji, fresh and relaxed, candid unposed energy, contemporary casual clothes. No older adults, no children, no writing, logos, watermark, collage, drawing, CGI, plastic skin, beauty filter or tourist costumes. Keep the lower quarter visually calm for web captions. Scene: Three young adult indigenous iTaukei Fijian friends aged 19\u201324 sharing an acoustic guitar jam on a simple lived-in timber veranda. Young man with short natural curls in a relaxed navy T-shirt plays a plain acoustic guitar, young woman with natural coily hair in a muted coral tee and young woman in a sage top smiling and singing along. Comfortable youthful casual clothing, greenery outside, warm dappled late afternoon light, tactile wood grain. 50mm medium wide photo, candid small friendship group. Faces all clear in upper-middle."
+    },
+    {
+      "id": "talanoa-youth",
+      "prompt": "Use case: photorealistic-natural. Asset: original editorial photo for the Sota Kece Fiji social website, aimed at young adult early adopters. One landscape 3:2 photograph, beautiful contemporary natural photography, lifelike skin pores, hair and cloth texture, real camera colour and depth. Every person is a fictional young adult aged 18\u201325, visibly youthful. Everyday modern Fiji, fresh and relaxed, candid unposed energy, contemporary casual clothes. No older adults, no children, no writing, logos, watermark, collage, drawing, CGI, plastic skin, beauty filter or tourist costumes. Keep the lower quarter visually calm for web captions. Scene: Five young adult Fijian friends aged 18\u201325 (indigenous iTaukei and Indo-Fijian, women and men) laughing and talking together around a wooden table with iced drinks and sliced papaya on a contemporary everyday coastal home veranda. Young natural curls, relaxed youthful faces, modern casual T-shirts and shirts in cream, coral, indigo and sage. Coconut grove and turquoise ocean beyond. Beautiful late afternoon daylight, lively but believable unposed friendship. Wide 35mm photograph with group clustered on the right half and quiet shaded veranda on the left for website copy. Heads fully inside the frame, no older people, no resort."
+    }
+  ],
+  "refinement": {
+    "tool": "OpenAI built-in image_gen edit",
+    "prompt": "Use case: lighting-weather. Edit this existing Sota Kece editorial photograph to brighten its colourful tropical vibes. Preserve the same exact people and their youthful 18\u201325 appearance (where people are present), facial identities, expressions, clothing, poses, framing, objects, architecture and composition. Make the light feel like fresh beautiful tropical daytime: lift exposure and shadow detail, vibrant luminous turquoise water and clear sky where visible, rich fresh emerald foliage, cleaner warm sunshine, more lively coral, yellow and sea-green clothing accents already present. Bright, happy, colourful, welcoming and premium photorealistic camera image. Preserve believable natural brown skin tones, real texture, realistic white balance and highlight detail. Remove any murky or dark brown colour cast. No heavy vignette, no dark gradient baked into the photo, no neon or oversaturation, no plastic skin, no new people, no added text, no logos. This is a colour and lighting refinement of the reference, not a new scene.",
+    "sources": [
+      {
+        "id": "friends-vivid",
+        "generatedSource": "exec-351dae7e-6805-4c5d-ba75-02658ed4bb2c.png"
+      },
+      {
+        "id": "music-vivid",
+        "generatedSource": "exec-b87fa5e8-939b-40f3-aa01-57411977039b.png"
+      },
+      {
+        "id": "space-vivid",
+        "generatedSource": "exec-51e09eeb-7f2c-44b1-ad9d-637e5ef379c2.png"
+      },
+      {
+        "id": "talanoa-vivid",
+        "generatedSource": "exec-4bb245ad-2594-4421-bf65-5401c0b0d178.png"
+      }
+    ]
   }
-]
+}
