@@ -37,8 +37,9 @@
   var APP = (me && me.dataset.app) || 'dimau';
   var LABEL = (me && me.dataset.label) || document.title || 'this app';
   var SW = (me && me.dataset.sw) || '';
-  // Only a path names a worker this script owns; anything else means the site manages its own.
-  var OWN = SW.charAt(0) === '/' && SW.charAt(1) !== '/';
+  // Only a path on this site names a worker this script owns; anything else means the site manages its own.
+  // "//host/x.js" and "/\host/x.js" both point at another host.
+  var OWN = /^\/(?![\/\\])/.test(SW);
   var SHARED = !!(me && me.hasAttribute('data-shared-origin'));
   var MODE = (me && me.dataset.prompt) === 'manual' ? 'manual' : 'auto';
   var NOTIFY = !(me && me.dataset.notify === 'off');
