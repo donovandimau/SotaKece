@@ -17,7 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| — | — | nothing claimed | — |
+| 2026-11-03 | Codex | Add four original photorealistic welcome-page scenes; verify desktop and phone. | agent/photorealistic-scenes-20261103 |
 
 ## Do not change
 - nothing recorded yet
@@ -42,3 +42,4 @@
 - 2026-10-30 — claude — Dimau Pay: load the widget from a host every app security policy already allows  The Supabase function address was blocked by script-src on the live sites.  Co-Authored-By: Claude Fable 5.1 <noreply@a
 
 _Seeded 2026-11-02 from the Ops Room. From here on, this file is the record for this project._
+
