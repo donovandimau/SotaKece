@@ -1,0 +1,48 @@
+{
+  "tool": "OpenAI built-in image_gen",
+  "useCase": "photorealistic-natural",
+  "fictionalScenes": true,
+  "optimization": "Proportional resize and WebP encoding only; no retouching.",
+  "assets": [
+    {
+      "path": "assets/welcome-20261103/friends-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 69518,
+      "sha256": "7d2700a0d133e5dfd685cd3e7125101c04a1d82c075babcf9465dbd1c4357da5",
+      "generatedSource": "exec-2f783dd7-6511-4c23-91bf-554f1d5a3c98.png"
+    },
+    {
+      "path": "assets/welcome-20261103/music-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 64550,
+      "sha256": "88cd0f11182ad0e4e53449c62678512ac397deca46e8cf39d67a8973f62318aa",
+      "generatedSource": "exec-549efa4e-d14b-462d-9e8c-e539b9751dc4.png"
+    },
+    {
+      "path": "assets/welcome-20261103/space-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 55542,
+      "sha256": "a1dfc70a52fc63e92c323fb947e6bab31bc63a743ca273fb881fa1e1f33f3e12",
+      "generatedSource": "exec-0fb457a9-518f-4996-888a-0d9da62b1af0.png"
+    },
+    {
+      "path": "assets/welcome-20261103/talanoa-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 69832,
+      "sha256": "b4a452843c83fabd74153c962f2ac3e2667f9b906fd83b6c71ecfb06572689c2",
+      "generatedSource": "exec-f4e04ee4-e9f7-4970-a051-f8bf1818a3e8.png"
+    },
+    {
+      "path": "assets/welcome-20261103/talanoa-1440.webp",
+      "width": 1440,
+      "height": 960,
+      "bytes": 177842,
+      "sha256": "efd86879bf52592d04d257da6b8ff10e3d2c19dc7b9a9e076844a09fde93bb7f",
+      "generatedSource": "exec-f4e04ee4-e9f7-4970-a051-f8bf1818a3e8.png"
+    }
+  ]
+}

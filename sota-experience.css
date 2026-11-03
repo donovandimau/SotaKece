@@ -198,3 +198,25 @@ body.sx-enabled #app.sx-app .sx-account-actions button{min-height:44px}
 .sx-create-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:8px}
 .sx-hero small a.sx-inline{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:none;margin-left:0}
 @media(max-width:760px){.sx-create-secondary{grid-template-columns:1fr}}
+
+/* Original photographic scenes; the existing destinations and colours stay familiar. */
+.sx-discover-card{display:block;padding:25px;isolation:isolate}
+.sx-discover-card .sx-card-photo{display:block;width:calc(100% + 50px);max-width:none;height:auto;aspect-ratio:3/2;object-fit:cover;margin:-25px -25px 22px;background:#284b45}
+.sx-discover-card>svg{position:absolute;top:14px;right:14px;width:34px;height:34px;padding:8px;border-radius:50%;background:#fff9e9;color:#234c45;margin:0;box-shadow:0 2px 10px #173e4b22}
+.sx-discover-card:after{display:none}
+.sx-discover-card h3{margin-bottom:22px}
+.sx-together{min-height:360px;padding:55px 5%;text-align:left;isolation:isolate}
+.sx-together-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 42%;z-index:-2}
+.sx-together:before{background:linear-gradient(90deg,#112f31f5 0%,#112f31d9 30%,#112f3166 58%,#112f3110 100%);opacity:1;z-index:-1}
+.sx-together h2{max-width:48%;text-shadow:0 1px 4px #102c2d66}
+.sx-together .sx-eyebrow{color:#fff8e7}
+@media(max-width:1100px){.sx-discover-card{padding:22px}.sx-discover-card .sx-card-photo{width:calc(100% + 44px);margin:-22px -22px 22px}.sx-together h2{font-size:31px}}
+@media(max-width:760px){
+ .sx-discover-card{display:block;min-height:0;padding:22px}
+ .sx-discover-card>svg{position:absolute;top:14px;right:14px;width:34px;height:34px}
+ .sx-discover-card small{font-size:9px}.sx-discover-card>span{font-size:12px}.sx-discover-card h3{font-size:27px;margin:12px 0 18px}
+ .sx-together{min-height:0;padding:0 20px 30px;text-align:left}
+ .sx-together-photo{position:static;display:block;width:calc(100% + 40px);max-width:none;height:auto;aspect-ratio:3/2;margin:0 -20px 26px}
+ .sx-together:before{display:none}.sx-together h2{max-width:none;font-size:29px}
+}
+@media(forced-colors:active){.sx-discover-card,.sx-together{border:1px solid CanvasText}.sx-together-photo{display:none}.sx-together:before{display:none}}
