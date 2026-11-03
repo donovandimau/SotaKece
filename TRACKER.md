@@ -17,7 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| — | — | nothing claimed | — |
+| 2026-11-03 | Claude | Install kit: back to an exact copy of the Dimau master, keeping the Sota glass buttons through its new `data-buttons="glass"` option | `claude/dimau-install-kit` |
 
 ## Do not change
 - nothing recorded yet
