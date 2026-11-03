@@ -14,6 +14,7 @@ function harness(t,hash=''){
 }
 browserTest('the five destinations preserve original controls, drafts and DOM owners',t=>{
  const h=harness(t),music=h.get('#sota-music-home'),canvas=h.get('#world-canvas'),account=h.get('#bv-entry'),mate=h.get('#mate');h.mount();
+ assert.equal(h.w.document.activeElement,h.get('#sx-welcome-title'),'initial inline dialog must leave visitors at the welcome heading');
  assert.deepEqual([...h.app.querySelectorAll('.sx-nav a')].map(n=>n.textContent.trim()),['Home','People','Talanoa','Music','My space']);
  for(const page of ['music','people','talanoa','profile','home'])h.get(`[data-sx-route="${page}"]`).click();
  assert.equal(h.get('#sota-music-home'),music);assert.equal(h.get('#world-canvas'),canvas);assert.equal(h.get('#bv-entry'),account);assert.equal(h.get('#mate'),mate);assert.equal(mate.value,'my_mate');assert.equal(h.get('#track-search').value,'keep my song');assert.equal(h.calls.pause,0);assert.equal(h.calls.playlist,1);

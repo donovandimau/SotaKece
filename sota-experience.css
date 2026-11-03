@@ -236,7 +236,7 @@ body.sx-enabled #app.sx-app .sx-primary{background:#ffd447;border-color:#ffd447;
 @keyframes sx-flag-turn{to{transform:rotate(360deg)}}
 body.sx-enabled #app.sx-app .sx-hero{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:30px;padding:44px 4% 56px;min-height:680px;overflow:hidden;align-items:center}
 .sx-hero::before{background:linear-gradient(90deg,#341139a8 0%,#3f1a3638 56%,#18233b12 100%)}
-.sx-hero-copy{width:100%;max-width:none}.sx-hero h1{font-size:clamp(44px,4.7vw,76px);text-shadow:0 3px 14px #34204066}.sx-hero h1 em{color:#ffd447}
+.sx-hero-copy{width:100%;max-width:none}.sx-hero h1{font-size:clamp(44px,4.7vw,76px);text-shadow:0 3px 14px #34204066}.sx-hero h1 em{color:#ffd447}.sx-hero h1:focus{outline:none}
 .sx-hero-room{min-width:0;border:1px solid #fff8;border-radius:20px;background:#fff8;box-shadow:0 22px 55px #2012374d;backdrop-filter:blur(16px);color:#302343;transform:rotate(1deg);overflow:hidden}
 .sx-hero-room>header,.sx-hero-room>footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;background:#fff2e3dc;font-size:12px;font-weight:900}
 .sx-hero-room>header small{font-size:9px;letter-spacing:1px}.sx-hero-room>header span{letter-spacing:1px}

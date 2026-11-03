@@ -87,7 +87,7 @@
     });
     listen(s,root,'hashchange',()=>{const page=fromHash(root.location.hash);if(page)show(page);});
     listen(s,root,'popstate',()=>{const page=fromHash(root.location.hash);if(page)show(page);});
-    show(fromHash(root.location.hash)||'home',{focus:false});
+    show(fromHash(root.location.hash)||'home');
     // Opening the playlist from an existing control must also reveal its page.
     const host=app.querySelector('[data-music-playlist-host]');if(host)listen(s,host,'sota-playlist-inline-open',()=>{if(s.page!=='music'&&s.page!=='home'){root.history.pushState(null,'','#music');show('music');}});
     miniPlayer(s);
