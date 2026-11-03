@@ -14,6 +14,7 @@ function harness(t,hash=''){
 }
 browserTest('the five destinations preserve original controls, drafts and DOM owners',t=>{
  const h=harness(t),music=h.get('#sota-music-home'),canvas=h.get('#world-canvas'),account=h.get('#bv-entry'),mate=h.get('#mate');h.mount();
+ assert.equal(h.w.document.activeElement,h.get('#sx-welcome-title'),'initial inline dialog must leave visitors at the welcome heading');
  assert.deepEqual([...h.app.querySelectorAll('.sx-nav a')].map(n=>n.textContent.trim()),['Home','People','Talanoa','Music','My space']);
  for(const page of ['music','people','talanoa','profile','home'])h.get(`[data-sx-route="${page}"]`).click();
  assert.equal(h.get('#sota-music-home'),music);assert.equal(h.get('#world-canvas'),canvas);assert.equal(h.get('#bv-entry'),account);assert.equal(h.get('#mate'),mate);assert.equal(mate.value,'my_mate');assert.equal(h.get('#track-search').value,'keep my song');assert.equal(h.calls.pause,0);assert.equal(h.calls.playlist,1);
@@ -30,7 +31,26 @@ browserTest('routing uses the existing music owner without autoplay or losing th
  assert.equal(h.calls.playlist,1);assert.equal(h.get('#track-search').value,'new filter');assert.equal(h.calls.pause,0);assert.equal(h.get('[data-music-panel="visualiser"]').hidden,true);assert.equal(h.get('[data-music-panel="playlist"]').hidden,false);
 });
 browserTest('stopping a session removes route listeners',t=>{
- const h=harness(t);h.mount();h.api.stop();h.w.history.replaceState(null,'','#music');h.w.dispatchEvent(new h.w.HashChangeEvent('hashchange'));assert.equal(h.app.dataset.sxPage,'home');assert.equal(h.calls.playlist,0);
+ const h=harness(t);h.mount();h.api.stop();h.w.history.replaceState(null,'','#music');h.w.dispatchEvent(new h.w.HashChangeEvent('hashchange'));assert.equal(h.app.dataset.sxPage,'home');assert.equal(h.calls.playlist,1);
+});
+browserTest('Home and destination pages share the same room and music nodes without restarting playback',t=>{
+ const h=harness(t);h.mount();const room=h.get('.sx-room-example'),music=h.get('#sota-music-home');
+ assert(h.get('[data-sx-room-home]').contains(room));assert(h.get('[data-sx-home-music]').contains(music));
+ h.get('#track-search').value='keep this filter';
+ for(const page of ['profile','music','home','people','home'])h.get(`[data-sx-route="${page}"]`).click();
+ assert.equal(h.app.querySelectorAll('.sx-room-example').length,1);assert.equal(h.app.querySelectorAll('#sota-music-home').length,1);
+ assert(h.get('[data-sx-room-home]').contains(room));assert(h.get('[data-sx-home-music]').contains(music));
+ assert.equal(h.get('#track-search').value,'keep this filter');assert.equal(h.calls.playlist,1);assert.equal(h.calls.pause,0);
+});
+browserTest('native playlist controls opened from Home stay on Home and keep the current player',t=>{
+ const h=harness(t);h.mount();const music=h.get('#sota-music-home');
+ h.get('[data-music-playlist-host]').dispatchEvent(new h.w.CustomEvent('sota-playlist-inline-open',{bubbles:true}));
+ assert.equal(h.app.dataset.sxPage,'home');assert.equal(h.get('#sota-music-home'),music);assert.equal(h.calls.playlist,1);
+});
+browserTest('Home exposes the selected playlist instead of the legacy gallery-only music view',t=>{
+ const h=harness(t);const style=h.w.document.createElement('style');style.textContent=source('front-pages.css');h.w.document.head.append(style);h.mount();
+ assert.notEqual(h.w.getComputedStyle(h.get('[data-music-panel="playlist"]')).display,'none');
+ assert.equal(h.w.getComputedStyle(h.get('[data-music-panel="visualiser"]')).display,'none');
 });
 browserTest('signed-in navigation dispatches the existing views and retains wallet controls',t=>{
  const h=harness(t);h.app.innerHTML='<header class="top"><button id="wallet" class="luvchip">Wallet</button></header><main id="view"><input value="keep my draft"></main><nav class="bottom"></nav>';const wallet=h.get('#wallet');h.api.mountMember(h.app,{user:{id:'test'},me:{display_name:'A < B',handle:'example'},tab:'pulse',pending:[1]});

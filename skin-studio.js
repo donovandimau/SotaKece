@@ -20,8 +20,8 @@
     document.querySelector('.bv-mixtape')?.classList.remove('is-playing');
   }
   function picked() {
-    try { return skins.normalize(JSON.parse(localStorage.getItem('bv-picked-skin')||'{"id":"midnight"}')); }
-    catch (_) { return skins.normalize({id:'midnight'}); }
+    try { return skins.normalize(JSON.parse(localStorage.getItem('bv-picked-skin')||'{"id":"hibiscus"}')); }
+    catch (_) { return skins.normalize({id:'hibiscus'}); }
   }
   function remix(settings,id) {
     const oldPreset=skins.presets.find(p=>p.id===settings.id);

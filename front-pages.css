@@ -22,14 +22,14 @@
 #app[data-front-page=home] .lg3d-stage>.sfp-visual-link{z-index:160}
 #app[data-front-page] :is(.sfp-navigation>a,.sfp-back,.sfp-visual-link,.sfp-page-close,.sfp-panel-close):focus-visible{outline:3px solid #00a9cf;outline-offset:4px}
 #app[data-front-page=home] .sfp-visual-link:hover>span{background:#12617c}
-#app[data-front-page=home] #sota-music-home .bv-music-copy>p,
-#app[data-front-page=home] #sota-music-home .bv-music-actions,
-#app[data-front-page=home] #sota-music-home .bv-music-copy>[data-playlist-status],
-#app[data-front-page=home] #sota-music-home .sota-music-view-tabs,
-#app[data-front-page=home] #sota-music-home [data-music-panel=playlist],
-#app[data-front-page=home] #sota-music-home .sk-music-stage-heading,
-#app[data-front-page=home] #sota-music-home .sk-music-stage-footer{display:none!important}
-#app[data-front-page=home] #sota-music-home [data-music-panel=visualiser]{display:block!important}
+#app:not(.sx-app)[data-front-page=home] #sota-music-home .bv-music-copy>p,
+#app:not(.sx-app)[data-front-page=home] #sota-music-home .bv-music-actions,
+#app:not(.sx-app)[data-front-page=home] #sota-music-home .bv-music-copy>[data-playlist-status],
+#app:not(.sx-app)[data-front-page=home] #sota-music-home .sota-music-view-tabs,
+#app:not(.sx-app)[data-front-page=home] #sota-music-home [data-music-panel=playlist],
+#app:not(.sx-app)[data-front-page=home] #sota-music-home .sk-music-stage-heading,
+#app:not(.sx-app)[data-front-page=home] #sota-music-home .sk-music-stage-footer{display:none!important}
+#app:not(.sx-app)[data-front-page=home] #sota-music-home [data-music-panel=visualiser]{display:block!important}
 /* Let the original 3:2 photograph determine the banner height, without cropping. */
 #app.bv-welcome[data-front-page=home] #sota-music-home>.bv-music-feature{display:block;min-height:0;height:auto}
 #app.bv-welcome[data-front-page=home] #sota-music-home .bv-music-feature>img{position:relative;inset:auto;display:block;width:100%;height:auto;object-fit:contain;object-position:center}
