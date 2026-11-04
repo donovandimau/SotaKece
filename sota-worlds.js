@@ -33,9 +33,9 @@
   function destinationCard(key,member=false){const w=worlds[key];return `<${member?'button type="button" data-world-member="'+key+'"':'a href="#'+key+'"'} class="sx-world-card" data-world-tone="${w.tone}"><span class="sx-world-card-art" aria-hidden="true">${symbol(key)}</span><span class="sx-world-card-copy"><small>EXPLORE YOUR WORLD</small><strong>${esc(w.label)}</strong><span>${esc(w.line)}</span><b aria-hidden="true">↗</b></span></${member?'button':'a'}>`;}
   function recommendations(page,member=false){const pages=member?({pulse:['moments','crews','room'],moments:['room','music','friends'],friends:['connections','crews','room'],crews:['circles','music','connections'],circles:['crews','music','friends'],room:['music','friends','moments'],music:['room','crews','moments'],connections:['friends','crews','room']}[page]||['room','music','friends']):({people:['world','talanoa','profile'],talanoa:['people','music','profile'],music:['profile','skins','talanoa'],profile:['skins','music','world'],skins:['profile','music','people'],world:['people','talanoa','profile']}[page]||[]);return `<section class="sx-world-next" aria-label="Keep exploring"><header><div><span class="sx-eyebrow">THERE’S MORE TO YOUR WORLD</span><h2>Where to next?</h2></div><button type="button" data-world-tool="explore">Explore everything <span aria-hidden="true">↗</span></button></header><div>${pages.map(p=>destinationCard(p,member)).join('')}</div></section>`;}
   function directory(s){if(s.directory?.isConnected)return s.directory;const d=root.document.createElement('dialog');d.className='sx-world-directory';d.setAttribute('aria-labelledby','sx-directory-title');const pages=s.member?memberPages:publicPages;d.innerHTML=`<header><div><span class="sx-eyebrow">A WORLD OF POSSIBILITIES</span><h2 id="sx-directory-title">What feels like you today?</h2></div><button type="button" data-world-close aria-label="Close Explore">×</button></header><div class="sx-world-directory-grid">${pages.map(p=>destinationCard(p,s.member)).join('')}</div><footer><button type="button" data-world-tool="studio">Room Studio</button><button type="button" data-world-tool="skins">Browse skins</button><button type="button" data-world-tool="design">Design this page</button><a href="/communications.html?app=sota-kece">Chats & calls ↗</a></footer>`;s.app.append(d);s.directory=d;d.addEventListener('close',()=>s.returnFocus?.isConnected&&s.returnFocus.focus({preventScroll:true}));return d;}
-  function stop(){if(!session)return;session.remove.forEach(fn=>fn());session.directory?.remove();session=null;}
+  function stop(){if(!session)return;const visual=session.app.querySelector('[data-world-home-visual] dimau-music-visualiser'),player=root.document?.querySelector('#sk-music-playlist');if(visual&&player){visual.removeAttribute('compact');move(visual,player.querySelector('[data-world-inline-visual]')||player);}session.remove.forEach(fn=>fn());session.directory?.remove();session=null;}
   function enhanceMusic(){
-    const doc=root.document,player=doc?.querySelector('#sk-music-playlist');if(!player)return;
+    const doc=root.document;let player=doc?.querySelector('#sk-music-playlist');if(!player){root.SotaPlaylist?.prepareVisual?.();player=doc?.querySelector('#sk-music-playlist');}if(!player)return;
     let now=player.querySelector('.sx-player-now');
     if(!now){now=doc.createElement('div');now.className='sx-player-now';now.setAttribute('aria-label','Now playing');player.querySelector('.sk-playlist-head')?.after(now);for(const n of [...player.children])if(n.matches('.sk-playlist-hero,audio,.sk-playlist-transport,.sk-deck,.sk-playlist-status')||n.tagName==='BUTTON')move(n,now);}
     let library=player.querySelector('.sx-player-library');
@@ -47,8 +47,11 @@
     if(!region.querySelector('[data-world-inline-visual]')){const header=doc.createElement('header');header.innerHTML='<span class="sx-eyebrow">MAKE YOUR MUSIC MOVE</span><h3>Music visuals</h3><p>Choose a visual and colour. Turn it up, or go fullscreen.</p>';const host=doc.createElement('div');host.setAttribute('data-world-inline-visual','');region.prepend(header);region.append(host);}
     const section=doc.querySelector('#sota-music-home'),panel=section?.querySelector('[data-music-panel="visualiser"]');
     let stage=panel?.querySelector('[data-world-visual-stage]');if(panel&&!stage){stage=doc.createElement('div');stage.setAttribute('data-world-visual-stage','');stage.className='sx-visual-studio';stage.innerHTML='<header><span class="sx-eyebrow">YOUR SOUND, YOUR WAY</span><h2>A whole different atmosphere.</h2><p>Four visual styles. Five colour moods. One soundtrack.</p><button type="button" data-world-tool="playlist">Back to player & library ↗</button></header>';panel.append(stage);}
-    const visual=player.querySelector('dimau-music-visualiser')||stage?.querySelector('dimau-music-visualiser');if(!visual)return;
-    const target=section?.dataset.activeMusicView==='visualiser'&&stage?stage:region.querySelector('[data-world-inline-visual]');move(visual,target);visual.wake?.();
+    const homeHost=doc.querySelector('[data-world-home-visual]');
+    const visual=player.querySelector('dimau-music-visualiser')||stage?.querySelector('dimau-music-visualiser')||homeHost?.querySelector('dimau-music-visualiser');if(!visual)return;
+    const atHome=!!homeHost&&section?.closest('.sx-app')?.dataset.sxPage==='home';
+    if(atHome)visual.setAttribute('compact','');else visual.removeAttribute('compact');
+    const target=atHome?homeHost:section?.dataset.activeMusicView==='visualiser'&&stage?stage:region.querySelector('[data-world-inline-visual]');move(visual,target);visual.wake?.();
     const oldStage=panel?.querySelector('.sk-music-stage');if(oldStage)oldStage.hidden=true;
     for(const [key,label] of [['playlist','Player & library'],['visualiser','Music visuals']]){const tab=section?.querySelector(`[data-music-view="${key}"]`);if(tab)tab.textContent=label;}
     const close=player.querySelector('.sk-playlist-close');if(close&&player.classList.contains('sk-playlist-inline'))close.hidden=true;
@@ -75,7 +78,7 @@
     const rail=app.querySelector('.sx-rail');if(rail){const links=root.document.createElement('nav');links.className='sx-world-rail-links';links.setAttribute('aria-label','Create and explore');links.innerHTML=`<span>MAKE IT YOURS</span><button type="button" data-world-tool="studio">Room Studio <i aria-hidden="true">↗</i></button><button type="button" data-world-tool="skins">Skins & collections <i aria-hidden="true">↗</i></button><button type="button" data-world-tool="explore">Explore every world <i aria-hidden="true">✦</i></button><a href="/communications.html?app=sota-kece">Chats & calls <i aria-hidden="true">↗</i></a>`;rail.querySelector('.sx-nav')?.after(links);}
     function update(page){if(!worlds[page])return;s.page=page;app.dataset.worldPage=page;const w=worlds[page];app.querySelectorAll('[data-world-label]').forEach(n=>n.textContent=w.label);if(!heading)return;heading.querySelector('[data-world-label]').textContent=w.label;heading.querySelector('h1').textContent=w.title;heading.querySelector('.sx-world-hero').dataset.worldTone=w.tone;heading.querySelector('[data-world-description]').textContent=w.line;heading.querySelector('[data-world-actions]').innerHTML=action(w);heading.querySelector('.sx-world-hero-photo').innerHTML=heroVisual(w,page);}
     update(s.page);enhanceMusic();
-    on(root,'sota-front-page-change',event=>{if(!member)update(event.detail?.view);});
+    on(root,'sota-front-page-change',event=>{if(!member)update(event.detail?.view);enhanceMusic();});
     on(root.document,'sota-music-home-prepare',()=>enhanceMusic());
     on(root.document,'sota-music-home-change',()=>enhanceMusic());
     on(app,'click',event=>{
@@ -99,3 +102,4 @@
   }
   return {mount,stop,enhanceMusic,memberRouteFromHash,worlds};
 });
+

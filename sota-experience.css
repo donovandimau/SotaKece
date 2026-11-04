@@ -315,3 +315,29 @@ body.sx-enabled .sx-top .bw-pill{min-height:44px!important}
 .sx-hero-social{display:block;width:100%;margin:22px 0 0;border:1px solid #fff6;border-radius:14px;overflow:hidden;box-shadow:0 8px 26px #25103233;background:#593a40}
 .sx-hero-social>img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain}
 @media(max-width:760px){.sx-hero-social{margin-top:20px;border-radius:12px}}
+
+
+/* Feature photographs carry their headings; music stays behind an explicit action. */
+.sx-discover-card.sx-photo-card{display:flex;flex-direction:column;justify-content:flex-end;min-height:310px;padding:26px;isolation:isolate;color:#fff!important;background:#30263a!important;border:1px solid #ffffff80;box-shadow:0 8px 24px #3e235326;transition:box-shadow .2s,border-color .2s,transform .2s}
+.sx-discover-card.sx-photo-card>.sx-card-photo{position:absolute;inset:0;z-index:-2;display:block;width:100%;height:100%;max-width:none;aspect-ratio:auto;object-fit:cover;object-position:center;margin:0}
+.sx-discover-card.sx-photo-card:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#1710200a 0%,#17102024 25%,#171020bf 67%,#171020ed 100%);pointer-events:none}
+.sx-discover-card.sx-photo-card>svg{position:absolute;top:16px;right:16px;width:40px;height:40px;margin:0;padding:9px;background:#ffffffdc;color:#38204d;border:1px solid #fff9;border-radius:12px}
+body.sx-enabled #app.sx-app .sx-photo-card h3{color:#fff!important;font-size:29px;line-height:1.08;margin:12px 0 18px;text-shadow:0 2px 10px #170e26b3;transition:color .2s,text-shadow .2s}
+.sx-photo-card small,.sx-photo-card>span{color:#fff!important;text-shadow:0 1px 5px #171020}
+.sx-photo-card:is(:hover,:focus-visible,:active){border-color:#c8f5ff;box-shadow:0 0 0 2px #9ce9ff70,0 0 24px #b775ff6b,0 12px 32px #3e235340}
+body.sx-enabled #app.sx-app .sx-photo-card:is(:hover,:focus-visible,:active) h3{color:#fff6c7!important;text-shadow:0 0 7px #fff2a8,0 0 18px #b4efffbd,0 2px 10px #171020}
+.sx-photo-teaser{position:relative;isolation:isolate;min-height:340px;background:#342644}
+.sx-photo-teaser>.sx-soundtrack-photo{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 44%;pointer-events:none}
+.sx-photo-teaser:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#24152aeb 0%,#24152ac9 40%,#24152a4d 100%);pointer-events:none}
+.sx-home-soundtrack.sx-photo-teaser>header{position:relative;min-height:340px;background:transparent;align-content:center}
+.sx-photo-teaser h2{color:white!important;text-shadow:0 2px 10px #171020;transition:color .2s,text-shadow .2s}
+.sx-photo-teaser:is(:hover,:focus-within) h2{color:#fff6c7!important;text-shadow:0 0 8px #fff2a8,0 0 20px #b4efffbd,0 2px 10px #171020}
+@media(max-width:760px){.sx-discover-card.sx-photo-card{min-height:270px;padding:24px}.sx-photo-card.sx-discover-people>.sx-card-photo{object-position:center 40%}.sx-home-soundtrack.sx-photo-teaser>header{min-height:365px;padding:28px 24px}.sx-photo-teaser:before{background:linear-gradient(180deg,#24152a82,#24152ade)}.sx-photo-teaser>.sx-soundtrack-photo{object-position:center}.sx-photo-teaser h2{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.sx-photo-card,.sx-photo-card h3,.sx-photo-teaser h2{transition:none!important}}
+@media(forced-colors:active){.sx-photo-card>.sx-card-photo,.sx-photo-teaser>.sx-soundtrack-photo,.sx-photo-card:before,.sx-photo-teaser:before{display:none!important}.sx-discover-card.sx-photo-card,.sx-home-soundtrack.sx-photo-teaser{background:Canvas!important;border:1px solid CanvasText!important;color:CanvasText!important;box-shadow:none!important}.sx-photo-card h3,.sx-photo-card small,.sx-photo-card>span,.sx-photo-teaser h2{color:CanvasText!important;text-shadow:none!important}}
+
+.sx-home-visuals{position:relative;padding:20px;background:#efe3ff}.sx-home-visuals>dimau-music-visualiser{display:block;margin:0}
+@media(max-width:760px){.sx-home-visuals{padding:14px}}
+
+.sx-photo-teaser>.sx-soundtrack-photo{height:340px;inset:0 0 auto}
+@media(max-width:760px){.sx-photo-teaser>.sx-soundtrack-photo{height:365px}}

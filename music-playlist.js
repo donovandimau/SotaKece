@@ -181,6 +181,7 @@ hideInline();
 if(!dialog)create();if(dialog.open)return;
 focusBefore=root.document.activeElement;dialog.showModal();dialog.querySelector('button').focus();sync();load();
 }
+function prepareVisual(){if(!dialog)create();return audio;}
 function mount(target,options={}){
 beforePlay=options.beforePlay||beforePlay;
 target.querySelectorAll('[data-playlist-open]:not([data-playlist-bound])').forEach(b=>{
@@ -190,5 +191,6 @@ b.dataset.playlistBound='true';b.setAttribute('aria-haspopup','dialog');b.setAtt
 // Shared song / music links open the player; the add-on picks the song.
 if(root.location&&/[?&](?:song|music)=/.test(root.location.search||''))root.addEventListener?.('load',()=>root.setTimeout(open,600),{once:true});
 if(root.document)root.document.addEventListener('play',event=>{if(event.target.tagName==='AUDIO'&&event.target!==audio)pause();},true);
-return {validateCatalog,mount,open,pause,extend,showInline,hideInline,detachInline:hideInline,isInline:()=>!!inlineHost&&!!dialog?.open&&inlineHost.isConnected};
+return {validateCatalog,mount,open,pause,extend,showInline,hideInline,prepareVisual,detachInline:hideInline,isInline:()=>!!inlineHost&&!!dialog?.open&&inlineHost.isConnected};
 });
+
