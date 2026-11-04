@@ -101,7 +101,7 @@ let disposed=false;const entry={control,dispose(){if(disposed)return;disposed=tr
 }
 function placeLauncher(){
 if(!launcher||!root.document?.body)return;
-const target=app?.querySelector('.sfp-navigation')||app?.querySelector('header.top')||(viewPage()==='communications'?root.document.querySelector('body>header.masthead')||app?.querySelector('.intro'):null);
+const target=app?.querySelector('.sfp-navigation')||app?.querySelector('header.top')||(viewPage()==='communications'?root.document.querySelector('body>header.masthead')||root.document.querySelector('.cr-lobby-footer')||app?.querySelector('.intro'):null);
 launcher.classList.toggle('ssd-hosted-launcher',!!target);(target||root.document.body).append(launcher);
 }
 function setMode(value){mode=value==='mix'?'mix':'one';if(!editor)return;editor.dataset.designMode=mode;editor.querySelectorAll('[data-ssd-mode]').forEach(b=>{const selected=b.dataset.ssdMode===mode;b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1;});editor.querySelector('#ssd-one-panel').hidden=mode!=='one';editor.querySelector('#ssd-mix-panel').hidden=mode!=='mix';editor.querySelector('.ssd-save').hidden=mode!=='mix';editor.querySelector('.ssd-cancel').textContent=mode==='one'?'Close':'Cancel';}

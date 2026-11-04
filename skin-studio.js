@@ -279,6 +279,7 @@
   function frontAvatar(label) { return originalCrop(121,951,215,215,label); }
   async function shareApp(copyOnly=false) {
     const url='https://sotakece.com/';
+    if(!copyOnly&&typeof window==='object'&&window.SotaShare){const kind=await window.SotaShare.share({title:'Sota Kece',text:'Join me on Sota Kece for friends, music and talanoa.',url});return {kind,message:kind==='cancelled'?'Sharing cancelled.':kind==='shared'?'Sharing options opened.':'Choose how to send your invitation.'};}
     if(!copyOnly&&typeof navigator.share==='function'){
       try{await navigator.share({title:'Sota Kece',text:'Join me on Sota Kece for friends, music and talanoa.',url});return {kind:'shared',message:'Sharing options opened.'};}
       catch(error){if(error?.name==='AbortError')return {kind:'cancelled',message:'Sharing cancelled.'};}

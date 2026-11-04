@@ -1,11 +1,11 @@
 /* Discover the existing Sota worlds. Content, media, accounts and saved designs keep their owners. */
 (function(root,factory){const api=factory(root);if(typeof module==='object'&&module.exports)module.exports=api;else root.SotaWorlds=api;})(typeof globalThis==='object'?globalThis:this,function(root){
   'use strict';
-  const photos={music:'/assets/welcome-20261103/music-natural-768.webp',space:'/assets/welcome-20261103/space-together-natural-768.webp',talanoa:'/assets/welcome-20261103/talanoa-natural-768.webp'};
+  const photos={music:'/assets/welcome-20261103/music-natural-768.webp',space:'/assets/welcome-20261103/space-together-natural-768.webp'};
   const worlds={
     home:{label:'Home',title:'A little closer to your people.',line:'Your people, music and space, together.',tone:'sun',photo:null},
     people:{label:'People',title:'Good people. Great connections.',line:'Find a familiar face. Bring your friends. See your world grow.',tone:'rose',photo:null,action:'Find a mate',focus:'#bv-find-mate,#s-q'},
-    talanoa:{label:'Talanoa',title:'Pull up a seat. Stay a while.',line:'Your stories, your circles and a little time together.',tone:'coral',photo:photos.talanoa,action:'Explore a circle',tool:'circle'},
+    talanoa:{label:'Talanoa',title:'Pull up a seat. Stay a while.',line:'Your stories, your circles and a little time together.',tone:'coral',photo:null,action:'Explore a circle',tool:'circle'},
     music:{label:'Music',title:'Your music. In full colour.',line:'Choose your soundtrack, remix the visuals and make the moment yours.',tone:'violet',photo:photos.music,action:'Choose music visuals',tool:'visuals'},
     profile:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio'},
     skins:{label:'Skins & Room Studio',title:'Your space. Your choice.',line:'Browse colours, artwork and layouts, or create your own.',tone:'sun',photo:null,action:'Browse every skin',tool:'skins'},
@@ -14,8 +14,8 @@
     moments:{label:'Moments',title:'Little moments. Yours to keep.',line:'The good days, everyday stories and memories worth sharing.',tone:'sun',photo:null,action:'Share a moment',focus:'#m-body'},
     friends:{label:'Friends',title:'Good people. Great connections.',line:'Keep your circle close. Find a mate, visit a room and catch up.',tone:'rose',photo:null,action:'Find a friend',focus:'#s-q'},
     room:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio'},
-    crews:{label:'Your Koro',title:'Your people. Your Koro.',line:'Private groups for the people you want to bring together.',tone:'coral',photo:photos.talanoa,action:'Start a Koro',focus:'#koro-create input'},
-    circles:{label:'Talanoa circles',title:'A place for every voice.',line:'Familiar voices, fresh stories and space for your circle.',tone:'coral',photo:photos.talanoa,action:'Explore your circles',focus:'#kc-retry,.kava-room button'},
+    crews:{label:'Your Koro',title:'Your people. Your Koro.',line:'Private groups for the people you want to bring together.',tone:'coral',photo:null,action:'Start a Koro',focus:'#koro-create input'},
+    circles:{label:'Talanoa circles',title:'A place for every voice.',line:'Familiar voices, fresh stories and space for your circle.',tone:'coral',photo:null,action:'Explore your circles',focus:'#kc-retry,.kava-room button'},
     connections:{label:'Your connections',title:'Every connection has a story.',line:'Discover the friendships and Koro that make up your world.',tone:'lime',photo:null,action:'Explore the map',focus:'#sc-search,.sc-map,#sota-connections'}
   };
   const publicPages=['home','people','talanoa','music','profile','skins','world'];
@@ -39,7 +39,7 @@
     let now=player.querySelector('.sx-player-now');
     if(!now){now=doc.createElement('div');now.className='sx-player-now';now.setAttribute('aria-label','Now playing');player.querySelector('.sk-playlist-head')?.after(now);for(const n of [...player.children])if(n.matches('.sk-playlist-hero,audio,.sk-playlist-transport,.sk-deck,.sk-playlist-status')||n.tagName==='BUTTON')move(n,now);}
     let library=player.querySelector('.sx-player-library');
-    if(!library){library=doc.createElement('section');library.className='sx-player-library';library.setAttribute('aria-label','Music library');player.append(library);for(const n of [...player.children])if(n.matches('.sk-lib-host,.sk-playlist-search,.sk-playlist-queue,.sk-playlist-songs'))move(n,library);}
+    if(!library){library=doc.createElement('details');library.className='sx-player-library';library.setAttribute('aria-label','Music library');const summary=doc.createElement('summary');summary.innerHTML='<span class="sx-library-symbol" aria-hidden="true">'+symbol('music')+'</span><span><strong><span class="sx-library-closed-label">Browse music</span><span class="sx-library-open-label">Hide music library</span></strong><small>Island Mix, your playlists and music from your device</small></span><span class="sx-library-chevron" aria-hidden="true">⌄</span>';library.append(summary);player.append(library);for(const n of [...player.children])if(n.matches('.sk-lib-host,.sk-playlist-search,.sk-playlist-queue,.sk-playlist-songs'))move(n,library);}
     let region=player.querySelector('.sx-music-visuals');
     if(region?.tagName==='DETAILS'){const old=region;region=doc.createElement('section');region.className=old.className;for(const n of [...old.children])if(n.tagName!=='SUMMARY')region.append(n);old.replaceWith(region);}
     if(!region){region=doc.createElement('section');region.className='sx-music-visuals';now.after(region);}
@@ -92,7 +92,7 @@
       if(tool==='design'){root.SotaSpaceDesign?.open(member&&s.page==='room'?'profile':s.page);return;}
       if(tool==='studio'||tool==='skins'){root.BulaSkinStudio?.open(null,tool==='skins'?'All':undefined);return;}
       if(tool==='visuals'||tool==='playlist'){
-        root.SotaMusicHome?.choose('playlist');enhanceMusic();const target=tool==='visuals'?root.document.querySelector('.sx-music-visuals'):root.document.querySelector('#sk-playlist-filter');target?.scrollIntoView?.({block:'center',behavior:'auto'});const focus=tool==='visuals'?target?.querySelector('dimau-music-visualiser')?.shadowRoot?.querySelector('.mode'):target;focus?.focus?.({preventScroll:true});
+        root.SotaMusicHome?.choose('playlist');enhanceMusic();if(tool==='playlist'){const library=root.document.querySelector('.sx-player-library');if(library)library.open=true;}const target=tool==='visuals'?root.document.querySelector('.sx-music-visuals'):root.document.querySelector('#sk-playlist-filter');target?.scrollIntoView?.({block:'center',behavior:'auto'});const focus=tool==='visuals'?target?.querySelector('dimau-music-visualiser')?.shadowRoot?.querySelector('.mode'):target;focus?.focus?.({preventScroll:true});
       }
     });
     return ()=>{if(session===s)stop();};

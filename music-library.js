@@ -81,7 +81,7 @@ const main=el('div','','sk-deck-main');
 const shuffleBtn=ib('sk-deck-mode','Shuffle',ICON.shuffle,()=>{prefs.shuffle=!prefs.shuffle;if(prefs.shuffle)shuffled();keep();api.say(prefs.shuffle?'Shuffle on · songs play in a random order.':'Shuffle off · songs play in list order.');});
 const playBtn=ib('sk-deck-play','Play',ICON.play,start);
 const repeatBtn=ib('sk-deck-mode sk-deck-repeat','Repeat',ICON.repeat,()=>{prefs.repeat={off:'all',all:'one',one:'off'}[prefs.repeat];keep();api.say(prefs.repeat==='one'?'Repeat on · this song plays again.':prefs.repeat==='all'?'Repeat on · the list starts again at the end.':'Repeat off.');});
-main.append(shuffleBtn,ib('sk-deck-skip','Previous song',ICON.prev,back),playBtn,ib('sk-deck-skip','Next song',ICON.next,()=>api.move(1)),repeatBtn);
+main.append(ib('sk-deck-skip','Previous song',ICON.prev,back),playBtn,ib('sk-deck-skip','Next song',ICON.next,()=>api.move(1)));
 const extra=el('div','','sk-deck-extra'),sw=el('label','','sk-deck-switch'),auto=el('input');auto.type='checkbox';auto.setAttribute('role','switch');
 auto.addEventListener('change',()=>{prefs.autoplay=auto.checked;keep();api.say(prefs.autoplay?'Auto-play on · the next song starts by itself.':'Auto-play off · music stops after each song.');});
 sw.append(auto,el('span','','sk-deck-knob'),el('span','Auto-play'));
@@ -89,8 +89,10 @@ const sound=el('div','','sk-deck-volume'),vol=el('input');
 const mute=ib('sk-deck-mute','Mute',ICON.vol,()=>{if(prefs.muted||!prefs.volume){prefs.muted=false;if(!prefs.volume)prefs.volume=.6;}else prefs.muted=true;keep();loud();modes();});
 Object.assign(vol,{type:'range',min:'0',max:'100',step:'1',className:'sk-deck-range'});vol.setAttribute('aria-label','Volume');
 vol.addEventListener('input',()=>{prefs.volume=Number(vol.value)/100;prefs.muted=!prefs.volume;keep();loud();modes();});
-sound.append(ib('sk-deck-mute','Share this song',ICON.share,shareSong),mute,vol);
-extra.append(sw,sound);deck.append(time,main,extra);
+sound.append(mute,vol);
+const options=el('div','','sk-deck-options');options.append(shuffleBtn,repeatBtn,sw);
+const share=ib('sk-deck-share','Share this song',ICON.share,shareSong);share.append(el('span','Share music'));
+extra.append(sound,share);deck.append(time,main,options,extra);
 function loud(){audio.volume=prefs.volume;audio.muted=prefs.muted;}
 function modes(){
 shuffleBtn.setAttribute('aria-pressed',String(prefs.shuffle));label(shuffleBtn,prefs.shuffle?'Shuffle on':'Shuffle off');
@@ -109,7 +111,7 @@ for(const e of ['timeupdate','loadedmetadata','durationchange'])audio.addEventLi
 api.dialog.querySelector('.sk-playlist-transport')?.setAttribute('hidden','');
 audio.controls=false;audio.hidden=true;
 api.dialog.querySelector('.sk-playlist-hero').after(deck);
-if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='stylesheet';l.href='/music-controls.css?v=20261028-library';l.dataset.skDeck='1';doc.head.append(l);}
+if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='stylesheet';l.href='/music-controls.css?v=20261104-player-polish-3';l.dataset.skDeck='1';doc.head.append(l);}
 const session=navigator.mediaSession,set=(a,h)=>{try{session.setActionHandler(a,h);}catch(_){}};
 if(session){set('play',()=>{if(!api.live())start();});set('pause',api.pause);set('previoustrack',back);set('nexttrack',()=>api.move(1));set('seekto',d=>{if(Number.isFinite(d?.seekTime))audio.currentTime=d.seekTime;});}
 loud();modes();tick();
