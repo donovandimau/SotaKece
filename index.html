@@ -1145,11 +1145,8 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/icon-controls.js?v=20261104-premium-worlds-1"></script>
 <script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261031-activity-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script>
-<script src="/dimau-companion.js?v=20261027-ui-clarity-3" data-app="sota-kece" defer></script>
 <link rel="stylesheet" href="/sota-worlds.css?v=20261104-premium-worlds-1">
 <link rel="stylesheet" href="/phone-tidy-20261029.css?v=20261104-premium-worlds-1">
-<script src="/bula-welcome.js?v=20261030" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
-<script src="/bula-top-20261030.js" defer></script>
 <script src="https://fijian-assistant-api.vercel.app/dimau-pay.js" data-product="sotakece-plus-30d" data-pill="Sota Kece Plus · FJ$9.90 / 30 days" data-blurb="Back the build of Fiji’s own social network. Plus perks land first for members; gifts and everything you use today stay free." defer></script>
 <script src="https://fijian-assistant-api.vercel.app/dimau-consistency.js" defer></script>
 </body>

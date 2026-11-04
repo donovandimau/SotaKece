@@ -1,3 +1,7 @@
+## 4 November 2026 — Volau assistant and Bula welcome button taken out
+
+Owner decision (4 Nov): take both assistants out of every app until the new Fijian-speaking, animated Volau is ready. `index.html` no longer loads `dimau-companion.js`, `bula-welcome.js` or `bula-top-20261030.js`; `communications.html` and `tests/chat-preview.html` no longer load `dimau-companion.js`. Visitors no longer see the "Bula! Welcome" button in the top bar. The shared files stay in the repo, so Volau can come back by re-adding the tags. `sw.js` is unchanged. Checks: `node --test tests/*.test.cjs` with jsdom 550 pass, the same 4 companion/Connect failures as main, 4 skipped; Talanoa database checks pass. Draft PR, waiting for owner sign-off.
+
 ## 2 November 2026 — Connection over scrolling
 
 Owner asked for every app's engagement to reward good behaviour rather than copy social-media tricks. Sota Kece already had no algorithmic feed, so this adds three small things that favour real connection and give the feed an end. New `sota-wellbeing.js` + `.css` (remembered on the device only, `sk.well.v1`; the last-seen marker only moves forward; nothing sent anywhere; no streaks, no activity badges, no time counters):
