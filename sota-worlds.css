@@ -186,3 +186,8 @@ body.sx-standalone .sidebar.panel>details>summary{display:flex;align-items:cente
 html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!important;border-color:#dfcfe9!important;color:#432657!important;border-radius:20px!important;min-height:0;padding:22px!important}
 .cr .cr-lobby-art{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 10%,#b55d98,transparent 70%),linear-gradient(140deg,#482568,#713b91);color:#fff4fd}.cr .cr-lobby-art:after{display:none}.cr-call-symbol{display:grid;place-items:center;width:190px;height:190px;border:1px solid #ffffff70;border-radius:40px;background:#ffffff12;transform:rotate(-5deg);margin-bottom:80px}.cr-call-symbol svg{width:100px;height:100px}
 @media(max-width:760px){#app.sx-app .sx-player-library>summary{padding:18px 16px;gap:12px}.sx-player-library summary strong{font-size:15px}.sx-player-library summary small{font-size:10px}#app.sx-app .sx-player-library>:not(summary){margin:0 16px 18px}html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{padding:16px!important}.cr-call-symbol{width:100px;height:100px;border-radius:24px;margin:0 0 70px}.cr-call-symbol svg{width:55px;height:55px}}
+
+/* Keep every face and the acoustic guitar visible in the social photograph. */
+.sx-world-hero-photo:has(.sx-world-social){min-height:0;height:auto;align-self:center;background:#50383e}
+.sx-world-hero-photo>.sx-world-social{position:relative;height:auto;aspect-ratio:3/2;object-fit:contain}
+@media(max-width:760px){.sx-world-hero-photo:has(.sx-world-social){height:auto;min-height:0}}

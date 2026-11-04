@@ -44,3 +44,20 @@ test('member navigation records destinations and a late owner cannot steal focus
  const next=ctx.go('friends');finish();await next;assert.equal(focus,1);assert.equal(scroll,1);assert.equal(pushes.at(-1),'#view=friends');
  const back=ctx.go('music',{history:false});finish();await back;assert.equal(pushes.length,2,'Restoring Back does not add another history entry');
 });
+
+
+browserTest('Home keeps one animated visual while the working player stays collapsed',t=>{
+ const h=harness(t),host=h.get('[data-world-home-visual]'),visual=h.visual,audio=h.audio;
+ assert(host.contains(visual));assert(visual.hasAttribute('compact'));assert.equal(h.player.open,false);assert(!host.querySelector('audio,select,input,.sk-playlist-transport,.sk-playlist-search'));
+ h.app.querySelector('a[href="#music"]').click();assert(!visual.hasAttribute('compact'));assert.equal(h.player.open,true);assert(h.get('[data-world-inline-visual]').contains(visual));
+ h.get('#sk-playlist-filter').value='keep this choice';h.app.querySelector('a[href="#home"]').click();
+ assert(host.contains(visual));assert(visual.hasAttribute('compact'));assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);assert.equal(h.d.querySelector('#sota-playlist-audio'),audio);assert.equal(h.get('#sk-playlist-filter').value,'keep this choice');assert.equal(h.calls.pause,0);
+ assert.equal(h.get('#sota-music-home').closest('.sx-panel').hidden,true);
+});
+
+browserTest('stopping the shell returns the visible visual to its existing player owner',t=>{
+ const h=harness(t),visual=h.visual;assert(h.get('[data-world-home-visual]').contains(visual));
+ h.w.SotaWorlds.stop();assert(h.player.contains(visual));assert(!visual.hasAttribute('compact'));
+ assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);
+ h.w.SotaWorlds.mount(h.app);assert(h.get('[data-world-home-visual]').contains(visual));
+});

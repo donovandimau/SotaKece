@@ -42,7 +42,23 @@
     listen(s,bar.querySelector('.sx-mini-toggle'),'click',()=>{root.document.querySelector('#sk-music-playlist .sk-deck-play,#sk-music-playlist .sk-playlist-play')?.click();});
     listen(s,bar.querySelector('.sx-mini-open'),'click',()=>{if(s.member){config.go?.('music');}else{root.history.pushState(null,'','#music');s.show?.('music');}});update();
   }
-  function welcome(){return `<section class="sx-hero" aria-labelledby="sx-welcome-title"><div class="sx-hero-copy"><span class="sx-eyebrow">FIJI ROOTS. EVERYWHERE ENERGY.</span><h1 id="sx-welcome-title" tabindex="-1">Your people.<br>Your music.<br><em>Your space.</em></h1><p>Choose your look. Bring your soundtrack. Make a place for your people.</p><div class="sx-actions"><button class="sx-button sx-primary" data-sx-auth="up">Create your space <span aria-hidden="true">↗</span></button></div><small>Already part of the circle? <button class="sx-inline" data-sx-auth="in">Sign in</button><br><a class="sx-inline" href="#profile">Take a look around</a></small></div><section class="sx-hero-room" aria-label="Sema’s example room"><header><span>SEMA’S SPACE</span><small>EXAMPLE ROOM</small></header><div data-sx-room-home></div><footer><button type="button" data-sx-customise>Try Room Studio ↗</button><a href="#profile">Open this space ↗</a></footer></section><div class="sx-hero-caption">SOTA KECE <span>Come as you are.</span></div></section><nav class="sx-home-paths" aria-label="Explore Sota Kece"><a href="#people">${icon('people')} Find your people</a><a href="#talanoa">${icon('talanoa')} Pull up a seat</a><a href="#music">${icon('music')} Build your soundtrack</a><a href="#skins">${icon('profile')} Find your look</a><a href="#world">${icon('home')} Your 3D world</a></nav><section class="sx-intro"><div><span class="sx-eyebrow">MORE CONNECTION. MORE YOU.</span><h2>All the things that<br>bring us together.</h2></div><p>Catch up with your people, share a favourite song and build a space that tells your story.</p></section><div class="sx-discover"><a class="sx-discover-card sx-discover-people" href="#people">${icon('people')}<small>01 / YOUR PEOPLE</small><h3>Good company.<br>Wherever you are.</h3><span>Find your people ↗</span></a><a class="sx-discover-card sx-discover-music" href="#music">${icon('music')}<small>02 / YOUR SOUNDTRACK</small><h3>Island roots.<br>Volume up.</h3><span>Explore the music ↗</span></a><a class="sx-discover-card sx-discover-space" href="#skins">${icon('profile')}<small>03 / YOUR OWN SPACE</small><h3>A whole lot<br>of personality.</h3><span>Find your look ↗</span></a></div><section class="sx-home-soundtrack" aria-labelledby="sx-soundtrack-title"><header><div><span class="sx-eyebrow">TURN UP YOUR KIND OF MUSIC</span><h2 id="sx-soundtrack-title">A soundtrack for<br>every catch-up.</h2></div><p>Find a favourite, build a playlist or bring music from your device.</p><a class="sx-button" href="#music">Open the music room ↗</a></header><div data-sx-home-music></div></section><section class="sx-together sx-together-conversation"><span class="sx-eyebrow">SIT DOWN. CATCH UP.</span><h2>There’s a place for you<br>in the circle.</h2><a class="sx-button" href="#talanoa">Explore Talanoa ${icon('talanoa')}</a><div class="sx-conversation-art" aria-hidden="true">${icon('talanoa')}<span>Stories.</span><span>Music.</span><span>Your people.</span></div></section>`;}
+  function welcome(){return `<section class="sx-hero" aria-labelledby="sx-welcome-title"><div class="sx-hero-copy"><span class="sx-eyebrow">FIJI ROOTS. EVERYWHERE ENERGY.</span><h1 id="sx-welcome-title" tabindex="-1">Your people.<br>Your music.<br><em>Your space.</em></h1><p>Choose your look. Bring your soundtrack. Make a place for your people.</p><div class="sx-actions"><button class="sx-button sx-primary" data-sx-auth="up">Create your space <span aria-hidden="true">↗</span></button></div><small>Already part of the circle? <button class="sx-inline" data-sx-auth="in">Sign in</button><br><a class="sx-inline" href="#profile">Take a look around</a></small><picture class="sx-hero-social"><img src="/assets/social-sunset-20261104/friends-guitar-768.webp" srcset="/assets/social-sunset-20261104/friends-guitar-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-1536.webp 1536w" sizes="(max-width:760px) calc(100vw - 72px), 440px" width="1536" height="1024" alt="Illustrative scene of four friends chatting while one plays guitar on a veranda at sunset" decoding="async"></picture></div><section class="sx-hero-room" aria-label="Sema’s example room"><header><span>SEMA’S SPACE</span><small>EXAMPLE ROOM</small></header><div data-sx-room-home></div><footer><button type="button" data-sx-customise>Try Room Studio ↗</button><a href="#profile">Open this space ↗</a></footer></section><div class="sx-hero-caption">SOTA KECE <span>Come as you are.</span></div></section><nav class="sx-home-paths" aria-label="Explore Sota Kece"><a href="#people">${icon('people')} Find your people</a><a href="#talanoa">${icon('talanoa')} Pull up a seat</a><a href="#music">${icon('music')} Build your soundtrack</a><a href="#skins">${icon('profile')} Find your look</a><a href="#world">${icon('home')} Your 3D world</a></nav><section class="sx-intro"><div><span class="sx-eyebrow">MORE CONNECTION. MORE YOU.</span><h2>All the things that<br>bring us together.</h2></div><p>Catch up with your people, share a favourite song and build a space that tells your story.</p></section><div class="sx-discover sx-scene-grid">
+    <a class="sx-discover-card sx-photo-card sx-discover-people" href="#people">
+      <img class="sx-card-photo" src="/assets/feature-scenes/rugby-friends.webp" alt="" width="900" height="900" loading="lazy" decoding="async">
+      ${icon('people')}<small>YOUR PEOPLE</small><h3>Good company.<br>Wherever you are.</h3><span>Find your people ↗</span>
+    </a>
+    <a class="sx-discover-card sx-photo-card sx-discover-space" href="#skins">
+      <img class="sx-card-photo" src="/assets/feature-scenes/room-print.webp" alt="" width="900" height="900" loading="lazy" decoding="async">
+      ${icon('profile')}<small>YOUR OWN SPACE</small><h3>A whole lot<br>of personality.</h3><span>Find your look ↗</span>
+    </a>
+    <section class="sx-home-soundtrack sx-band-panel" aria-labelledby="sx-soundtrack-title">
+      <a href="#music" class="sx-discover-card sx-discover-music sx-band-link">
+        <img class="sx-band-photo" src="/assets/feature-scenes/live-band.webp" srcset="/assets/feature-scenes/live-band-768.webp 768w, /assets/feature-scenes/live-band.webp 1800w" sizes="(max-width:760px) 100vw, (max-width:1450px) 80vw, 1280px" width="1800" height="600" alt="" loading="lazy" decoding="async">
+        <div class="sx-band-caption"><small>YOUR ROOM. YOUR SOUNDTRACK.</small><h3 id="sx-soundtrack-title">Viti roots.<br>Volume up.</h3><span>Explore the music ↗</span></div>
+      </a>
+      <div class="sx-home-visuals" data-world-home-visual aria-label="Music visualiser"></div>
+    </section>
+  </div><section class="sx-together sx-together-conversation"><span class="sx-eyebrow">SIT DOWN. CATCH UP.</span><h2>There’s a place for you<br>in the circle.</h2><a class="sx-button" href="#talanoa">Explore Talanoa ${icon('talanoa')}</a><div class="sx-conversation-art" aria-hidden="true">${icon('talanoa')}<span>Stories.</span><span>Music.</span><span>Your people.</span></div></section>`;}
   function mountGuest(app,{roomMarkup=''}={}){
     root.SotaFrontPages?.stop();
     const s=start(app,false),take=selector=>app.querySelector(selector);
@@ -67,12 +83,12 @@
       // The example room and audio controls each keep one DOM owner across destinations.
       const roomHost=app.querySelector(page==='home'?'[data-sx-room-home]':'[data-sx-room-profile]');
       if(profile&&roomHost&&!roomHost.contains(profile))roomHost.append(profile);
-      const musicHost=app.querySelector(page==='home'?'[data-sx-home-music]':'[data-sx-slot="music"]');
+      const musicHost=app.querySelector('[data-sx-slot="music"]');
       if(kept.music&&musicHost&&!musicHost.contains(kept.music))musicHost.append(kept.music);
       app.querySelectorAll('[data-sx-page]').forEach(panel=>panel.hidden=panel.dataset.sxPage!==page);
       app.querySelectorAll('[data-sx-route]').forEach(link=>link.setAttribute('aria-current',String(link.dataset.sxRoute===(page==='skins'?'profile':page==='world'?'people':page)?'page':'false')));
       const heading=app.querySelector('.sx-page-heading');heading.hidden=page==='home';heading.querySelector('.sx-eyebrow').textContent=titles[page][0];heading.querySelector('h1').textContent=titles[page][1];
-      if((page==='home'||page==='music')&&!musicOpened){root.SotaMusicHome?.choose('playlist');musicDetails();musicOpened=true;}
+      if(page==='music'&&!musicOpened){root.SotaMusicHome?.choose('playlist');musicDetails();musicOpened=true;}
       // Switching pages hides existing panels without recreating the player or its draft state.
       root.dispatchEvent(new root.CustomEvent('sota-front-page-change',{detail:{view:page}}));root.dispatchEvent(new root.Event('resize'));
       if(focus){(page==='home'?app.querySelector('#sx-welcome-title'):heading.querySelector('h1')).focus({preventScroll:true});root.scrollTo?.({top:0,behavior:'instant'});}
@@ -91,7 +107,7 @@
     listen(s,root,'popstate',()=>{const page=fromHash(root.location.hash);if(page)show(page);});
     show(fromHash(root.location.hash)||'home');
     // Opening the playlist from an existing control must also reveal its page.
-    const host=app.querySelector('[data-music-playlist-host]');if(host)listen(s,host,'sota-playlist-inline-open',()=>{if(s.page!=='music'&&s.page!=='home'){root.history.pushState(null,'','#music');show('music');}});
+    const host=app.querySelector('[data-music-playlist-host]');if(host)listen(s,host,'sota-playlist-inline-open',()=>{if(s.page!=='music'){root.history.pushState(null,'','#music');show('music');}});
     miniPlayer(s);root.SotaWorlds?.mount(app);
     return ()=>{if(session===s)stop();};
   }
@@ -118,3 +134,4 @@
   function mountMusic(app){root.SotaLocalMusic?.mount(app);root.SotaHeroVisualiser?.mount(app);root.SotaPlaylist?.mount(app);root.SotaMusicHome?.mount(app);root.SotaMusicHome?.choose('playlist');musicDetails();}
   return {init,stop,mountGuest,mountMember,mountMusic,fromHash,nav};
 });
+

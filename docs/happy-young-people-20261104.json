@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-04",
+  "type": "Original AI-generated illustrative lifestyle photography",
+  "direction": "Happy young adults in every promotional photograph; everyday Fiji sunset socialising, no devices or work setting.",
+  "cast": "Four fictional adults aged 24-30: one Fijian man and Fijian, Chinese and Indian women; reference cast retained. Chinese woman plays guitar in Music scene.",
+  "assets": [
+    {
+      "path": "assets/social-sunset-20261104/music-friends-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 110172,
+      "sha256": "1ed7951bf7cf7fe188b8d375744dc688d69619abebdaf83a0978c875069b1853",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-22ff0b38-548a-4599-a47a-abfc65893301.png"
+    },
+    {
+      "path": "assets/social-sunset-20261104/music-friends-1536.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 309880,
+      "sha256": "50db299c294f8222031dbf14db5da4eb4604459b62f03e82b344906259369d46",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-22ff0b38-548a-4599-a47a-abfc65893301.png"
+    },
+    {
+      "path": "assets/social-sunset-20261104/space-friends-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 90222,
+      "sha256": "d688537c9529f8a8223cce1d29c84f0776ee170b2d38189ad5ffdf2354cc9066",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-30f90355-cfdf-47df-8724-f7681b498dfe.png"
+    },
+    {
+      "path": "assets/social-sunset-20261104/space-friends-1536.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 255256,
+      "sha256": "25747b9eea8cf8f94fa0adf9951719835e886e2cd4e84303bd303de263e8138a",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-30f90355-cfdf-47df-8724-f7681b498dfe.png"
+    }
+  ]
+}

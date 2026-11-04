@@ -1,3 +1,11 @@
+## 4 November 2026 — Visible visualiser; controls collapsed; photographic headings
+
+Home retains the existing animated visualiser in compact mode. Only choosing Music reveals playback, settings, sharing and the library. The same visual/audio elements are preserved across routes and shell remount. Feature cards and the music teaser carry photorealistic images with overlaid hover/focus-lit headings. Existing Bula and sunset social-image corrections remain. 72 focused tests pass. Fresh browser visual inspection is unavailable; provider/CI evidence is recorded in PR369. Whole-page audio-reactive lighting is researched as a further option, not included in this change.
+
+## 4 November 2026 — Bula retained; Volau removed; everyday sunset social imagery
+
+Owner corrected the previous draft: keep the Bula welcome pill and remove only Volau. The two Bula scripts remain unchanged; only the companion loader tags are removed from the three existing entry pages. The revised layout is retained. New local responsive artwork depicts four fictional adults socialising face to face, with an acoustic guitar and soft Pacific sunset light. No phones or work scene. Existing member portraits, skins, music and current main's sharing changes are preserved. See docs/social-sunset-20261104.md and existing PR369 for checks and deployment status.
+
 ## 2 November 2026 — Connection over scrolling
 
 Owner asked for every app's engagement to reward good behaviour rather than copy social-media tricks. Sota Kece already had no algorithmic feed, so this adds three small things that favour real connection and give the feed an end. New `sota-wellbeing.js` + `.css` (remembered on the device only, `sk.well.v1`; the last-seen marker only moves forward; nothing sent anywhere; no streaks, no activity badges, no time counters):
@@ -322,3 +330,4 @@ Owner rejected the illustrated flat life map. Replace it with a native WebGL 3D 
 ## 26 October 2026 — Live profile and cover photo editing
 
 Make the supplied artwork's Edit profile control a real button aligned to its desktop/phone position. Separate circular profile and rectangular banner photo pickers provide decoded image previews, explicit Save/Cancel and JPG/PNG/WebP signature/size checks. Guest photos are device-local IndexedDB blobs. Member photo uploads use the existing private bv-room-media covers namespace; avatarPath and coverPath are stored inside existing versioned room settings. Save merges the latest server settings with a guarded comparison and preserves unrelated skin/custom CSS. Existing owner/friend policies are retained; no new database columns, public bucket or privileged credentials. Own rooms expose the same editor and render permitted signed photo URLs. Authentication changes cancel the editor and clear old media. The existing split music badge already keeps its centre upright and static while its flag circle rotates; the old open tab was refreshed to show that deployed correction.
+
