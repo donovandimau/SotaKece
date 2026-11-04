@@ -34,7 +34,7 @@ test('one skin section provides the existing anchor, heading and selected-skin l
   assert.equal((html.match(/\bid="bv-your-room"/g)||[]).length,1);
   assert.match(html,/<section\b[^>]*\bid="bv-your-room"[^>]*\btabindex="-1"[^>]*\baria-labelledby="bv-discovery-title"/);
   assert.equal((html.match(/\bid="bv-discovery-title"/g)||[]).length,1);
-  assert.match(html,/<h2\b[^>]*\bid="bv-discovery-title"[^>]*>Where you belong\.<\/h2>/);
+  assert.match(html,/<h2\b[^>]*\bid="bv-discovery-title"[^>]*>Make it yours\.<\/h2>/);
   assert.equal((html.match(/\bid="bv-welcome-skin-name"/g)||[]).length,1);
   assert.match(html,/<span\b[^>]*\bid="bv-welcome-skin-name"[^>]*><\/span>/);
   assert.equal(allButtons(html).length,1);

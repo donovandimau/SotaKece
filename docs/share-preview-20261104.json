@@ -1,0 +1,14 @@
+{
+  "asset": "assets/og-sota-kece-20261104.jpg",
+  "dimensions": [
+    1200,
+    630
+  ],
+  "sha256": "27a8c017ff3af097400655a57ce24401fc6bbbd607b0d3caee32f3b364dca845",
+  "sources": [
+    "icons/sota-icon-512-20261027g.png",
+    "assets/fonts/nunito-latin.woff2 (bundled app font, weights 600 and 900)"
+  ],
+  "method": "Original typographic layout rendered with Pillow using the existing app logo; no synthetic people or product screens.",
+  "alt": "Sota Kece: Your people. Your music. Your space, with the multicolour people logo."
+}

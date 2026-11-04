@@ -14,8 +14,11 @@ test('community collections resolve only available identities without changing s
     assert.equal(discovery.matching(skins.presets,group.id).length,group.count);
   }
   const featured=discovery.matching(skins.presets);
-  assert.equal(featured.length,12);
-  assert.equal(new Set(featured.map(p=>p.id)).size,12);
+  assert.equal(featured.length,10);
+  assert.equal(new Set(featured.map(p=>p.id)).size,10);
+  assert(featured.every(p=>p.category!=='Schools'&&!p.id.includes('school')));
+  assert(discovery.featuredCollections(skins.presets).every(g=>g.id!=='school-pride'));
+  assert.equal(discovery.matching(skins.presets,'school-pride').length,8);
   assert.deepEqual(skins.presets.map(p=>p.id),ids);
   assert.equal(discovery.matching(skins.presets,'All').length,94);
   assert.deepEqual(discovery.matching(skins.presets,'not-a-collection'),[]);

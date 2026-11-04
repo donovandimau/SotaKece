@@ -158,7 +158,8 @@ editorTest('blank, reset, Undo, and choosing a new cover keep media and update s
   h.get('#bv-reset-design').click();
   assert.equal(h.get('#bv-customName').value,'');assert.equal(h.get('#bv-textScale').value,'100');assert.equal(h.get('#bv-showArtwork').checked,true);
   h.get('#bv-undo-design').click();
-  h.get('.bv-studio-covers [data-skin="school-natabua-high-school"]').click();
+  h.input('#bv-skin-category','Schools','change');
+  h.get('#bv-skin-options [data-skin="school-natabua-high-school"]').click();
   assert.equal(h.get('#bv-showArtwork').checked,true,'Choosing another cover intentionally restores its artwork');
   for(const key of ['customName','font','textScale','headingScale','coverHeight','coverX','coverY','textAlign','layout','musicPosition'])assert.equal(h.get('#bv-'+key).value,String(values[key]),key+' survives another base cover');
   h.get('#bv-save').click();const saved=JSON.parse(h.w.localStorage.getItem('bv-picked-skin'));
@@ -237,4 +238,15 @@ editorTest('the saved room renderer uses the same placement tokens and moves mus
   for(const token of ['--bv-text-scale:1.2','--bv-heading-scale:1.3','--bv-cover-height:380px','--bv-cover-x:60%','--bv-cover-y:30%','--bv-hero:none'])assert(css.includes(token),token);
   assert.equal(h.get('#room-head .bv-identity-title').textContent,'My room');
   const columns=h.get('#view .grid.two');assert.equal(columns.nextElementSibling,h.get('.bv-room-soundstage'),'Bottom soundtrack is placed after the cards');h.clean();
+});
+
+editorTest('school skins remain an explicit catalogue choice while featured covers stay neutral',t=>{
+ const h=harness(t);h.open();
+ assert.equal(h.get('.bv-studio-covers [data-skin^="school-"]'),null);
+ const coverImages=[...h.get('.bv-studio-covers').querySelectorAll('img')].map(n=>n.getAttribute('src'));assert.equal(new Set(coverImages).size,coverImages.length,'Featured covers do not repeat the same image');
+ assert.equal(h.get('.bv-collection-shortcuts [data-collection="school-pride"]'),null);
+ assert.equal(h.get('#bv-skin-options [data-skin^="school-"]'),null);
+ h.input('#bv-skin-category','Schools','change');assert.equal(h.get('#bv-skin-options').querySelectorAll('[data-skin]').length,8);
+ h.get('#bv-skin-options [data-skin="school-natabua-high-school"]').click();assert.equal(h.get('#bv-preview-name').textContent,h.skins.presets.find(p=>p.id==='school-natabua-high-school').name);
+ h.input('#bv-skin-category','All','change');assert.equal(h.get('#bv-skin-options').querySelectorAll('[data-skin]').length,94);h.clean();
 });

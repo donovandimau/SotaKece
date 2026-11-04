@@ -1,6 +1,6 @@
-## 4 November 2026 — Volau assistant and Bula welcome button taken out
+## 4 November 2026 — Bula retained; Volau removed; everyday sunset social imagery
 
-Owner decision (4 Nov): take both assistants out of every app until the new Fijian-speaking, animated Volau is ready. `index.html` no longer loads `dimau-companion.js`, `bula-welcome.js` or `bula-top-20261030.js`; `communications.html` and `tests/chat-preview.html` no longer load `dimau-companion.js`. Visitors no longer see the "Bula! Welcome" button in the top bar. The shared files stay in the repo, so Volau can come back by re-adding the tags. `sw.js` is unchanged. Checks: `node --test tests/*.test.cjs` with jsdom 550 pass, the same 4 companion/Connect failures as main, 4 skipped; Talanoa database checks pass. Draft PR, waiting for owner sign-off.
+Owner corrected the previous draft: keep the Bula welcome pill and remove only Volau. The two Bula scripts remain unchanged; only the companion loader tags are removed from the three existing entry pages. The revised layout is retained. New local responsive artwork depicts four fictional adults socialising face to face, with an acoustic guitar and soft Pacific sunset light. No phones or work scene. Existing member portraits, skins, music and current main's sharing changes are preserved. See docs/social-sunset-20261104.md and existing PR369 for checks and deployment status.
 
 ## 2 November 2026 — Connection over scrolling
 

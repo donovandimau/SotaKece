@@ -5,7 +5,7 @@ body.sx-enabled :focus-visible{outline-color:var(--world-accent,#6b35ce)!importa
 .sx-world-crumb,.sx-world-toolbar>div:last-child{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sx-world-crumb{font-size:12px;font-weight:800}.sx-world-crumb>span:last-child{color:var(--world-muted)}
 .sx-world-toolbar :is(a,button),.sx-world-home-tools button,.sx-world-next>header>button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:10px 16px;border:1px solid var(--world-line);border-radius:12px;background:var(--world-panel);color:var(--world-ink);font:800 12px/1.4 Nunito,system-ui,sans-serif;cursor:pointer;text-decoration:none;box-shadow:0 3px 10px #4c24720b}
-.sx-world-crumb>:first-child{background:transparent;border:0;padding:8px 0;box-shadow:none}
+.sx-world-crumb>:first-child{min-width:44px;background:transparent;border:0;padding:8px 0;box-shadow:none}
 .sx-world-toolbar [data-world-tool=design]{background:var(--world-accent);color:var(--world-on-accent);border-color:var(--world-accent)}
 body.sx-enabled #app.sx-app .sx-page-heading{margin:0;padding:0}
 body.sx-enabled #app.sx-app .sx-page-heading>.sx-back{display:none}
@@ -157,3 +157,37 @@ body.sx-standalone #groupWorkspace.circle-workspace .tabs button[aria-selected=t
 
 body.sx-standalone #groupWorkspace.circle-workspace #panel-calls{padding:20px;border:1px solid var(--bv-accent);border-radius:14px;background:var(--bv-panel);color:var(--bv-ink)}
 body.sx-standalone #groupWorkspace.circle-workspace #panel-calls :is(h2,h3,h4,p,label,.fine){color:inherit}
+
+/* Navigation uses its own symbols; photographs are reserved for contextual content. */
+.sx-world-card>.sx-world-card-art{display:flex;align-items:center;height:96px;padding:22px 24px;background:linear-gradient(125deg,#ffffff80,transparent);color:var(--world-dark);border-bottom:1px solid #ffffff70}
+.sx-world-card-art>svg{width:46px;height:46px;flex:none}.sx-world-card>.sx-world-card-copy{display:block;padding:20px}
+.sx-world-directory-grid .sx-world-card>.sx-world-card-art{height:88px;padding:20px}.sx-world-directory-grid .sx-world-card-art>svg{width:38px;height:38px}
+.sx-world-art{height:100%;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(ellipse at 70% 20%,#ffffffb3,transparent 70%),var(--world-tint);color:var(--world-dark);border-left:1px solid #ffffff90}
+.sx-world-art>svg{width:92px;height:92px;padding:18px;background:#ffffff80;border:1px solid white;border-radius:24px;transform:rotate(-4deg)}.sx-world-art>span{font-size:15px;font-weight:900;letter-spacing:.03em}
+.sx-world-hero-photo:has(.sx-world-art):after{display:none}
+@media(max-width:760px){.sx-world-art{min-height:150px;flex-direction:row;gap:22px;border-left:0;border-top:1px solid #ffffff90}.sx-world-art>svg{width:70px;height:70px;padding:15px}.sx-world-next .sx-world-card>.sx-world-card-art{height:100%;min-height:135px;padding:20px;justify-content:center;border:0}.sx-world-next .sx-world-card-art>svg{width:40px;height:40px}.sx-world-next .sx-world-card>.sx-world-card-copy{padding:16px}.sx-world-directory-grid .sx-world-card>.sx-world-card-art{height:70px;padding:16px}.sx-world-directory-grid .sx-world-card-art>svg{width:32px;height:32px}.sx-world-directory-grid .sx-world-card>.sx-world-card-copy{padding:14px 12px}}
+@media(forced-colors:active){.sx-world-card>.sx-world-card-art,.sx-world-art{background:Canvas;color:CanvasText;border-color:CanvasText}}
+
+/* Songs are a deliberate reveal; playback and its visuals remain in view. */
+/* Small member tools retain their local hierarchy and a comfortable hit area. */
+#app.sx-app .sp-link[data-sp="note-new"]{display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;border:1px solid var(--world-line);border-radius:12px;background:var(--world-panel);color:var(--world-ink);font-weight:800}
+#app.sx-app .bv-meme-input>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 14px;border:1px solid var(--world-line);border-radius:12px;background:var(--world-panel);font-size:12px;font-weight:800;cursor:pointer;list-style:none;box-sizing:border-box}
+#app.sx-app .bv-meme-input>summary::after{content:'+';font-size:20px;line-height:1}#app.sx-app .bv-meme-input[open]>summary::after{content:'−'}#app.sx-app .bv-meme-input>summary::-webkit-details-marker{display:none}
+#app.sx-app :is(#sc-in,#sc-out){min-width:44px;min-height:44px}
+body.sx-standalone #groupWorkspace :is(.nc-callbacks,.external-calls)>summary{display:flex;align-items:center;min-height:44px;box-sizing:border-box;padding:10px 0}
+body.sx-standalone .sidebar.panel>details>summary{display:flex;align-items:center;min-height:44px;box-sizing:border-box;padding:10px 0}
+.cr .cr-lobby-footer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:14px}.cr .cr-lobby-footer .ssd-launcher.ssd-hosted-launcher{position:static!important;inset:auto!important;margin:0;min-height:44px}
+#app.sx-app details.sx-player-library{display:block;padding:0;overflow:hidden;background:var(--world-panel)}
+#app.sx-app .sx-player-library>summary{display:flex;align-items:center;gap:16px;min-height:84px;padding:20px 24px;cursor:pointer;list-style:none;color:var(--world-ink)}
+.sx-player-library>summary::-webkit-details-marker{display:none}.sx-player-library>summary::marker{content:''}.sx-player-library>summary>span:nth-child(2){flex:1;min-width:0}.sx-player-library summary strong{display:block;font-size:16px;font-weight:900}.sx-player-library summary small{display:block;margin-top:5px;font-size:11px;line-height:1.5;color:var(--world-muted)}
+.sx-library-symbol{display:grid;place-items:center;width:44px;height:44px;flex:none;background:#ece0fb;color:#65319b;border-radius:13px}.sx-library-symbol svg{width:23px;height:23px}.sx-library-chevron{font-size:25px;color:var(--world-muted)}
+.sx-library-open-label{display:none}.sx-player-library[open] .sx-library-open-label{display:inline}.sx-player-library[open] .sx-library-closed-label{display:none}.sx-player-library[open] .sx-library-chevron{transform:rotate(180deg)}
+#app.sx-app .sx-player-library>:not(summary){margin:0 24px 20px;width:auto}#app.sx-app .sx-player-library>summary:focus-visible{outline:3px solid var(--world-accent);outline-offset:-5px;border-radius:16px}
+html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!important;border-color:#dfcfe9!important;color:#432657!important;border-radius:20px!important;min-height:0;padding:22px!important}
+.cr .cr-lobby-art{display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 10%,#b55d98,transparent 70%),linear-gradient(140deg,#482568,#713b91);color:#fff4fd}.cr .cr-lobby-art:after{display:none}.cr-call-symbol{display:grid;place-items:center;width:190px;height:190px;border:1px solid #ffffff70;border-radius:40px;background:#ffffff12;transform:rotate(-5deg);margin-bottom:80px}.cr-call-symbol svg{width:100px;height:100px}
+@media(max-width:760px){#app.sx-app .sx-player-library>summary{padding:18px 16px;gap:12px}.sx-player-library summary strong{font-size:15px}.sx-player-library summary small{font-size:10px}#app.sx-app .sx-player-library>:not(summary){margin:0 16px 18px}html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{padding:16px!important}.cr-call-symbol{width:100px;height:100px;border-radius:24px;margin:0 0 70px}.cr-call-symbol svg{width:55px;height:55px}}
+
+/* Keep every face and the acoustic guitar visible in the social photograph. */
+.sx-world-hero-photo:has(.sx-world-social){min-height:0;height:auto;align-self:center;background:#50383e}
+.sx-world-hero-photo>.sx-world-social{position:relative;height:auto;aspect-ratio:3/2;object-fit:contain}
+@media(max-width:760px){.sx-world-hero-photo:has(.sx-world-social){height:auto;min-height:0}}
