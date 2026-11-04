@@ -18,6 +18,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Replace the lookalike feature panels with rugby friends, a full-width live band and an individual decorating her room. | Existing PR #369 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
