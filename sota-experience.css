@@ -299,3 +299,14 @@ body.sx-enabled #app.sx-app .sx-hero{background:radial-gradient(ellipse at 85% 1
 .sx-hero::before{background:linear-gradient(90deg,#2e12473d,transparent 80%)}
 .sx-discover-card>svg{position:static;width:54px;height:54px;padding:12px;margin:0 0 24px;background:#ffffff85;color:inherit;box-shadow:none;border:1px solid #ffffff90;border-radius:16px}
 @media(max-width:760px){.sx-discover-card>svg{position:static;grid-column:2;grid-row:1/4;align-self:center;justify-self:end;width:50px;height:50px;margin:0}}
+
+/* An invitation to the actual social space, without a staged lifestyle scene. */
+.sx-together.sx-together-conversation{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);column-gap:36px;align-items:center;min-height:300px;background:radial-gradient(ellipse at 85% 20%,#a44487,transparent 70%),linear-gradient(115deg,#4f236e,#743559);color:#fff8f5;border:1px solid #c27aab}
+.sx-together-conversation:before{display:none}.sx-together.sx-together-conversation h2{max-width:none;grid-column:1;text-shadow:none;font-size:40px}.sx-together-conversation>.sx-eyebrow{grid-column:1}.sx-together-conversation>.sx-button{grid-column:1;justify-self:start;max-width:100%;min-height:48px}
+.sx-conversation-art{grid-column:2;grid-row:1/4;display:flex;flex-direction:column;align-items:start;gap:10px;justify-self:center;transform:rotate(-3deg)}.sx-conversation-art>svg{width:55px;height:55px;color:#ffd77d;margin-bottom:10px}.sx-conversation-art>span{padding:10px 20px;border:1px solid #ffffff60;border-radius:12px;background:#ffffff15;font-size:19px;font-weight:800}.sx-conversation-art>span:nth-of-type(2){margin-left:35px;background:#ffdf9b;color:#513356;border-color:#ffdf9b}.sx-conversation-art>span:nth-of-type(3){margin-left:15px}
+@media(max-width:760px){.sx-together.sx-together-conversation{grid-template-columns:1fr;padding:30px 24px;gap:18px}.sx-together.sx-together-conversation h2{font-size:31px;margin:0}.sx-conversation-art{display:none}.sx-together-conversation>.sx-button{justify-self:stretch;justify-content:space-between}}
+
+.sx-hero small button.sx-inline{min-width:44px;min-height:44px}.sx-mini-open{min-height:44px}.sx-mini-toggle{width:44px;height:44px;min-width:44px;min-height:44px}.sx-mini-player{gap:10px;padding:10px 14px}.sx-mini-open small{font-size:8px}.sx-mini-open b{font-size:11px}
+
+.sx-has-mini .sx-footer{padding-bottom:110px}.sx-has-mini .sx-member-content{padding-bottom:120px}
+body.sx-enabled .sx-top .bw-pill{min-height:44px!important}

@@ -178,3 +178,8 @@ test('a detached opener is not refocused even when disabling it originally lost 
   gate.resolve();await pending;
   assert.equal(doc.activeElement,doc.body);assert.equal(n.button.focused,0);assert.equal(n.button.disabled,true);
 });
+
+test('public invitation delegates to the premium share sheet without including private route or profile data',async()=>{
+ const h=harness();let packet;h.window={SotaShare:{share:async value=>{packet=value;return 'sheet';}}};
+ const result=await h.shareApp();assert.equal(packet.url,publicURL);assert.equal(packet.title,'Sota Kece');assert.equal(result.kind,'sheet');assert(!JSON.stringify(packet).includes('PRIVATE_'));
+});

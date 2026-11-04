@@ -1,85 +1,45 @@
-/* Sota Kece sharing: any element with [data-sota-share] shares the app (or data-share-url / -title / -text).
-   Phones get their own share sheet; everywhere else gets a small panel with the usual apps and Copy link. */
+/* Share the app or a particular song; native phone sharing keeps its normal behaviour. */
 (function(root){
 'use strict';
 const SITE='https://sotakece.com/';
-const DEFAULT={title:'Sota Kece — Your room. Your soundtrack.',text:'Come hang out with me on Sota Kece 🌺 Make your space your own, share music and catch up over Talanoa.',url:SITE};
+const DEFAULT={title:'Sota Kece — Your people. Your music. Your space.',text:'Come hang out with me on Sota Kece. Make your space your own, share music and catch up over Talanoa.',url:SITE};
 const ICON='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>';
+const paths={whatsapp:'M20 11.5a8.5 8.5 0 0 1-12.7 7.4L3 20l1.1-4.2A8.5 8.5 0 1 1 20 11.5ZM8 7l2 3-1 1c1 2 2 3 4 4l1-1 3 2c-2 3-7 0-9-3S5 7 8 7Z',facebook:'M14 21v-8h3l.5-4H14V7c0-1 1-2 2-2h2V2h-3c-3 0-5 2-5 5v2H7v4h3v8',x:'M4 3h4l12 18h-4L4 3ZM20 3 4 21',telegram:'M2 11 22 3l-4 18-6-5-4 4v-7L19 6 9 14l-7-3Z',email:'M3 5h18v14H3V5Zm0 0 9 8 9-8',messenger:'M21 11a9 9 0 0 1-9 9H8l-5 2 1-5a9 9 0 1 1 17-6ZM6 14l5-6 3 3 4-3-5 7-3-3-4 2Z'};
+const glyph=key=>'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="'+paths[key]+'"/></svg>';
 let sheet=null;
-function clean(url){
-try{const u=new URL(url||SITE,SITE);if(!/^https?:$/.test(u.protocol))return SITE;
-if(/(?:^|\.)vercel\.app$|^localhost$|^127\./.test(u.hostname)){u.protocol='https:';u.host='sotakece.com';}
-return u.href;}catch(_){return SITE;}
-}
-function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;}
-function styles(){
-if(document.getElementById('sota-share-styles'))return;
-const s=el('style');s.id='sota-share-styles';
-s.textContent=`
-.sota-share-sheet{border:0;padding:0;background:transparent;max-width:min(420px,calc(100vw - 24px));width:100%;margin:auto auto 16px}
-.sota-share-sheet::backdrop{background:rgba(20,59,82,.42);backdrop-filter:blur(4px)}
-.sota-share-box{background:rgba(255,255,255,.96);border:1px solid rgba(135,206,235,.9);border-radius:22px;padding:18px;box-shadow:0 18px 50px rgba(20,59,82,.28);font-family:Lexend,system-ui,sans-serif;color:#143b52}
-.sota-share-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.sota-share-head h2{font:800 18px/1.2 Manrope,system-ui,sans-serif;margin:0}
-.sota-share-close{width:38px;height:38px;border-radius:50%;border:1px solid rgba(135,206,235,.95);background:#fff;font-size:20px;line-height:1;cursor:pointer;color:#143b52}
-.sota-share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
-.sota-share-grid a,.sota-share-grid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:16px;background:#f2fafd;border:1px solid #cbe7f3;color:#143b52;font:600 12.5px/1.2 Lexend,system-ui,sans-serif;text-decoration:none;cursor:pointer}
-.sota-share-grid i{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;color:#fff;font:800 15px/1 Manrope,system-ui,sans-serif;font-style:normal}
-.sota-share-link{display:flex;gap:8px}
-.sota-share-link input{flex:1;min-width:0;min-height:44px;border-radius:12px;border:1px solid #cbe7f3;padding:0 12px;font:400 13px Lexend,system-ui,sans-serif;background:#fff;color:#143b52}
-.sota-share-link button{min-height:44px;padding:0 16px;border:0;border-radius:999px;background:#4fa8d8;color:#fff;font:600 13.5px Lexend,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
-.sota-share-sheet :focus-visible{outline:3px solid #ff62ae;outline-offset:2px}
-[data-sota-share].sk-share-chip{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;font:inherit}
-`;
-document.head.append(s);
-}
-function copy(text,input,btn){
-const done=()=>{btn.textContent='Copied ✓';setTimeout(()=>{btn.textContent='Copy link';},1800);};
-if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(done,()=>{input.select();try{document.execCommand('copy');done();}catch(_){}});
-else{input.select();try{document.execCommand('copy');done();}catch(_){}}
-}
+function clean(url){try{const u=new URL(url||SITE,SITE);if(!/^https?:$/.test(u.protocol))return SITE;if(/(?:^|\.)vercel\.app$|^localhost$|^127\./.test(u.hostname)){u.protocol='https:';u.host='sotakece.com';}return u.href;}catch(_){return SITE;}}
+function el(tag,cls,text){const n=root.document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;}
+function styles(){if(root.document.getElementById('sota-share-styles'))return;const s=el('style');s.id='sota-share-styles';s.textContent=`
+.sota-share-sheet{border:0;padding:0;background:transparent;width:min(560px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 40px);margin:auto;overflow:visible;color:#3c284d}
+.sota-share-sheet::backdrop{background:#2616337d;backdrop-filter:blur(6px)}
+.sota-share-box{box-sizing:border-box;width:100%;max-height:calc(100dvh - 40px);overflow:auto;background:#fffafd;border:1px solid #fff;border-radius:24px;padding:28px;box-shadow:0 24px 80px #30143a40;font-family:Nunito,system-ui,sans-serif;color:#3c284d}
+.sota-share-head{display:flex;align-items:start;justify-content:space-between;gap:18px;margin-bottom:22px}.sota-share-eyebrow{font-size:9px;font-weight:900;letter-spacing:1.8px;color:#99527e}.sota-share-head h2{font:900 28px/1.12 Nunito,system-ui,sans-serif;letter-spacing:-.9px;margin:9px 0 0;color:inherit}
+.sota-share-close{display:grid;place-items:center;flex:none;width:44px;height:44px;border:1px solid #decee7;border-radius:50%;background:#fff;color:#5b3a72;font:400 24px/1 system-ui;cursor:pointer}
+.sota-share-preview{display:flex;gap:16px;align-items:center;padding:18px;background:linear-gradient(120deg,#f2e6fc,#fff0da);border:1px solid #e3d0ea;border-radius:16px;margin:0 0 24px}.sota-share-preview img{display:block;width:48px;height:48px;flex:none;object-fit:contain;border-radius:12px}.sota-share-preview strong{display:block;font-size:15px;line-height:1.5;overflow-wrap:anywhere}.sota-share-preview small{display:block;color:#796486;font-size:11px;margin-top:4px}
+.sota-share-label{display:block;font-size:11px;font-weight:900;color:#6e557e;margin-bottom:10px}.sota-share-link{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-bottom:22px}.sota-share-link input{box-sizing:border-box;min-width:0;width:100%;height:48px;border:1px solid #d9c5e5;border-radius:12px;background:white;color:#654979;padding:0 13px;font:12px/1.4 Nunito,system-ui,sans-serif}.sota-share-copy{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border:0;border-radius:12px;background:#6b35ce;color:white;font:900 12px/1.4 Nunito,system-ui,sans-serif;cursor:pointer}.sota-share-copy svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
+.sota-share-grid{display:grid;grid-template-columns:repeat(var(--share-count,5),minmax(0,1fr));gap:10px;padding-top:18px;border-top:1px solid #eadfed}.sota-share-grid a{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;min-width:0;min-height:84px;padding:12px 5px;border-radius:13px;border:1px solid #e6d8ed;background:#fff;color:#56366c;font:800 11px/1.3 Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer}.sota-share-grid a:hover{background:#f3e9fa;border-color:#bb92d3}.sota-share-grid i{display:grid;place-items:center;width:30px;height:30px;font-style:normal;color:var(--share-colour,#6b35ce)}.sota-share-grid svg{width:25px;height:25px}.sota-share-status{font-size:12px;line-height:1.5;min-height:18px;margin:14px 0 0;color:#79437e}.sota-share-sheet :focus-visible{outline:3px solid #a555b6;outline-offset:3px}
+@media(max-width:600px){.sota-share-sheet{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);margin:auto auto max(12px,env(safe-area-inset-bottom))}.sota-share-box{padding:22px;max-height:calc(100dvh - 24px);border-radius:22px}.sota-share-head h2{font-size:25px}.sota-share-link{grid-template-columns:1fr}.sota-share-copy{width:100%}.sota-share-preview{padding:14px}.sota-share-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.sota-share-grid a{flex-direction:row;min-height:52px;padding:10px 12px;justify-content:start;gap:12px;font-size:12px}.sota-share-grid a:last-child:nth-child(odd){grid-column:1/-1;justify-content:center}.sota-share-grid i{width:24px;height:24px}.sota-share-grid svg{width:22px;height:22px}}
+@media(forced-colors:active){.sota-share-box,.sota-share-preview,.sota-share-grid a,.sota-share-copy{background:Canvas;color:CanvasText;border:1px solid CanvasText}}
+`;root.document.head.append(s);}
 function openSheet(data){
-styles();
-if(sheet)sheet.remove();
-sheet=el('dialog','sota-share-sheet');sheet.setAttribute('aria-labelledby','sota-share-title');
-const box=el('div','sota-share-box'),head=el('div','sota-share-head'),h=el('h2','','Share Sota Kece');h.id='sota-share-title';
-const close=el('button','sota-share-close','×');close.type='button';close.setAttribute('aria-label','Close sharing');close.addEventListener('click',()=>sheet.close());
-head.append(h,close);
+styles();const old=sheet,opener=old?.returnFocus||root.document.activeElement;if(old){old.close();old.remove();}
+const panel=el('dialog','sota-share-sheet');sheet=panel;panel.returnFocus=opener;panel.setAttribute('aria-labelledby','sota-share-title');
+const music=new URL(data.url).searchParams.has('song')||new URL(data.url).searchParams.has('music');
+const box=el('div','sota-share-box'),head=el('div','sota-share-head'),titles=el('div');titles.append(el('span','sota-share-eyebrow','PASS IT ON'));const h=el('h2','',music?'Share music':'Share Sota Kece');h.id='sota-share-title';titles.append(h);
+const close=el('button','sota-share-close','×');close.type='button';close.setAttribute('aria-label','Close sharing');close.addEventListener('click',()=>panel.close());head.append(titles,close);
+const preview=el('div','sota-share-preview'),art=el('img');art.src='/icons/sota-icon-192-20261027g.png';art.alt='';art.width=48;art.height=48;const description=el('div');description.append(el('strong','',data.title),el('small','','sotakece.com'));preview.append(art,description);
+const linkLabel=el('label','sota-share-label','Link to share');linkLabel.htmlFor='sota-share-url';const row=el('div','sota-share-link'),input=el('input');input.id='sota-share-url';input.readOnly=true;input.value=data.url;
+const btn=el('button','sota-share-copy');btn.type='button';btn.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h13v13H8V8ZM16 4V2H2v14h2"/></svg><span>Copy link</span>';
+const status=el('p','sota-share-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+btn.addEventListener('click',async()=>{try{if(root.navigator.clipboard?.writeText)await root.navigator.clipboard.writeText(data.url);else throw Error('Clipboard unavailable');status.textContent='Link copied. Ready to send.';}catch(_){input.focus();input.select();let copied=false;try{copied=root.document.execCommand('copy')===true;}catch(_){}status.textContent=copied?'Link copied. Ready to send.':'Select and copy the link above.';}});row.append(input,btn);
 const u=encodeURIComponent(data.url),t=encodeURIComponent(data.text),both=encodeURIComponent(data.text+' '+data.url);
-const apps=[
-['WhatsApp','#25D366','W','https://wa.me/?text='+both],
-['Facebook','#1877F2','f','https://www.facebook.com/sharer/sharer.php?u='+u],
-['Messenger','#0084FF','m','fb-messenger://share/?link='+u],
-['X','#000000','X','https://twitter.com/intent/tweet?text='+t+'&url='+u],
-['Telegram','#229ED9','T','https://t.me/share/url?url='+u+'&text='+t],
-['Email','#5FB3D9','@','mailto:?subject='+encodeURIComponent(data.title)+'&body='+both]
-];
-const grid=el('div','sota-share-grid');
-for(const [name,colour,mark,href] of apps){
-if(name==='Messenger'&&!/Android|iPhone|iPad/i.test(navigator.userAgent))continue;
-const a=el('a');a.href=href;a.target=href.startsWith('http')?'_blank':'_self';a.rel='noopener noreferrer';
-const i=el('i','',mark);i.style.background=colour;a.append(i,el('span','',name));a.addEventListener('click',()=>setTimeout(()=>sheet?.close(),300));grid.append(a);
+const apps=[['WhatsApp','whatsapp','#197b4c','https://wa.me/?text='+both],['Facebook','facebook','#1877f2','https://www.facebook.com/sharer/sharer.php?u='+u],['X','x','#33213e','https://twitter.com/intent/tweet?text='+t+'&url='+u],['Telegram','telegram','#217eac','https://t.me/share/url?url='+u+'&text='+t],['Email','email','#8550a4','mailto:?subject='+encodeURIComponent(data.title)+'&body='+both]];
+const grid=el('nav','sota-share-grid');grid.setAttribute('aria-label','Share with an app');grid.style.setProperty('--share-count',String(apps.length));
+for(const [name,key,colour,href]of apps){const a=el('a');a.href=href;a.target=href.startsWith('http')?'_blank':'_self';a.rel='noopener noreferrer';const i=el('i');i.style.setProperty('--share-colour',colour);i.innerHTML=glyph(key);a.append(i,el('span','',name));grid.append(a);}
+box.append(head,preview,linkLabel,row,grid,status);panel.append(box);root.document.body.append(panel);
+panel.addEventListener('close',()=>{const active=sheet===panel;if(active)sheet=null;panel.remove();if(active&&opener?.isConnected)opener.focus({preventScroll:true});});panel.addEventListener('click',event=>{if(event.target===panel)panel.close();});panel.showModal();btn.focus({preventScroll:true});
 }
-const row=el('div','sota-share-link'),input=el('input');input.readOnly=true;input.value=data.url;input.setAttribute('aria-label','Link to share');
-const btn=el('button','','Copy link');btn.type='button';btn.addEventListener('click',()=>copy(data.url,input,btn));
-row.append(input,btn);
-box.append(head,grid,row);sheet.append(box);document.body.append(sheet);
-sheet.addEventListener('close',()=>{sheet?.remove();sheet=null;});
-sheet.addEventListener('click',e=>{if(e.target===sheet)sheet.close();});
-sheet.showModal();btn.focus();
-}
-async function share(input={}){
-const data={title:input.title||DEFAULT.title,text:input.text||DEFAULT.text,url:clean(input.url||DEFAULT.url)};
-const phone=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
-if(phone&&navigator.share){
-try{await navigator.share(data);return 'shared';}catch(error){if(error&&error.name==='AbortError')return 'cancelled';}
-}
-openSheet(data);return 'sheet';
-}
-document.addEventListener('click',event=>{
-const trigger=event.target.closest?.('[data-sota-share]');if(!trigger)return;
-event.preventDefault();
-share({url:trigger.dataset.shareUrl,title:trigger.dataset.shareTitle,text:trigger.dataset.shareText});
-});
+async function share(input={}){const data={title:input.title||DEFAULT.title,text:input.text||DEFAULT.text,url:clean(input.url||DEFAULT.url)};const phone=/Android|iPhone|iPad|iPod/i.test(root.navigator.userAgent)||(root.navigator.maxTouchPoints>1&&/Macintosh/.test(root.navigator.userAgent));if(phone&&root.navigator.share){try{await root.navigator.share(data);return 'shared';}catch(error){if(error?.name==='AbortError')return 'cancelled';}}openSheet(data);return 'sheet';}
+root.document.addEventListener('click',event=>{const trigger=event.target.closest?.('[data-sota-share]');if(!trigger)return;event.preventDefault();share({url:trigger.dataset.shareUrl,title:trigger.dataset.shareTitle,text:trigger.dataset.shareText});});
 root.SotaShare={share,icon:ICON};
 })(window);

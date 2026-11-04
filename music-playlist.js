@@ -116,7 +116,7 @@ const extras=el('div','','sk-lib-host');
 dialog.append(head,hero,audio,transport,visuals,status,retry,extras,search,queue,list);root.document.body.append(dialog);
 const docHead=root.document.head;
 if(root.SotaMusicLibrary)extend(root.SotaMusicLibrary);
-else if(docHead){const s=el('script');s.src='/music-library.js?v=20261028-library';s.async=true;docHead.append(s);}
+else if(docHead){const s=el('script');s.src='/music-library.js?v=20261104-player-polish-3';s.async=true;docHead.append(s);}
 audio.addEventListener('play',()=>{
 root.SotaPlayback?.activate('playlist',audio);
 beforePlay();root.document.querySelectorAll('audio').forEach(other=>{if(other!==audio)other.pause();});
