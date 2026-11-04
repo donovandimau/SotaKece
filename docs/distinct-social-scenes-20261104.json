@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-04",
+  "type": "Original AI-edited illustrative lifestyle photography",
+  "edit_target": "/workspace/scratch/3ed9f844bb34/upload/image-edit-target-91594402d32d522a.png",
+  "direction": "Different happy young adult casts in different everyday Pacific settings; soft sunset, no devices or work. Inspect anatomy, grounded plants and contact with seating.",
+  "placements": {
+    "music": "beach-singalong",
+    "space": "garden-catchup"
+  },
+  "assets": [
+    {
+      "path": "assets/social-sunset-20261104/beach-singalong-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 75960,
+      "sha256": "036aaff7b9fc669449a4aa027388f45720ef4252432c26287d7273e188d417cd",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-eb7c2ccf-4081-4be4-99ac-8829d2086146.png"
+    },
+    {
+      "path": "assets/social-sunset-20261104/beach-singalong-1536.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 214412,
+      "sha256": "7bc5278fd448328da63818ac7510d23e7a3e808952f502e61919c35d4036d503",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-eb7c2ccf-4081-4be4-99ac-8829d2086146.png"
+    },
+    {
+      "path": "assets/social-sunset-20261104/garden-catchup-768.webp",
+      "width": 768,
+      "height": 512,
+      "bytes": 94410,
+      "sha256": "381b04a76356efaf129d7d3cccf745ef67e3811e57c1a2065ef40dcd4fedc5ed",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-b22cc7e4-f2f7-46a5-81bc-2eeb1215691d.png"
+    },
+    {
+      "path": "assets/social-sunset-20261104/garden-catchup-1536.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 258210,
+      "sha256": "6755326ccb8377db7a3ea8517a01c17a6ffc066a09bec420e423b0d16802be2c",
+      "source": "/workspace/scratch/3ed9f844bb34/generated_images/exec-b22cc7e4-f2f7-46a5-81bc-2eeb1215691d.png"
+    }
+  ],
+  "prompts": {
+    "music": "Use case: precise-object-edit. Edit target: the supplied four-friends image. Overhaul this image into a DIFFERENT happy group in a DIFFERENT Pacific setting. Change ALL four people's faces, hair and outfits; replace the veranda completely. Preserve only photorealistic everyday friendliness and gentle sunset lighting. This is the MUSIC promotional photograph for a Fiji social app, not a business scene.\nNew scene: four attractive but believable young adult friends aged 23-29 sit together on a low driftwood log at a quiet Fijian beach, relaxed candid laughter and a casual singalong, palms and gently rippling lagoon behind them at peach-pink sunset. Exactly one Fijian man with close-cropped hair wearing a faded teal T-shirt; one Fijian woman with long braids wearing a coral casual T-shirt; one Chinese woman with short bob haircut in a simple denim shirt; one Indian woman with loose wavy dark hair in a mustard T-shirt who plays a small acoustic guitar. New faces, none of the original people. Warm joyful eye contact among friends, natural skin texture, unposed ordinary clothes, modest surroundings. Soft open shade and sunset glow, no harsh glare or luxury resort. A medium candid group framing from approximately knees up, all four happy faces and the guitar clearly visible in the upper central part. Lower legs can naturally fall outside the frame. Anatomically correct hands on the guitar with plausible string/fret contact; correct fingers and separate limbs; log supports hips naturally. No flower accessories or floating flowers. No phones, laptops, office/work items, alcohol, text, logo or watermark. Wide 3:2 horizontal editorial lifestyle photograph.",
+    "space": "Use case: precise-object-edit. Edit target: the supplied four-friends image. Replace ALL four people with an entirely DIFFERENT group of happy young adult friends and replace the entire location with a different everyday Pacific setting. Keep a photorealistic informal friendship feeling and soft sunset light only. This is YOUR SPACE social app promotional photography. Do not reuse the reference faces, hairstyles or outfits, and do not reuse its sofa, wicker furniture, foreground mat or weathered white veranda.\nScene: a candid laughing conversation in a simple lush garden courtyard beside a modest light-blue timber Fijian home. Green palms and large-leaf plants visibly rooted in garden beds, a low painted garden wall and ordinary grass, softly glowing sunset sky. Four good-looking yet natural adults aged 23-29 standing comfortably in a small social circle: one Fijian man with short curls and faded burgundy tee; one Fijian woman with shoulder-length loose dark waves and mint casual blouse; one Chinese woman with long straight hair and glasses in a lilac T-shirt; one Indian woman with shoulder-length curly hair in a relaxed turquoise patterned blouse. Clearly distinct people from both the supplied reference cast and a beach singalong cast. Their attention is on each other, one tells an amusing story and the others smile and laugh. No work activity and nothing being built. Medium waist-up framing: all four happy faces large and clear, natural separate arms/hands, no ambiguous merged limbs or lower-body/floor intersections. Everyday clothes and lived-in garden, not upscale hotel or fashion event. All flowers omitted; lush grounded foliage only. No phones, laptops, devices, guitars, drink products, work props, text, logo or watermarks. Wide 3:2 landscape photograph with believable natural skin and candid documentary realism. Faces and social interaction are the clear focal point."
+  }
+}
