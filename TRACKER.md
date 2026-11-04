@@ -18,6 +18,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Replace people-free promotional photos with happy young adults; preserve music collapse/visuals, Bula and layout. Record image direction for future work. Ops access fallback used. | claude/remove-assistants / #369 |
 
 ## Do not change
 - nothing recorded yet
