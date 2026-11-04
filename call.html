@@ -14,8 +14,14 @@
 <link rel="stylesheet" href="/colourful-pages.css?v=20261026-personal-world-2">
 <link rel="stylesheet" href="/space-design.css?v=20261026-personal-world-2">
 <link rel="stylesheet" href="/glass-controls.css?v=20261027-chrome-buttons-1">
+<link rel="stylesheet" href="/sota-worlds.css?v=20261104-premium-worlds-1">
 </head>
 <body class="cr">
+<section id="crLobby" class="cr-lobby" aria-labelledby="crLobbyTitle">
+<header class="cr-lobby-header"><a href="/" class="cr-lobby-brand"><img src="/icons/sota-icon-192-20261027g.png" width="44" height="44" alt=""><span>Sota Kece</span></a><a href="/communications.html?app=sota-kece">Back to chats & calls ↗</a></header>
+<div class="cr-join-layout"><div class="cr-lobby-art"><img src="/assets/welcome-20261103/talanoa-natural-768.webp" width="768" height="512" alt="Generated scene of fictional young adult Fijian friends catching up together"><span>A little time together.<i>A whole lot of connection.</i></span></div><div class="cr-join-card"><p class="cr-lobby-eyebrow">YOUR PEOPLE. FACE TO FACE.</p><h1 id="crLobbyTitle">Bring your people closer.</h1><p>Settle in. Choose how you want to join.</p><label for="crLobbyName">Your name in this call</label><input id="crLobbyName" maxlength="40" autocomplete="nickname" placeholder="Your name"><div class="cr-join-modes" role="group" aria-label="How to join"><button type="button" data-call-mode="audio" aria-pressed="false"><strong>Voice only</strong><span>Come as you are.</span></button><button type="button" data-call-mode="video" aria-pressed="true"><strong>Camera & voice</strong><span>Good to see you.</span></button></div><button type="button" id="crJoin" class="cr-join-button">Join video call ↗</button><p class="cr-join-note">Your camera and microphone start when you choose Join. You can turn either off during the call.</p></div></div>
+<footer class="cr-lobby-footer"><span>Part of Dimau Group</span></footer>
+</section>
 <div id="nativeCalls">
 <section id="ncLive" hidden aria-label="Call">
 <div class="nc-live-heading"><h4 id="ncLiveTitle">Call</h4><span id="ncConnection">Starting…</span></div>
@@ -40,7 +46,7 @@
 </section>
 </section>
 </div>
-<section id="crEnded" class="cr-ended" hidden><div class="cr-ended-card"><h1 id="crEndedText">You left the call.</h1><div class="cr-ended-actions"><button type="button" id="crRejoin" class="cr-invite-btn">Rejoin</button></div></div></section>
+<section id="crEnded" class="cr-ended" hidden><div class="cr-ended-card"><h1 id="crEndedText">You left the call.</h1><div class="cr-ended-actions"><a href="/communications.html?app=sota-kece">Back to chats & calls</a><button type="button" id="crRejoin" class="cr-invite-btn">Rejoin</button></div></div></section>
 <button type="button" id="crSound" class="cr-sound" hidden>Tap to hear the call</button>
 <div id="crToast" class="cr-toast" role="status" aria-live="polite" hidden></div>
 <script src="/vendor/supabase-2.45.0.min.js"></script>
@@ -48,7 +54,7 @@
 <script src="/native-call-stage.js?v=20261025-1"></script>
 <script src="/space-design.js?v=20261027-chrome-buttons-1"></script>
 <script>window.SotaSpaceDesign?.init();window.SotaSpaceDesign?.mount(document.getElementById("nativeCalls"),{page:"communications"});</script>
-<script src="/call-room.js?v=20261025-3"></script>
-<script src="/icon-controls.js?v=20261027-chrome-buttons-1"></script><script>window.addEventListener("DOMContentLoaded",()=>window.SotaIconControls?.init(),{once:true});</script>
+<script src="/call-room.js?v=20261104-premium-worlds-1"></script>
+<script src="/icon-controls.js?v=20261104-premium-worlds-1"></script><script>window.addEventListener("DOMContentLoaded",()=>window.SotaIconControls?.init(),{once:true});</script>
 </body>
 </html>

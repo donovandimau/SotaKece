@@ -22,13 +22,14 @@
     return `<div data-dimau-header-bar>${headerBrand()}<div data-dimau-header-actions>${account}<span data-dimau-music-slot>${music}<span class="sx-music-badge" aria-hidden="true"><img class="sx-music-ring" src="/assets/music-badge-ring.svg" width="48" height="48" alt=""><img class="sx-music-note" src="/assets/music-badge-note.svg" width="48" height="48" alt=""></span>${musicEnd}</span><div data-dimau-menu-host><button type="button" data-dimau-menu-toggle aria-label="Menu" aria-controls="sota-header-menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span class="dimau-header-sr-only">Menu</span></button><div id="sota-header-menu" data-dimau-menu-panel class="" hidden>${accountMenu}${designEntry()}${native}${member||example?endorsement():''}</div></div></div></div>`;
   }
   function creativeTools(member=false){return `<section class="sx-create-tools" aria-labelledby="sx-create-title"><header><span class="sx-eyebrow">MAKE IT YOURS</span><h2 id="sx-create-title">Your creative corner.</h2><p>${member?'Shape your space, find your look and build your soundtrack.':'Try the example, find your look and make a playlist. Page designs stay on this device.'}</p></header><div class="sx-create-actions"><button type="button" class="sx-create-tool" data-sx-design="profile" aria-haspopup="dialog" aria-controls="ssd-editor"><span aria-hidden="true">✦</span><strong>${member?'Edit my page':'Try page design'}</strong><small>Colours, type, buttons and backgrounds.</small></button><details class="sx-create-more" open><summary>Room skins and music</summary><div class="sx-create-secondary"><button type="button" class="sx-create-tool" data-sx-customise aria-haspopup="dialog"><span aria-hidden="true">▧</span><strong>Room Studio</strong><small>Choose a skin, cover and soundtrack.</small></button><${member?'button type="button" data-sx-member="music"':'a href="#music"'} class="sx-create-tool"><span aria-hidden="true">♫</span><strong>Your music</strong><small>Make playlists or bring music from your device.</small></${member?'button':'a'}></div></details></div></section>`;}
-  function nav(member=false,tab='home',pending=0){return `<nav class="sx-nav" aria-label="Main navigation">${routes.map(([key,label,target])=>`<${member?'button type="button"':'a'} ${member?`data-sx-member="${target}"`:`href="#${key}" data-sx-route="${key}"`} aria-current="${tab===(member?target:key)?'page':'false'}">${icon(key)}<span>${label}</span>${key==='people'&&pending?`<b class="sx-count" aria-label="${pending} pending requests">${pending}</b>`:''}</${member?'button':'a'}>`).join('')}</nav>`;}
-  function stop(){if(session){session.listeners.forEach(remove=>remove());session=null;}root.document?.body.classList.remove('sx-enabled','sx-guest','sx-member');}
+  function nav(member=false,tab='home',pending=0){if(member)tab=({moments:'pulse',circles:'crews',connections:'friends'})[tab]||tab;return `<nav class="sx-nav" aria-label="Main navigation">${routes.map(([key,label,target])=>`<${member?'button type="button"':'a'} ${member?`data-sx-member="${target}"`:`href="#${key}" data-sx-route="${key}"`} aria-current="${tab===(member?target:key)?'page':'false'}">${icon(key)}<span>${label}</span>${key==='people'&&pending?`<b class="sx-count" aria-label="${pending} pending requests">${pending}</b>`:''}</${member?'button':'a'}>`).join('')}</nav>`;}
+  function stop(){root.SotaWorlds?.stop();if(session){session.listeners.forEach(remove=>remove());session=null;}root.document?.body.classList.remove('sx-enabled','sx-guest','sx-member');}
   function start(app,member){stop();root.SotaIconControls?.stop();root.document.body.classList.add('sx-enabled',member?'sx-member':'sx-guest');app.classList.add('sx-app');session={app,listeners:[],member};return session;}
   function listen(s,node,event,fn){node.addEventListener(event,fn);s.listeners.push(()=>node.removeEventListener(event,fn));}
   function fromHash(hash){const key=String(hash||'').replace(/^#/,'');return validPages.has(key)?key:aliases[key]||null;}
   function init(options={}){config=options;root.SotaIconControls?.stop();}
   function musicDetails(){
+    if(root.SotaWorlds){root.SotaWorlds.enhanceMusic();return;}
     const player=root.document.querySelector('#sk-music-playlist'),visual=player?.querySelector(':scope > dimau-music-visualiser');
     if(visual){const details=root.document.createElement('details');details.className='sx-music-visuals';const summary=root.document.createElement('summary');summary.textContent='Show music visuals';details.append(summary);visual.before(details);details.append(visual);}
   }
@@ -90,7 +91,7 @@
     show(fromHash(root.location.hash)||'home');
     // Opening the playlist from an existing control must also reveal its page.
     const host=app.querySelector('[data-music-playlist-host]');if(host)listen(s,host,'sota-playlist-inline-open',()=>{if(s.page!=='music'&&s.page!=='home'){root.history.pushState(null,'','#music');show('music');}});
-    miniPlayer(s);
+    miniPlayer(s);root.SotaWorlds?.mount(app);
     return ()=>{if(session===s)stop();};
   }
   function mountMember(app,state={}){
@@ -111,6 +112,7 @@
     listen(s,app,'click',event=>{const publicLink=event.target.closest('[data-sx-route],.sx-brand,.sx-mobile-brand');if(!member&&publicLink){event.preventDefault();root.history.pushState(null,'',publicLink.getAttribute('href'));config.welcome?.();return;}const button=event.target.closest('[data-sx-member]');if(button){config.go?.(button.dataset.sxMember);return;}const design=event.target.closest('[data-sx-design]');if(design){root.SotaSpaceDesign?.open(design.dataset.sxDesign||designPage);return;}if(event.target.closest('[data-sx-customise]')){root.BulaSkinStudio?.open();return;}if(event.target.closest('.sx-brand,.sx-mobile-brand')){event.preventDefault();config.go?.('pulse');}});
     if(wasNav)app.querySelector(`[data-sx-member="${state.tab}"]`)?.focus({preventScroll:true});
     if(member)miniPlayer(s);
+    root.SotaWorlds?.mount(app,{member,state,go:config.go});
   }
   function mountMusic(app){root.SotaLocalMusic?.mount(app);root.SotaHeroVisualiser?.mount(app);root.SotaPlaylist?.mount(app);root.SotaMusicHome?.mount(app);root.SotaMusicHome?.choose('playlist');musicDetails();}
   return {init,stop,mountGuest,mountMember,mountMusic,fromHash,nav};

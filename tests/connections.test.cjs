@@ -88,7 +88,7 @@ function client({fr=friends,gr=crews,members=[],profiles=[],user=me,authError=fa
     const vm=require('node:vm'),html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
     const source=html.slice(html.indexOf('async function viewPulse(){'),html.indexOf('async function postPulse(){'));
     let mounts=0,socialMounts=0,errors=0,current=true;
-    const insertions=[],view={insertAdjacentHTML(where,value){insertions.push({where,value});}};
+    const insertions=[],view={querySelector:()=>null,insertAdjacentHTML(where,value){insertions.push({where,value});}};
     const context=vm.createContext({Date,S:{user:{id:me.id},me,tab:'pulse'},viewRun:()=>1,currentView:()=>current,shell(){},requestResult:async p=>p,
       sb:{rpc:async()=>({data:[]}),from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({error:Error('Unavailable Spark')})})})})},
       viewError(){errors++;},$:selector=>{assert.equal(selector,'#view');return view;},window:{
