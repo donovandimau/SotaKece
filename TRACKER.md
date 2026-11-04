@@ -18,6 +18,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Keep player/visualiser collapsed until Music is chosen; photograph-backed feature headings with hover/focus glow. Preserve current Bula/image/layout revision. Ops access fallback; no lease receipt claimed. | claude/remove-assistants / #369 |
 
 ## Do not change
 - nothing recorded yet
