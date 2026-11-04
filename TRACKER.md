@@ -17,6 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | claude | Take the Volau assistant and the "Bula! Welcome" button out of Sota Kece until the new Volau is ready (owner decision 4 Nov) | claude/remove-assistants |
 
 ## Do not change
 - nothing recorded yet
