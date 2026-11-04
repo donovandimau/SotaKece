@@ -18,6 +18,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Replace repeated cast/location with different happy young adults in distinct beach/music and garden/social scenes; correct physical realism. Preserve layout, Bula and music disclosure. | claude/remove-assistants / #369 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Keep the Fijian man and Fijian/Chinese/Indian women cast where this scene is used. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
