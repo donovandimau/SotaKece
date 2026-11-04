@@ -17,6 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Collapse the music library until requested, remove the staged Talanoa food scene, and refine desktop/phone button placement and sharing. | agent/player-share-polish-20261104 |
 
 ## Do not change
 - nothing recorded yet
