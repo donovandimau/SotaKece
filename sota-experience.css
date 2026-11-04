@@ -293,3 +293,9 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button
 }
 @media(prefers-reduced-motion:reduce){.sx-music-ring{animation:none!important}.sx-hero-room{transform:none}}
 @media(forced-colors:active){body.sx-enabled{background:Canvas!important}.sx-home-paths a,.sx-hero-room,.sx-hero-room>header,.sx-hero-room>footer,.sx-home-soundtrack>header,.sx-home-soundtrack,.sx-discover-card,.sx-side-card{background:Canvas!important;color:CanvasText!important;border:1px solid CanvasText}.sx-music-ring{animation:none}.sx-home-soundtrack h2,.sx-home-soundtrack>header p{color:CanvasText}.sx-music-badge{box-shadow:none}}
+
+/* The front door demonstrates the actual product without a fictional location. */
+body.sx-enabled #app.sx-app .sx-hero{background:radial-gradient(ellipse at 85% 10%,#a83892,transparent 60%),linear-gradient(130deg,#44206d,#70347d 55%,#9b4257)}
+.sx-hero::before{background:linear-gradient(90deg,#2e12473d,transparent 80%)}
+.sx-discover-card>svg{position:static;width:54px;height:54px;padding:12px;margin:0 0 24px;background:#ffffff85;color:inherit;box-shadow:none;border:1px solid #ffffff90;border-radius:16px}
+@media(max-width:760px){.sx-discover-card>svg{position:static;grid-column:2;grid-row:1/4;align-self:center;justify-self:end;width:50px;height:50px;margin:0}}
