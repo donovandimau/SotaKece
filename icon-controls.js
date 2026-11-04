@@ -103,7 +103,7 @@
   const preview='.bv-skin-option[data-skin],.bv-collection-card[data-collection]';
   const content='.sk-playlist-songs button,.bv-local-music-row,.pulse-item,.group-button,[data-circle],.tc-graph-list [data-tc-person],.sc-list button,.sc-neighbours button,.scf-list button,.lg3d-list button,.sota-social-panel,.nc-emoji,.sk-emo,.kava-room [data-tip],button[onclick^="walletTopUp"]';
   const selector=rules.map(rule=>rule.selector).join(',')+','+content+','+preview;
-  const excluded='.sk-hero-play,.sk-artwork-play,.sk-hero-create,.spp-hero-edit,.sfp-visual-link,#bv-your-room .bv-discovery-all,#bv-your-room .bv-collection-card';
+  const excluded='#crLobby button,#workspace .tabs button,.sx-standalone-nav button,.sk-hero-play,.sk-artwork-play,.sk-hero-create,.spp-hero-edit,.sfp-visual-link,#bv-your-room .bv-discovery-all,#bv-your-room .bv-collection-card';
   let current=null;
   const words=value=>String(value||'').replace(/\s+/g,' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'').trim();
   function infer(value,fallback){

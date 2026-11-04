@@ -78,3 +78,10 @@ browserTest('page exit remains a close icon in navigation and playlist return re
  h.d.querySelector('section').classList.remove('sk-playlist-inline');button.setAttribute('aria-label','Close music playlist');await flush();
  assert.equal(button.dataset.sotaIcon,'close');assert.equal(button.getAttribute('aria-label'),'Close music playlist');
 });
+
+browserTest('call entry choices and conversation tabs retain visible labels through the shared icon pass',async t=>{
+ const h=harness(t,'<section id="crLobby"><button data-call-mode="audio"><strong>Voice only</strong><span>Come as you are.</span></button><button id="crJoin">Join voice call</button></section><main id="workspace"><nav class="tabs"><button role="tab" data-tab="chat">Chat</button><button role="tab" data-tab="board">Board</button></nav><button id="ncMute">Mute</button></main>');
+ let joined=0;h.d.querySelector('#crJoin').addEventListener('click',()=>joined++);h.api.init();await flush();
+ for(const button of h.d.querySelectorAll('#crLobby button,#workspace .tabs button')){assert.equal(button.hasAttribute('data-sota-icon'),false);assert.equal(button.querySelector('.sota-control-label'),null);assert(button.textContent.trim());}
+ h.d.querySelector('#crJoin').click();assert.equal(joined,1);assert.equal(h.d.querySelector('#ncMute').dataset.sotaIcon,'mic');
+});

@@ -17,6 +17,7 @@
     function show(view,{focus=false,playlist=true}={}){
       if(!valid()||!['visualiser','playlist'].includes(view))return;
       session.view=view;section.dataset.activeMusicView=view;
+      section.dispatchEvent(new root.CustomEvent('sota-music-home-prepare',{bubbles:true,detail:{view}}));
       for(const tab of tabs){const selected=tab.dataset.musicView===view;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1;if(selected&&focus)tab.focus();}
       for(const panel of panels)panel.hidden=panel.dataset.musicPanel!==view;
       if(playlist){if(view==='playlist')root.SotaPlaylist?.showInline?.(host);else root.SotaPlaylist?.hideInline?.();}

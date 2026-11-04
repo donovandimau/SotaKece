@@ -1,4 +1,4 @@
-/* Sota Kece direct calls: open the link and you are in the call.
+/* Sota Kece direct calls: choose voice or video, then join.
  * Anyone with the link can join (like a meeting link), up to 6 people.
  * Signalling runs over a realtime channel named after the room; media goes
  * person-to-person through native-call-media.js. Nothing is recorded. */
@@ -8,11 +8,11 @@
   const MAX = 6, UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);
-  const mode = params.get('mode') === 'audio' ? 'audio' : 'video';
+  let mode = params.get('mode') === 'audio' ? 'audio' : 'video';
   const me = crypto.randomUUID();
   let room = location.hash.slice(1).toLowerCase();
   if (!UUID.test(room)) { room = crypto.randomUUID(); history.replaceState(null, '', location.pathname + location.search + '#' + room); }
-  const link = location.origin + '/call.html?mode=' + mode + '#' + room;
+  let link = location.origin + '/call.html?mode=' + mode + '#' + room;
 
   let stream = null, camTrack = null, screenTrack = null, engine = null, channel = null, sb = null, left = false;
   let micOn = true, camOn = mode === 'video';
@@ -100,7 +100,9 @@
 
   async function join() {
     pill(mode === 'video' ? 'Starting your camera…' : 'Starting your microphone…');
-    stream = await getMedia();
+    const media = await getMedia();
+    if(left){media.getTracks().forEach(track=>track.stop());return;}
+    stream = media;
     camTrack = stream.getVideoTracks()[0] || null;
     stream.getAudioTracks().forEach(t => { t.enabled = micOn; });
     if (camTrack) camTrack.enabled = camOn;
@@ -163,6 +165,7 @@
     if (!camTrack) {
       try {
         const s = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } });
+        if(left){s.getTracks().forEach(track=>track.stop());return;}
         camTrack = s.getVideoTracks()[0]; stream.addTrack(camTrack);
         if (engine) await engine.replaceVideoTrack(camTrack);
         $('ncSelf').srcObject = stream; camOn = true;
@@ -175,6 +178,7 @@
     if (screenTrack) { screenTrack.stop(); return; }
     try {
       const s = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+      if(left){s.getTracks().forEach(track=>track.stop());return;}
       screenTrack = s.getVideoTracks()[0];
       if (engine) await engine.replaceVideoTrack(screenTrack);
       $('ncSelf').srcObject = s;
@@ -184,7 +188,8 @@
   }
 
   function start() {
-    $('crTitle').textContent = mode === 'video' ? 'Video call' : 'Voice call';
+    $('crLobby').hidden = true;
+    if($('crTitle'))$('crTitle').textContent = mode === 'video' ? 'Video call' : 'Voice call';
     $('ncLiveTitle').textContent = mode === 'video' ? 'Video call' : 'Voice call';
     $('ncMute').addEventListener('click', () => { micOn = !micOn; stream && stream.getAudioTracks().forEach(t => { t.enabled = micOn; }); if (engine) engine.setAudioEnabled(micOn); paintButtons(); });
     $('ncVideo').addEventListener('click', toggleCamera);
@@ -212,5 +217,19 @@
     join().catch(() => pill('The call could not start. Check your connection and reload.'));
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();
+  function prepareLobby(){
+    $('ncLive').hidden=true;
+    const name=$('crLobbyName');name.value=myName;
+    const choices=[...document.querySelectorAll('[data-call-mode]')];
+    function choose(value){mode=value;camOn=mode==='video';for(const button of choices)button.setAttribute('aria-pressed',String(button.dataset.callMode===mode));$('crJoin').textContent='Join '+(mode==='video'?'video':'voice')+' call ↗';}
+    for(const button of choices)button.addEventListener('click',()=>choose(button.dataset.callMode));
+    choose(mode);
+    $('crJoin').addEventListener('click',()=>{
+      $('crJoin').disabled=true;myName=name.value.trim().slice(0,40);
+      try{localStorage.setItem('sk-call-name',myName);}catch(_){}
+      const url=new URL(location.href);url.searchParams.set('mode',mode);history.replaceState(null,'',url.pathname+url.search+url.hash);
+      link=location.origin+'/call.html?mode='+mode+'#'+room;start();
+    },{once:true});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepareLobby, { once: true }); else prepareLobby();
 })();
