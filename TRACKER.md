@@ -17,6 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Owner correction: keep Bula welcome; remove only Volau; investigate image locations without changing artwork. Ops agent key unavailable; using standing access fallback, no lease receipt claimed. | claude/remove-assistants / #369 |
 
 ## Do not change
 - nothing recorded yet
