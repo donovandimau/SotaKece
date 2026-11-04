@@ -17,6 +17,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Remove staged walking imagery and repeated navigation photos; remove school skins from featured displays while preserving the catalogue and saved choices. | agent/authentic-front-displays-20261104 |
 
 ## Do not change
 - nothing recorded yet
