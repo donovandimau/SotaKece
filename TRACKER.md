@@ -18,6 +18,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-04 | Codex | Complete the current rebuilt Sota experience: reconcile stale open-tab delivery, audit every public/member screen and design/music/share path on phone and desktop, repair verified gaps and publish exact verified source. | agent/finish-sota-kece-20261104 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
