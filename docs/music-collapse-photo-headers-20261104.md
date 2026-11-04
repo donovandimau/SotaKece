@@ -9,3 +9,5 @@ Three feature cards use distinct original photographs of happy young adult frien
 Checks: 72 focused routing/disclosure, photograph-link, room/audio ownership, visualiser preview/analysis/reconnect and offline tests pass with jsdom 26.1.0; zero failures or skips. Changed JavaScript parses. The connected Browser tool is unavailable, so no fresh hosted desktop/phone visual check or screenshot is claimed. Deployment/CI evidence is recorded in PR369.
 
 Same canonical repository and existing PR/branch. TRACKER claim committed before implementation. Current Ops access fallback applies; no lease, memory, checkpoint or publication receipt is invented. Whole-page ambient lighting, Butterchurn/MilkDrop and audioMotion are researched options, not features claimed in this patch.
+
+CI follow-up: the compact visualiser CSS is also synchronized into revised/live/music-visualiser.js, whose byte equality with the canonical root file is an existing repository contract. The exact-head full and Revised CI jobs exposed this missed copy; it is corrected without changing audio/analysis behavior.
