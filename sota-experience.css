@@ -386,3 +386,99 @@ body.sx-enabled #app.sx-app .sx-photo-wide h3 {
     color: LinkText !important; text-shadow: none;
   }
 }
+
+/* Signed-in Home uses its own feed and social cards. Keep their native actions. */
+body.sx-member #app.sx-app[data-world-page="pulse"] {
+  --sx-feed-photo: url('/assets/social-sunset-20261104/friends-guitar-1536.webp');
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero {
+  display: block;
+  background: linear-gradient(90deg, #121820ee, #121820a3 54%, #12182026), var(--sx-feed-photo) center 38% / cover !important;
+  color: white !important;
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-copy { max-width: 34rem; }
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-copy::before,
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-photo { display: none; }
+
+[data-world-page="pulse"] .sota-social-host:not(.sota-social-hero) [data-social-panel="wall"] {
+  --sx-member-photo: url('/assets/feature-scenes/talanoa-kava-jam-20261105-720.webp');
+  --sx-member-crop: center 23%;
+}
+[data-world-page="pulse"] .sota-social-host:not(.sota-social-hero) [data-social-panel="mates"] {
+  --sx-member-photo: url('/assets/feature-scenes/courtside-friends-20261105-880.webp');
+  --sx-member-crop: center 36%;
+}
+[data-world-page="pulse"] .sx-world-next .sx-world-card[data-world-member="room"] {
+  --sx-member-photo: url('/assets/feature-scenes/design-together-20261105-880.webp');
+  --sx-member-crop: center 26%;
+}
+[data-world-page="pulse"] .sx-world-next .sx-world-card[data-world-member="music"] {
+  --sx-member-photo: url('/assets/feature-scenes/courtyard-guitars-20261105-720.webp');
+  --sx-member-crop: center 26%;
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] :is(
+  .sota-social-host:not(.sota-social-hero) button[data-social-panel],
+  .sx-world-next .sx-world-card:is([data-world-member="room"], [data-world-member="music"])
+) {
+  background: linear-gradient(0deg, #111b2af2, #111b2a26 83%), var(--sx-member-photo) var(--sx-member-crop) / cover !important;
+  color: white !important;
+  min-height: 235px;
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sota-social-host:not(.sota-social-hero) .sota-social-panel {
+  justify-content: end;
+  gap: 8px;
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sota-social-host:not(.sota-social-hero) .sota-social-body { flex: 0 1 auto; }
+body.sx-member #app.sx-app[data-world-page="pulse"] .sota-social-host:not(.sota-social-hero) .sota-social-action { margin-top: 0; }
+body.sx-member #app.sx-app[data-world-page="pulse"] .sota-social-host:not(.sota-social-hero) :is(.sota-social-empty,.sota-social-action,.sota-social-note-author,.sota-social-note-text) { color: white; }
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-next .sx-world-card:is([data-world-member="room"],[data-world-member="music"]) {
+  display: flex;
+  align-items: end;
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-next .sx-world-card:is([data-world-member="room"],[data-world-member="music"]) .sx-world-card-art { display: none; }
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-next > div { grid-template-columns: repeat(2,minmax(0,1fr)); }
+body.sx-member #app.sx-app[data-world-page="pulse"] :is(
+  .sx-world-hero h1,
+  .sota-social-host:not(.sota-social-hero) .sota-social-heading,
+  .sx-world-next :is([data-world-member="room"],[data-world-member="music"]) strong
+) {
+  color: white !important;
+  text-shadow: 0 2px 8px #111827;
+}
+body.sx-member #app.sx-app[data-world-page="pulse"] :is(
+  .sx-world-hero:is(:hover,:focus-within) h1,
+  .sota-social-host:not(.sota-social-hero) button:is(:hover,:focus-visible) .sota-social-heading,
+  .sx-world-next :is([data-world-member="room"],[data-world-member="music"]):is(:hover,:focus-visible) strong
+) {
+  color: #fff6c7 !important;
+  text-shadow: 0 0 7px #fff2a8, 0 0 18px #b4efffbd, 0 2px 10px #171020;
+}
+@media (max-width: 760px) {
+  body.sx-member #app.sx-app[data-world-page="pulse"] {
+    --sx-feed-photo: url('/assets/social-sunset-20261104/friends-guitar-768.webp');
+  }
+  body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero {
+    background: linear-gradient(0deg,#121820f2,#12182036 90%), var(--sx-feed-photo) center / cover !important;
+    display: flex;
+    align-items: end;
+    min-height: 280px;
+  }
+  body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-next > div { grid-template-columns: minmax(0,1fr); }
+}
+@media (forced-colors: active) {
+  body.sx-member #app.sx-app[data-world-page="pulse"] :is(
+    .sx-member-world-heading .sx-world-hero,
+    .sx-world-next .sx-world-card:is([data-world-member="room"],[data-world-member="music"]),
+    .sota-social-host:not(.sota-social-hero) button[data-social-panel]
+  ) {
+    background: Canvas !important;
+    color: CanvasText !important;
+    border: 1px solid CanvasText;
+  }
+  body.sx-member #app.sx-app[data-world-page="pulse"] :is(
+    .sx-world-hero *, .sx-world-next .sx-world-card *, .sota-social-panel *
+  ) {
+    color: CanvasText !important;
+    text-shadow: none !important;
+  }
+}
