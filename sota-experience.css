@@ -310,6 +310,13 @@ body.sx-enabled #app.sx-app .sx-hero{background:radial-gradient(ellipse at 85% 1
 
 .sx-has-mini .sx-footer{padding-bottom:110px}.sx-has-mini .sx-member-content{padding-bottom:120px}
 body.sx-enabled .sx-top .bw-pill{min-height:44px!important}
+/* Quiet navigation still needs a comfortable target on touch screens. */
+.sx-footer>a,.sx-text-link{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;padding-top:10px;padding-bottom:10px}
+#sota-update{position:fixed;z-index:2147482000;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;box-sizing:border-box;width:max-content;max-width:calc(100vw - 32px);padding:14px 16px;border:1px solid #ccb5e2;border-radius:18px;background:#fffafc;color:#432657;box-shadow:0 12px 40px #321a4c40;font:700 13px/1.5 Nunito,system-ui,sans-serif}
+#sota-update[hidden]{display:none}#sota-update p{margin:0;max-width:40ch}#sota-update button{flex:none;min-height:44px;min-width:44px;border:0;border-radius:11px;padding:10px 14px;background:#6b35ce;color:white;font:800 12px/1.4 Nunito,system-ui,sans-serif;cursor:pointer}#sota-update .sota-update-later{background:#f0e5fa;color:#553273}#sota-update :focus-visible{outline:3px solid #a458bd;outline-offset:3px}
+body:has(.sx-mini-player:not([hidden])) #sota-update{bottom:104px}
+@media(max-width:600px){#sota-update{width:calc(100vw - 24px);max-width:none;flex-wrap:wrap;gap:8px;padding:16px}#sota-update p{flex-basis:100%;margin-bottom:4px}#sota-update button{flex:1}}
+@media(forced-colors:active){#sota-update{background:Canvas;color:CanvasText;border-color:CanvasText}#sota-update button{background:ButtonFace;color:ButtonText;border:1px solid ButtonText}}
 
 /* Owner's social photograph stays inside the existing split welcome layout. */
 .sx-hero-social{display:block;width:100%;margin:22px 0 0;border:1px solid #fff6;border-radius:14px;overflow:hidden;box-shadow:0 8px 26px #25103233;background:#593a40}

@@ -9,7 +9,7 @@ const workerSource=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 function worker(){
   const handlers={},stores=new Map(),calls=[];
   let network=async url=>new Response('public '+new URL(url).pathname);
-  let installed=0,claimed=0;
+  let installed=0,claimed=0;const broadcasts=[];
   const absolute=value=>new URL(typeof value==='string'?value:value.url,origin).href;
   const fetch=async request=>{const url=absolute(request);calls.push(url);return network(url,request);};
   const caches={
@@ -25,7 +25,7 @@ function worker(){
     async keys(){return [...stores.keys()];},
     async delete(name){return stores.delete(name);}
   };
-  const context={URL,Request,Response,Set,caches,fetch,self:{location:{origin},addEventListener(type,handler){handlers[type]=handler;},skipWaiting(){installed++;},clients:{claim(){claimed++;}}}};
+  const context={URL,Request,Response,Set,caches,fetch,self:{location:{origin},addEventListener(type,handler){handlers[type]=handler;},skipWaiting(){installed++;},clients:{claim(){claimed++;},async matchAll(){return [{postMessage(message){broadcasts.push(JSON.parse(JSON.stringify(message)));}}];}}}};
   vm.createContext(context);vm.runInContext(workerSource,context);
   const cacheName=vm.runInContext('CACHE',context),assets=Array.from(vm.runInContext('ASSETS',context));
   async function lifetime(type){const waits=[];handlers[type]({waitUntil(promise){waits.push(promise);}});await Promise.all(waits);}
@@ -38,7 +38,7 @@ function worker(){
     try{result=await response;}finally{await Promise.all(waits);}
     return {intercepted:true,response:result};
   }
-  return {assets,cacheName,stores,calls,caches,install:()=>lifetime('install'),activate:()=>lifetime('activate'),request,
+  return {assets,cacheName,stores,calls,caches,broadcasts,install:()=>lifetime('install'),activate:()=>lifetime('activate'),request,message(data){let answer;handlers.message({data,ports:[{postMessage(value){answer=JSON.parse(JSON.stringify(value));}}]});return answer;},
     setNetwork(fn){network=fn;},get installed(){return installed;},get claimed(){return claimed;}};
 }
 
@@ -163,6 +163,15 @@ test('activation removes only older Sota Kece shell caches',async()=>{
   await app.activate();assert.equal(app.claimed,1);assert(!app.stores.has('sota-kece-shell-old'));assert(app.stores.has('another-app'));assert(app.stores.has(app.cacheName));
 });
 
+test('the page and worker identify the same release and notify open tabs without private data',async()=>{
+ const app=worker(),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ assert(html.includes('<meta name="sota-release" content="'+app.cacheName+'">'),'Bump the page release and worker cache together');
+ await app.install();await app.activate();
+ assert.deepEqual(app.broadcasts,[{type:'SOTA_RELEASE',release:app.cacheName}]);
+ assert.deepEqual(app.message({type:'SOTA_RELEASE_REQUEST'}),{type:'SOTA_RELEASE',release:app.cacheName});
+ assert.equal(app.message({type:'UNKNOWN',token:'private'}),undefined);
+});
+
 test('photographic theme covers cache on demand without widening access to private media',async()=>{
  const app=worker();await app.install();
  const image='/revised/assets/skins/photographic-20261029/reef.webp';
@@ -175,8 +184,8 @@ test('photographic theme covers cache on demand without widening access to priva
 test('connectivity changes update the notice while preserving active views and drafts',()=>{
   const handlers={},notices=new Map(),draft={value:'My unfinished Talanoa'},activeView={name:'room'},registrations=[];
   let boots=0;
-  const context={document:{querySelector:selector=>notices.get(selector),createElement:()=>({setAttribute(){}}),body:{prepend(node){notices.set('#'+node.id,node);}}},
-    navigator:{onLine:false,serviceWorker:{register:url=>{registrations.push(url);return Promise.resolve();}}},window:{addEventListener(type,handler){handlers[type]=handler;}},boot(){boots++;},draft,activeView};
+  const context={document:{querySelector:selector=>notices.get(selector),addEventListener(){},createElement:()=>({setAttribute(){}}),body:{prepend(node){notices.set('#'+node.id,node);}}},
+    navigator:{onLine:false,serviceWorker:{addEventListener(){},register:url=>{registrations.push(url);return Promise.resolve({update:async()=>{}});}}},window:{addEventListener(type,handler){const previous=handlers[type];handlers[type]=previous?()=>{previous();handler();}:handler;}},setInterval(){},boot(){boots++;},draft,activeView};
   vm.createContext(context);vm.runInContext(fs.readFileSync(path.join(root,'offline.js'),'utf8'),context);
   assert.equal(notices.get('#sota-connection').hidden,false);assert.match(notices.get('#sota-connection').textContent,/offline/);
   context.navigator.onLine=true;handlers.online();assert.equal(notices.get('#sota-connection').hidden,true);

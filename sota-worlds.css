@@ -174,6 +174,7 @@ body.sx-standalone #groupWorkspace.circle-workspace #panel-calls :is(h2,h3,h4,p,
 #app.sx-app .bv-meme-input>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 14px;border:1px solid var(--world-line);border-radius:12px;background:var(--world-panel);font-size:12px;font-weight:800;cursor:pointer;list-style:none;box-sizing:border-box}
 #app.sx-app .bv-meme-input>summary::after{content:'+';font-size:20px;line-height:1}#app.sx-app .bv-meme-input[open]>summary::after{content:'−'}#app.sx-app .bv-meme-input>summary::-webkit-details-marker{display:none}
 #app.sx-app :is(#sc-in,#sc-out){min-width:44px;min-height:44px}
+#app.sx-app .sc-focus{display:inline-flex;align-items:center;gap:8px;min-height:44px;box-sizing:border-box;padding:8px 0;cursor:pointer}
 body.sx-standalone #groupWorkspace :is(.nc-callbacks,.external-calls)>summary{display:flex;align-items:center;min-height:44px;box-sizing:border-box;padding:10px 0}
 body.sx-standalone .sidebar.panel>details>summary{display:flex;align-items:center;min-height:44px;box-sizing:border-box;padding:10px 0}
 .cr .cr-lobby-footer{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:14px}.cr .cr-lobby-footer .ssd-launcher.ssd-hosted-launcher{position:static!important;inset:auto!important;margin:0;min-height:44px}
