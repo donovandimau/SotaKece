@@ -62,7 +62,8 @@ browserTest('music remains collapsed on Home and each music entry reveals the sa
 });
 browserTest('photographic feature headings retain their original destinations',t=>{
  const h=harness(t);h.mount();const cards=[...h.app.querySelectorAll('.sx-discover-card')];
- assert.equal(cards.length,3);assert.equal(new Set(cards.map(card=>card.querySelector('img').getAttribute('src'))).size,3);
+ assert.deepEqual(cards.map(card=>card.getAttribute('href')),['#people','#skins','#music','#talanoa']);
+ assert.equal(new Set(cards.map(card=>card.querySelector('img').getAttribute('src'))).size,4);
  for(const card of cards){assert(card.querySelector('h3').textContent.trim());assert.equal(card.querySelector('img').getAttribute('loading'),'lazy');const target=card.getAttribute('href').slice(1);card.click();assert.equal(h.app.dataset.sxPage,target);h.get('[data-sx-route="home"]').click();}
 });
 browserTest('signed-in navigation dispatches the existing views and retains wallet controls',t=>{
