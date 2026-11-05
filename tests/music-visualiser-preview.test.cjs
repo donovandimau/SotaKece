@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const source=fs.readFileSync(path.join(__dirname,'../music-visualiser.js'),'utf8');
 let JSDOM;try{({JSDOM}=require('jsdom'));}catch{}
 const run=(name,fn)=>test(name,{skip:!JSDOM&&'Optional jsdom is not installed'},fn),flush=async()=>{for(let i=0;i<4;i++)await new Promise(setImmediate);};
-function context(){const calls=[];const gradient={addColorStop(){}};const ctx={calls,save(){},restore(){},createLinearGradient:()=>gradient,createRadialGradient:()=>gradient};for(const key of ['fillRect','beginPath','moveTo','lineTo','stroke','arc','fillText'])ctx[key]=(...args)=>calls.push([key,...args]);return ctx;}
+function context(){const calls=[];const gradient={addColorStop(){}};const ctx={calls,save(){},restore(){},createLinearGradient:()=>gradient,createRadialGradient:()=>gradient};for(const key of ['fillRect','beginPath','moveTo','lineTo','stroke','arc','fill','fillText'])ctx[key]=(...args)=>calls.push([key,...args]);return ctx;}
 function fixture({reduced=false,saveData=false,pausedPreference=false}={}){
  const dom=new JSDOM('<!doctype html><body><audio id="music" src="/song.mp3"></audio></body>',{url:'https://sotakece.com/',runScripts:'outside-only'}),w=dom.window,d=w.document,frames=new Map(),observers=[],motionListeners=new Set(),ctx=context();let frameId=0,contexts=0,sources=0,plays=0,mediaPaused=true,ready=4,hidden=false,fullscreen=null,modal=null;
  const queryAll=d.querySelectorAll.bind(d);d.querySelectorAll=selector=>selector==='dialog:modal'?(modal?[modal]:[]):queryAll(selector);
@@ -19,8 +19,9 @@ function fixture({reduced=false,saveData=false,pausedPreference=false}={}){
  w.eval(source);const visual=d.createElement('dimau-music-visualiser');visual.setAttribute('for','music');d.body.append(visual);
  return {w,d,dom,visual,audio,ctx,frames,api:w.DimauMusicVisuals,buffer(value){ready=value;audio.dispatchEvent(new w.Event(value<3?'waiting':'playing'));},counters:()=>({contexts,sources,plays}),step(time){const pending=[...frames];frames.clear();pending.forEach(([,fn])=>fn(time));},visibility(value){hidden=value;d.dispatchEvent(new w.Event('visibilitychange'));},intersect(value){observers.forEach(o=>o.fn([{isIntersecting:value}]));},motion(value){for(const listener of motionListeners){visual.motion.matches=value;listener();}},modal(value){modal=value;},fullscreen(value){fullscreen=value;d.dispatchEvent(new w.Event('fullscreenchange'));},close(){visual.remove();dom.window.close();}};
 }
-test('preview renderer varies all four modes without media and real silence remains real silence',()=>{
+test('preview renderer varies all five modes without media and real silence remains real silence',()=>{
  const root={Float32Array,Uint8Array,URL,WeakMap,Math,Number,Blob,DOMException};vm.runInNewContext(source,root);const api=root.DimauMusicVisuals;
+ assert.equal(api.modes.length,5);assert.equal(Object.keys(api.palettes).length,5);
  assert(api.previewSpectrum(0).some(n=>n>.3));assert.notDeepEqual([...api.previewSpectrum(0)],[...api.previewSpectrum(1000)]);
  for(const mode of api.modes){const first=context(),next=context();api.draw(first,600,220,{mode},{previewTime:0},null,false);api.draw(next,600,220,{mode},{previewTime:1000},null,false);assert.notDeepEqual(first.calls,next.calls,mode+' has moving preview geometry');}
  const silent=context();api.draw(silent,600,220,{mode:'spectrum'},{previewTime:1000},{frequency:new Uint8Array(1024),context:{sampleRate:48000}},false);const bars=silent.calls.filter(c=>c[0]==='fillRect').filter((_,i)=>i%3===0);assert(bars.every(c=>c[4]===1));

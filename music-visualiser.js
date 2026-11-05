@@ -3,7 +3,7 @@
   'use strict';
   if(root.DimauMusicVisuals)return;
   const graphs=new WeakMap();
-  const modes=['spectrum','waveform','halo','ocean'];
+  const modes=['spectrum','waveform','halo','ocean','orbit'];
   const palettes={rainbow:['#ff3048','#ff8a18','#ffe62e','#8ded24','#16e879','#00dce8','#1786ff','#6248ff','#b944ff','#ff38ca'],ocean:['#009cbe','#3458d4','#00b48b'],ember:['#d9480f','#de2474','#e4a100'],violet:['#8436d3','#146ecc','#d31b8d'],mono:['#456477','#748597','#243b53']};
   const abortError=signal=>signal?.reason||new DOMException('Cancelled','AbortError');
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -90,6 +90,17 @@
       ctx.lineWidth=Math.max(1,unit*.008);ctx.globalAlpha=.95;
       for(let i=0;i<128;i++){const a=i/128*Math.PI*2-Math.PI/2+(preview?time*.16:0),v=f[i<64?i:127-i]*gain,r=radius+clamp(v,0,1)*unit*.2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*radius,cy+Math.sin(a)*radius);ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);ctx.stroke();}
       ctx.globalAlpha=.7;ctx.fillStyle=colours[2];ctx.font=`500 ${Math.max(10,unit*.045)}px system-ui`;ctx.textAlign='center';ctx.fillText('D I M A U',cx,cy+4);
+    }else if(mode==='orbit'){
+      const cx=w*.5,cy=h*.5;
+      for(let i=0;i<48;i++){
+        const energy=clamp(f[i]*gain,0,1),angle=i*Math.PI/8+(preview?time*.6:0);
+        const radius=unit*(.13+(i%3)*.088+energy*.07);
+        ctx.globalAlpha=.2+energy*.75;
+        ctx.fillStyle=colours[i%colours.length];
+        ctx.beginPath();
+        ctx.arc(cx+Math.cos(angle)*radius*1.5,cy+Math.sin(angle)*radius,Math.max(1,unit*(.008+energy*.025)),0,Math.PI*2);
+        ctx.fill();
+      }
     }else{
       const layers=mode==='ocean'?5:1;ctx.lineWidth=mode==='ocean'?1.4:2;
       for(let layer=0;layer<layers;layer++){
@@ -264,7 +275,7 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
       connectedCallback(){
         if(this.built)return;this.built=true;
         try{const saved=JSON.parse(root.localStorage.getItem('dimau.music.visuals.v1')||'null');if(saved){if(modes.includes(saved.mode))this.settings.mode=saved.mode;if(palettes[saved.theme])this.settings.theme=saved.theme;this.settings.gain=clamp(Number(saved.gain)||1,.5,2);if(typeof saved.paused==='boolean')this.userPaused=saved.paused;}}catch{}
-        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" aria-label="Music visuals"><div class="heading"><strong>SOUND IN MOTION</strong><span class="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption"><span>FREQUENCY / FORM</span><span>DIMAU MUSIC</span></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Waveform</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
+        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" aria-label="Music visuals"><div class="heading"><strong>SOUND IN MOTION</strong><span class="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption"><span>FREQUENCY / FORM</span><span>DIMAU MUSIC</span></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Waveform</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
         const $=s=>this.shadowRoot.querySelector(s);this.$=$;this.canvas=$('canvas');this.ctx=this.canvas.getContext('2d');
         for(const key of ['mode','theme','gain']){const control=$('.'+key);control.value=this.settings[key];control.addEventListener('input',()=>{this.settings[key]=key==='gain'?Number(control.value):control.value;this.persist();this.changed();this.render();});}
         $('.toggle').addEventListener('click',()=>this.toggle());

@@ -74,3 +74,20 @@ browserTest('stopping the shell returns the visible visual to its existing playe
  assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);
  h.w.SotaWorlds.mount(h.app);assert(h.get('[data-world-home-visual]').contains(visual));
 });
+
+browserTest('member Home moves one compact visualiser back to the existing player before remount',t=>{
+ const h=harness(t);
+ const {app,w,visual,player,audio}=h;
+ const state={user:{id:'fixture'},me:{handle:'fixture'},tab:'pulse'};
+ for(let pass=0;pass<2;pass++){
+   w.SotaExperience.stop();
+   assert(player.contains(visual));
+   app.innerHTML='<header class="top"></header><main id="view"></main>';
+   w.SotaExperience.mountMember(app,state);
+   const host=app.querySelector('[data-world-home-visual]');
+   assert(host.contains(visual));
+   assert(visual.hasAttribute('compact'));
+   assert(!host.contains(audio));
+   assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);
+ }
+});

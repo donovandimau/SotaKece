@@ -277,6 +277,7 @@
     return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="/assets/front-reference.jpg" width="1360" height="768"/></svg>`;
   }
   function frontAvatar(label) { return originalCrop(121,951,215,215,label); }
+  function showcasePortrait() { return frontAvatar('Sema — My Space showcase model'); }
   async function shareApp(copyOnly=false) {
     const url='https://sotakece.com/';
     if(!copyOnly&&typeof window==='object'&&window.SotaShare){const kind=await window.SotaShare.share({title:'Sota Kece',text:'Join me on Sota Kece for friends, music and talanoa.',url});return {kind,message:kind==='cancelled'?'Sharing cancelled.':kind==='shared'?'Sharing options opened.':'Choose how to send your invitation.'};}
@@ -619,6 +620,6 @@
     if(pending.length)setTimeout(()=>pending.forEach(file=>window.SotaRoomMedia.api(sb,file.userId).remove(file.path).catch(()=>{})),0);
   }
   window.SotaPlayback?.register('sample',stopSampleOnly);
-  window.BulaSkinStudio={musicMarkup,apply,applyChat,reset,open,preview,chatPreview,closeForOwnerChange};
+  window.BulaSkinStudio={musicMarkup,apply,applyChat,reset,open,preview,chatPreview,showcasePortrait,closeForOwnerChange};
 })();
 
