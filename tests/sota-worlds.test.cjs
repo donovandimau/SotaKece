@@ -91,3 +91,44 @@ browserTest('member Home moves one compact visualiser back to the existing playe
    assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);
  }
 });
+
+browserTest('the eight signed-in worlds have five choices and a feed choice changes the prompt without writing a post',t=>{
+ const h=harness(t);
+ const {app,w}=h;
+ const user={id:'choice-test-member'};
+ function home(owner){
+   w.SotaExperience.stop();
+   app.innerHTML='<header class="top"></header><main id="view"><textarea id="p-text" placeholder="Say something"></textarea></main>';
+   w.SotaExperience.mountMember(app,{user:owner,me:{handle:'fixture'},tab:'pulse'});
+ }
+ home(user);
+ h.get('.sx-world-toolbar [data-world-tool="explore"]').click();
+ const menus=[...h.get('.sx-world-directory').querySelectorAll('[data-world-choice]')];
+ assert.equal(menus.length,8);
+ assert(menus.every(menu=>menu.options.length===6));
+ const faith=menus.find(menu=>menu.dataset.worldChoice==='pulse');
+ faith.value='faith';
+ faith.dispatchEvent(new w.Event('change',{bubbles:true}));
+ assert.match(h.get('#p-text').placeholder,/prayer/);
+ assert.equal(h.get('#p-text').value,'');
+ home(user);
+ assert.match(h.get('#p-text').placeholder,/prayer/);
+ home({id:'another-member'});
+ assert.equal(h.get('#p-text').placeholder,'Say something');
+});
+
+browserTest('Koro choices use native group type and naming controls',t=>{
+ const h=harness(t);
+ const {app,w}=h;
+ w.SotaExperience.stop();
+ app.innerHTML='<header class="top"></header><main id="view"><section id="koro-create"><input data-tc-name placeholder="Circle name"><select data-tc-type><option value="koro">Koro</option><option value="mataqali">Mataqali</option></select></section></main>';
+ w.SotaExperience.mountMember(app,{user:{id:'choice-test-member'},me:{handle:'fixture'},tab:'crews'});
+ const menu=h.get('[data-world-choice=crews]');
+ for(const [choice,type,placeholder] of [['yasana','koro',/provincial/],['mataqali','mataqali',/mataqali/],['island','koro',/island/]]){
+   menu.value=choice;
+   menu.dispatchEvent(new w.Event('change',{bubbles:true}));
+   assert.equal(h.get('[data-tc-type]').value,type);
+   assert.match(h.get('[data-tc-name]').placeholder,placeholder);
+   assert.equal(h.get('[data-tc-name]').value,'');
+ }
+});

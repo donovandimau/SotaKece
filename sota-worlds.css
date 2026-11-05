@@ -379,3 +379,48 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
   .sx-sema-showcase { grid-template-columns: 92px minmax(0, 1fr); padding: 12px; }
   .sx-sema-showcase .sx-world-primary { width: auto; }
 }
+
+.sx-world-choice {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--world-line);
+  border-radius: 12px;
+  background: var(--world-panel);
+  color: var(--world-ink);
+}
+.sx-world-choice label {
+  display: grid;
+  flex: 1 1 180px;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 800;
+}
+.sx-world-choice :is(select,button) {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--world-line);
+  border-radius: 9px;
+  background: var(--world-panel);
+  color: var(--world-ink);
+  font: inherit;
+}
+.sx-world-choice select { width: 100%; }
+.sx-world-choice button { font-size: 13px; font-weight: 800; }
+.sx-world-choice button:disabled { opacity: .55; }
+.sx-world-directory-tile { min-width: 0; }
+.sx-world-directory-tile > .sx-world-card { width: 100%; }
+.sx-world-choice-compact { margin-top: 6px; padding: 8px; }
+.sx-world-choice-compact label { font-size: 12px; }
+@media (forced-colors: active) {
+  .sx-world-choice,.sx-world-choice :is(select,button) {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+}
