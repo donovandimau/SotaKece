@@ -11,7 +11,8 @@
     "layout": "Current revised app retained"
   },
   "assets": [
-    "assets/social-sunset-20261104/friends-guitar-768.webp",
-    "assets/social-sunset-20261104/friends-guitar-1536.webp"
-  ]
+    "assets/social-sunset-20261104/friends-guitar-clean-768.webp",
+    "assets/social-sunset-20261104/friends-guitar-clean-1536.webp"
+  ],
+  "revision": "2026-11-05: Removed the floating red flower above the group. Kept the hibiscus tucked into the woman’s hair."
 }
