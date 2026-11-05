@@ -12,18 +12,18 @@
 ## Current state
 - Status: Ready to Test — Live preview (70% complete)
 - Next action: LAUNCH ORDER (Donovan, 31 Oct): open Sota Kece to overseas Fijians first - full social features, wallet hidden (done: #306 merged and live). Once the Reserve Bank of Fiji approves the wallet, open to Fijians in Fiji and connect the two.
-- Latest implementation: owner rebuild retained; explicit draft-safe update delivery, share focus return and 44px navigation/selection targets. Exact release evidence in the completion PR.
+- Latest implementation: four original Home photo panels with overlaid headings, keyboard and hover glow, and responsive wide artwork.
 - Blocker: none recorded
 
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-05 | Codex | Apply the four Sota Kece Home photo panels with on-image headings and hover/focus glow. | agent/home-photo-panels-20261105 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
 
 ## Last handover
+- 2026-11-05 — Codex — Applied four distinct Home photo panels: courtside friends, friends designing a space, the courtyard guitar session, and Talanoa around the kava bowl in sulus. The existing headings overlay the photos and glow on hover and keyboard focus, with the compact visualiser still below Soundtrack.
 - 2026-11-05 — Codex — Preserved the owner rebuild at 6c71f355: distinct People/Space photos, full-width band, compact visualiser and Bula. Added explicit custom-worker update offers with draft/editor protection and no automatic reload; repaired share Menu focus return and 44px navigation/selection targets. Seven public layouts checked at desktop/phone widths; current production music mode and contextual sharing exercised. Member checks use fictional local data; no real account/call acceptance claimed. 26 focused tests pass; expanded canonical-source suite 567 pass, four existing Companion/Connect failures, four skips. Full scope: docs/completion-check-20261105.md. Exact release CI/preview/production verification is recorded in the PR. Ops authenticated command writes unavailable; no receipt claimed.
 - 2026-11-04 — Codex — Existing PR #369 now has two distinct photo cards and one full-width soundtrack panel. The complete band image scales on mobile with the copy below it. The existing music route and compact visualiser are retained. Source/PR fallback used while Ops agent access is unavailable.
 - 2026-11-04 — Codex — Exact-head CI caught the earlier compact-visualiser CSS change missing from revised/live/music-visualiser.js. Synchronized that existing copy with the canonical root implementation, preserving analysis/drawing/audio behavior. Difference was only the compact tools/note CSS and trailing newline. Canonical-copy equality and JavaScript syntax verified locally; resulting exact-head CI/preview evidence recorded in PR369. The new distinct beach/garden imagery and current Bula/music/layout changes remain.
@@ -40,6 +40,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-05 — Codex — Applied four distinct Home photo panels: courtside friends, friends designing a space, the courtyard guitar session, and Talanoa around the kava bowl in sulus. The existing headings overlay the photos and glow on hover and keyboard focus, with the compact visualiser still below Soundtrack.
 - 2026-11-05 — Codex — Preserved the owner rebuild at 6c71f355: distinct People/Space photos, full-width band, compact visualiser and Bula. Added explicit custom-worker update offers with draft/editor protection and no automatic reload; repaired share Menu focus return and 44px navigation/selection targets. Seven public layouts checked at desktop/phone widths; current production music mode and contextual sharing exercised. Member checks use fictional local data; no real account/call acceptance claimed. 26 focused tests pass; expanded canonical-source suite 567 pass, four existing Companion/Connect failures, four skips. Full scope: docs/completion-check-20261105.md. Exact release CI/preview/production verification is recorded in the PR. Ops authenticated command writes unavailable; no receipt claimed.
 - 2026-11-04 — Codex — Replaced the lookalike Home feature photos with rugby friends, a live band, and a young woman decorating her room. The band panel combines the previous music card and teaser into one linked photograph.
 - 2026-11-04 — Codex — Exact-head CI caught the earlier compact-visualiser CSS change missing from revised/live/music-visualiser.js. Synchronized that existing copy with the canonical root implementation, preserving analysis/drawing/audio behavior. Difference was only the compact tools/note CSS and trailing newline. Canonical-copy equality and JavaScript syntax verified locally; resulting exact-head CI/preview evidence recorded in PR369. The new distinct beach/garden imagery and current Bula/music/layout changes remain.

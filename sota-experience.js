@@ -44,21 +44,25 @@
   }
   function welcome(){return `<section class="sx-hero" aria-labelledby="sx-welcome-title"><div class="sx-hero-copy"><span class="sx-eyebrow">FIJI ROOTS. EVERYWHERE ENERGY.</span><h1 id="sx-welcome-title" tabindex="-1">Your people.<br>Your music.<br><em>Your space.</em></h1><p>Choose your look. Bring your soundtrack. Make a place for your people.</p><div class="sx-actions"><button class="sx-button sx-primary" data-sx-auth="up">Create your space <span aria-hidden="true">↗</span></button></div><small>Already part of the circle? <button class="sx-inline" data-sx-auth="in">Sign in</button><br><a class="sx-inline" href="#profile">Take a look around</a></small><picture class="sx-hero-social"><img src="/assets/social-sunset-20261104/friends-guitar-768.webp" srcset="/assets/social-sunset-20261104/friends-guitar-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-1536.webp 1536w" sizes="(max-width:760px) calc(100vw - 72px), 440px" width="1536" height="1024" alt="Illustrative scene of four friends chatting while one plays guitar on a veranda at sunset" decoding="async"></picture></div><section class="sx-hero-room" aria-label="Sema’s example room"><header><span>SEMA’S SPACE</span><small>EXAMPLE ROOM</small></header><div data-sx-room-home></div><footer><button type="button" data-sx-customise>Try Room Studio ↗</button><a href="#profile">Open this space ↗</a></footer></section><div class="sx-hero-caption">SOTA KECE <span>Come as you are.</span></div></section><nav class="sx-home-paths" aria-label="Explore Sota Kece"><a href="#people">${icon('people')} Find your people</a><a href="#talanoa">${icon('talanoa')} Pull up a seat</a><a href="#music">${icon('music')} Build your soundtrack</a><a href="#skins">${icon('profile')} Find your look</a><a href="#world">${icon('home')} Your 3D world</a></nav><section class="sx-intro"><div><span class="sx-eyebrow">MORE CONNECTION. MORE YOU.</span><h2>All the things that<br>bring us together.</h2></div><p>Catch up with your people, share a favourite song and build a space that tells your story.</p></section><div class="sx-discover sx-scene-grid">
     <a class="sx-discover-card sx-photo-card sx-discover-people" href="#people">
-      <img class="sx-card-photo" src="/assets/feature-scenes/rugby-friends.webp" alt="" width="900" height="900" loading="lazy" decoding="async">
+      <img class="sx-card-photo" src="/assets/feature-scenes/courtside-friends-20261105-880.webp" alt="" width="880" height="587" loading="lazy" decoding="async">
       ${icon('people')}<small>YOUR PEOPLE</small><h3>Good company.<br>Wherever you are.</h3><span>Find your people ↗</span>
     </a>
     <a class="sx-discover-card sx-photo-card sx-discover-space" href="#skins">
-      <img class="sx-card-photo" src="/assets/feature-scenes/room-print.webp" alt="" width="900" height="900" loading="lazy" decoding="async">
+      <img class="sx-card-photo" src="/assets/feature-scenes/design-together-20261105-880.webp" alt="" width="880" height="495" loading="lazy" decoding="async">
       ${icon('profile')}<small>YOUR OWN SPACE</small><h3>A whole lot<br>of personality.</h3><span>Find your look ↗</span>
     </a>
     <section class="sx-home-soundtrack sx-band-panel" aria-labelledby="sx-soundtrack-title">
-      <a href="#music" class="sx-discover-card sx-discover-music sx-band-link">
-        <img class="sx-band-photo" src="/assets/feature-scenes/live-band.webp" srcset="/assets/feature-scenes/live-band-768.webp 768w, /assets/feature-scenes/live-band.webp 1800w" sizes="(max-width:760px) 100vw, (max-width:1450px) 80vw, 1280px" width="1800" height="600" alt="" loading="lazy" decoding="async">
-        <div class="sx-band-caption"><small>YOUR ROOM. YOUR SOUNDTRACK.</small><h3 id="sx-soundtrack-title">Viti roots.<br>Volume up.</h3><span>Explore the music ↗</span></div>
+      <a href="#music" class="sx-discover-card sx-photo-card sx-photo-wide sx-discover-music sx-band-link">
+        <img class="sx-card-photo" src="/assets/feature-scenes/courtyard-guitars-20261105-1400.webp" srcset="/assets/feature-scenes/courtyard-guitars-20261105-720.webp 720w, /assets/feature-scenes/courtyard-guitars-20261105-1400.webp 1400w" sizes="(max-width:760px) 100vw, (max-width:1450px) 80vw, 1280px" alt="" width="1400" height="788" loading="lazy" decoding="async">
+        <small>YOUR ROOM. YOUR SOUNDTRACK.</small><h3 id="sx-soundtrack-title">Viti roots.<br>Volume up.</h3><span>Explore the music ↗</span>
       </a>
       <div class="sx-home-visuals" data-world-home-visual aria-label="Music visualiser"></div>
     </section>
-  </div><section class="sx-together sx-together-conversation"><span class="sx-eyebrow">SIT DOWN. CATCH UP.</span><h2>There’s a place for you<br>in the circle.</h2><a class="sx-button" href="#talanoa">Explore Talanoa ${icon('talanoa')}</a><div class="sx-conversation-art" aria-hidden="true">${icon('talanoa')}<span>Stories.</span><span>Music.</span><span>Your people.</span></div></section>`;}
+    <a class="sx-discover-card sx-photo-card sx-photo-wide sx-discover-talanoa" href="#talanoa">
+      <img class="sx-card-photo" src="/assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp" srcset="/assets/feature-scenes/talanoa-kava-jam-20261105-720.webp 720w, /assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp 1400w" sizes="(max-width:760px) 100vw, (max-width:1450px) 80vw, 1280px" alt="" width="1400" height="788" loading="lazy" decoding="async">
+      <small>SIT DOWN. CATCH UP.</small><h3>There’s a place for you<br>in the circle.</h3><span>Explore Talanoa ↗</span>
+    </a>
+  </div>`;}
   function mountGuest(app,{roomMarkup=''}={}){
     root.SotaFrontPages?.stop();
     const s=start(app,false),take=selector=>app.querySelector(selector);
