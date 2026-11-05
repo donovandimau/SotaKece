@@ -30,7 +30,20 @@ browserTest('player, visual choices, filter and audio survive switching between 
  h.w.SotaWorlds.enhanceMusic();assert.equal(h.player.querySelectorAll('.sx-player-library').length,1);assert.equal(h.player.querySelectorAll('.sx-player-now').length,1);
 });
 browserTest('each signed-in destination retains its content and exposes all eight existing worlds',t=>{
- const h=harness(t);for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});if(page==='pulse'){assert(h.get('.sx-world-next [data-world-member=room]'));h.get('.sx-world-next [data-world-member=music]').click();assert.equal(h.calls.go.at(-1),'music');}assert.equal(h.get('#draft'),draft);assert.equal(draft.value,'keep my draft');assert.equal(h.app.querySelectorAll('.sx-world-member-tabs button').length,8);assert.equal(h.app.querySelector('.sx-world-member-tabs [aria-current="page"]').dataset.worldMember,page);assert.equal(h.app.querySelectorAll('.sx-nav [aria-current="page"]').length,1);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page==='room'?'profile':page);}
+ const h=harness(t);for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});if(page==='pulse'){
+    assert(h.get('.sx-world-next [data-world-member=room]'));
+    h.get('.sx-world-next [data-world-member=music]').click();
+    assert.equal(h.calls.go.at(-1),'music');
+    const cards=[...h.app.querySelectorAll('.sx-world-next .sx-world-card-photo')];
+    assert.deepEqual(cards.map(card=>card.dataset.worldMember),['moments','crews']);
+    assert.equal(new Set(cards.map(card=>card.querySelector('img').getAttribute('src'))).size,2);
+  }
+  if(page==='friends'){
+    const connections=h.get('.sx-world-next .sx-world-card-photo[data-world-member=connections]');
+    assert(connections.querySelector('img').getAttribute('src').includes('connections-ferry'));
+    connections.click();
+    assert.equal(h.calls.go.at(-1),'connections');
+  }assert.equal(h.get('#draft'),draft);assert.equal(draft.value,'keep my draft');assert.equal(h.app.querySelectorAll('.sx-world-member-tabs button').length,8);assert.equal(h.app.querySelector('.sx-world-member-tabs [aria-current="page"]').dataset.worldMember,page);assert.equal(h.app.querySelectorAll('.sx-nav [aria-current="page"]').length,1);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page==='room'?'profile':page);}
 });
 test('member deep links are bounded and leave invitation and public graph routes to their existing owners',()=>{
  const {memberRouteFromHash}=require('../sota-worlds.js');assert.equal(memberRouteFromHash('#music'),'music');assert.equal(memberRouteFromHash('#profile'),'room');assert.equal(memberRouteFromHash('#world'),'connections');assert.equal(memberRouteFromHash('#view=moments'),'moments');for(const route of ['#view=wallet','#view=admin','#circle-invite=secret','#circle-graph=public','#friends-graph=public','#connections=mine'])assert.equal(memberRouteFromHash(route),null);
