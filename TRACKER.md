@@ -18,12 +18,12 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-05 | Codex | Add distinct Moments, Your Koro and Your connections photos to signed-in recommendations. | agent/member-destination-photos-20261105 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
 
 ## Last handover
+- 2026-11-05 — Codex — Added distinct photo covers to the signed-in Moments, Your Koro and Your connections recommendation cards, with the existing headings over the images and hover/focus glow. The Pulse shows a separate café scene while the feed is empty.
 - 2026-11-05 — Codex — Removed the floating background flower from the veranda image. Switched Home, the signed-in feed and contextual headers to the new responsive image URLs.
 - 2026-11-05 — Codex — Put the signed-in feed, Music and My Space photography on dedicated layers so saved colour themes cannot hide the images or compromise heading contrast.
 - 2026-11-05 — Codex — Added photography and hover/focus title glow to the signed-in Home that Ops previews: feed hero, Talanoa, Top Mates, My space and Music. Retained the signed-in feed and existing social controls.
@@ -44,6 +44,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-05 — Codex — Added distinct photo covers to the signed-in Moments, Your Koro and Your connections recommendation cards, with the existing headings over the images and hover/focus glow. The Pulse shows a separate café scene while the feed is empty.
 - 2026-11-05 — Codex — Removed the floating background flower from the veranda image. Switched Home, the signed-in feed and contextual headers to the new responsive image URLs.
 - 2026-11-05 — Codex — Put the signed-in feed, Music and My Space photography on dedicated layers so saved colour themes cannot hide the images or compromise heading contrast.
 - 2026-11-05 — Codex — Added photography and hover/focus title glow to the signed-in Home that Ops previews: feed hero, Talanoa, Top Mates, My space and Music. Retained the signed-in feed and existing social controls.

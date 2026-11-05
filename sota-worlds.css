@@ -192,3 +192,57 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
 .sx-world-hero-photo:has(.sx-world-social){min-height:0;height:auto;align-self:center;background:#50383e}
 .sx-world-hero-photo>.sx-world-social{position:relative;height:auto;aspect-ratio:3/2;object-fit:contain}
 @media(max-width:760px){.sx-world-hero-photo:has(.sx-world-social){height:auto;min-height:0}}
+
+/* Member recommendations and the empty Pulse keep copy legible over artwork. */
+.sx-world-card.sx-world-card-photo,
+.sx-pulse-empty-photo {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: end;
+  min-height: 190px;
+  overflow: hidden;
+}
+.sx-pulse-empty-photo {
+  min-height: 155px;
+  border-radius: 12px;
+  background: #172332;
+}
+.sx-world-card.sx-world-card-photo > img,
+.sx-pulse-empty-photo > img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+}
+.sx-world-card-photo::before,
+.sx-pulse-empty-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg,#101824f7,#101824b8 39%,#1018240d 86%);
+  pointer-events: none;
+}
+.sx-world-card-photo > .sx-world-card-copy,
+.sx-pulse-empty-photo > p { color: white; }
+.sx-world-card-photo > .sx-world-card-copy { width: 100%; }
+.sx-pulse-empty-photo > p { margin: 0; padding: 15px; }
+.sx-world-card-photo:is(:hover,:focus-visible) strong {
+  color: #fff6c7;
+  text-shadow: 0 0 7px #fff2a8, 0 0 18px #b4efffbd, 0 2px 10px #171020;
+}
+.sx-world-card-photo:focus-visible { outline: 3px solid #fff1a6; outline-offset: -4px; }
+@media (forced-colors: active) {
+  .sx-world-card-photo > img, .sx-pulse-empty-photo > img,
+  .sx-world-card-photo::before, .sx-pulse-empty-photo::before { display: none !important; }
+  .sx-pulse-empty-photo { background: Canvas; border: 1px solid CanvasText; }
+  .sx-world-card-photo > .sx-world-card-copy,
+  .sx-pulse-empty-photo > p,
+  .sx-world-card-photo:is(:hover,:focus-visible) strong { color: CanvasText; text-shadow: none; }
+  .sx-world-card-photo:focus-visible { outline-color: Highlight; }
+}
