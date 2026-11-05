@@ -33,6 +33,13 @@
     const alt=w.photo===photos.social?'Illustrative scene of four friends chatting while one plays guitar on a veranda at sunset':w.photo===photos.music?'Illustrative scene of happy young adult friends singing with a guitar on a beach at sunset':'Illustrative scene of happy young adult friends chatting in a Fijian garden at sunset';
     return `<img src="${w.photo}" class="${w.photo===photos.social?'sx-world-social':''}" srcset="${w.photo} 768w, ${w.photo.replace('-768.webp','-1536.webp')} 1536w" sizes="(max-width:760px) calc(100vw - 48px), 500px" alt="${alt}" width="768" height="512" decoding="async"><span aria-hidden="true">${esc(w.label)}<i>Make it yours.</i></span>`;
   }
+  const lightsToggle='<button type="button" class="sx-lights-toggle" data-sota-lights-toggle aria-pressed="true">Page lights: On</button>';
+  function homeListening(){
+    return `<section class="sx-home-listen" aria-labelledby="sx-home-listen-title">
+      <header><h2 id="sx-home-listen-title">Music visuals</h2><button type="button" class="sx-world-primary" data-world-member="music">Open Music ↗</button></header>
+      <div class="sx-home-visuals" data-world-home-visual aria-label="Music visualiser"></div>
+    </section>`;
+  }
   let session=null;
   function move(node,parent){if(!node||!parent||node.parentNode===parent)return;if(typeof parent.moveBefore==='function'&&node.isConnected&&parent.isConnected){try{parent.moveBefore(node,null);return;}catch(_){}}parent.append(node);}
   function memberRouteFromHash(hash){const key=String(hash||'').replace(/^#/,'');if(key.startsWith('view=')){const p=key.slice(5);return memberPages.includes(p)?p:null;}return ({'':'pulse',home:'pulse',people:'friends',talanoa:'crews',music:'music',profile:'room',skins:'room',world:'connections'})[key]||null;}
@@ -60,12 +67,13 @@
     if(region?.tagName==='DETAILS'){const old=region;region=doc.createElement('section');region.className=old.className;for(const n of [...old.children])if(n.tagName!=='SUMMARY')region.append(n);old.replaceWith(region);}
     if(!region){region=doc.createElement('section');region.className='sx-music-visuals';now.after(region);}
     region.setAttribute('aria-label','Music visuals');
-    if(!region.querySelector('[data-world-inline-visual]')){const header=doc.createElement('header');header.innerHTML='<span class="sx-eyebrow">MAKE YOUR MUSIC MOVE</span><h3>Music visuals</h3><p>Choose a visual and colour. Turn it up, or go fullscreen.</p>';const host=doc.createElement('div');host.setAttribute('data-world-inline-visual','');region.prepend(header);region.append(host);}
+    if(!region.querySelector('[data-world-inline-visual]')){const header=doc.createElement('header');header.innerHTML='<span class="sx-eyebrow">MAKE YOUR MUSIC MOVE</span><h3>Music visuals</h3><p>Choose a visual style and colour. Page lights respond to the playing track.</p>'+lightsToggle;const host=doc.createElement('div');host.setAttribute('data-world-inline-visual','');region.prepend(header);region.append(host);}
     const section=doc.querySelector('#sota-music-home'),panel=section?.querySelector('[data-music-panel="visualiser"]');
-    let stage=panel?.querySelector('[data-world-visual-stage]');if(panel&&!stage){stage=doc.createElement('div');stage.setAttribute('data-world-visual-stage','');stage.className='sx-visual-studio';stage.innerHTML='<header><span class="sx-eyebrow">YOUR SOUND, YOUR WAY</span><h2>A whole different atmosphere.</h2><p>Four visual styles. Five colour moods. One soundtrack.</p><button type="button" data-world-tool="playlist">Back to player & library ↗</button></header>';panel.append(stage);}
-    const homeHost=doc.querySelector('[data-world-home-visual]');
+    let stage=panel?.querySelector('[data-world-visual-stage]');if(panel&&!stage){stage=doc.createElement('div');stage.setAttribute('data-world-visual-stage','');stage.className='sx-visual-studio';stage.innerHTML='<header><span class="sx-eyebrow">YOUR SOUND, YOUR WAY</span><h2>A whole different atmosphere.</h2><p>Five visual styles and five colour moods, with lighting synced to your soundtrack.</p><button type="button" data-world-tool="playlist">Back to player & library ↗</button>'+lightsToggle+'</header>';panel.append(stage);}
+    root.SotaMusicBadge?.updateControls?.();
+    const homeHost=session?.app.querySelector('[data-world-home-visual]');
     const visual=player.querySelector('dimau-music-visualiser')||stage?.querySelector('dimau-music-visualiser')||homeHost?.querySelector('dimau-music-visualiser');if(!visual)return;
-    const atHome=!!homeHost&&section?.closest('.sx-app')?.dataset.sxPage==='home';
+    const atHome=!!homeHost&&(session.member?session.page==='pulse':session.app.dataset.sxPage==='home');
     if(atHome)visual.setAttribute('compact','');else visual.removeAttribute('compact');
     const target=atHome?homeHost:section?.dataset.activeMusicView==='visualiser'&&stage?stage:region.querySelector('[data-world-inline-visual]');move(visual,target);visual.wake?.();
     const oldStage=panel?.querySelector('.sk-music-stage');if(oldStage)oldStage.hidden=true;
@@ -74,7 +82,7 @@
   }
   function mount(app,{member=false,state={},go}={}){
     stop();if(!app)return;
-    app.querySelectorAll('.sx-member-world-heading,.sx-world-member-tabs,.sx-world-next,.sx-world-rail-links,.sx-world-home-tools').forEach(n=>n.remove());
+    app.querySelectorAll('.sx-member-world-heading,.sx-world-member-tabs,.sx-world-next,.sx-world-rail-links,.sx-world-home-tools,.sx-home-listen').forEach(n=>n.remove());
     const s={app,member,go,state,remove:[],directory:null,page:member?state.tab||'pulse':app.dataset.sxPage||'home'};session=s;
     const on=(node,event,fn)=>{node.addEventListener(event,fn);s.remove.push(()=>node.removeEventListener(event,fn));};
     const heading=member?null:app.querySelector('.sx-page-heading');
@@ -82,9 +90,25 @@
     if(member){
       const view=app.querySelector('#view');if(view){const w=worlds[s.page]||worlds.room;
         const nativeHero=view.querySelector('.koro-hero,.kava-hero,.sc-heading,.sc-hero');
-        const tools=root.document.createElement('div');tools.className='sx-member-world-heading';tools.innerHTML=nativeHero||s.page==='room'?toolbar(true):banner(w,true,s.page);if(s.page==='room')tools.insertAdjacentHTML('beforeend','<h1 class="sx-room-page-title">'+(state.roomHandle&&state.roomHandle!==state.me?.handle?'Their space.':'Your space.')+'</h1>');view.prepend(tools);
+        const tools=root.document.createElement('div');
+        tools.className='sx-member-world-heading';
+        tools.innerHTML=nativeHero||s.page==='room'?toolbar(true):banner(w,true,s.page);
+        if(s.page==='room'){
+          const visiting=state.roomHandle&&state.roomHandle!==state.me?.handle;
+          tools.insertAdjacentHTML('beforeend','<h1 class="sx-room-page-title">'+(visiting?'Their space.':'Your space.')+'</h1>');
+          const portrait=visiting?'':root.BulaSkinStudio?.showcasePortrait?.();
+          if(portrait)tools.insertAdjacentHTML('beforeend',`<section class="sx-sema-showcase" aria-labelledby="sx-sema-title">
+            <div class="sx-sema-portrait">${portrait}</div>
+            <div><span class="sx-eyebrow">MY SPACE SHOWCASE</span><h2 id="sx-sema-title">Sema’s space</h2>
+              <p>See how Sema makes her room her own, from the skin to the soundtrack.</p>
+              <button type="button" class="sx-world-primary" data-world-tool="studio">Try Room Studio ↗</button>
+            </div>
+          </section>`);
+        }
+        view.prepend(tools);
         const old=view.querySelector('.sx-member-heading');old?.remove();
         const tabs=root.document.createElement('nav');tabs.className='sx-world-member-tabs';tabs.setAttribute('aria-label','Your Sota Kece worlds');tabs.innerHTML=memberPages.map(p=>`<button type="button" data-world-member="${p}" aria-current="${p===s.page?'page':'false'}">${esc(worlds[p].label)}</button>`).join('');tools.before(tabs);
+        if(s.page==='pulse')tools.insertAdjacentHTML('afterend',homeListening());
         view.insertAdjacentHTML('beforeend',recommendations(s.page,true));
       }
     }else{

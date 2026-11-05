@@ -295,3 +295,87 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
     body.sx-enabled #app.sx-app [data-dimau-header-actions] .bw-flag { display: none; }
   }
 }
+
+/* Live sound paints the viewport edges and leaves controls and text readable. */
+.sota-page-lights {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+}
+.sota-page-lights::before,
+.sota-page-lights::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.sota-page-lights::before {
+  background: radial-gradient(ellipse at 0% 18%, var(--sota-light-bass-a,#ffae32), transparent 37%),
+    radial-gradient(ellipse at 100% 82%, var(--sota-light-bass-b,#f044a6), transparent 34%);
+  opacity: var(--sota-bass-light,0);
+}
+.sota-page-lights::after {
+  background: radial-gradient(ellipse at 100% 0%, var(--sota-light-mid-a,#32e9ff), transparent 40%),
+    radial-gradient(ellipse at 2% 100%, var(--sota-light-mid-b,#8055e9), transparent 36%);
+  opacity: var(--sota-mid-light,0);
+}
+@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .sota-page-lights { display: none; }
+}
+.sx-home-listen {
+  margin: 16px 0;
+  border: 1px solid var(--world-line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--world-panel);
+  color: var(--world-ink);
+}
+.sx-home-listen > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+}
+.sx-home-listen h2 { margin: 0; font-size: 18px; }
+.sx-home-listen .sx-home-visuals { padding: 8px; }
+.sx-home-listen dimau-music-visualiser { --music-visual-stage-height: 124px; }
+.sx-lights-toggle {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--world-line);
+  border-radius: 10px;
+  background: var(--world-panel);
+  color: var(--world-ink);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.sx-lights-toggle[aria-pressed="true"] {
+  background: var(--world-accent);
+  color: var(--world-on-accent);
+}
+
+.sx-sema-showcase {
+  display: grid;
+  grid-template-columns: minmax(96px, 148px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(12px, 3vw, 32px);
+  padding: 16px;
+  border: 1px solid var(--world-line);
+  border-radius: 16px;
+  background: var(--world-panel);
+  color: var(--world-ink);
+}
+.sx-sema-portrait {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.sx-sema-showcase h2 { margin: 4px 0; }
+.sx-sema-showcase p { margin: 6px 0 12px; }
+@media (max-width: 480px) {
+  .sx-sema-showcase { grid-template-columns: 92px minmax(0, 1fr); padding: 12px; }
+  .sx-sema-showcase .sx-world-primary { width: auto; }
+}

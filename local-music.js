@@ -66,6 +66,7 @@
     await ensure();if(!selected)return;
     const player=getAudio();if(!player.paused){pause();return;}
     beforePlay();message='';
+    root.SotaMusicBadge?.prepare?.(player);
     root.SotaHeroVisualiser?.prepare(player);
     try{await player.play();}catch(_){message='Tap Play again, or choose a music format this browser supports.';sync();}
   }

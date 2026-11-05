@@ -47,6 +47,7 @@ const url=selected.url||ext?.urlFor?.(selected)||'';
 if(current!==index||audio.getAttribute('src')!==url||audio.error){audio.pause();current=index;audio.src=url;}
 selectedTrack=selected;
 message='Loading · '+selected.title;sync();
+root.SotaMusicBadge?.prepare?.(audio);
 root.SotaHeroVisualiser?.prepare(audio);
 try{await audio.play();if(request!==attempt)return;message='Playing · '+selected.title;sync();}
 catch(_){if(request===attempt){message='Could not play this song. Tap Play to retry, or choose another song.';sync();}}
