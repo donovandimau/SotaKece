@@ -389,7 +389,7 @@ body.sx-enabled #app.sx-app .sx-photo-wide h3 {
 
 /* Signed-in Home uses its own feed and social cards. Keep their native actions. */
 body.sx-member #app.sx-app[data-world-page="pulse"] {
-  --sx-feed-photo: url('/assets/social-sunset-20261104/friends-guitar-1536.webp');
+  --sx-feed-photo: url('/assets/social-sunset-20261104/friends-guitar-clean-1536.webp');
 }
 body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero {
   display: block;
@@ -472,7 +472,7 @@ body.sx-member #app.sx-app[data-world-page="pulse"] :is(
 }
 @media (max-width: 760px) {
   body.sx-member #app.sx-app[data-world-page="pulse"] {
-    --sx-feed-photo: url('/assets/social-sunset-20261104/friends-guitar-768.webp');
+    --sx-feed-photo: url('/assets/social-sunset-20261104/friends-guitar-clean-768.webp');
   }
   body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero {
     display: flex;

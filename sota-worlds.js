@@ -1,7 +1,7 @@
 /* Discover the existing Sota worlds. Content, media, accounts and saved designs keep their owners. */
 (function(root,factory){const api=factory(root);if(typeof module==='object'&&module.exports)module.exports=api;else root.SotaWorlds=api;})(typeof globalThis==='object'?globalThis:this,function(root){
   'use strict';
-  const photos={social:'/assets/social-sunset-20261104/friends-guitar-768.webp',music:'/assets/social-sunset-20261104/beach-singalong-768.webp',space:'/assets/social-sunset-20261104/garden-catchup-768.webp'};
+  const photos={social:'/assets/social-sunset-20261104/friends-guitar-clean-768.webp',music:'/assets/social-sunset-20261104/beach-singalong-768.webp',space:'/assets/social-sunset-20261104/garden-catchup-768.webp'};
   const worlds={
     home:{label:'Home',title:'A little closer to your people.',line:'Your people, music and space, together.',tone:'sun',photo:null},
     people:{label:'People',title:'Good people. Great connections.',line:'Find a familiar face. Bring your friends. See your world grow.',tone:'rose',photo:photos.social,action:'Find a mate',focus:'#bv-find-mate,#s-q'},
