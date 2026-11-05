@@ -269,6 +269,7 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
     padding-bottom: 0 !important;
   }
   body.sx-member > [data-dimau-group-footer] {
+    z-index: 0 !important;
     padding-bottom: calc(87px + env(safe-area-inset-bottom, 0px)) !important;
   }
   body.sx-member:has(#app.sx-has-mini) > [data-dimau-group-footer] {
