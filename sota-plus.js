@@ -52,6 +52,9 @@
   /* ---------------------------------------------------------------- reactions + comments bar (moments, wall, stories) */
   function bar(kind, id, reactions, commentCount, extra) {
     var rs = reactions || { counts: {}, mine: null }, mine = rs.mine;
+    // A refreshed count can come from DOM text; never reinterpret it as HTML.
+    var replies = Number(commentCount);
+    if (!Number.isSafeInteger(replies) || replies < 0) replies = 0;
     var top = REACTIONS.filter(function (r) { return rs.counts[r.key] > 0; })
       .sort(function (a, b) { return rs.counts[b.key] - rs.counts[a.key]; }).slice(0, 3)
       .map(function (r) { return r.icon; }).join('');
@@ -66,7 +69,7 @@
           }).join('') + '</div>' +
       '</div>' +
       (total ? '<button type="button" class="sp-who" data-sp="reactors" title="Who reacted">' + top + ' ' + total + '</button>' : '') +
-      '<button type="button" class="sp-btn" data-sp="comments">💬 ' + (commentCount || 'Reply') + '</button>' +
+      '<button type="button" class="sp-btn" data-sp="comments">💬 ' + (replies || 'Reply') + '</button>' +
       (extra || '') +
       '</div><div class="sp-comments" hidden></div>';
   }
