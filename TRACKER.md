@@ -18,7 +18,6 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-06 | Codex | Add safe response headers | fix/security-response-headers-20261106 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
@@ -50,6 +49,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-06 — Codex — Added nosniff and strict-origin-when-cross-origin response headers. Existing embedding, media and call behavior remains. JSON validation passes; hosted checks and live readback belong to the scoped security PR.
 - 2026-11-06 — Codex — Prepared comment-count HTML hardening and read-only workflow declaration on fix/security-dom-rendering-20261106; focused regression tests pass. Publication and full CI evidence are recorded in the PR.
 - 2026-11-06 — Codex — Corrected robots and sitemap from the old sotakece.vercel.app alias to https://sotakece.com/. XML parsing and source diff checks pass; hosted gates and production verification are recorded in the scoped PR.
 - 2026-11-05 — Codex — Added five starting choices to each signed-in world, available in Explore and on the destination. Per-account device preferences drive writing and search prompts, Koro presets, native circle creation, room previews, Music style or map actions as applicable.
