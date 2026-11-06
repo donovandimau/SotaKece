@@ -18,7 +18,6 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-06 | Codex | Repair verified robots/sitemap discovery and canonical identity | codex/seo-discovery-20261106 |
 
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
@@ -49,6 +48,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-06 — Codex — Corrected robots and sitemap from the old sotakece.vercel.app alias to https://sotakece.com/. XML parsing and source diff checks pass; hosted gates and production verification are recorded in the scoped PR.
 - 2026-11-05 — Codex — Added five starting choices to each signed-in world, available in Explore and on the destination. Per-account device preferences drive writing and search prompts, Koro presets, native circle creation, room previews, Music style or map actions as applicable.
 - 2026-11-05 — Codex — Put compact music visuals on signed-in Home, with the full player behind Music. Added analyser-driven page lights with a toggle, reduced-motion support, and the visualiser palette. Added Orbit as the fifth visual style and featured the existing Sema model portrait in a labelled My Space showcase.
 - 2026-11-05 — Codex — Kept the shared Dimau footer beneath the fixed navigation layer on signed-in phones so the five bottom tabs stay visible at the end of the feed.
