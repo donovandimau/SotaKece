@@ -3,6 +3,8 @@ on:
   pull_request:
   push:
     branches: [main, 'agent/**']
+permissions:
+  contents: read
 jobs:
   social-and-skins:
     runs-on: ubuntu-latest
