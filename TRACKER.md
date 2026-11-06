@@ -48,6 +48,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-06 — Codex — Corrected robots and sitemap from the old sotakece.vercel.app alias to https://sotakece.com/. XML parsing and source diff checks pass; hosted gates and production verification are recorded in the scoped PR.
 - 2026-11-05 — Codex — Added five starting choices to each signed-in world, available in Explore and on the destination. Per-account device preferences drive writing and search prompts, Koro presets, native circle creation, room previews, Music style or map actions as applicable.
 - 2026-11-05 — Codex — Put compact music visuals on signed-in Home, with the full player behind Music. Added analyser-driven page lights with a toggle, reduced-motion support, and the visualiser palette. Added Orbit as the fifth visual style and featured the existing Sema model portrait in a labelled My Space showcase.
 - 2026-11-05 — Codex — Kept the shared Dimau footer beneath the fixed navigation layer on signed-in phones so the five bottom tabs stay visible at the end of the feed.
