@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /account/
+Disallow: /revised/
+Disallow: /tests/
+Disallow: /verify/
 
-Sitemap: https://sotakece.vercel.app/sitemap.xml
+Sitemap: https://sotakece.com/sitemap.xml
