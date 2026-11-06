@@ -49,6 +49,7 @@
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-06 — Codex — Added nosniff and strict-origin-when-cross-origin response headers. Existing embedding, media and call behavior remains. JSON validation passes; hosted checks and live readback belong to the scoped security PR.
 - 2026-11-06 — Codex — Prepared comment-count HTML hardening and read-only workflow declaration on fix/security-dom-rendering-20261106; focused regression tests pass. Publication and full CI evidence are recorded in the PR.
 - 2026-11-06 — Codex — Corrected robots and sitemap from the old sotakece.vercel.app alias to https://sotakece.com/. XML parsing and source diff checks pass; hosted gates and production verification are recorded in the scoped PR.
 - 2026-11-05 — Codex — Added five starting choices to each signed-in world, available in Explore and on the destination. Per-account device preferences drive writing and search prompts, Koro presets, native circle creation, room previews, Music style or map actions as applicable.
