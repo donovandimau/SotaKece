@@ -13,5 +13,29 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "sotakece.vercel.app"
+        }
+      ],
+      "source": "/(.*)",
+      "statusCode": 308,
+      "destination": "https://sotakece.com/$1"
+    },
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "bulavata.vercel.app"
+        }
+      ],
+      "source": "/(.*)",
+      "statusCode": 308,
+      "destination": "https://sotakece.com/$1"
+    }
   ]
 }
