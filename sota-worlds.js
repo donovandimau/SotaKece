@@ -6,14 +6,14 @@
     home:{label:'Home',title:'A little closer to your people.',line:'Your people, music and space, together.',tone:'sun',photo:null},
     people:{label:'People',title:'Good people. Great connections.',line:'Find a familiar face. Bring your friends. See your world grow.',tone:'rose',photo:photos.social,action:'Find a mate',focus:'#bv-find-mate,#s-q'},
     talanoa:{label:'Talanoa',title:'Pull up a seat. Stay a while.',line:'Your stories, your circles and a little time together.',tone:'coral',photo:photos.social,action:'Explore a circle',tool:'circle'},
-    music:{label:'Music',title:'Your music. In full colour.',line:'Choose your soundtrack, remix the visuals and make the moment yours.',tone:'violet',photo:photos.music,action:'Choose music visuals',tool:'visuals'},
-    profile:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio'},
+    music:{label:'Music',title:'Your music. In full colour.',line:'Choose your soundtrack, remix the visuals and make the moment yours.',tone:'violet',photo:photos.music,action:'Choose music visuals',tool:'visuals',sere:true},
+    profile:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio',sere:true},
     skins:{label:'Skins & Room Studio',title:'Your space. Your choice.',line:'Browse colours, artwork and layouts, or create your own.',tone:'sun',photo:null,action:'Browse every skin',tool:'skins'},
     world:{label:'3D world',title:'Every connection has a story.',line:'Explore your people and places from a different perspective.',tone:'lime',photo:null,action:'Explore the map',focus:'#sota-connections'},
-    pulse:{label:'Your feed',title:'A little closer, every day.',line:'Catch up with your people. Share a thought. Start a conversation.',tone:'rose',photo:null,action:'Share a moment',member:'moments'},
+    pulse:{label:'Your feed',title:'A little closer, every day.',line:'Catch up with your people. Share a thought. Start a conversation.',tone:'rose',photo:null,action:'Share a moment',member:'moments',sere:true},
     moments:{label:'Moments',title:'Little moments. Yours to keep.',line:'The good days, everyday stories and memories worth sharing.',tone:'sun',photo:null,action:'Share a moment',focus:'#m-body'},
     friends:{label:'Friends',title:'Good people. Great connections.',line:'Keep your circle close. Find a mate, visit a room and catch up.',tone:'rose',photo:photos.social,action:'Find a friend',focus:'#s-q'},
-    room:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio'},
+    room:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio',sere:true},
     crews:{label:'Your Koro',title:'Your people. Your Koro.',line:'Private groups for the people you want to bring together.',tone:'coral',photo:photos.social,action:'Start a Koro',focus:'#koro-create input'},
     circles:{label:'Talanoa circles',title:'A place for every voice.',line:'Familiar voices, fresh stories and space for your circle.',tone:'coral',photo:photos.social,action:'Explore your circles',focus:'#kc-retry,.kava-room button'},
     connections:{label:'Your connections',title:'Every connection has a story.',line:'Discover the friendships and Koro that make up your world.',tone:'lime',photo:null,action:'Explore the map',focus:'#sc-search,.sc-map,#sota-connections'}
@@ -104,7 +104,9 @@
   let session=null;
   function move(node,parent){if(!node||!parent||node.parentNode===parent)return;if(typeof parent.moveBefore==='function'&&node.isConnected&&parent.isConnected){try{parent.moveBefore(node,null);return;}catch(_){}}parent.append(node);}
   function memberRouteFromHash(hash){const key=String(hash||'').replace(/^#/,'');if(key.startsWith('view=')){const p=key.slice(5);return memberPages.includes(p)?p:null;}return ({'':'pulse',home:'pulse',people:'friends',talanoa:'crews',music:'music',profile:'room',skins:'room',world:'connections'})[key]||null;}
-  function action(w){if(w.member)return `<button type="button" class="sx-world-primary" data-world-member="${w.member}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;if(w.tool)return `<button type="button" class="sx-world-primary" data-world-tool="${w.tool}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;return `<button type="button" class="sx-world-primary" data-world-focus="${esc(w.focus||'')}">${esc(w.action||'Explore')} <span aria-hidden="true">↗</span></button>`;}
+  function sereButton(w){return w.sere&&typeof window!=='undefined'&&window.SotaSere?` <button type="button" class="sx-world-primary sx-world-sere" data-world-sere="1">🎤 Make a photo sing</button>`:'';}
+  function action(w){return actionMain(w)+sereButton(w);}
+  function actionMain(w){if(w.member)return `<button type="button" class="sx-world-primary" data-world-member="${w.member}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;if(w.tool)return `<button type="button" class="sx-world-primary" data-world-tool="${w.tool}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;return `<button type="button" class="sx-world-primary" data-world-focus="${esc(w.focus||'')}">${esc(w.action||'Explore')} <span aria-hidden="true">↗</span></button>`;}
   function toolbar(member=false){return `<nav class="sx-world-toolbar" aria-label="Page tools"><div class="sx-world-crumb"><${member?'button type="button" data-world-member="pulse"':'a href="#home"'}>Home</${member?'button':'a'}><span aria-hidden="true">/</span><span data-world-label></span></div><div><button type="button" data-world-tool="explore" aria-haspopup="dialog">Explore Sota Kece <span aria-hidden="true">✦</span></button><button type="button" data-world-tool="design" aria-haspopup="dialog">Design this page <span aria-hidden="true">✎</span></button></div></nav>`;}
   function banner(w,member=false,key='home'){return `${toolbar(member)}<section class="sx-world-hero" data-world-tone="${w.tone}"><div class="sx-world-hero-copy"><span class="sx-eyebrow">YOUR PEOPLE. YOUR POSSIBILITIES.</span><h1 tabindex="-1">${esc(w.title)}</h1><p data-world-description>${esc(w.line)}</p><div class="sx-world-actions" data-world-actions>${action(w)}</div></div><div class="sx-world-hero-photo">${heroVisual(w,key)}</div></section>`;}
   function destinationCard(key,member=false,photo){
@@ -253,6 +255,7 @@
       if(s.page===page)applyChoice(s);
     });
     on(app,'click',event=>{
+      const sere=event.target.closest('[data-world-sere]');if(sere&&app.contains(sere)){event.preventDefault();window.SotaSere?.open();return;}
       const button=event.target.closest('[data-world-tool],[data-world-member],[data-world-focus],[data-world-close],[data-world-choice-action]');
       if(!button){if(event.target.closest('.sx-world-directory a'))s.directory?.close();return;}
       if(!app.contains(button))return;event.preventDefault();

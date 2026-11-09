@@ -23,6 +23,8 @@
     GONE: 'That sere is gone.', NOT_FRIENDS: 'Add them as a mate to tip them.', OUT_OF_GIFTS: 'No gifts left today.',
     SELF_GIFT: 'You cannot tip yourself.', NOT_YOURS: 'That is not yours to remove.'
   };
+  var VOICES = [['bella', 'Bella'], ['sarah', 'Sarah'], ['nicole', 'Nicole'], ['emma', 'Emma (UK)'], ['isabella', 'Isabella (UK)'], ['adam', 'Adam'], ['michael', 'Michael'], ['george', 'George (UK)'], ['lewis', 'Lewis (UK)']];
+  var ENGINES = [['quick', 'Quick', 'about a minute · lips move'], ['lifelike', 'Lifelike', 'several minutes · head, eyes and expression move']];
   var GIFTS = [['bilo', '🥥', 'Bilo'], ['salusalu', '🌺', 'Salusalu'], ['lovo', '🔥', 'Lovo'], ['bua', '🌼', 'Bua']];
   var SCENES_FALLBACK = [{ id: 'none', label: 'As it is' }, { id: 'studio-soft', label: 'Studio' }, { id: 'golden-hour', label: 'Golden hour' }, { id: 'neon', label: 'Neon night' }, { id: 'bure-night', label: 'Bure night' }, { id: 'beach-day', label: 'Beach day' }];
 
@@ -30,8 +32,8 @@
   var st = fresh(), wired = false, played = {};
 
   function fresh() {
-    return { open: false, step: 'pick', image: null, imageMeta: null, audio: null, audioMeta: null, startMs: 0, scene: 'none',
-             caption: '', remixOf: null, id: null, pct: 0, status: null, error: null, channel: null, scenes: null, mine: [] };
+    return { open: false, step: 'pick', mode: 'sing', image: null, imageMeta: null, audio: null, audioMeta: null, startMs: 0, scene: 'none',
+             engine: 'quick', text: '', voice: 'bella', caption: '', remixOf: null, id: null, pct: 0, status: null, error: null, channel: null, scenes: null, mine: [] };
   }
   function say(err, fallback) {
     var m = (err && err.message) || String(err || '');
@@ -132,15 +134,32 @@
   }
 
   /* ---------------------------------------------------------------- the run */
+  async function authed(body) {
+    var sess = await client.auth.getSession(), tok = sess && sess.data && sess.data.session && sess.data.session.access_token;
+    if (!tok) throw new Error('NOT_SIGNED_IN');
+    var r = await fetch('/api/sere', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+    var j = await r.json().catch(function () { return {}; });
+    if (!r.ok) throw new Error(j.error || 'That did not go through.');
+    return j;
+  }
   async function create() {
-    if (!st.image || (!st.audio && !st.remixOf)) { toast('Choose a photo' + (st.remixOf ? '.' : ' and a sound.')); return; }
+    var say = st.mode === 'say' && !st.remixOf;
+    if (!st.image) { toast('Choose a photo.'); return; }
+    if (say && st.text.trim().length < 2) { toast('Type a few words first.'); return; }
+    if (!say && !st.audio && !st.remixOf) { toast('Choose a sound.'); return; }
     st.step = 'working'; st.pct = 0; st.error = null; paint();
     try {
-      var cut = st.remixOf ? null : cutAudio(st.audio, st.startMs);
-      var row = await rpc('bv_sere_create', {
-        p_image_ext: st.image.ext, p_duration_ms: st.remixOf ? 1000 : st.audio.durationMs, p_start_ms: cut ? cut.startMs : 0,
-        p_scene: st.scene, p_caption: st.caption || null, p_remix_of: st.remixOf
-      });
+      var row, cut = null;
+      if (say) {
+        // Words → voice happens on the server (it also writes the pending row and uploads the sound).
+        row = await authed({ action: 'speak', text: st.text.trim(), voice: st.voice, imageExt: st.image.ext, scene: st.scene, caption: st.caption || null, engine: st.engine });
+      } else {
+        cut = st.remixOf ? null : cutAudio(st.audio, st.startMs);
+        row = await rpc('bv_sere_create', {
+          p_image_ext: st.image.ext, p_duration_ms: st.remixOf ? 1000 : st.audio.durationMs, p_start_ms: cut ? cut.startMs : 0,
+          p_scene: st.scene, p_caption: st.caption || null, p_remix_of: st.remixOf, p_engine: st.engine
+        });
+      }
       st.id = row.id; localStorage.setItem('sere:job', row.id);
       var pi = 0, pa = cut ? 0 : 1, tick = function () { st.pct = Math.round((pi * 0.3 + pa * 0.7) * 100); paintProgress(); };
       await Promise.all([
@@ -220,30 +239,48 @@
   function sceneOptions() {
     return (st.scenes || SCENES_FALLBACK).map(function (s) { return '<option value="' + esc(s.id) + '"' + (s.id === st.scene ? ' selected' : '') + '>' + esc(s.label) + '</option>'; }).join('');
   }
+  function modeTabs() {
+    if (st.remixOf) return '';
+    return '<div class="sere-modes" role="tablist" aria-label="What should it do">' +
+      '<button type="button" role="tab" data-sere="mode" data-mode="sing" aria-selected="' + (st.mode === 'sing') + '">🎵 Sing a sound</button>' +
+      '<button type="button" role="tab" data-sere="mode" data-mode="say" aria-selected="' + (st.mode === 'say') + '">💬 Say my words</button></div>';
+  }
+  function sayBox() {
+    return '<div class="sere-say"><label>Words to say <textarea data-sere="text" maxlength="300" rows="3" placeholder="Bula! Type what the photo should say…">' + esc(st.text) + '</textarea></label>' +
+      '<div class="sere-row"><label>Voice <select data-sere="voice">' + VOICES.map(function (v) { return '<option value="' + v[0] + '"' + (v[0] === st.voice ? ' selected' : '') + '>' + v[1] + '</option>'; }).join('') + '</select></label>' +
+      '<small class="sere-say-note">' + (300 - st.text.length) + ' characters left · English voices for now</small></div></div>';
+  }
+  function engineRow() {
+    return '<div class="sere-engines" role="radiogroup" aria-label="How it moves">' + ENGINES.map(function (e) {
+      return '<button type="button" role="radio" class="sere-engine" data-sere="engine" data-engine="' + e[0] + '" aria-checked="' + (st.engine === e[0]) + '"><b>' + e[1] + '</b><small>' + e[2] + '</small></button>';
+    }).join('') + '</div>';
+  }
   function pickStep() {
-    var dur = st.audio ? st.audio.durationMs : 0, win = st.audio ? pickWindow(st.startMs, dur) : null;
-    return '<div class="sere-grid">' +
+    var dur = st.audio ? st.audio.durationMs : 0, win = st.audio ? pickWindow(st.startMs, dur) : null, say = st.mode === 'say' && !st.remixOf;
+    return modeTabs() + '<div class="sere-grid">' +
       '<label class="sere-drop' + (st.image ? ' has' : '') + '">' + (st.image ? '<img src="' + st.image.previewUrl + '" alt="Your photo">' : '<span class="sere-ico">🖼️</span><span>Choose a photo</span><small>JPG or PNG · one face · portrait</small>') +
         '<input type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.jfif,.png" data-sere="image" hidden></label>' +
       (st.remixOf
         ? '<div class="sere-drop has sere-remix"><span class="sere-ico">🔁</span><span>Remixing the sound from that sere</span><small>Your photo, their sound</small></div>'
+        : say ? sayBox()
         : '<label class="sere-drop' + (st.audio ? ' has' : '') + '">' + (st.audio ? '<span class="sere-ico">🎵</span><span>' + esc(st.audio.name || 'Your sound') + '</span><small>' + fmt(dur) + '</small>' : '<span class="sere-ico">🎵</span><span>Choose a sound</span><small>MP3 or WAV · up to 10 minutes</small>') +
           '<input type="file" accept="audio/mpeg,audio/wav,.mp3,.wav" data-sere="audio" hidden></label>') +
       '</div>' +
-      (st.audio && !st.remixOf ? '<div class="sere-trim"><div class="sere-trim-head"><span>Sing from <b>' + fmt(win.startMs) + '</b> to <b>' + fmt(win.endMs) + '</b></span><button type="button" class="btn sm" data-sere="preview">▶ Hear it</button></div>' +
+      (st.audio && !st.remixOf && !say ? '<div class="sere-trim"><div class="sere-trim-head"><span>Sing from <b>' + fmt(win.startMs) + '</b> to <b>' + fmt(win.endMs) + '</b></span><button type="button" class="btn sm" data-sere="preview">▶ Hear it</button></div>' +
         '<input type="range" min="0" max="' + Math.max(0, dur - LIMITS.audio.windowMs) + '" step="500" value="' + win.startMs + '" data-sere="start" aria-label="Start of the part that sings"' + (dur <= LIMITS.audio.windowMs ? ' disabled' : '') + '>' +
         '<small>Up to 60 seconds sings. Slide to pick the part.</small><audio data-sere="player" src="' + st.audio.previewUrl + '" preload="none"></audio></div>' : '') +
+      engineRow() +
       '<div class="sere-row"><label>Scene <select data-sere="scene">' + sceneOptions() + '</select></label>' +
         '<label class="sere-cap">Caption <input type="text" maxlength="140" data-sere="caption" value="' + esc(st.caption) + '" placeholder="Say something (optional)"></label></div>' +
       (st.error ? '<p class="sere-error" role="alert">' + esc(st.error) + '</p>' : '') +
-      '<div class="sere-actions"><button type="button" class="btn" data-sere="create"' + (st.image && (st.audio || st.remixOf) ? '' : ' disabled') + '>Make it sing</button></div>';
+      '<div class="sere-actions"><button type="button" class="btn" data-sere="create"' + (st.image && (say ? st.text.trim().length >= 2 : (st.audio || st.remixOf)) ? '' : ' disabled') + '>' + (say ? 'Make it speak' : 'Make it sing') + '</button></div>';
   }
   function workingStep() {
     var uploading = st.status !== 'processing';
     return '<div class="sere-working">' + (st.image ? '<img class="sere-working-img" src="' + (st.image.previewUrl || st.poster || '') + '" alt="">' : '') +
-      '<p class="sere-working-title">' + (uploading ? 'Sending your photo and sound…' : 'Making it sing…') + '</p>' +
+      '<p class="sere-working-title">' + (uploading ? (st.mode === 'say' ? 'Giving it a voice…' : 'Sending your photo and sound…') : (st.engine === 'lifelike' ? 'Making it lifelike…' : 'Making it sing…')) + '</p>' +
       '<div class="sere-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + st.pct + '"><i style="width:' + st.pct + '%"></i></div>' +
-      '<small>' + (uploading ? st.pct + '%' : 'Usually one to four minutes. You can close this — it posts to the wall by itself.') + '</small>' +
+      '<small>' + (uploading ? st.pct + '%' : (st.engine === 'lifelike' ? 'Lifelike takes five to ten minutes.' : 'Usually one to four minutes.') + ' You can close this — it posts to the wall by itself.') + '</small>' +
       (uploading ? '' : '<button type="button" class="btn sm" data-sere="check">Check now</button>') + '</div>';
   }
   function doneStep() {
@@ -276,11 +313,13 @@
         if (k === 'image') { st.image = await prepImage(t.files[0]); st.error = null; paint(); }
         if (k === 'audio') { toast('Reading the sound…'); st.audio = await decodeAudio(t.files[0]); st.startMs = 0; st.error = null; paint(); }
         if (k === 'scene') st.scene = t.value;
+        if (k === 'voice') st.voice = t.value;
         if (k === 'caption') st.caption = t.value.slice(0, 140);
       } catch (e) { st.error = say(e, e && e.message); paint(); }
     });
     document.addEventListener('input', function (ev) {
       var cap = ev.target.closest('[data-sere="caption"]'); if (cap) { st.caption = cap.value.slice(0, 140); return; }
+      var txt = ev.target.closest('[data-sere="text"]'); if (txt) { st.text = txt.value.slice(0, 300); var n = $('.sere-say-note'), c = $('[data-sere="create"]'); if (n) n.textContent = (300 - st.text.length) + ' characters left · English voices for now'; if (c) c.disabled = !(st.image && st.text.trim().length >= 2); return; }
       var t = ev.target.closest('[data-sere="start"]'); if (!t) return;
       st.startMs = Number(t.value) || 0; var win = pickWindow(st.startMs, st.audio.durationMs), b = document.querySelectorAll('.sere-trim-head b');
       if (b.length === 2) { b[0].textContent = fmt(win.startMs); b[1].textContent = fmt(win.endMs); }
@@ -289,6 +328,8 @@
       var t = ev.target.closest('[data-sere]'); if (!t) return;
       var k = t.dataset.sere;
       if (k === 'close') return close();
+      if (k === 'mode') { st.mode = t.dataset.mode; st.error = null; return paint(); }
+      if (k === 'engine') { st.engine = t.dataset.engine; document.querySelectorAll('.sere-engine').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.engine === st.engine); }); return; }
       if (k === 'create') return create();
       if (k === 'check') return check(st.id);
       if (k === 'again') { var keep = st.scenes; st = fresh(); st.scenes = keep; st.open = true; return paint(); }
@@ -323,7 +364,7 @@
   return {
     init: init, open: open, close: close, tip: tip, resume: resume, check: check,
     // pure helpers (tested)
-    pickWindow: pickWindow, checkImageDims: checkImageDims, encodeWav: encodeWav, mixWindow: mixWindow, say: say,
+    pickWindow: pickWindow, checkImageDims: checkImageDims, encodeWav: encodeWav, mixWindow: mixWindow, say: say, VOICES: VOICES, ENGINES: ENGINES,
     state: function () { return st; }, LIMITS: LIMITS
   };
 });
