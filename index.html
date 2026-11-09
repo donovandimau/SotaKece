@@ -1,9 +1,12 @@
 <!doctype html>
 <html lang="en">
-<head><style>@layer dimau-premium-shell;</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261109-sere-1"><link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
+<head><style>@layer dimau-premium-shell;.social-signin{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:rgba(255,255,255,.85)}
+.social-or{text-align:center;margin-top:2px}
+</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261109-sere-1"><link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261109-v155-motion-room">
+<meta name="sota-release" content="sota-kece-shell-20261109-v156-motion-room">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -293,6 +296,11 @@ function renderAuth(mode="in"){
     <button class="btn ghost" type="button" onclick="window.SotaKavaUI.preview()" style="margin-bottom:16px">Explore Our Talanoa Circle</button>
     <a class="btn ghost" href="/communications.html?app=sota-kece" style="display:block;text-align:center;margin-bottom:16px">Open Communications · Chat, boards and calls</a>
     <a class="btn ghost" href="/motion.html" style="display:block;text-align:center;margin-bottom:16px">Make a motion wallpaper · Free for your first year</a>
+    <div class="social-signin" aria-label="Continue with">
+      <button type="button" class="btn ghost social-btn" onclick="oauthSignIn('google')"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.5 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.8 6C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6C6.5 42.6 14.6 48 24 48z"/></svg>Continue with Google</button>
+      <button type="button" class="btn ghost social-btn" onclick="oauthSignIn('facebook')"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>Continue with Facebook</button>
+      <div class="sub social-or">or with email</div>
+    </div>
     <div class="seg">
       <button class="${mode==='in'?'on':''}" onclick="renderAuth('in')">Sign in</button>
       <button class="${mode==='up'?'on':''}" onclick="renderAuth('up')">Create a room</button>
@@ -311,6 +319,14 @@ function renderAuth(mode="in"){
   </div>`;
   $("#a-go").onclick = () => mode==='up' ? signUp() : signIn();
   app.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#a-go").click()}));
+}
+/* Google / Facebook: the login system (Supabase Auth) does the whole dance and brings the person
+   back to this page signed in. A first-time visitor has no room yet, so boot() lands them on
+   finishRoom() to pick a handle; their name from Google/Facebook is pre-filled there. */
+async function oauthSignIn(provider){
+  const err=$("#a-err"); if(err)err.textContent="";
+  const {error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+"/"}});
+  if(error&&err)err.textContent=/not enabled|unsupported/i.test(error.message)?"That sign-in is not switched on yet. Use email for now.":error.message;
 }
 async function signIn(){
   const b=$("#a-go"); b.disabled=true; $("#a-err").textContent="";
@@ -1056,7 +1072,7 @@ function finishRoom(){
     <div class="stack">
       <div><label for="f-handle">Your handle</label><input id="f-handle" value="${esc(pre.handle||'')}" placeholder="bula_sina" maxlength="20" autocapitalize="off">
         <div class="sub" style="margin-top:5px">Lowercase letters, numbers and underscores.</div></div>
-      <div><label for="f-name">Display name</label><input id="f-name" value="${esc(pre.name||'')}" placeholder="Sina" maxlength="40"></div>
+      <div><label for="f-name">Display name</label><input id="f-name" value="${esc(pre.name||S.user?.user_metadata?.full_name||S.user?.user_metadata?.name||'')}" placeholder="Sina" maxlength="40"></div>
       <div><label for="f-year">Year you were born</label><input id="f-year" type="number" inputmode="numeric" placeholder="e.g. 2004" min="1900" max="${new Date().getFullYear()}"></div>
       <button class="btn" id="f-go">Make my room</button>
       <div class="sub" id="f-err" role="alert" style="color:var(--coral);text-align:center"></div>
