@@ -86,18 +86,23 @@ function client({fr=friends,gr=crews,members=[],profiles=[],user=me,authError=fa
   });
   await check('Home request errors preserve social panels without starting the optional People map',async()=>{
     const vm=require('node:vm'),html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
-    const source=html.slice(html.indexOf('async function viewPulse(){'),html.indexOf('async function postPulse(){'));
-    let mounts=0,socialMounts=0,errors=0,current=true;
+    const source=html.slice(html.indexOf('async function viewPulse(){'),html.indexOf('async function answerSpark(id){'));
+    let mounts=0,socialMounts=0,errors=0,shells=0,current=true;
     const insertions=[],view={querySelector:()=>null,insertAdjacentHTML(where,value){insertions.push({where,value});}};
-    const context=vm.createContext({Date,S:{user:{id:me.id},me,tab:'pulse'},viewRun:()=>1,currentView:()=>current,shell(){},requestResult:async p=>p,
+    // The wall module renders through shell(); a failed first page paints its own error card there.
+    const wall={init(cfg){assert.equal(cfg.client,context.sb);assert.equal(typeof cfg.spark,'function');},async view(){context.shell('<section class="view-error"></section>');errors++;}};
+    const context=vm.createContext({Date,S:{user:{id:me.id},me,tab:'pulse'},viewRun:()=>1,currentView:()=>current,shell(){shells++;},requestResult:async p=>p,
       sb:{rpc:async()=>({data:[]}),from:()=>({select:()=>({eq:()=>({maybeSingle:async()=>({error:Error('Unavailable Spark')})})})})},
-      viewError(){errors++;},$:selector=>{assert.equal(selector,'#view');return view;},window:{
+      toast(){},esc:String,ago:()=>'now',openRoom(){},
+      viewError(){errors++;},$:selector=>{assert.equal(selector,'#view');return view;},window:{SotaPulse:wall,
         SotaRoomSocial:{markup:()=>'<section data-room-social></section>',mount(target){assert.equal(target,view);socialMounts++;}},
         SotaConnections:{entryHtml:()=>'<section data-friend-graph></section>',mountEntry(){mounts++;}}
       }});
-    vm.runInContext(source+';this.testPulse=viewPulse;',context);await context.testPulse();assert.equal(errors,1);assert.equal(mounts,0);assert.equal(socialMounts,1);
+    vm.runInContext(source+';this.testPulse=viewPulse;this.testSpark=sparkCard;',context);await context.testPulse();assert.equal(errors,1);assert.equal(shells,1);assert.equal(mounts,0);assert.equal(socialMounts,1);
     assert.deepEqual(insertions,[{where:'afterbegin',value:'<section data-room-social></section>'}]);
-    current=false;await context.testPulse();assert.equal(mounts,0);assert.equal(socialMounts,1);assert.equal(insertions.length,1);assert.equal(errors,1);
+    assert.equal(await context.testSpark(),'','an unavailable Spark yields no card instead of an error');
+    current=false;context.S.tab='room';await context.testPulse();assert.equal(mounts,0);assert.equal(socialMounts,1,'social panel mounts only on the Pulse tab');assert.equal(insertions.length,1);assert.equal(errors,2);
+    delete context.window.SotaPulse;context.S.tab='pulse';await context.testPulse();assert.equal(errors,3,'without the wall module the page shows the error view');
   });
   await check('truncation is explicit and queries only the bounded graph',async()=>{
     const api=client({fr:Array.from({length:130},(_,i)=>({id:String(i)})),gr:Array.from({length:45},(_,i)=>({id:i}))});

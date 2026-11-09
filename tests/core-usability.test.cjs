@@ -156,7 +156,10 @@ check('core markup keeps a main landmark, native social controls, named inputs a
   assert.match(html,/<nav class="bottom glass" aria-label="Main navigation">/);assert.match(html,/aria-current="\$\{S\.tab===k\?'page':'false'\}"/);
   assert.match(html,/<button type="button" class="pulse-item" onclick="openRoom/);
   assert.match(html,/<button type="button" class="pulse-item" onclick="S\.crew=/);
-  for(const id of ['p-text','p-mood','sp-a','m-body','m-url','c-code','cm','s-q'])assert.match(html,new RegExp('id="'+id+'" aria-label="'));
+  for(const id of ['sp-a','m-body','m-url','c-code','cm','s-q'])assert.match(html,new RegExp('id="'+id+'" aria-label="'));
+  // The Pulse composer moved to the Talanoa Wall module; its textarea is labelled there.
+  const wall=fs.readFileSync(path.join(__dirname,'../sota-pulse.js'),'utf8');
+  assert.match(wall,/<textarea name="body" maxlength="' \+ MAX \+ '" rows="2" aria-label="/);
   // Circle name/type/privacy inputs now come from the actual shared factory.
   const circleContext=vm.createContext({SotaCircleTypes:require('../circle-types.js')});
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../circle-groups.js'),'utf8'),circleContext);

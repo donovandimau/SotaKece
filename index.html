@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
-<head><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
+<head><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261109-wall-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261108-v150-pwa-kit-redirect">
+<meta name="sota-release" content="sota-kece-shell-20261109-v151-talanoa-wall">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -352,7 +352,7 @@ function shell(body){
   if(navFocused)app.querySelector(`nav.bottom [data-tab="${S.tab}"]`)?.focus({preventScroll:true});
   else if(viewFocused)$('#view')?.focus({preventScroll:true});
 }
-function go(t,{history:record=true}={}){ const owner=S.user?.id; S.plusView=null; if((t!=='connections'&&/^#connections=(?:mine|example)$/.test(location.hash))||/^#(?:circle-invite|circle-graph|friends-graph)=/.test(location.hash))history.replaceState(null,'',location.pathname+location.search); if(record&&owner&&window.SotaWorlds?.memberRouteFromHash('#view='+t)&&location.hash!=='#view='+t)history.pushState({sotaView:t},'','#view='+t); window.SotaCircles?.stop(); window.SotaConnections?.stop(); window.SotaKavaUI?.stop(); window.SotaRoomSocial?.stop(); S.tab=t; S.roomHandle=null; S.crew=null; return Promise.resolve(render()).then(()=>{if(S.tab!==t||!owner||S.user?.id!==owner||typeof document!=='object')return;const view=$('#view'),heading=view?.querySelector?.('h1')||view;heading?.focus?.({preventScroll:true});window.scrollTo?.({top:0,behavior:'instant'});}); }
+function go(t,{history:record=true}={}){ const owner=S.user?.id; S.plusView=null; if((t!=='connections'&&/^#connections=(?:mine|example)$/.test(location.hash))||/^#(?:circle-invite|circle-graph|friends-graph)=/.test(location.hash))history.replaceState(null,'',location.pathname+location.search); if(record&&owner&&window.SotaWorlds?.memberRouteFromHash('#view='+t)&&location.hash!=='#view='+t)history.pushState({sotaView:t},'','#view='+t); window.SotaCircles?.stop(); window.SotaConnections?.stop(); window.SotaKavaUI?.stop(); window.SotaRoomSocial?.stop(); window.SotaPulse?.stop(); S.tab=t; S.roomHandle=null; S.crew=null; return Promise.resolve(render()).then(()=>{if(S.tab!==t||!owner||S.user?.id!==owner||typeof document!=='object')return;const view=$('#view'),heading=view?.querySelector?.('h1')||view;heading?.focus?.({preventScroll:true});window.scrollTo?.({top:0,behavior:'instant'});}); }
 
 /* ================= DATA ================= */
 async function refreshMeta(){
@@ -463,95 +463,43 @@ async function walletSend(){
   await render();
 }
 
-/* ================= PULSE ================= */
+/* ================= PULSE — the Talanoa Wall ================= */
+/* The wall itself lives in sota-pulse.js (one feed for every member, live). This page keeps the
+   daily Spark and hands it to the wall as a card so the two load side by side, not in a queue. */
 async function viewPulse(){
-  const run=viewRun();
-  shell(`<div class="empty glass card" role="status"><em>🌊</em>Loading the pulse…</div>`);
-  const today = new Date().toISOString().slice(0,10);
-  const [pf, sp] = await Promise.all([
-    requestResult(sb.rpc("bv_pulse_feed")),
-    requestResult(sb.from("bv_sparks").select("*").eq("for_date",today).maybeSingle())
-  ]);
-  if(!currentView(run))return;
-  if(pf.error||sp.error){
-    viewError('the Pulse','viewPulse()');mountPulseSocial();
-    return;
-  }
-  const pulses = (pf.data||[]).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  let spark = sp.data, mine=null, answers=[];
-  if(spark){
-    const {data:ans,error:answerError} = await requestResult(sb.from("bv_spark_answers").select("*").eq("spark_id",spark.id));
-    if(!currentView(run))return;
-    if(answerError){viewError("today's Spark",'viewPulse()');mountPulseSocial();return;}
-    answers = ans||[]; mine = answers.find(a=>a.author===S.user.id);
-    if(mine){ const ids=answers.map(a=>a.author);
-      const {data:ppl,error:peopleError} = await requestResult(sb.from("bv_profiles").select("id,handle,display_name,avatar_emoji").in("id",ids));
-      if(!currentView(run))return;
-      if(peopleError){viewError("today's Spark",'viewPulse()');mountPulseSocial();return;}
-      const map=Object.fromEntries((ppl||[]).map(p=>[p.id,p]));
-      answers = answers.map(a=>({...a,p:map[a.author]||{}})); }
-  }
-  shell(`
-  <div class="grid two">
-    <div class="stack">
-      <div class="glass card">
-        <h3>Say where you're at</h3>
-        <div class="sub" style="margin-bottom:11px">One line. Your friends see it. It replaces the last one.</div>
-        <textarea id="p-text" aria-label="Your Pulse update" maxlength="140" placeholder="knackered but the sun's out" style="min-height:62px"></textarea>
-        <div class="row" style="margin-top:9px">
-          <input id="p-mood" aria-label="Mood (optional)" placeholder="mood (optional) 🌤" maxlength="16" style="max-width:170px">
-          <div class="spacer"></div><button class="btn sm" onclick="postPulse()">Post</button>
-        </div>
-      </div>
-      <div class="glass card">
-        <h3>The Pulse</h3><div class="sub" style="margin-bottom:8px">Everyone, right now. Newest first.</div>
-        ${pulses.length? pulses.map(p=>`
-          <button type="button" class="pulse-item" onclick="openRoom('${esc(p.handle)}')" aria-label="Visit ${esc(p.display_name||p.handle)}'s room">
-            <div class="av" style="background:${esc(p.accent)}18">${esc(p.avatar_emoji||'🌺')}</div>
-            <div style="flex:1;min-width:0">
-              <div class="row" style="gap:7px"><span class="name">${esc(p.display_name||p.handle)}</span>
-                ${p.mood?`<span class="pill">${esc(p.mood)}</span>`:''}
-                <div class="spacer"></div><span class="ago">${ago(p.created_at)}</span></div>
-              <div class="pulse-text">${esc(p.text)}</div>
-            </div></button>`).join("")
-          : `<div class="sx-pulse-empty-photo"><img src="/assets/feature-scenes/pulse-cafe-20261105-880.webp" alt="" loading="lazy" decoding="async"><p>Quiet in here. Add a friend, or post the first line.</p></div>`}
-      </div>
-    </div>
-    <div class="stack">
-      ${spark?`<div class="glass card">
-        <h3>Today's Spark</h3><div class="sub">One question a day. You see the answers once you've written yours.</div>
-        <div style="font-size:15.5px;line-height:1.5;margin:13px 0;font-weight:400">${esc(spark.question)}</div>
-        ${mine? `<div class="scrawl"><b style="font-weight:600">You:</b> ${esc(mine.body)}</div>
-          ${answers.filter(a=>a.author!==S.user.id).map(a=>`
-            <div class="scrawl" style="border-left-color:var(--sun)">
-              <b style="font-weight:600">${esc(a.p.display_name||a.p.handle||'friend')}:</b> ${esc(a.body)}</div>`).join("")
-            || `<div class="sub" style="margin-top:9px">No friends have answered yet today.</div>`}`
-        : `<textarea id="sp-a" aria-label="Your answer to today's Spark" maxlength="300" placeholder="Answer to unlock everyone else's…"></textarea>
-           <button class="btn sm" style="margin-top:9px" onclick="answerSpark(${spark.id})">Unlock</button>`}
-      </div>`:''}
-      <div class="glass card">
-        <h3>Why this is small</h3>
-        <div class="sub" style="line-height:1.7;margin-top:8px">
-          Sota Kece has no recommendations, no reach, no boost and no strangers.
-          Three Uro a day keeps praise meaningful.
-          Everything you write is yours and downloadable from
-          <a href="#" onclick="go('room');return false">your room</a>.
-        </div>
-      </div>
-    </div>
-  </div>`);
+  if(!window.SotaPulse){viewError('the Pulse','viewPulse()');return;}
+  window.SotaPulse.init({client:sb,state:S,toast,esc,ago,openRoom,shell,spark:sparkCard});
+  await window.SotaPulse.view();
   mountPulseSocial();
+}
+async function sparkCard(){
+  const today = new Date().toISOString().slice(0,10);
+  const {data:spark,error} = await requestResult(sb.from("bv_sparks").select("*").eq("for_date",today).maybeSingle());
+  if(error||!spark||!S.user) return '';
+  const {data:ans,error:answerError} = await requestResult(sb.from("bv_spark_answers").select("*").eq("spark_id",spark.id));
+  if(answerError) return '';
+  let answers = ans||[], mine = answers.find(a=>a.author===S.user.id);
+  if(mine){ const ids=answers.map(a=>a.author);
+    const {data:ppl} = await requestResult(sb.from("bv_profiles").select("id,handle,display_name,avatar_emoji").in("id",ids));
+    const map=Object.fromEntries((ppl||[]).map(p=>[p.id,p]));
+    answers = answers.map(a=>({...a,p:map[a.author]||{}})); }
+  return `<div class="glass card">
+    <h3>Today's Spark</h3><div class="sub">One question a day. You see the answers once you've written yours.</div>
+    <div style="font-size:15.5px;line-height:1.5;margin:13px 0;font-weight:400">${esc(spark.question)}</div>
+    ${mine? `<div class="scrawl"><b style="font-weight:600">You:</b> ${esc(mine.body)}</div>
+      ${answers.filter(a=>a.author!==S.user.id).map(a=>`
+        <div class="scrawl" style="border-left-color:var(--sun)">
+          <b style="font-weight:600">${esc(a.p.display_name||a.p.handle||'friend')}:</b> ${esc(a.body)}</div>`).join("")
+        || `<div class="sub" style="margin-top:9px">No friends have answered yet today.</div>`}`
+    : `<textarea id="sp-a" aria-label="Your answer to today's Spark" maxlength="300" placeholder="Answer to unlock everyone else's…"></textarea>
+       <button class="btn sm" style="margin-top:9px" onclick="answerSpark(${spark.id})">Unlock</button>`}
+  </div>`;
 }
 function mountPulseSocial(){
   const view=$("#view");if(!view||S.tab!=="pulse"||!S.user||!S.me)return;
   const heading=view.querySelector(".sx-home-listen")||view.querySelector(".sx-member-world-heading");
   if(heading)heading.insertAdjacentHTML("afterend",window.SotaRoomSocial?.markup()||"");else view.insertAdjacentHTML("afterbegin",window.SotaRoomSocial?.markup()||"");
   window.SotaRoomSocial?.mount(view);
-}
-async function postPulse(){
-  const t=$("#p-text").value.trim(); if(!t) return;
-  const {error}=await sb.from("bv_pulses").insert({author:S.user.id,text:t,mood:$("#p-mood").value.trim()});
-  if(error) return toast(error.message); toast("Posted"); render();
 }
 async function answerSpark(id){
   const b=$("#sp-a").value.trim(); if(!b) return;
@@ -1145,7 +1093,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/connections.js?v=20261026-spatial-life-1"></script>
 <script src="/icon-controls.js?v=20261104-premium-worlds-1"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261106-security-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261106-security-1"></script><script src="/sota-pulse.js?v=20261109-wall-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script>
 <link rel="stylesheet" href="/sota-worlds.css?v=20261105-world-choices-1">
 <link rel="stylesheet" href="/phone-tidy-20261029.css?v=20261104-premium-worlds-1">
