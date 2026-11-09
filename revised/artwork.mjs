@@ -22,8 +22,8 @@ export const ARTWORK=Object.freeze({
  'album-night':{file:'album-night.webp',alt:'Somewhere, together: AI-generated photorealistic scene of Fijian friends talking on a veranda at dusk',shape:'square'}
 });
 export const IDENTITY_ART=Object.freeze([['identity','Island bloom'],['album-lagoon','Sea glass'],['album-gold','Golden hour'],['album-coral','After the rain'],['album-night','Moonlight']]);
-export const artworkSource=key=>'./assets/'+(Object.hasOwn(ARTWORK,key)?ARTWORK[key]:ARTWORK.identity).file;
-export function artworkImage(key,{className='',decorative=false,eager=false}={}){const art=Object.hasOwn(ARTWORK,key)?ARTWORK[key]:ARTWORK.identity;return `<img class="artwork ${esc(className)}" src="${artworkSource(key)}" width="${art.shape==='wide'?1200:512}" height="${art.shape==='wide'?800:512}" alt="${decorative?'':esc(art.alt)}" loading="${eager?'eager':'lazy'}" decoding="async"${eager?' fetchpriority="high"':''}>`;}
+export const artworkSource=key=>'./assets/'+(Object.prototype.hasOwnProperty.call(ARTWORK,key)?ARTWORK[key]:ARTWORK.identity).file;
+export function artworkImage(key,{className='',decorative=false,eager=false}={}){const art=Object.prototype.hasOwnProperty.call(ARTWORK,key)?ARTWORK[key]:ARTWORK.identity;return `<img class="artwork ${esc(className)}" src="${artworkSource(key)}" width="${art.shape==='wide'?1200:512}" height="${art.shape==='wide'?800:512}" alt="${decorative?'':esc(art.alt)}" loading="${eager?'eager':'lazy'}" decoding="async"${eager?' fetchpriority="high"':''}>`;}
 export function identityArtwork(p,mode='demo'){if(mode!=='demo')return p?.emoji?null:'identity';if(['ani','jo','lani','eli','mika','sela'].includes(p?.id))return p.id;return IDENTITY_ART.some(([key])=>key===p?.avatarArt)?p.avatarArt:'identity';}
 export const topicArtwork=key=>['making','outside','music','food','photos','culture'].includes(key)?key:'hero';
 export function circleArtwork(c){return c?.id==='makers'?'making':c?.id==='sounds'||c?.type==='music'?'music':c?.id==='weekend'?'food':'hero';}

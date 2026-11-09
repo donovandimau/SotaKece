@@ -8,7 +8,7 @@
  function valid(e){
   if(!e||typeof e!=='object'||Array.isArray(e))return false;
   const shapes={chat:['kind','text'],thread:['kind','id','title','text'],reply:['kind','thread','text'],task:['kind','id','title','status'],call:['kind','id','mode']};
-  const keys=shapes[e.kind];if(!keys||Object.keys(e).length!==keys.length||!keys.every(k=>Object.hasOwn(e,k)))return false;
+  const keys=shapes[e.kind];if(!keys||Object.keys(e).length!==keys.length||!keys.every(k=>Object.prototype.hasOwnProperty.call(e,k)))return false;
   if(e.kind==='chat')return clean(e.text,850);
   if(e.kind==='thread')return UUID.test(e.id)&&clean(e.title,80)&&clean(e.text,600);
   if(e.kind==='reply')return UUID.test(e.thread)&&clean(e.text,700);
