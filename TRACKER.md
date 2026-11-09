@@ -11,7 +11,7 @@
 
 ## Current state
 - Status: Ready to Test — Live preview (72% complete)
-- 2026-11-09 Rolling upgrade Phase 1 (Dimau Premium Shell) is on branch agent/premium-shell-phase1, draft PR: bottom dock at every width, floating search, zero layout shift, production deploy verification. Needs Donovan's look at the preview before it merges.
+- 2026-11-09 Rolling upgrade Phase 1 (Dimau Premium Shell) is LIVE: PR #409 merged on Donovan's instruction (commit 653804f), production deployment dpl_5ikgxpMoJSaPwYb3cQboa87wrvCj triggered by hand after Vercel's Git hook did not fire, aliased to sotakece.com at 10:38 UTC. Live verification (GitHub Actions, real Chromium against sotakece.com): release v153 served, nosniff + referrer policy present, vercel.app 308, phone dock 375×64 with five 71×56 targets, desktop dock 560×64, no horizontal overflow, search overlay 12 results, CLS 0.035 phone / 0.033 desktop (under the 0.05 floor; higher than the 0.007 local figure because the live page also loads its web fonts and beacons). Watch: Vercel's automatic deploy from main did not trigger for this merge; check the Git integration if the next push to main also needs a manual deploy.
 - Next action: LAUNCH ORDER (Donovan, 31 Oct): open Sota Kece to overseas Fijians first - full social features, wallet hidden (done: #306 merged and live). Once the Reserve Bank of Fiji approves the wallet, open to Fijians in Fiji and connect the two.
 - Latest implementation: the Talanoa Wall — the Pulse tab is one live feed for every member (280-character posts, quote, reply, like, repost, share; Latest default with a Hot toggle). Migration applied to dimau-core-sydney on 9 Nov (owner-approved); see docs/talanoa-wall-20261109.md.
 - Blocker: none recorded
