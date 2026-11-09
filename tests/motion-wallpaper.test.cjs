@@ -43,3 +43,16 @@ test('upload helper refuses non-pictures before doing any work', async () => {
   await assert.rejects(E.handleUserWallpaperUpload({ type: 'application/pdf', size: 10 }), /PNG, JPEG or WebP/);
   await assert.rejects(E.handleUserWallpaperUpload({ type: 'image/png', size: 30 * 1024 * 1024 }), /25 MB/);
 });
+test('room file links are reused instead of re-signed on every view', async () => {
+  const M = require('../room-media.js');
+  let calls = 0;
+  const client = { storage: { from: () => ({ createSignedUrl: async () => ({ data: { signedUrl: 'https://x/' + (++calls) } }), remove: async () => ({}) }) } };
+  const p = '11111111-1111-4111-8111-111111111111/covers/22222222-2222-4222-8222-222222222222.webp';
+  const [a, b] = await Promise.all([M.signed(client, p, 'covers'), M.signed(client, p, 'covers')]);
+  const c = await M.signed(client, p, 'covers');
+  assert.strictEqual(calls, 1); assert.strictEqual(a, b); assert.strictEqual(a, c);
+  await M.api(client, '11111111-1111-4111-8111-111111111111').remove(p);
+  await M.signed(client, p, 'covers'); assert.strictEqual(calls, 2);
+  const other = { storage: client.storage };
+  await M.signed(other, p, 'covers'); assert.strictEqual(calls, 3);
+});
