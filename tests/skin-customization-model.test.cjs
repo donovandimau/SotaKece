@@ -2,7 +2,7 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const skins=require('../skins.js');
-const defaults={customName:'',showArtwork:true,textScale:100,headingScale:100,coverHeight:195,coverX:0,coverY:100,textAlign:'left',musicPosition:'auto',avatarPath:''};
+const defaults={customName:'',showArtwork:true,textScale:100,headingScale:100,coverHeight:195,coverX:0,coverY:100,textAlign:'left',musicPosition:'auto',avatarPath:'',motionPath:'',motionStyle:'',motionVariant:0,motionIntensity:1,motionFocusX:0.5,motionFocusY:0.5};
 const numeric={textScale:[90,140,100],headingScale:[80,150,100],coverHeight:[180,420,195],coverX:[0,100,0],coverY:[0,100,100]};
 const fields=Object.keys(defaults);
 function customization(settings){return Object.fromEntries(fields.map(key=>[key,settings[key]]));}
@@ -49,7 +49,7 @@ test('only new defaults are omitted; existing fields and every nondefault custom
  const normal=skins.normalize(),encoded=skins.encode(normal),payload=JSON.parse(decodeURIComponent(encoded.match(/^\/\* bv-skin:v1 ([^\n]+) \*\//)[1]));
  for(const key of fields)assert.equal(Object.hasOwn(payload,key),false);
  for(const key of ['layout','font','note','atmosphere','motionEnergy','trackUrl'])assert.equal(payload[key],normal[key]);
- const changed=skins.normalize({customName:'Own skin',showArtwork:false,textScale:120,headingScale:130,coverHeight:300,coverX:40,coverY:60,textAlign:'right',musicPosition:'top',avatarPath:'11111111-1111-4111-8111-111111111111/covers/22222222-2222-4222-8222-222222222222.webp'});
+ const changed=skins.normalize({customName:'Own skin',showArtwork:false,textScale:120,headingScale:130,coverHeight:300,coverX:40,coverY:60,textAlign:'right',musicPosition:'top',motionPath:'11111111-1111-4111-8111-111111111111/covers/44444444-4444-4444-8444-444444444444.webp',motionStyle:'fluid',motionVariant:2,motionIntensity:1.4,motionFocusX:0.3,motionFocusY:0.7,avatarPath:'11111111-1111-4111-8111-111111111111/covers/22222222-2222-4222-8222-222222222222.webp'});
  const stored=JSON.parse(decodeURIComponent(skins.encode(changed).match(/^\/\* bv-skin:v1 ([^\n]+) \*\//)[1]));
  for(const key of fields)assert.equal(stored[key],changed[key]);
  assert.deepEqual(skins.read(skins.encode(changed)).settings,changed);
@@ -181,4 +181,13 @@ test('pathological maximum encoded Unicode fails explicitly without truncating u
  assert.equal(normalized.customName,raw.customName);assert.equal(normalized.note,raw.note);assert.equal(normalized.interests,raw.interests);assert.equal(normalized.trackUrl.length,320);
  assert.throws(()=>skins.encode(normalized),/Skin settings are too long/);
  assert.deepEqual(normalized,skins.normalize(raw));
+});
+
+test('motion wallpaper settings are bounded and survive a skin round-trip',()=>{
+ const owner='11111111-1111-4111-8111-111111111111';
+ const n=skins.normalize({motionPath:owner+'/covers/55555555-5555-4555-8555-555555555555.webp',motionStyle:'glitch',motionVariant:9,motionIntensity:7,motionFocusX:-1,motionFocusY:2});
+ assert.deepEqual([n.motionStyle,n.motionVariant,n.motionIntensity,n.motionFocusX,n.motionFocusY],['glitch',2,1.8,0,1]);
+ assert.equal(skins.normalize({motionPath:'https://evil.example/x.webp',motionStyle:'nope'}).motionPath,'');
+ assert.equal(skins.normalize({motionStyle:'nope'}).motionStyle,'');
+ assert.deepEqual(skins.read(skins.encode(n)).settings,n);
 });

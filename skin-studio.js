@@ -28,6 +28,7 @@
     return skins.normalize({id,note:settings.note!==oldPreset.note?settings.note:undefined,
       layout:settings.layout,interests:settings.interests,trackUrl:settings.trackUrl,trackTitle:settings.trackTitle,
       trackPath:settings.trackPath,coverPath:settings.coverPath,avatarPath:settings.avatarPath,songRef:settings.songRef,
+      motionPath:settings.motionPath,motionStyle:settings.motionStyle,motionVariant:settings.motionVariant,motionIntensity:settings.motionIntensity,motionFocusX:settings.motionFocusX,motionFocusY:settings.motionFocusY,
       atmosphere:settings.atmosphere,motionEnergy:settings.motionEnergy,
       customName:settings.customName,font:settings.font!==oldPreset.font?settings.font:undefined,
       textScale:settings.textScale,headingScale:settings.headingScale,coverHeight:settings.coverHeight,
@@ -168,6 +169,7 @@
     window.SotaProfilePhotos?.stop();
     window.SotaHeroVisualiser?.release();
     window.SotaRoomAtmosphere?.release(app);
+    window.SotaMotionRoom?.release();
     window.SotaPlayback?.pauseSource('profile');
     stopSample();
     document.body.classList.remove('bv-room-active','bv-chat-active');
@@ -221,6 +223,7 @@
     }
     wireMedia(view);
     window.SotaProfilePhotos?.mountRoom(view,profile,{isOwner:!!room.is_me});
+    window.SotaMotionRoom?.mount(view.querySelector('#room-head .bv-cover'),s,sb);
   }
   function applyChat(profile) {
     if(!profile||!document.querySelector('#msgs'))return;
@@ -478,7 +481,7 @@
     });
     const replaceDesign=blank=>{
       undoDesign={...draft};
-      const keep={interests:draft.interests,trackUrl:draft.trackUrl,trackTitle:draft.trackTitle,trackPath:draft.trackPath,coverPath:draft.coverPath,avatarPath:draft.avatarPath,songRef:draft.songRef};
+      const keep={interests:draft.interests,trackUrl:draft.trackUrl,trackTitle:draft.trackTitle,trackPath:draft.trackPath,coverPath:draft.coverPath,avatarPath:draft.avatarPath,songRef:draft.songRef,motionPath:draft.motionPath,motionStyle:draft.motionStyle,motionVariant:draft.motionVariant,motionIntensity:draft.motionIntensity,motionFocusX:draft.motionFocusX,motionFocusY:draft.motionFocusY};
       draft=skins.normalize({...keep,id:blank?'lagoon':draft.id,...(blank?{customName:'My own skin',showArtwork:false,pattern:'plain',note:'Your space. Your people.'}:{})});
       syncDesignControls();drawOptions();drawPreview();studio.querySelector('#bv-undo-design').hidden=false;
       studio.querySelector('#bv-editor-status').textContent=blank?'Blank canvas ready. Your music and favourites are kept.':'Design reset to the original skin. Your music and favourites are kept.';
