@@ -18,6 +18,9 @@ jobs:
       - run: npm ci --ignore-scripts
         working-directory: tests/talanoa-tools
       - run: node --test tests/circle-types.test.cjs tests/circle-groups.test.cjs tests/circle-communications.test.cjs
-      - run: node --test tests/skin-customization-model.test.cjs tests/skin-customization-editor.test.cjs
-      - run: node --test tests/music-visualiser-prepare.test.cjs tests/hero-visualiser.test.cjs tests/shared-music-catalogue.test.cjs
+      - run: node --test tests/skin-customization-model.test.cjs tests/skin-customization-editor.test.cjs
+
+      - run: node --test tests/music-visualiser-prepare.test.cjs tests/hero-visualiser.test.cjs tests/shared-music-catalogue.test.cjs
+
       - run: node tests/run-talanoa-db.cjs
+      - run: node tests/run-talanoa-wall-db.cjs
