@@ -77,8 +77,13 @@
   $('signout').addEventListener('click',async()=>{await sb.auth.signOut();status('');});
   $('delete').addEventListener('click',async()=>{
     $('delete').disabled=true; status('Deleting…');
-    const {error}=await sb.rpc('bv_account_delete');
-    if(error){status('Could not delete: '+error.message+'. Email support@fijiinvestment.com and we will do it for you.');$('delete').disabled=false;return;}
+    const {data:{session}}=await sb.auth.getSession();
+    let fail='';
+    try{
+      const r=await fetch('/api/account-delete',{method:'POST',headers:{Authorization:'Bearer '+(session?.access_token||'')}});
+      if(!r.ok) fail=(await r.json().catch(()=>({}))).error||('error '+r.status);
+    }catch(e){fail=e.message;}
+    if(fail){status('Could not delete: '+fail+'. Email support@fijiinvestment.com and we will do it for you.');$('delete').disabled=false;return;}
     await sb.auth.signOut().catch(()=>{});
     $('ready').hidden=true; $('auth').hidden=true; $('done').hidden=false; status('');
   });

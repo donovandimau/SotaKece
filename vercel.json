@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/sere.js": { "maxDuration": 60 },
-    "api/sere-callback.js": { "maxDuration": 60 }
+    "api/sere-callback.js": { "maxDuration": 60 },
+    "api/account-delete.js": { "maxDuration": 60 }
   },
   "routes": [
     {

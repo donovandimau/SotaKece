@@ -3,7 +3,9 @@
 -- member deletes their own account and everything stored with it. Tables
 -- that reference bulavata.profiles(id) cascade; the three public circle
 -- tables do not, so they are cleared first. Storage objects under the
--- member's folders and any they own are removed. Finally the auth user goes.
+-- member's folders and any they own are removed here as rows; the file bytes
+-- are removed through the storage API by /api/account-delete, which calls
+-- this function after the sweep and sweeps once more afterwards.
 create or replace function public.bv_account_delete()
 returns void
 language plpgsql
