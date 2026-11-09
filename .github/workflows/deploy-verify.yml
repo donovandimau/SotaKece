@@ -1,0 +1,38 @@
+name: Verify production deployment
+# Runs when Vercel reports the production deployment ready. The live page must answer with the security
+# headers, carry the release the commit shipped, and pass the Premium Shell check (bottom dock geometry, 44px
+# targets, no horizontal overflow, floating search behaviour, cumulative layout shift under 0.05) at 390 and 1440.
+on:
+  deployment_status:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Live site answers with headers, body and the shipped release
+        run: |
+          set -e
+          headers=$(curl -sS -D - -o /tmp/body.html https://sotakece.com/ -A "sota-release-check")
+          echo "$headers" | head -1
+          echo "$headers" | grep -i '^x-content-type-options: nosniff' >/dev/null || { echo "nosniff missing"; exit 1; }
+          echo "$headers" | grep -i '^referrer-policy: strict-origin-when-cross-origin' >/dev/null || { echo "referrer policy missing"; exit 1; }
+          grep -q '<title>Sota Kece' /tmp/body.html || { echo "page body unexpected"; exit 1; }
+          expected=$(sed -n 's/.*<meta name="sota-release" content="\([^"]*\)".*/\1/p' index.html | head -1)
+          grep -q "content=\"$expected\"" /tmp/body.html || { echo "live release is not $expected yet"; exit 1; }
+          code=$(curl -sS -o /dev/null -w '%{http_code}' https://sotakece.vercel.app/)
+          [ "$code" = "308" ] || { echo "vercel.app alias should redirect (308), got $code"; exit 1; }
+      - name: Premium Shell check on the live page (Chromium, 390 and 1440)
+        run: |
+          npm i --no-save --no-audit --no-fund playwright@1.63.0
+          npx playwright install --with-deps chromium
+          node tests/tools/check-shell.mjs https://sotakece.com/

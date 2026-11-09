@@ -10,7 +10,8 @@
 - Live: https://sotakece.com
 
 ## Current state
-- Status: Ready to Test — Live preview (70% complete)
+- Status: Ready to Test — Live preview (72% complete)
+- 2026-11-09 Rolling upgrade Phase 1 (Dimau Premium Shell) is on branch agent/premium-shell-phase1, draft PR: bottom dock at every width, floating search, zero layout shift, production deploy verification. Needs Donovan's look at the preview before it merges.
 - Next action: LAUNCH ORDER (Donovan, 31 Oct): open Sota Kece to overseas Fijians first - full social features, wallet hidden (done: #306 merged and live). Once the Reserve Bank of Fiji approves the wallet, open to Fijians in Fiji and connect the two.
 - Latest implementation: the Talanoa Wall — the Pulse tab is one live feed for every member (280-character posts, quote, reply, like, repost, share; Latest default with a Hot toggle). Migration applied to dimau-core-sydney on 9 Nov (owner-approved); see docs/talanoa-wall-20261109.md.
 - Blocker: none recorded
@@ -18,7 +19,6 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-09 | Claude | Rolling upgrade Phase 1: Dimau Premium Shell (bottom dock at every width, floating search, zero layout shift) + production deploy verification | agent/premium-shell-phase1 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
@@ -59,6 +59,7 @@ Source kept read-only at https://github.com/donovandimau/sota-kece (`src/skins.t
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-09 — Claude — Rolling upgrade Phase 1: the Dimau Premium Shell applied to Sota Kece (branch agent/premium-shell-phase1). Shell files copied byte-for-byte from dimau-platform-standard/premium-shell (hash-checked by a new test); the existing five-destination navigation becomes the shell's bottom dock at every width (phone: full-width glass bar with safe area; desktop: centred 560px floating dock) and the desktop left rail is retired; a floating search button opens the shell overlay, searching destinations, members by handle, skins and the music library with no new storage or hosts; light sky-blue kept (owner, 9 Nov), no dark theme. Zero layout shift: overlay and button are static markup after #app; measured CLS 0.007 phone / 0.004 desktop on the real page. Offline: four files added to the essential shell; chat/call files for the un-precached communications.html and call.html moved to on-demand caching to stay under 1 MB. New `deploy-verify.yml` runs on Vercel's production deployment_status: headers, shipped release label, vercel.app 308 and the Chromium shell check against sotakece.com. Release v153. Tests 581 pass / 4 pre-existing Companion-Connect failures / 13 skipped. Full notes: PROJECT_STATE.md (9 Nov, Phase 1).
 - 2026-11-09 — Claude — Built the Talanoa Wall (real-time Pulse feed for every member) in the app's own stack: migration, module, page wiring, SQL and DOM tests, CI step. Default order is Latest to honour the 2 November "no algorithmic feed" decision; Hot is a toggle. Migration applied to the live project with Donovan's approval; the branch is ready to review.
 - 2026-11-07 — Claude — Reviewed the archived `sota-kece` skins demo for anything worth bringing over. No code merged (its skins clash with the premium Fiji-first studio); its two useful feature ideas are listed above for Donovan to approve.
 - 2026-11-06 — Codex — Added nosniff and strict-origin-when-cross-origin response headers. Existing embedding, media and call behavior remains. JSON validation passes; hosted checks and live readback belong to the scoped security PR.

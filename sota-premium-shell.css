@@ -1,0 +1,39 @@
+/* Sota Kece adapter for the Dimau Premium Shell (9 November 2026).
+   dimau-premium-shell.css/.js are byte copies of dimau-platform-standard/premium-shell and are never edited here.
+   This file maps Sota's existing navigation (.sx-nav, built by sota-experience.js) onto the shell's bottom dock at
+   every width, retires the desktop left rail, and places the floating search button. Light sky-blue stays; no dark theme. */
+body.sx-enabled #app.sx-app{padding-left:0!important;padding-bottom:calc(64px + env(safe-area-inset-bottom,0px) + 28px)!important}
+body.sx-enabled .sx-rail{position:static!important;display:contents!important;width:auto!important;padding:0!important;background:none!important;border:0!important}
+body.sx-enabled .sx-rail>.sx-brand,body.sx-enabled .sx-rail-caption,body.sx-enabled .sx-rail-bottom,body.sx-enabled .sx-world-rail-links{display:none!important}
+body.sx-enabled .sx-nav{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;z-index:100!important;box-sizing:border-box!important;
+ display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;grid-template-columns:none!important;gap:2px!important;
+ width:100%!important;height:calc(64px + env(safe-area-inset-bottom,0px))!important;margin:0!important;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))!important;
+ background:rgba(255,255,255,.78)!important;-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);
+ border:0!important;border-top:1px solid rgba(255,255,255,.75)!important;border-radius:0!important;box-shadow:0 -4px 24px rgba(11,42,74,.10)!important;transform:none}
+body.sx-enabled .sx-nav :is(a,button){position:relative!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;
+ width:100%!important;height:100%!important;min-height:0!important;padding:4px 2px!important;margin:0!important;border:0!important;border-radius:14px!important;background:transparent!important;
+ color:#3C6B86!important;font:700 11px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif!important;text-align:center!important;text-decoration:none!important;box-shadow:none!important;letter-spacing:.01em!important}
+body.sx-enabled .sx-nav :is(a,button) svg{width:22px!important;height:22px!important;margin:0!important}
+body.sx-enabled .sx-nav :is(a,button):hover{background:rgba(255,255,255,.6)!important;color:#0b2a4a!important}
+body.sx-enabled .sx-nav [aria-current=page]{background:#fff!important;color:#1E90FF!important;box-shadow:0 2px 10px rgba(11,42,74,.10)!important}
+body.sx-enabled .sx-nav [aria-current=page]::after{display:none!important}
+body.sx-enabled .sx-nav .sx-count{position:absolute;top:4px;right:calc(50% - 24px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#e85d4c;color:#fff;font:700 10px/16px system-ui,sans-serif}
+body.sx-enabled .sx-mini-player{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 12px)!important}
+body.sx-enabled #sota-update{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 12px)!important}
+body.sx-enabled:has(.sx-mini-player:not([hidden])) #sota-update{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 92px)!important}
+body.sx-enabled .sx-skip{left:16px}
+@media(min-width:761px){
+ body.sx-enabled .sx-nav{left:50%!important;right:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:min(560px,calc(100vw - 32px))!important;height:64px!important;padding:6px!important;
+  border:1px solid rgba(255,255,255,.8)!important;border-radius:22px!important;box-shadow:0 10px 30px rgba(11,42,74,.14)!important}
+ body.sx-enabled #app.sx-app{padding-bottom:calc(64px + 12px + 28px)!important}
+ body.sx-enabled .sx-mini-player{bottom:calc(64px + 12px + 12px)!important;transform:translateX(-50%)!important}
+ body.sx-enabled #sota-update{bottom:calc(64px + 12px + 12px)!important}
+ body.sx-enabled:has(.sx-mini-player:not([hidden])) #sota-update{bottom:calc(64px + 12px + 92px)!important}
+}
+/* Floating search: bottom-left, above the dock, clear of the mini player and update bar. Connect and the Plus pill keep the right side. */
+.dps-fab{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 20px)!important;left:16px!important;right:auto!important}
+body:has(.sx-mini-player:not([hidden])) .dps-fab{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 100px)!important}
+@media(min-width:761px){.dps-fab{bottom:calc(64px + 12px + 20px)!important;left:24px!important}body:has(.sx-mini-player:not([hidden])) .dps-fab{bottom:calc(64px + 12px + 100px)!important}}
+body.dps-search-open .dps-fab{visibility:hidden}
+/* Sign-in / welcome screens (no .sx-enabled): keep the search button and nothing else. */
+body:not(.sx-enabled) .dps-fab{bottom:calc(20px + env(safe-area-inset-bottom,0px))!important}
