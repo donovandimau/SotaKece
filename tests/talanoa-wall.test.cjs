@@ -51,7 +51,7 @@ test('pure helpers: merge never duplicates, newest picks the latest timestamp, p
   const vm=require('node:vm');const sandbox={location:{origin:'http://test.invalid',pathname:'/app',hash:''}};sandbox.window=sandbox;
   vm.runInContext(src,vm.createContext(sandbox));const P=sandbox.SotaPulse;
   const merged=P.merge([post(3),post(2)],[post(2),post(1)]);
-  assert.deepEqual(merged.map(p=>p.id),[3,2,1]);
+  assert.equal(JSON.stringify(merged.map(p=>p.id)),'[3,2,1]'); // vm-realm arrays are not reference-equal to ours
   assert.equal(P.newest([post(1),post(5),post(3)]),post(5).created_at);
   assert.equal(P.pillText(1),'1 new post');assert.equal(P.pillText(4),'4 new posts');
   assert.equal(P.shareUrl(12),'http://test.invalid/app#talanoa=12');
