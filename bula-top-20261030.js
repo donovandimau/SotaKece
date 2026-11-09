@@ -13,7 +13,8 @@
     set(pill.querySelector('.bw-long'),'display',small?'none':'inline');
     set(pill.querySelector('.bw-short'),'display',small?'inline':'none');
   }
-  var q=0;new MutationObserver(function(){if(q)return;q=1;requestAnimationFrame(function(){q=0;bulaTop();});}).observe(document.documentElement,{childList:true,subtree:true});
+  // Move the pill in the same task it is added (a microtask, before paint) so the page never shows it on its own line first: no layout jump.
+  var q=0;new MutationObserver(function(){if(q)return;q=1;Promise.resolve().then(function(){q=0;bulaTop();});}).observe(document.documentElement,{childList:true,subtree:true});
   window.addEventListener('resize',bulaTop);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bulaTop);else bulaTop();
 })();

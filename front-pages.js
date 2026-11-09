@@ -4,7 +4,7 @@
   const pages={home:{name:'Home'},music:{name:'Music',title:'Your music. Your way.',note:'Choose a song, switch the visuals or bring your own soundtrack.'},world:{name:'3D connections',title:'Your world, connected.',note:'Explore the live map. Add the people, pets and living things that belong in your world.'},connect:{name:'Connect',title:'Bring your people together.',note:'Create your account, invite your people or find someone you already know.'},talanoa:{name:'Talanoa',title:'Pull up a seat.',note:'A circle brings people together for conversation. Explore the Talanoa Circle, then create or join your own with an invitation.'},skins:{name:'Skins',title:'A space that feels like you.',note:'Explore your school, vanua, music and memories. Choose a collection to preview and personalise your room.'},profile:{name:'Your space',title:'Make this space your own.',note:'Choose Edit photos to add your profile photo and banner. Make this example space your own.'}};
   const aliases={'bv-music':'music','sota-music-home':'music','sota-connections':'world','bv-circle':'talanoa','bv-your-room':'skins'};
   let current=null;
-  function fromHash(hash){const value=String(hash||'').replace(/^#/,'');return !value?'home':Object.hasOwn(pages,value)?value:aliases[value]||null;}
+  function fromHash(hash){const value=String(hash||'').replace(/^#/,'');return !value?'home':Object.prototype.hasOwnProperty.call(pages,value)?value:aliases[value]||null;}
   function stop(){
     const session=current;current=null;if(!session)return;
     session.listeners.forEach(remove=>remove());
@@ -58,7 +58,7 @@
       try{root.scrollTo?.({top:0,left:0,behavior:'instant'});}finally{styles.forEach(([node,value,priority])=>{if(value)node.style.setProperty('scroll-behavior',value,priority);else node.style.removeProperty('scroll-behavior');});}
     }
     function show(view,{focus=false,scroll=false}={}){
-      if(!valid()||!Object.hasOwn(pages,view))return false;
+      if(!valid()||!Object.prototype.hasOwnProperty.call(pages,view))return false;
       session.view=view;app.dataset.frontPage=view;
       session.blocks.forEach(({node,views})=>{node.hidden=!views.includes(view)||session.hidden.get(node);});
       session.inert.forEach((original,node)=>{if(view==='home')node.setAttribute('inert','');else if(original===null)node.removeAttribute('inert');else node.setAttribute('inert',original);});
@@ -72,7 +72,7 @@
       app.dispatchEvent(new root.CustomEvent('sota-front-page-change',{bubbles:true,detail:{view}}));return true;
     }
     session.navigate=(view,options={})=>{
-      if(!valid()||!Object.hasOwn(pages,view))return false;
+      if(!valid()||!Object.prototype.hasOwnProperty.call(pages,view))return false;
       if(root.location.hash!=='#'+view)root.history.pushState(null,'',root.location.pathname+root.location.search+'#'+view);
       return show(view,{focus:options.focus!==false,scroll:true});
     };
