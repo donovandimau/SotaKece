@@ -28,3 +28,7 @@ test('Room Studio uploads a room song and cover privately, and keeps device musi
   assert.match(studio,/if\(onDevice\)\{/);
   assert.match(studio,/input\.disabled=false\);event\.target\.value=''/);
 });
+test('only one upload runs at a time, so Save cannot come back early',()=>{
+  assert.equal((studio.match(/querySelectorAll\('input\[type=file\]'\)\.forEach\(input=>input\.disabled=true\)/g)||[]).length,2);
+  assert.equal((studio.match(/querySelectorAll\('input\[type=file\]'\)\.forEach\(input=>input\.disabled=false\)/g)||[]).length,2);
+});

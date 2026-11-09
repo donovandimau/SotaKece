@@ -137,10 +137,10 @@
     const dialog=studio,userId=S.user?.id;if(!dialog||!draft)return;
     if(onDevice){
       const status=dialog.querySelector('#bv-upload-status'),saveButton=dialog.querySelector('#bv-save');
-      mediaBusy=true;saveButton.disabled=true;event.target.disabled=true;status.textContent='Saving music on this device…';
+      mediaBusy=true;saveButton.disabled=true;dialog.querySelectorAll('input[type=file]').forEach(input=>input.disabled=true);status.textContent='Saving music on this device…';
       try{const result=await window.SotaLocalMusic.importFiles(Array.from(event.target.files||[]));if(studio===dialog){status.textContent=result.saved.length?'Music saved on this device. Tap Play in the preview or open Your music.':result.rejected.map(r=>r.reason).join(' ');drawPreview();}}
       catch(error){if(studio===dialog)status.textContent=error.message;}
-      finally{mediaBusy=false;if(studio===dialog){saveButton.disabled=false;event.target.disabled=false;event.target.value='';}}
+      finally{mediaBusy=false;if(studio===dialog){saveButton.disabled=false;dialog.querySelectorAll('input[type=file]').forEach(input=>input.disabled=false);event.target.value='';}}
       return;
     }
     const status=dialog.querySelector('#bv-upload-status'),saveButton=dialog.querySelector('#bv-save');
