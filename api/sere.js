@@ -53,23 +53,37 @@ async function copyObject(env,bucket,from,to,fetcher){
     body:JSON.stringify({bucketId:bucket,sourceKey:from,destinationKey:to}),signal:AbortSignal.timeout(10000)});
   return r.ok;
 }
-function modelInput(env,imageUrl,audioUrl){
-  const input={};
-  input[env.SERE_INPUT_IMAGE||'source_image']=imageUrl;
-  input[env.SERE_INPUT_AUDIO||'driven_audio']=audioUrl;
-  let extra={still:true,preprocess:'full',enhancer:'gfpgan'};
-  if(env.SERE_INPUT_EXTRA){try{extra=JSON.parse(env.SERE_INPUT_EXTRA);}catch(_){throw Error('config');}}
-  return Object.assign(input,extra);
+// Two render engines. "quick" is SadTalker (fast, cheap, still body). "lifelike" is MEMO (head,
+// eyes and expression move; several minutes and a few pence more). Versions can be overridden by env.
+const ENGINES={
+  quick:   {version:env=>env.SERE_REPLICATE_VERSION||'85c698db7c0a66d5011435d0191db323034e1da04b912a6d365833141b6a285b',
+            keys:{image:'source_image',audio:'driven_audio'},
+            input:(i,a)=>({source_image:i,driven_audio:a,still:true,preprocess:'full',enhancer:'gfpgan'})},
+  lifelike:{version:env=>env.SERE_LIFELIKE_VERSION||'be54f93bc72d562ab2577f57b7eec44707efde55d058ee504c8b65a62d70fdf3',
+            keys:{image:'image',audio:'audio'},
+            input:(i,a)=>({image:i,audio:a,resolution:512,fps:30,max_audio_seconds:60})}
+};
+// Text to speech for "Say it": Kokoro on Replicate (fast, runs while the request waits).
+const TTS={version:env=>env.SERE_TTS_VERSION||'f559560eb822dc509045f3921a1921234918b91739db4bf3daab2169b71c7a13',
+  voices:{bella:'af_bella',sarah:'af_sarah',nicole:'af_nicole',adam:'am_adam',michael:'am_michael',emma:'bf_emma',isabella:'bf_isabella',george:'bm_george',lewis:'bm_lewis'}};
+function engineFor(name){return ENGINES[name]?name:'quick';}
+function modelInput(env,imageUrl,audioUrl,engine){
+  const e=ENGINES[engineFor(engine)],input=e.input(imageUrl,audioUrl);
+  // An env override renames the field (for a model with other input names); the built-in one goes.
+  if(env.SERE_INPUT_IMAGE){delete input[e.keys.image];input[env.SERE_INPUT_IMAGE]=imageUrl;}
+  if(env.SERE_INPUT_AUDIO){delete input[e.keys.audio];input[env.SERE_INPUT_AUDIO]=audioUrl;}
+  if(env.SERE_INPUT_EXTRA){let extra;try{extra=JSON.parse(env.SERE_INPUT_EXTRA);}catch(_){throw Error('config');}Object.assign(input,extra);}
+  return input;
 }
 async function startRender(env,job,imageUrl,audioUrl,fetcher){
   const token=String(env.REPLICATE_API_TOKEN||''),secret=String(env.SERE_SECRET||'');
   if(token.length<10||secret.length<16)throw Error('config');
   const base=String(env.SERE_PUBLIC_URL||'https://sotakece.com').replace(/\/$/,'');
-  const body={input:modelInput(env,imageUrl,audioUrl),webhook:`${base}/api/sere-callback?id=${job.id}&sig=${sign(secret,job.id)}`,webhook_events_filter:['completed']};
+  const engine=engineFor(job.engine);
+  const body={input:modelInput(env,imageUrl,audioUrl,engine),webhook:`${base}/api/sere-callback?id=${job.id}&sig=${sign(secret,job.id)}`,webhook_events_filter:['completed']};
   let url=`${REPLICATE}/predictions`;
-  if(env.SERE_REPLICATE_VERSION)body.version=String(env.SERE_REPLICATE_VERSION);
-  else if(/^[\w.-]+\/[\w.-]+$/.test(env.SERE_REPLICATE_MODEL||''))url=`${REPLICATE}/models/${env.SERE_REPLICATE_MODEL}/predictions`;
-  else throw Error('config');
+  if(engine==='quick'&&!env.SERE_REPLICATE_VERSION&&/^[\w.-]+\/[\w.-]+$/.test(env.SERE_REPLICATE_MODEL||''))url=`${REPLICATE}/models/${env.SERE_REPLICATE_MODEL}/predictions`;
+  else body.version=ENGINES[engine].version(env);
   const r=await fetcher(url,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
   if(!r.ok)throw Error('provider');
   const p=await r.json();
@@ -115,17 +129,61 @@ async function finish(env,job,prediction,fetcher){
   return 'completed';
 }
 
+// Duration of a WAV from its header (Kokoro returns 24 kHz 16-bit mono WAV).
+function wavDurationMs(buf){
+  if(buf.length<44||buf.toString('ascii',0,4)!=='RIFF')return null;
+  let o=12;while(o+8<=buf.length){const id=buf.toString('ascii',o,o+4),size=buf.readUInt32LE(o+4);
+    if(id==='fmt '){var rate=buf.readUInt32LE(o+12),ch=buf.readUInt16LE(o+10),bits=buf.readUInt16LE(o+22);}
+    if(id==='data'){if(!rate)return null;return Math.round(size/(rate*ch*(bits/8))*1000);}
+    o+=8+size+(size%2);}
+  return null;
+}
+// Speak the text with Kokoro and return the WAV bytes. Waits on the request (Replicate 'Prefer: wait').
+async function speak(env,text,voice,fetcher){
+  const token=String(env.REPLICATE_API_TOKEN||'');if(token.length<10)throw Error('config');
+  const r=await fetcher(`${REPLICATE}/predictions`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',Prefer:'wait=60'},
+    body:JSON.stringify({version:TTS.version(env),input:{text,voice:TTS.voices[voice]||TTS.voices.bella,speed:1}}),signal:AbortSignal.timeout(70000)});
+  if(!r.ok)throw Error('provider');
+  let p=await r.json();
+  for(let i=0;i<20&&p.status!=='succeeded'&&p.status!=='failed';i++){await new Promise(w=>setTimeout(w,1500));p=await readRender(env,p.id,fetcher);}
+  const src=outputUrl(p);if(p.status!=='succeeded'||!src)throw Error('provider');
+  const a=await fetcher(src,{signal:AbortSignal.timeout(20000)});if(!a.ok)throw Error('provider');
+  return Buffer.from(await a.arrayBuffer());
+}
+
 async function handler(req,res){
   res.setHeader('Cache-Control','private, no-store, max-age=0');
   res.setHeader('X-Content-Type-Options','nosniff');
   if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Use POST.'});}
   const body=typeof req.body==='object'&&req.body?req.body:{};
   const id=String(body.id||'');
-  if(!UUID.test(id))return res.status(400).json({error:'A valid sere is required.'});
+  if(body.action!=='speak'&&!UUID.test(id))return res.status(400).json({error:'A valid sere is required.'});
   try{
     const me=await who(req.headers?.authorization,fetch);
     if(!me)return res.status(401).json({error:'Sign in again.'});
     const env=process.env;
+
+    if(body.action==='speak'){
+      // "Say it": words → voice → a pending sere whose sound is already uploaded. The row is created
+      // AS THE MEMBER (their token), so the daily allowance and ownership rules apply unchanged.
+      const text=String(body.text||'').trim().slice(0,300);
+      if(text.length<2)return res.status(400).json({error:'Type a few words first.'});
+      if(!/^(jpg|png)$/.test(body.imageExt||''))return res.status(400).json({error:'Choose a photo first.'});
+      // Allowance first, so a member who is out of seres does not cost a voice render.
+      const mine=await fetch(`${SOTA_URL}/rest/v1/rpc/bv_sere_mine`,{method:'POST',headers:{apikey:SOTA_KEY,Authorization:req.headers.authorization,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(5000)});
+      const list=mine.ok?await mine.json().catch(()=>[]):[];
+      const dayAgo=Date.now()-86400000,usedToday=(Array.isArray(list)?list:[]).filter(g=>g.status!=='failed'&&new Date(g.created_at).getTime()>dayAgo).length;
+      if(usedToday>=5)return res.status(429).json({error:'Five a day — more tomorrow.',code:'OUT_OF_SERE'});
+      const wav=await speak(env,text,String(body.voice||'bella'),fetch);
+      const ms=wavDurationMs(wav);if(!ms||ms<1000)throw Error('provider');
+      const rpc=await fetch(`${SOTA_URL}/rest/v1/rpc/bv_sere_create`,{method:'POST',headers:{apikey:SOTA_KEY,Authorization:req.headers.authorization,'Content-Type':'application/json'},
+        body:JSON.stringify({p_image_ext:body.imageExt,p_duration_ms:Math.min(ms,600000),p_start_ms:0,p_scene:String(body.scene||'none'),p_caption:body.caption?String(body.caption).slice(0,140):null,p_remix_of:null,p_engine:engineFor(body.engine)}),signal:AbortSignal.timeout(8000)});
+      const row=await rpc.json().catch(()=>null);
+      if(!rpc.ok||!row?.id){const m=String(row?.message||'');return res.status(rpc.status===400?400:503).json({error:/OUT_OF_SERE/.test(m)?'Five a day — more tomorrow.':'Could not start the sere.',code:m.slice(0,40)});}
+      const up=await fetch(`${SOTA_URL}/storage/v1/object/sere-audio/${row.audio_path}`,{method:'POST',headers:svcHeaders(env,{'Content-Type':'audio/wav','x-upsert':'true'}),body:wav,signal:AbortSignal.timeout(20000)});
+      if(!up.ok){console.error('sere speak upload',up.status);throw Error('storage');}
+      return res.status(200).json({ok:true,id:row.id,image_path:row.image_path,duration_ms:ms});
+    }
     const job=await getJob(env,id,fetch);
     if(!job||job.user_id!==me)return res.status(404).json({error:'That sere is not yours.'});
 
@@ -165,6 +223,9 @@ module.exports.sign=sign;
 module.exports.sameSig=sameSig;
 module.exports.outputUrl=outputUrl;
 module.exports.modelInput=modelInput;
+module.exports.wavDurationMs=wavDurationMs;
+module.exports.speak=speak;
+module.exports.ENGINES=ENGINES;
 module.exports.startRender=startRender;
 module.exports.readRender=readRender;
 module.exports.finish=finish;

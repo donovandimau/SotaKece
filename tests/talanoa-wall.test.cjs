@@ -124,7 +124,7 @@ test('posting prepends the returned card and clears the box; the counter and but
   const form=w.document.querySelector('[data-tw-form="post"]'),ta=form.querySelector('textarea'),btn=form.querySelector('button[type=submit]');
   assert.ok(btn.disabled);
   ta.value='bula everyone';ta.dispatchEvent(new w.Event('input',{bubbles:true}));
-  assert.equal(form.querySelector('.tw-count').textContent,String(280-'bula everyone'.length));assert.ok(!btn.disabled);
+  assert.equal(form.querySelector('.tw-count').textContent,(280-'bula everyone'.length)+' letters left');assert.ok(!btn.disabled);
   form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await flush();
   const first=w.document.querySelector('#tw-list .tw-post');
   assert.equal(first.dataset.id,'900');assert.match(first.textContent,/bula everyone/);

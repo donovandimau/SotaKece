@@ -9,6 +9,7 @@ const root=path.resolve(__dirname,'..');
 const fixture=String.raw`
 CREATE ROLE anon NOLOGIN;
 CREATE ROLE authenticated NOLOGIN;
+CREATE ROLE service_role NOLOGIN;
 CREATE SCHEMA auth;
 CREATE SCHEMA bulavata;
 GRANT USAGE ON SCHEMA auth, bulavata, public TO anon,authenticated;
@@ -50,6 +51,8 @@ ORDER BY name;
   const before=(await db.query(snapshot)).rows;
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109200000_sota_sere.sql'),'utf8'));
   assert.deepEqual((await db.query(snapshot)).rows,before,'Existing tables keep their grants and row security');
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109210000_sota_sere_service_grants.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109220000_sota_sere_engines.sql'),'utf8'));
   const results=await db.exec(fs.readFileSync(path.join(root,'tests/sere-db.sql'),'utf8'));
   const checks=results.flatMap(r=>r.rows||[]).flatMap(row=>Object.values(row)).filter(v=>typeof v==='string'&&v.startsWith('PASS '));
   for(const check of checks)process.stdout.write(check+'\n');

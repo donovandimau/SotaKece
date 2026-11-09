@@ -62,7 +62,8 @@ test('outputUrl handles string, array and object outputs',()=>{
 });
 test('modelInput maps the two files onto the model keys and merges extras',()=>{
   assert.deepEqual(api.modelInput({},'I','A'),{source_image:'I',driven_audio:'A',still:true,preprocess:'full',enhancer:'gfpgan'});
-  assert.deepEqual(api.modelInput({SERE_INPUT_IMAGE:'face',SERE_INPUT_AUDIO:'audio',SERE_INPUT_EXTRA:'{"fps":25}'},'I','A'),{face:'I',audio:'A',fps:25});
+  const custom=api.modelInput({SERE_INPUT_IMAGE:'face',SERE_INPUT_AUDIO:'audio',SERE_INPUT_EXTRA:'{"fps":25}'},'I','A');
+  assert.deepEqual(custom,{face:'I',audio:'A',still:true,preprocess:'full',enhancer:'gfpgan',fps:25},'env overrides rename the file fields; the built-in names go');
   assert.throws(()=>api.modelInput({SERE_INPUT_EXTRA:'{bad'},'I','A'),/config/);
 });
 test('startRender posts to Replicate with a signed webhook and refuses without keys',async()=>{
@@ -76,8 +77,9 @@ test('startRender posts to Replicate with a signed webhook and refuses without k
   assert.deepEqual(calls[0].body.webhook_events_filter,['completed']);
   await api.startRender(Object.assign({},env,{SERE_REPLICATE_VERSION:'abc123'}),job,'I','A',fetcher);
   assert.equal(calls[1].url,'https://api.replicate.com/v1/predictions');assert.equal(calls[1].body.version,'abc123');
-  await assert.rejects(api.startRender({SERE_SECRET:'a-long-secret-value-1234'},job,'I','A',fetcher),/config/);
-  await assert.rejects(api.startRender(Object.assign({},env,{SERE_REPLICATE_MODEL:'bad'}),job,'I','A',fetcher),/config/);
+  await assert.rejects(api.startRender({SERE_SECRET:'a-long-secret-value-1234'},job,'I','A',fetcher),/config/,'no token');
+  await api.startRender(Object.assign({},env,{SERE_REPLICATE_MODEL:'bad'}),job,'I','A',fetcher);
+  assert.equal(calls[2].url,'https://api.replicate.com/v1/predictions');assert.match(calls[2].body.version,/^85c698db/,'a bad model name falls back to the built-in quick version');
 });
 test('finish stores the video and poster, marks completed, and marks failures',async()=>{
   const log=[];
@@ -133,4 +135,39 @@ test('the wall renders a sere post with video, tip and remix',{skip:!JSDOM&&'jsd
   assert.ok(!w.SotaPulse.card({id:9,author:'u-bo',handle:'bo',body:'plain',created_at:'2026-11-09T00:00:00Z'}).includes('tw-sere'));
   assert.ok(w.SotaPulse.composer().includes('data-tw="sere"'),'composer offers Sere');
   assert.ok(!w.SotaPulse.composer({replyTo:1}).includes('data-tw="sere"'),'not on a reply');
+});
+
+// ---------------------------------------------------------------- engines and say-it
+test('modelInput picks the engine mapping (quick = SadTalker keys, lifelike = MEMO keys)',()=>{
+  assert.deepEqual(api.modelInput({},'I','A','quick'),{source_image:'I',driven_audio:'A',still:true,preprocess:'full',enhancer:'gfpgan'});
+  assert.deepEqual(api.modelInput({},'I','A','lifelike'),{image:'I',audio:'A',resolution:512,fps:30,max_audio_seconds:60});
+  assert.deepEqual(api.modelInput({},'I','A','nonsense'),api.modelInput({},'I','A','quick'),'unknown engine falls back to quick');
+});
+test('startRender sends the lifelike version for a lifelike job',async()=>{
+  const calls=[];const fetcher=async(url,init)=>{calls.push(JSON.parse(init.body));return {ok:true,json:async()=>({id:'p'})};};
+  const env={REPLICATE_API_TOKEN:'r8_token_xxxxxxx',SERE_SECRET:'a-long-secret-value-1234'};
+  await api.startRender(env,{id:'11111111-1111-4111-8111-111111111111',engine:'lifelike'},'I','A',fetcher);
+  assert.equal(calls[0].version,'be54f93bc72d562ab2577f57b7eec44707efde55d058ee504c8b65a62d70fdf3');assert.equal(calls[0].input.image,'I');
+  await api.startRender(env,{id:'11111111-1111-4111-8111-111111111111'},'I','A',fetcher);
+  assert.equal(calls[1].version,'85c698db7c0a66d5011435d0191db323034e1da04b912a6d365833141b6a285b');assert.equal(calls[1].input.source_image,'I');
+});
+test('wavDurationMs reads a WAV header',()=>{
+  const buf=Buffer.from(sere.encodeWav(new Float32Array(16000*3),16000));
+  assert.equal(api.wavDurationMs(buf),3000);
+  assert.equal(api.wavDurationMs(Buffer.from('nope')),null);
+});
+test('speak waits on Replicate, polls, and returns the audio bytes',async()=>{
+  const log=[];
+  const fetcher=async(url,init={})=>{log.push(url);
+    if(url.endsWith('/predictions'))return {ok:true,json:async()=>({id:'tts1',status:'processing'})};
+    if(url.includes('/predictions/tts1'))return {ok:true,json:async()=>({id:'tts1',status:'succeeded',output:'https://r/out.wav'})};
+    if(url==='https://r/out.wav')return {ok:true,arrayBuffer:async()=>new Uint8Array([1,2,3,4]).buffer};
+    throw new Error('unexpected '+url);};
+  const bytes=await api.speak({REPLICATE_API_TOKEN:'r8_token_xxxxxxx'},'Bula vinaka','george',fetcher);
+  assert.deepEqual(Array.from(bytes),[1,2,3,4]);
+  assert.ok(log[0].endsWith('/predictions'),'creates the prediction first');
+  await assert.rejects(api.speak({},'hi','bella',fetcher),/config/);
+});
+test('the maker exposes the voice and engine lists the sheet is built from',()=>{
+  assert.ok(sere.VOICES.some(v=>v[0]==='george'));assert.deepEqual(sere.ENGINES.map(e=>e[0]),['quick','lifelike']);
 });

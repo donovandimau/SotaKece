@@ -41,15 +41,19 @@ INSERT INTO pg_temp.keep SELECT 'ana1',(public.bv_sere_create('jpg',185000,12000
 SELECT pg_temp.ok((v::jsonb->>'audio_path') LIKE '11111111-1111-1111-1111-111111111111/%.wav','audio path is in Ana''s folder') FROM pg_temp.keep WHERE k='ana1';
 SELECT pg_temp.ok((v::jsonb->>'image_path') LIKE '11111111-1111-1111-1111-111111111111/%.jpg','image path is in Ana''s folder') FROM pg_temp.keep WHERE k='ana1';
 SELECT pg_temp.ok((v::jsonb->>'left')::int=4,'four left today after the first') FROM pg_temp.keep WHERE k='ana1';
+SELECT pg_temp.ok((SELECT engine FROM public.bv_sere_media_generations WHERE id=(v::jsonb->>'id')::uuid)='quick','default engine is quick') FROM pg_temp.keep WHERE k='ana1';
+INSERT INTO pg_temp.keep SELECT 'ana-life',(public.bv_sere_create('jpg',5000,0,'none',NULL,NULL,'lifelike'))::text;
+SELECT pg_temp.ok((SELECT engine FROM public.bv_sere_media_generations WHERE id=(v::jsonb->>'id')::uuid)='lifelike','lifelike engine is recorded') FROM pg_temp.keep WHERE k='ana-life';
+SELECT pg_temp.ok((public.bv_sere_create('jpg',5000,0,'none',NULL,NULL,'nonsense'))->>'engine'='quick','unknown engine falls back to quick');
 SELECT pg_temp.ok((SELECT render_end_ms-render_start_ms FROM public.bv_sere_media_generations WHERE id=(v::jsonb->>'id')::uuid)=60000,'window is capped at 60 s') FROM pg_temp.keep WHERE k='ana1';
 SELECT pg_temp.ok((SELECT render_start_ms FROM public.bv_sere_media_generations WHERE id=(v::jsonb->>'id')::uuid)=120000,'window starts where asked') FROM pg_temp.keep WHERE k='ana1';
 SELECT pg_temp.ok((SELECT status FROM public.bv_sere_media_generations WHERE id=(v::jsonb->>'id')::uuid)='pending','starts pending') FROM pg_temp.keep WHERE k='ana1';
-SELECT pg_temp.ok(jsonb_array_length(public.bv_sere_mine())=1,'mine lists it');
+SELECT pg_temp.ok(jsonb_array_length(public.bv_sere_mine())=3,'mine lists all three');
 -- a short clip keeps its own length
 INSERT INTO pg_temp.keep SELECT 'ana2',(public.bv_sere_create('png',9000))::text;
 SELECT pg_temp.ok((SELECT render_end_ms FROM public.bv_sere_media_generations WHERE id=(v::jsonb->>'id')::uuid)=9000,'short clip window is the whole clip') FROM pg_temp.keep WHERE k='ana2';
 -- allowance: five a day
-SELECT public.bv_sere_create('jpg',5000); SELECT public.bv_sere_create('jpg',5000); SELECT public.bv_sere_create('jpg',5000);
+SELECT public.bv_sere_create('jpg',5000);
 SELECT pg_temp.fails($$SELECT public.bv_sere_create('jpg',5000)$$,'OUT_OF_SERE','sixth in a day is refused');
 SELECT pg_temp.fails($$UPDATE bulavata.sere_media_generations SET status='completed'$$,'42501','members cannot update the table');
 SELECT pg_temp.fails($$UPDATE public.bv_sere_media_generations SET status='completed'$$,'42501','members cannot update through the view');
