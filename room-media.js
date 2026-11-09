@@ -27,15 +27,26 @@
       },
       async remove(objectPath){
         if(!objectPath.startsWith(userId+'/')||!(path(objectPath,'music')||path(objectPath,'covers')))throw new Error('That upload belongs to another room.');
-        const {error}=await client.storage.from(bucket).remove([objectPath]);if(error)throw new Error(error.message);return true;
+        const {error}=await client.storage.from(bucket).remove([objectPath]);if(error)throw new Error(error.message);links.delete(objectPath);return true;
       }
     };
   }
+  // Re-use one link per file for most of its hour, so repeat views come from the
+  // browser and the nearby CDN copy instead of the Sydney origin. Memory only:
+  // a reload or sign-out starts fresh, so links never outlive the session.
+  const links=new Map(),reuseMs=50*60*1000;
   async function signed(client,objectPath,kind){
     if(!path(objectPath,kind))throw new Error('This room file is unavailable.');
-    const {data,error}=await client.storage.from(bucket).createSignedUrl(objectPath,3600);
-    if(error||!data?.signedUrl)throw new Error(error?.message||'This file is available to the room owner and their friends.');
-    return data.signedUrl;
+    const hit=links.get(objectPath);
+    if(hit&&hit.client===client&&hit.until>Date.now())return hit.url;
+    const url=(async()=>{
+      const {data,error}=await client.storage.from(bucket).createSignedUrl(objectPath,3600);
+      if(error||!data?.signedUrl)throw new Error(error?.message||'This file is available to the room owner and their friends.');
+      return data.signedUrl;
+    })();
+    links.set(objectPath,{client,url,until:Date.now()+reuseMs});
+    try{return await url;}catch(e){links.delete(objectPath);throw e;}
   }
-  return {bucket,limit,formats,path,inspect,api,signed};
+  function forget(objectPath){if(objectPath)links.delete(objectPath);else links.clear();}
+  return {bucket,limit,formats,path,inspect,api,signed,forget};
 });
