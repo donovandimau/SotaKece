@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sere — make a photo sing</title>
+<meta name="description" content="Sere: pick a photo, pick a sound or type your words, and the photo sings. By Sota Kece.">
+<meta property="og:title" content="Sere — make a photo sing">
+<meta property="og:description" content="Pick a photo, pick a sound or type your words, and the photo sings.">
+<meta property="og:image" content="https://sotakece.com/icons/icon-512.png">
+<meta name="theme-color" content="#87CEEB">
+<link rel="icon" href="/icons/icon-32.png">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-2">
+<script src="/vendor/supabase-2.45.0.min.js"></script>
+<style>
+  :root{--sky:#87CEEB;--ink:#0b2a4a;--ink-soft:#3C6B86;--accent:#1E90FF;--glass:rgba(255,255,255,.78);--line:rgba(11,42,74,.12)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);
+    background:linear-gradient(180deg,#CFEEFB 0%,#87CEEB 60%,#5FB3D9 100%) fixed;min-height:100vh}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;position:sticky;top:0;z-index:5;
+    background:rgba(255,255,255,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.7)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
+  .brand img{width:36px;height:36px;border-radius:10px}
+  .brand small{display:block;font-size:11.5px;font-weight:500;color:var(--ink-soft)}
+  main{max-width:960px;margin:0 auto;padding:18px 14px 90px}
+  .glass,.card{background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.75);border-radius:22px;box-shadow:0 10px 30px rgba(11,42,74,.14)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 20px;font:inherit;font-weight:700;font-size:15px;color:#fff;background:var(--accent);cursor:pointer;min-height:44px;box-shadow:0 6px 18px rgba(30,144,255,.35)}
+  .btn.sm{padding:8px 14px;font-size:14px;min-height:40px;box-shadow:none}
+  .btn.ghost{background:rgba(255,255,255,.75);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+  .btn[disabled]{opacity:.5;cursor:default}
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;padding:26px;margin-bottom:18px;align-items:center}
+  .hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,44px);line-height:1.05}
+  .hero p{margin:0 0 16px;color:var(--ink-soft);font-size:16px}
+  .hero video,.hero img{width:100%;border-radius:18px;display:block;background:#0b2a4a}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .auth{max-width:420px;margin:0 auto;padding:22px}
+  .auth label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin:10px 0 4px}
+  .auth input{width:100%;font:inherit;font-size:15px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .social{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+  .social .btn{width:100%;background:rgba(255,255,255,.85);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+  .err{color:#8a1c1c;font-size:14px;margin-top:8px;min-height:1.2em}
+  h2{font-size:18px;margin:22px 4px 10px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .tile{padding:10px;display:flex;flex-direction:column;gap:8px}
+  .tile video{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:14px;background:#0b2a4a}
+  .tile .meta{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--ink-soft)}
+  .tile .meta b{color:var(--ink)}
+  .tile .pending{aspect-ratio:3/4;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(207,238,251,.6);color:var(--ink-soft);font-weight:600;text-align:center;padding:12px}
+  .empty{padding:22px;text-align:center;color:var(--ink-soft)}
+  footer{text-align:center;padding:22px;color:var(--ink-soft);font-size:12.5px}
+  footer img{width:28px;height:28px;vertical-align:middle;margin-right:6px;border-radius:6px}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0b2a4a;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:70;box-shadow:0 10px 30px rgba(11,42,74,.3)}
+  @media (max-width:720px){.hero{grid-template-columns:1fr;padding:18px}.hero video,.hero img{max-height:360px;object-fit:cover}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><img src="/icons/icon-192.png" alt=""><div>Sere<small>make a photo sing</small></div></div>
+  <div id="who" class="row"></div>
+</header>
+<main id="app"></main>
+<footer><img src="/icons/icon-192.png" alt="">Dimau Group · <a href="https://sotakece.com" style="color:inherit">Sota Kece</a></footer>
+
+<script src="/sere-maker.js?v=20261109-sere-2"></script>
+<script>
+(function(){
+  'use strict';
+  const SB_URL="https://aqfzpaczyodhugsgqvxi.supabase.co", SB_KEY="sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF";
+  const sb=window.supabase.createClient(SB_URL,SB_KEY); window.sb=sb;
+  const S={user:null,me:null}; window.S=S;
+  const app=document.getElementById('app'), who=document.getElementById('who');
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function toast(m){const d=document.createElement('div');d.className='toast';d.setAttribute('role','status');d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2600);}
+  function ago(iso){const s=(Date.now()-new Date(iso))/1000;if(s<60)return'now';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d';}
+
+  /* ---------------- sign in (same accounts as Sota Kece) */
+  function renderAuth(mode){
+    app.innerHTML=`<section class="glass auth">
+      <h1 style="margin:0 0 6px;font-size:26px">Make a photo sing</h1>
+      <p style="margin:0 0 12px;color:var(--ink-soft)">Sign in with your Sota Kece account. One account works on both.</p>
+      <div class="social">
+        <button type="button" class="btn" data-oauth="google">Continue with Google</button>
+        <button type="button" class="btn" data-oauth="facebook">Continue with Facebook</button>
+      </div>
+      <label for="a-email">Email</label><input id="a-email" type="email" autocapitalize="off" placeholder="you@email.com">
+      <label for="a-pass">Password</label><input id="a-pass" type="password" placeholder="Your password">
+      <div class="row" style="margin-top:14px"><button type="button" class="btn" id="a-go">Sign in</button>
+        <a class="btn ghost sm" href="https://sotakece.com">New here? Create your room on Sota Kece</a></div>
+      <div class="err" id="a-err" role="alert"></div>
+    </section>`;
+    app.querySelectorAll('[data-oauth]').forEach(b=>b.onclick=async()=>{const {error}=await sb.auth.signInWithOAuth({provider:b.dataset.oauth,options:{redirectTo:location.origin+'/'}});if(error)document.getElementById('a-err').textContent=error.message;});
+    document.getElementById('a-go').onclick=async()=>{const b=document.getElementById('a-go');b.disabled=true;const {error}=await sb.auth.signInWithPassword({email:document.getElementById('a-email').value.trim(),password:document.getElementById('a-pass').value});if(error){document.getElementById('a-err').textContent=error.message;b.disabled=false;}else boot();};
+    app.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('a-go').click();}));
+  }
+
+  /* ---------------- the app */
+  function tile(s,p){
+    const video=s.video?`<video data-sere="${esc(s.id)}" controls playsinline preload="none" poster="${esc(s.poster||'')}" src="${esc(s.video)}"></video>`:
+      `<div class="pending">${s.status==='failed'?'Did not render':'Still rendering…'}</div>`;
+    return `<article class="card tile">${video}<div class="meta"><span>${p?`<b>${esc(p.display_name||p.handle)}</b> · `:''}${esc(s.caption||'')}</span><span>${s.created_at?ago(s.created_at):''}</span></div>
+      ${s.video?`<div class="row"><button type="button" class="btn sm ghost" data-remix="${esc(s.id)}">🎤 Remix</button>${s.plays?`<span style="font-size:12.5px;color:var(--ink-soft)">${s.plays} plays</span>`:''}</div>`:''}</article>`;
+  }
+  async function home(){
+    app.innerHTML=`<section class="glass hero">
+        <div><h1>Your photo. Your song.<br>Thirty seconds to make it sing.</h1>
+          <p>Pick a face, pick a sound or type a few words, and watch it come alive. Posts go to the Talanoa Wall on Sota Kece.</p>
+          <div class="row"><button type="button" class="btn" id="make">🎤 Make a photo sing</button><a class="btn ghost" href="https://sotakece.com">Open Sota Kece</a></div></div>
+        <img src="/assets/social-sunset-20261104/beach-singalong-768.webp" alt="">
+      </section>
+      <h2>Your seres</h2><div class="grid" id="mine"><div class="empty">Loading…</div></div>
+      <h2>Everyone's latest</h2><div class="grid" id="all"><div class="empty">Loading…</div></div>`;
+    document.getElementById('make').onclick=()=>window.SotaSere.open();
+    app.addEventListener('click',e=>{const r=e.target.closest('[data-remix]');if(r)window.SotaSere.open({remixOf:r.dataset.remix});});
+    const [mine,feed]=await Promise.all([sb.rpc('bv_sere_mine'),sb.rpc('bv_talanoa_feed',{p_mode:'latest',p_limit:50})]);
+    const m=document.getElementById('mine'),a=document.getElementById('all');
+    const myList=(mine.data||[]);
+    m.innerHTML=myList.length?myList.map(s=>tile(s)).join(''):'<div class="empty card">Nothing yet — make your first one.</div>';
+    const posts=(feed.data||[]).filter(p=>p.sere&&p.sere.video);
+    a.innerHTML=posts.length?posts.map(p=>tile(Object.assign({caption:p.body,created_at:p.created_at},p.sere),p)).join(''):'<div class="empty card">No seres on the wall yet.</div>';
+  }
+  async function boot(){
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session){who.innerHTML='';return renderAuth();}
+    S.user=session.user;
+    const {data:me}=await sb.from('bv_profiles').select('*').eq('id',S.user.id).maybeSingle();
+    if(!me){app.innerHTML=`<section class="glass auth"><h2 style="margin-top:0">One more step</h2><p>Your account exists but has no room yet. Create it on Sota Kece (30 seconds), then come back.</p><a class="btn" href="https://sotakece.com">Create my room</a> <button type="button" class="btn ghost sm" id="out">Sign out</button></section>`;document.getElementById('out').onclick=()=>sb.auth.signOut().then(()=>location.reload());return;}
+    S.me=me;
+    who.innerHTML=`<span style="font-size:14px;color:var(--ink-soft)">@${esc(me.handle)}</span> <button type="button" class="btn sm ghost" id="out">Sign out</button>`;
+    document.getElementById('out').onclick=()=>sb.auth.signOut().then(()=>location.reload());
+    window.SotaSere.init({client:sb,state:S,toast,esc,go:()=>home()});
+    home();
+  }
+  sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT')setTimeout(boot,0);});
+  boot();
+})();
+</script>
+</body>
+</html>

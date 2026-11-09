@@ -45,5 +45,17 @@
     "api/sere-callback.js": {
       "maxDuration": 60
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "sere.sotakece.com"
+        }
+      ],
+      "destination": "/sere/index.html"
+    }
+  ]
 }
