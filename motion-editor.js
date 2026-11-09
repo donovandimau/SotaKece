@@ -24,7 +24,7 @@
     replace: $('#mw-replace'), status: $('#mw-status'), access: $('#mw-access'), progress: $('#mw-progress'),
     hint: $('#mw-hint')
   };
-  let engine = null, user = null, access = { allowed: false, reason: 'signed-out' }, current = null, styleIndex = 0;
+  let engine = null, user = null, accountReady = null, uploadSeq = 0, access = { allowed: false, reason: 'signed-out' }, current = null, styleIndex = 0;
 
   /* ---------- account + free-year check ---------- */
   async function loadAccount() {
@@ -41,7 +41,8 @@
       : 'Free for your first year — sign in to export';
     ui.access.dataset.state = access.allowed ? 'ok' : 'locked';
   }
-  function requireAccess() {
+  async function requireAccess() {
+    await accountReady;
     if (access.allowed) return true;
     G.showUpgradeModal({ reason: access.reason, onUpgrade: function () { location.href = '/#plans'; } });
     return false;
@@ -52,6 +53,7 @@
   async function handleFile(file) {
     fail('');
     if (!file) return;
+    const seq = ++uploadSeq;
     if (TYPES.indexOf(file.type) < 0) return fail('Please choose a PNG, JPEG or WebP picture.');
     if (file.size > MAX_BYTES) return fail('That picture is over 25 MB. Please choose a smaller one.');
     const url = URL.createObjectURL(file);
@@ -61,13 +63,16 @@
     let bmp;
     try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
     catch (_) { try { bmp = await createImageBitmap(file); } catch (e) { URL.revokeObjectURL(url); return fail('That picture could not be opened.'); } }
+    if (seq !== uploadSeq) { bmp.close && bmp.close(); URL.revokeObjectURL(url); return; }
     if (Math.min(bmp.width, bmp.height) < MIN_EDGE) { URL.revokeObjectURL(url); return fail('That picture is too small. Use one at least ' + MIN_EDGE + ' pixels on its shortest side.'); }
     const scale = Math.min(1, MAX_EDGE / Math.max(bmp.width, bmp.height));
     const c = document.createElement('canvas');
     c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
     c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
     bmp.close && bmp.close();
-    current = { canvas: c, blob: await new Promise(function (r) { c.toBlob(r, 'image/webp', 0.9); }) || file };
+    const blob = await new Promise(function (r) { c.toBlob(r, 'image/webp', 0.9); }) || file;
+    if (seq !== uploadSeq) return;
+    current = { canvas: c, blob: blob };
     setStatus('Bringing it to life…');
     if (!engine) { engine = E.createMotionEngine(ui.canvas); }
     engine.setImage(c);
@@ -124,7 +129,7 @@
 
   /* ---------- export + save ---------- */
   ui.exportBtn.addEventListener('click', async function () {
-    if (!engine || !requireAccess()) return;
+    if (!engine || !(await requireAccess())) return;
     ui.exportBtn.disabled = true; ui.progress.hidden = false;
     try {
       const blob = await engine.exportLoop({ onProgress: function (p) { ui.progress.value = p; } });
@@ -138,7 +143,7 @@
     ui.exportBtn.disabled = false; ui.progress.hidden = true;
   });
   ui.saveBtn.addEventListener('click', async function () {
-    if (!engine || !current || !requireAccess()) return;
+    if (!engine || !current || !(await requireAccess())) return;
     try {
       await window.SotaMotionStore.save({ blob: current.blob, settings: engine.settings(), savedAt: Date.now() });
       setStatus('Set as your profile backdrop on this device.');
@@ -146,5 +151,5 @@
   });
   function setStatus(t) { ui.status.textContent = t; }
 
-  loadAccount();
+  accountReady = loadAccount();
 })();
