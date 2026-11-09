@@ -31,14 +31,14 @@ async function who(auth,fetcher){
 }
 async function getJob(env,id,fetcher){
   const r=await fetcher(`${SOTA_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&select=*`,{headers:svcHeaders(env),signal:AbortSignal.timeout(5000)});
-  if(!r.ok)throw Error('db');
+  if(!r.ok){console.error('sere db read',r.status);throw Error('db');}
   const rows=await r.json();return rows[0]||null;
 }
 async function patchJob(env,id,patch,fetcher,where){
   const r=await fetcher(`${SOTA_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}${where||''}`,{
     method:'PATCH',headers:svcHeaders(env,{'Content-Type':'application/json',Prefer:'return=representation'}),
     body:JSON.stringify(patch),signal:AbortSignal.timeout(5000)});
-  if(!r.ok)throw Error('db');
+  if(!r.ok){console.error('sere db write',r.status);throw Error('db');}
   return (await r.json())[0]||null;
 }
 async function signedUrl(env,bucket,path,fetcher){
@@ -154,9 +154,10 @@ async function handler(req,res){
     return res.status(400).json({error:'Unknown action.'});
   }catch(err){
     const m=err?.message;
-    if(m==='config')return res.status(503).json({error:'The sere maker needs its keys set on the server.'});
-    if(m==='provider')return res.status(502).json({error:'The render service did not answer. Try again in a minute.'});
-    return res.status(503).json({error:'The sere maker is temporarily unavailable.'});
+    console.error('sere',body.action,id,m);   // which step failed (db / storage / provider / config), never a key
+    if(m==='config')return res.status(503).json({error:'The sere maker needs its keys set on the server.',code:m});
+    if(m==='provider')return res.status(502).json({error:'The render service did not answer. Try again in a minute.',code:m});
+    return res.status(503).json({error:'The sere maker is temporarily unavailable.',code:m});
   }
 }
 module.exports=handler;
