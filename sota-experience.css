@@ -504,3 +504,7 @@ body.sx-member #app.sx-app[data-world-page="pulse"] :is(
     text-shadow: none !important;
   }
 }
+
+.sx-legal{display:flex;gap:14px;font-size:12.5px}
+.sx-legal a{color:inherit;opacity:.8}
+.sx-legal a:hover{opacity:1}

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delete my data — Sota Kece</title>
+<meta name="description" content="Delete your Sota Kece and Sere account and everything stored with it.">
+<link rel="icon" href="/icons/icon-32.png">
+<link rel="stylesheet" href="/legal/legal.css">
+<script src="/vendor/supabase-2.45.0.min.js"></script>
+</head>
+<body>
+<header><img src="/icons/icon-192.png" alt=""><a href="/">Sota Kece</a></header>
+<main>
+<nav class="legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/data-deletion.html">Delete my data</a></nav>
+<div class="card">
+<h1>Delete my data</h1>
+<p class="muted">Works for Sota Kece and Sere — they share one account.</p>
+
+<p>Deleting your account removes your profile, your space, your posts, comments, gifts, friends, songs, chats, your seres and their videos, and the account itself. It happens straight away and cannot be undone.</p>
+
+<h2>Do it yourself</h2>
+<p>Sign in below with the account you want gone, then press the red button.</p>
+
+<div id="auth">
+  <p><button class="btn" data-oauth="google">Continue with Google</button> <button class="btn" data-oauth="facebook">Continue with Facebook</button></p>
+  <label class="field"><span>Email</span><input id="email" type="email" autocomplete="email"></label>
+  <label class="field"><span>Password</span><input id="password" type="password" autocomplete="current-password"></label>
+  <p><button class="btn" id="signin">Sign in</button></p>
+</div>
+
+<div id="ready" hidden>
+  <p>Signed in as <b id="who"></b>.</p>
+  <div class="note">This deletes everything above for this account, right now, for good.</div>
+  <label class="field"><span>Type <b>DELETE</b> to confirm</span><input id="confirm" autocomplete="off"></label>
+  <p><button class="btn danger" id="delete" disabled>Delete my account and all my data</button> <button class="btn" id="signout" style="background:#6b8da3">Not this account</button></p>
+</div>
+
+<div id="done" hidden>
+  <h2>Done</h2>
+  <p>Your account and everything stored with it have been deleted. Vinaka for being part of Sota Kece.</p>
+</div>
+
+<p class="status" id="status" role="status" aria-live="polite"></p>
+
+<h2>Or ask us</h2>
+<p>If you cannot sign in, email <a href="mailto:support@fijiinvestment.com">support@fijiinvestment.com</a> from the address on your account and say "delete my Sota Kece account". We will do it within 30 days and confirm by email.</p>
+
+<h2>Signed in with Facebook?</h2>
+<p>You can also remove Sota Kece from your Facebook settings (Settings → Apps and websites). Facebook then tells us, and we delete the account the same way.</p>
+</div>
+</main>
+<footer><img src="/assets/dimau-owner-logo-20260920.png" alt="">Dimau Group · <a href="/">Sota Kece</a> · <a href="https://sere.sotakece.com">Sere</a></footer>
+<script>
+(function(){
+  const SB_URL="https://aqfzpaczyodhugsgqvxi.supabase.co", SB_KEY="sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF";
+  const sb=window.supabase.createClient(SB_URL,SB_KEY);
+  const $=id=>document.getElementById(id);
+  const status=m=>{$('status').textContent=m||'';};
+  function show(user){
+    $('auth').hidden=!!user; $('ready').hidden=!user;
+    if(user) $('who').textContent=user.email||user.id;
+  }
+  sb.auth.getSession().then(({data})=>show(data.session?.user||null));
+  sb.auth.onAuthStateChange((_e,s)=>show(s?.user||null));
+  document.querySelectorAll('[data-oauth]').forEach(b=>b.addEventListener('click',async()=>{
+    status('');
+    const {error}=await sb.auth.signInWithOAuth({provider:b.dataset.oauth,options:{redirectTo:location.origin+'/data-deletion.html'}});
+    if(error) status(error.message);
+  }));
+  $('signin').addEventListener('click',async()=>{
+    status('Signing in…');
+    const {error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+    status(error?error.message:'');
+  });
+  $('confirm').addEventListener('input',()=>{$('delete').disabled=$('confirm').value.trim()!=='DELETE';});
+  $('signout').addEventListener('click',async()=>{await sb.auth.signOut();status('');});
+  $('delete').addEventListener('click',async()=>{
+    $('delete').disabled=true; status('Deleting…');
+    const {error}=await sb.rpc('bv_account_delete');
+    if(error){status('Could not delete: '+error.message+'. Email support@fijiinvestment.com and we will do it for you.');$('delete').disabled=false;return;}
+    await sb.auth.signOut().catch(()=>{});
+    $('ready').hidden=true; $('auth').hidden=true; $('done').hidden=false; status('');
+  });
+})();
+</script>
+</body>
+</html>
