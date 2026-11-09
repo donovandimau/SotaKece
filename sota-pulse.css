@@ -65,3 +65,19 @@
 @keyframes tw-pulse{50%{opacity:.45}}
 
 @media (min-width:720px){.tw-wrap{padding-bottom:40px}.tw-post{padding:14px 16px 10px}}
+
+/* Plain words under every post button, so nobody has to guess what an icon does */
+.tw-bar{flex-wrap:wrap;row-gap:6px}
+.tw-bar .tw-btn[data-tw]{display:inline-grid!important;grid-auto-flow:column;justify-content:center;align-items:center;column-gap:3px;row-gap:2px;min-width:48px;height:auto!important;padding:5px 6px!important;border-radius:10px}
+.tw-bar .tw-btn[data-tw]:hover{background:rgba(135,206,235,.25)}
+.tw-bar .tw-btn[data-tw]::after{grid-row:2;grid-column:1/-1;font:600 11px/1.1 Lexend,system-ui,sans-serif;color:#33506b;white-space:nowrap}
+.tw-bar .tw-btn[data-tw="reply"]::after{content:"Reply"}
+.tw-bar .tw-btn[data-tw="repost"]::after{content:"Repost"}
+.tw-bar .tw-btn[data-tw="like"]::after{content:"Uro"}
+.tw-bar .tw-btn[data-tw="quote"]::after{content:"Quote"}
+.tw-bar .tw-btn[data-tw="share"]::after{content:"Share"}
+.tw-bar .tw-btn[data-tw="tip"]::after{content:"Gift"}
+.tw-bar .tw-btn[data-tw="remix"]::after{content:"Sing it"}
+.tw-bar .tw-btn[data-tw="del"]::after{content:"Delete"}
+.tw-count{font-size:12px;color:#5a7690}
+@media (max-width:420px){.tw-bar .tw-btn[data-tw]{min-width:40px;padding:4px 3px!important}.tw-bar .tw-btn[data-tw]::after{font-size:10px}}

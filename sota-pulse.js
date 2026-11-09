@@ -105,8 +105,8 @@
         '<textarea name="body" maxlength="' + MAX + '" rows="2" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?') + '"></textarea>' +
       '</div>' +
       (st.quote && !opts.replyTo ? '<div class="tw-quoting">' + quoteBox(st.quote) + '<button type="button" class="tw-btn tw-unquote" data-tw="unquote" aria-label="Remove the quote">✕</button></div>' : '') +
-      '<div class="tw-compose-bar">' + (opts.replyTo || !window.SotaSere ? '' : '<button type="button" class="tw-btn tw-sere-open" data-tw="sere" aria-label="Make a photo sing">🎤 Sere</button>') +
-        '<span class="tw-count" aria-live="polite">' + MAX + '</span><span class="spacer"></span>' +
+      '<div class="tw-compose-bar">' + (opts.replyTo || !window.SotaSere ? '' : '<button type="button" class="tw-btn tw-sere-open" data-tw="sere" aria-label="Make a photo sing">🎤 Make a singing photo</button>') +
+        '<span class="tw-count" aria-live="polite">' + MAX + ' letters left</span><span class="spacer"></span>' +
         '<button type="submit" class="btn sm" disabled>' + (opts.replyTo ? 'Reply' : 'Post') + '</button></div>' +
     '</form>';
   }
@@ -400,7 +400,7 @@
     app.addEventListener('input', function (ev) {
       var ta = ev.target; if (!ta.matches('.tw-compose textarea')) return;
       var form = ta.form, left = MAX - ta.value.length, c = form.querySelector('.tw-count');
-      c.textContent = left; c.classList.toggle('low', left < 20);
+      c.textContent = left + ' letters left'; c.classList.toggle('low', left < 20);
       form.querySelector('button[type=submit]').disabled = !ta.value.trim();
       ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 220) + 'px';
     });
