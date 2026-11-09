@@ -52,6 +52,7 @@
   /* ---------- upload + pre-processing ---------- */
   function fail(msg) { ui.error.textContent = msg; ui.error.hidden = !msg; }
   async function handleFile(file) {
+    if (busy) return;
     fail('');
     if (!file) return;
     const seq = ++uploadSeq;
@@ -150,6 +151,9 @@
   });
   /* ---------- profile backdrop (seen by the owner and accepted friends) ---------- */
   const EXT = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png' };
+  let busy = false;
+  /* One profile change at a time; the picture and style are fixed while it saves. */
+  function lock(on) { [ui.saveBtn, ui.removeBtn, ui.replace, ui.drop, ui.file].forEach(function (b) { b.disabled = on; }); ui.styles.style.pointerEvents = ui.variants.style.pointerEvents = on ? 'none' : ''; }
   async function roomFile() {
     let blob = current.blob;
     if (!EXT[blob.type] || blob.size > 5.5 * 1024 * 1024) blob = await new Promise(function (r) { current.canvas.toBlob(r, 'image/jpeg', 0.85); });
@@ -171,28 +175,29 @@
   ui.saveBtn.addEventListener('click', async function () {
     if (!engine || !current || !(await requireAccess())) return;
     if (!user || !sb || !window.SotaRoomMedia || !window.BulaSkins) return setStatus('Sign in to put this on your profile.');
-    ui.saveBtn.disabled = true; setStatus('Putting it on your profile…');
+    if (busy) return; busy = true; lock(true); setStatus('Putting it on your profile…');
     let uploaded = null;
+    const set = engine.settings(), blob = current.blob;
     try {
       const media = window.SotaRoomMedia.api(sb, user.id);
       uploaded = await media.upload(await roomFile(), 'covers');
-      const room = await readRoom(), old = room.s.motionPath, set = engine.settings();
+      const room = await readRoom(), old = room.s.motionPath;
       Object.assign(room.s, { motionPath: uploaded.path, motionStyle: set.style, motionVariant: set.variant || 0,
         motionIntensity: set.intensity, motionFocusX: set.focus ? set.focus[0] : 0.5, motionFocusY: set.focus ? set.focus[1] : 0.5 });
       await writeRoom(room);
       if (old && old !== uploaded.path) media.remove(old).catch(function () {});
-      window.SotaMotionStore.save({ blob: current.blob, settings: set, savedAt: Date.now() }).catch(function () {});
+      window.SotaMotionStore.save({ blob: blob, settings: set, savedAt: Date.now() }).catch(function () {});
       ui.removeBtn.hidden = false;
       setStatus('Done. Your friends now see it moving on your profile.');
     } catch (err) {
       if (uploaded) window.SotaRoomMedia.api(sb, user.id).remove(uploaded.path).catch(function () {});
       setStatus(err.message || 'Could not save. Please try again.');
     }
-    ui.saveBtn.disabled = false;
+    busy = false; lock(false);
   });
   ui.removeBtn.addEventListener('click', async function () {
-    if (!user || !sb) return;
-    ui.removeBtn.disabled = true;
+    if (!user || !sb || busy) return;
+    busy = true; lock(true);
     try {
       const room = await readRoom(), old = room.s.motionPath;
       Object.assign(room.s, { motionPath: '', motionStyle: '', motionVariant: 0, motionIntensity: 1, motionFocusX: 0.5, motionFocusY: 0.5 });
@@ -201,7 +206,7 @@
       window.SotaMotionStore.clear().catch(function () {});
       ui.removeBtn.hidden = true; setStatus('Removed from your profile.');
     } catch (err) { setStatus(err.message || 'Could not remove it. Please try again.'); }
-    ui.removeBtn.disabled = false;
+    busy = false; lock(false);
   });
   function setStatus(t) { ui.status.textContent = t; }
 
