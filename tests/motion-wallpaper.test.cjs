@@ -39,3 +39,7 @@ test('depth map is normalised and puts the bottom nearer than the sky', () => {
 test('five styles in the agreed order', () => {
   assert.deepStrictEqual(E.STYLES, ['parallax', 'particles', 'fluid', 'glitch', 'cinemagraph']);
 });
+test('upload helper refuses non-pictures before doing any work', async () => {
+  await assert.rejects(E.handleUserWallpaperUpload({ type: 'application/pdf', size: 10 }), /PNG, JPEG or WebP/);
+  await assert.rejects(E.handleUserWallpaperUpload({ type: 'image/png', size: 30 * 1024 * 1024 }), /25 MB/);
+});

@@ -330,5 +330,22 @@ void main(){
     return e;
   }
 
-  return { LOOP: LOOP, STYLES: STYLES, estimateDepth: estimateDepth, createMotionEngine: createMotionEngine, mount: mount };
+  /* Turn an uploaded file into a ready motion config (default: gentle depth parallax drift).
+     intensity is 0..1 here (0.2 = subtle) and maps onto the engine's 0..2 strength. */
+  const TYPE_TO_STYLE = { depth_parallax_drift: 'parallax', particles: 'particles', fluid: 'fluid', glitch: 'glitch', cinemagraph: 'cinemagraph' };
+  async function handleUserWallpaperUpload(file, opts) {
+    opts = opts || {};
+    if (!file || ['image/png', 'image/jpeg', 'image/webp'].indexOf(file.type) < 0) throw new Error('Please choose a PNG, JPEG or WebP picture.');
+    if (file.size > 25 * 1024 * 1024) throw new Error('That picture is over 25 MB.');
+    const animationType = opts.animationType || 'depth_parallax_drift';
+    const config = { sourceImage: URL.createObjectURL(file), animationType: animationType, style: TYPE_TO_STYLE[animationType] || 'parallax',
+      fps: 60, loop: true, intensity: opts.intensity != null ? opts.intensity : 0.2 };
+    config.bitmap = await createImageBitmap(file);
+    if (opts.container) {
+      config.engine = mount(opts.container, config.bitmap, { style: config.style, intensity: Math.max(0.2, config.intensity * 2) });
+    }
+    return config;
+  }
+
+  return { LOOP: LOOP, STYLES: STYLES, estimateDepth: estimateDepth, createMotionEngine: createMotionEngine, mount: mount, handleUserWallpaperUpload: handleUserWallpaperUpload };
 });
