@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#062c49">
+<title>Motion Wallpapers · Sota Kece</title>
+<meta name="description" content="Turn any picture into a living, looping wallpaper for your Sota Kece profile. Free for your first year.">
+<meta property="og:title" content="Motion Wallpapers · Sota Kece"><meta property="og:description" content="Turn any picture into a living, looping wallpaper for your Sota Kece profile.">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/sota-favicon-32-20261027g.png"><link rel="apple-touch-icon" sizes="180x180" href="/icons/sota-apple-touch-icon-20261027g.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/motion.css?v=20261109-motion-1">
+<script defer src="/vendor/supabase-2.45.0.min.js"></script>
+<script defer src="/subscription-guard.js?v=20261109-motion-1"></script>
+<script defer src="/motion-engine.js?v=20261109-motion-1"></script>
+<script defer src="/motion-store.js?v=20261109-motion-1"></script>
+<script defer src="/motion-editor.js?v=20261109-motion-1"></script>
+</head><body>
+<header class="mw-top"><a class="mw-brand" href="/"><img src="/icons/sota-icon-192-20261027g.png" alt="" width="36" height="36"><span>Sota Kece</span></a><span id="mw-access" class="mw-access" aria-live="polite">Checking your account…</span></header>
+<main class="mw-main">
+  <section class="mw-intro"><p class="mw-eyebrow">Motion wallpapers</p><h1>Bring your picture to life.</h1><p>Upload a photo, choose how it moves, and set it as your profile backdrop. Free for your first year.</p></section>
+  <section class="mw-workspace">
+    <div id="mw-stage" class="mw-stage">
+      <div id="mw-drop" class="mw-drop" role="button" tabindex="0" aria-label="Choose a picture to animate">
+        <span class="mw-drop-icon" aria-hidden="true"></span><b>Drop a picture here</b><span>or tap to choose · PNG, JPEG or WebP</span>
+      </div>
+      <img id="mw-preview" class="mw-preview" alt="Your picture" hidden>
+      <canvas id="mw-canvas" class="mw-canvas" aria-label="Motion wallpaper preview"></canvas>
+      <p id="mw-hint" class="mw-hint" hidden>Tap the part of the picture that should stay still</p>
+      <input id="mw-file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+    </div>
+    <p id="mw-error" class="mw-error" role="alert" hidden></p>
+    <div class="mw-panel">
+      <h2>Choose a motion</h2>
+      <div id="mw-styles" class="mw-styles" role="radiogroup" aria-label="Motion style"></div>
+      <div id="mw-variants" class="mw-variants" hidden></div>
+      <label class="mw-slider">Strength <input id="mw-intensity" type="range" min="0.2" max="1.8" step="0.1" value="1"></label>
+      <div class="mw-actions">
+        <button id="mw-tilt" type="button" class="mw-btn">Use phone tilt</button>
+        <button id="mw-replace" type="button" class="mw-btn">Change picture</button>
+        <button id="mw-save" type="button" class="mw-btn" disabled>Set as my backdrop</button>
+        <button id="mw-export" type="button" class="mw-btn mw-primary" disabled>Save looping video</button>
+      </div>
+      <progress id="mw-progress" class="mw-progress" max="1" value="0" hidden></progress>
+      <p id="mw-status" class="mw-status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+<footer class="mw-foot">Part of Dimau Group</footer>
+</body></html>
