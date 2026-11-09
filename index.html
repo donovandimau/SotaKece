@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
-<head><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261109-wall-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
+<head><style>@layer dimau-premium-shell;</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261109-wall-1"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261109-v152-fast-paint">
+<meta name="sota-release" content="sota-kece-shell-20261109-v153-premium-shell">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -224,11 +224,27 @@ nav.bottom button.on{background:#fff;color:var(--accent);box-shadow:0 2px 10px r
 <link rel="stylesheet" href="/glass-controls.css?v=20261027-ui-clarity-3">
 <link rel="stylesheet" href="/sota-experience.css?v=20261105-veranda-photo-1">
 <link rel="stylesheet" href="/premium-finish.css?v=20261029-1">
+<link rel="stylesheet" href="/sota-premium-shell.css?v=20261109-shell-1">
+<script src="/dimau-premium-shell.js?v=20261109-shell-1" defer></script>
+<script src="/sota-premium-shell.js?v=20261109-shell-1" defer></script>
 <script src="https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js" data-surface="sota-kece" defer></script>
 </head>
-<body>
+<body class="dps-shell dps-has-nav">
 <div class="bubbles" id="bubbles"></div>
 <div id="app"></div>
+<button type="button" class="dps-fab" data-dps-search-open aria-expanded="false" aria-label="Search Sota Kece" title="Search (press /)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+<div class="dps-search" data-dps-search hidden data-dps-empty="Nothing found. Try a name, a skin or a song." data-dps-searching="Searching…" data-dps-error="Search could not load. Check your connection and try again.">
+  <div class="dps-search-scrim" data-dps-search-close></div>
+  <div class="dps-search-panel" role="dialog" aria-modal="true" aria-labelledby="dps-search-title">
+    <form class="dps-search-form" role="search" data-dps-search-form action="#people">
+      <label id="dps-search-title" class="dps-visually-hidden" for="dps-search-input">Search Sota Kece</label>
+      <input id="dps-search-input" name="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="People, pages, skins, music" data-dps-search-input>
+      <button type="button" class="dps-search-cancel" data-dps-search-close>Cancel</button>
+    </form>
+    <ul class="dps-search-results" role="listbox" data-dps-search-results></ul>
+    <p class="dps-search-status" data-dps-search-status aria-live="polite"></p>
+  </div>
+</div>
 <script src="/communications-core.js?v=20261109-fast-paint-1"></script>
 <script>
 /* ---------- config ---------- */
