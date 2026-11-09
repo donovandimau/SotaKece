@@ -56,15 +56,14 @@
     const seq = ++uploadSeq;
     if (TYPES.indexOf(file.type) < 0) return fail('Please choose a PNG, JPEG or WebP picture.');
     if (file.size > MAX_BYTES) return fail('That picture is over 25 MB. Please choose a smaller one.');
-    const url = URL.createObjectURL(file);
-    ui.preview.src = url; ui.preview.hidden = false;
     document.body.classList.add('mw-has-image');
     setStatus('Reading your picture…');
     let bmp;
     try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
-    catch (_) { try { bmp = await createImageBitmap(file); } catch (e) { URL.revokeObjectURL(url); return fail('That picture could not be opened.'); } }
-    if (seq !== uploadSeq) { bmp.close && bmp.close(); URL.revokeObjectURL(url); return; }
-    if (Math.min(bmp.width, bmp.height) < MIN_EDGE) { URL.revokeObjectURL(url); return fail('That picture is too small. Use one at least ' + MIN_EDGE + ' pixels on its shortest side.'); }
+    catch (_) { try { bmp = await createImageBitmap(file); } catch (e) { return fail('That picture could not be opened.'); } }
+    if (seq !== uploadSeq) { bmp.close && bmp.close(); return; }
+    showPreview(bmp);
+    if (Math.min(bmp.width, bmp.height) < MIN_EDGE) { return fail('That picture is too small. Use one at least ' + MIN_EDGE + ' pixels on its shortest side.'); }
     const scale = Math.min(1, MAX_EDGE / Math.max(bmp.width, bmp.height));
     const c = document.createElement('canvas');
     c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
@@ -79,10 +78,16 @@
     selectStyle(styleIndex);
     engine.setIntensity(+ui.intensity.value);
     engine.start();
-    URL.revokeObjectURL(url);
     ui.preview.hidden = true; ui.stage.classList.add('is-live');
     setStatus('');
     [ui.exportBtn, ui.saveBtn].forEach(function (b) { b.disabled = false; });
+  }
+  function showPreview(bmp) {
+    const c = ui.preview, r = c.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = Math.round(r.width * dpr) || 360; c.height = Math.round(r.height * dpr) || 640;
+    const s = Math.max(c.width / bmp.width, c.height / bmp.height);
+    c.getContext('2d').drawImage(bmp, (c.width - bmp.width * s) / 2, (c.height - bmp.height * s) / 2, bmp.width * s, bmp.height * s);
+    c.hidden = false;
   }
   ui.drop.addEventListener('click', function () { ui.file.click(); });
   ui.drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ui.file.click(); } });
