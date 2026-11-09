@@ -21,16 +21,16 @@
     drop: $('#mw-drop'), file: $('#mw-file'), error: $('#mw-error'), stage: $('#mw-stage'),
     canvas: $('#mw-canvas'), preview: $('#mw-preview'), styles: $('#mw-styles'), variants: $('#mw-variants'),
     intensity: $('#mw-intensity'), tilt: $('#mw-tilt'), exportBtn: $('#mw-export'), saveBtn: $('#mw-save'),
-    replace: $('#mw-replace'), status: $('#mw-status'), access: $('#mw-access'), progress: $('#mw-progress'),
+    replace: $('#mw-replace'), removeBtn: $('#mw-remove'), status: $('#mw-status'), access: $('#mw-access'), progress: $('#mw-progress'),
     hint: $('#mw-hint')
   };
-  let engine = null, user = null, accountReady = null, uploadSeq = 0, access = { allowed: false, reason: 'signed-out' }, current = null, styleIndex = 0;
+  let engine = null, user = null, sb = null, accountReady = null, uploadSeq = 0, access = { allowed: false, reason: 'signed-out' }, current = null, styleIndex = 0;
 
   /* ---------- account + free-year check ---------- */
   async function loadAccount() {
     try {
       if (!window.supabase) throw new Error('no client');
-      const sb = window.supabase.createClient(SB_URL, SB_KEY);
+      sb = window.supabase.createClient(SB_URL, SB_KEY);
       const r = await sb.auth.getUser();
       user = r && r.data && r.data.user || null;
     } catch (_) { user = null; }
@@ -40,6 +40,7 @@
       : access.reason === 'upgrade-required' ? 'Creator plan needed to export'
       : 'Free for your first year — sign in to export';
     ui.access.dataset.state = access.allowed ? 'ok' : 'locked';
+    if (user && sb && window.BulaSkins) { try { ui.removeBtn.hidden = !(await readRoom()).s.motionPath; } catch (_) {} }
   }
   async function requireAccess() {
     await accountReady;
@@ -147,12 +148,60 @@
     } catch (err) { setStatus(err.message || 'Export failed. Please try again.'); }
     ui.exportBtn.disabled = false; ui.progress.hidden = true;
   });
+  /* ---------- profile backdrop (seen by the owner and accepted friends) ---------- */
+  const EXT = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png' };
+  async function roomFile() {
+    let blob = current.blob;
+    if (!EXT[blob.type] || blob.size > 5.5 * 1024 * 1024) blob = await new Promise(function (r) { current.canvas.toBlob(r, 'image/jpeg', 0.85); });
+    if (!blob || blob.size > 6 * 1024 * 1024) throw new Error('That picture is too large to save. Try a smaller one.');
+    return new File([blob], 'motion-wallpaper.' + EXT[blob.type], { type: blob.type });
+  }
+  async function readRoom() {
+    const r = await sb.from('bv_profiles').select('room_css,room_accent').eq('id', user.id).single();
+    if (r.error || !r.data) throw new Error('Your profile could not be opened. Please try again.');
+    const parsed = window.BulaSkins.read(r.data.room_css), s = parsed.settings;
+    if (!String(r.data.room_css || '').startsWith('/* bv-skin:v1 ') && /^#[0-9a-f]{6}$/i.test(r.data.room_accent || '')) s.accent = r.data.room_accent;
+    return { s: s, legacy: parsed.legacy };
+  }
+  async function writeRoom(room) {
+    const room_css = window.BulaSkins.encode(room.s, room.legacy);
+    const r = await sb.from('bv_profiles').update({ room_css: room_css }).eq('id', user.id).select('room_css').single();
+    if (r.error || !r.data || r.data.room_css !== room_css) throw new Error('Your profile could not be saved. Please try again.');
+  }
   ui.saveBtn.addEventListener('click', async function () {
     if (!engine || !current || !(await requireAccess())) return;
+    if (!user || !sb || !window.SotaRoomMedia || !window.BulaSkins) return setStatus('Sign in to put this on your profile.');
+    ui.saveBtn.disabled = true; setStatus('Putting it on your profile…');
+    let uploaded = null;
     try {
-      await window.SotaMotionStore.save({ blob: current.blob, settings: engine.settings(), savedAt: Date.now() });
-      setStatus('Set as your profile backdrop on this device.');
-    } catch (_) { setStatus('Could not save on this device. Check your browser storage settings.'); }
+      const media = window.SotaRoomMedia.api(sb, user.id);
+      uploaded = await media.upload(await roomFile(), 'covers');
+      const room = await readRoom(), old = room.s.motionPath, set = engine.settings();
+      Object.assign(room.s, { motionPath: uploaded.path, motionStyle: set.style, motionVariant: set.variant || 0,
+        motionIntensity: set.intensity, motionFocusX: set.focus ? set.focus[0] : 0.5, motionFocusY: set.focus ? set.focus[1] : 0.5 });
+      await writeRoom(room);
+      if (old && old !== uploaded.path) media.remove(old).catch(function () {});
+      window.SotaMotionStore.save({ blob: current.blob, settings: set, savedAt: Date.now() }).catch(function () {});
+      ui.removeBtn.hidden = false;
+      setStatus('Done. Your friends now see it moving on your profile.');
+    } catch (err) {
+      if (uploaded) window.SotaRoomMedia.api(sb, user.id).remove(uploaded.path).catch(function () {});
+      setStatus(err.message || 'Could not save. Please try again.');
+    }
+    ui.saveBtn.disabled = false;
+  });
+  ui.removeBtn.addEventListener('click', async function () {
+    if (!user || !sb) return;
+    ui.removeBtn.disabled = true;
+    try {
+      const room = await readRoom(), old = room.s.motionPath;
+      Object.assign(room.s, { motionPath: '', motionStyle: '', motionVariant: 0, motionIntensity: 1, motionFocusX: 0.5, motionFocusY: 0.5 });
+      await writeRoom(room);
+      if (old) window.SotaRoomMedia.api(sb, user.id).remove(old).catch(function () {});
+      window.SotaMotionStore.clear().catch(function () {});
+      ui.removeBtn.hidden = true; setStatus('Removed from your profile.');
+    } catch (err) { setStatus(err.message || 'Could not remove it. Please try again.'); }
+    ui.removeBtn.disabled = false;
   });
   function setStatus(t) { ui.status.textContent = t; }
 

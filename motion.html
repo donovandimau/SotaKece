@@ -10,11 +10,13 @@
 <script defer src="/subscription-guard.js?v=20261109-motion-1"></script>
 <script defer src="/motion-engine.js?v=20261109-motion-1"></script>
 <script defer src="/motion-store.js?v=20261109-motion-1"></script>
-<script defer src="/motion-editor.js?v=20261109-motion-1"></script>
+<script defer src="/room-media.js?v=20261109-motion-room-1"></script>
+<script defer src="/skins.js?v=20261109-motion-room-1"></script>
+<script defer src="/motion-editor.js?v=20261109-motion-room-1"></script>
 </head><body>
 <header class="mw-top"><a class="mw-brand" href="/"><img src="/icons/sota-icon-192-20261027g.png" alt="" width="36" height="36"><span>Sota Kece</span></a><span id="mw-access" class="mw-access" aria-live="polite">Checking your account…</span></header>
 <main class="mw-main">
-  <section class="mw-intro"><p class="mw-eyebrow">Motion wallpapers</p><h1>Bring your picture to life.</h1><p>Upload a photo, choose how it moves, and set it as your profile backdrop. Free for your first year.</p></section>
+  <section class="mw-intro"><p class="mw-eyebrow">Motion wallpapers</p><h1>Bring your picture to life.</h1><p>Upload a photo, choose how it moves, and put it on your profile for your friends to see. Free for your first year.</p></section>
   <section class="mw-workspace">
     <div id="mw-stage" class="mw-stage">
       <div id="mw-drop" class="mw-drop" role="button" tabindex="0" aria-label="Choose a picture to animate">
@@ -34,9 +36,10 @@
       <div class="mw-actions">
         <button id="mw-tilt" type="button" class="mw-btn">Use phone tilt</button>
         <button id="mw-replace" type="button" class="mw-btn">Change picture</button>
-        <button id="mw-save" type="button" class="mw-btn" disabled>Set as my backdrop</button>
+        <button id="mw-save" type="button" class="mw-btn" disabled>Put on my profile</button>
         <button id="mw-export" type="button" class="mw-btn mw-primary" disabled>Save looping video</button>
       </div>
+      <button id="mw-remove" type="button" class="mw-btn mw-quiet" hidden>Remove from my profile</button>
       <progress id="mw-progress" class="mw-progress" max="1" value="0" hidden></progress>
       <p id="mw-status" class="mw-status" aria-live="polite"></p>
     </div>

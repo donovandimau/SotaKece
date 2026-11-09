@@ -1831,7 +1831,7 @@
   const fontStacks = {rounded:'Manrope, system-ui, sans-serif',serif:'Georgia, serif',mono:'ui-monospace, monospace',
     sans:'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     display:'Impact, "Arial Black", sans-serif',handwritten:'"Segoe Print", "Bradley Hand", "Comic Sans MS", cursive'};
-  const customizationDefaults={customName:'',showArtwork:true,textScale:100,headingScale:100,coverHeight:195,coverX:0,coverY:100,textAlign:'left',musicPosition:'auto',avatarPath:''};
+  const customizationDefaults={customName:'',showArtwork:true,textScale:100,headingScale:100,coverHeight:195,coverX:0,coverY:100,textAlign:'left',musicPosition:'auto',avatarPath:'',motionPath:'',motionStyle:'',motionVariant:0,motionIntensity:1,motionFocusX:0.5,motionFocusY:0.5};
   const marker = /^\/\* bv-skin:v1 ([^\n]*?) \*\/\n?/;
   const hex = (v, fallback) => /^#[0-9a-f]{6}$/i.test(String(v)) ? String(v).toLowerCase() : fallback;
   function boundedNumber(value,min,max,fallback) {
@@ -1870,6 +1870,9 @@
       note:String(input.note??preset.note).slice(0,80),interests:String(input.interests??'').slice(0,160),
       songRef:song(input.songRef)?String(input.songRef):'',trackUrl:safeUrl(input.trackUrl,true),trackTitle:String(input.trackTitle??'').slice(0,80),
       trackPath:safeMediaPath(input.trackPath,'music'),coverPath:safeMediaPath(input.coverPath,'covers'),avatarPath:safeMediaPath(input.avatarPath,'covers'),
+      motionPath:safeMediaPath(input.motionPath,'covers'),motionStyle:['parallax','particles','fluid','glitch','cinemagraph'].includes(input.motionStyle)?input.motionStyle:'',
+      motionVariant:Math.round(boundedNumber(input.motionVariant,0,2,0)),motionIntensity:boundedNumber(input.motionIntensity,0.2,1.8,1),
+      motionFocusX:boundedNumber(input.motionFocusX,0,1,0.5),motionFocusY:boundedNumber(input.motionFocusY,0,1,0.5),
       panel:hex(input.panel,preset.panel),cover:hex(input.cover,preset.cover),
       cardStyle:['soft','square','round'].includes(input.cardStyle)?input.cardStyle:(preset.cardStyle||'soft'),
       effect:['flat','glow','sticker'].includes(input.effect)?input.effect:(preset.effect||'flat'),
