@@ -63,7 +63,7 @@ test('outputUrl handles string, array and object outputs',()=>{
 test('modelInput maps the two files onto the model keys and merges extras',()=>{
   assert.deepEqual(api.modelInput({},'I','A'),{source_image:'I',driven_audio:'A',still:true,preprocess:'full',enhancer:'gfpgan'});
   const custom=api.modelInput({SERE_INPUT_IMAGE:'face',SERE_INPUT_AUDIO:'audio',SERE_INPUT_EXTRA:'{"fps":25}'},'I','A');
-  assert.equal(custom.face,'I');assert.equal(custom.audio,'A');assert.equal(custom.fps,25,'env overrides add to the engine defaults');
+  assert.deepEqual(custom,{face:'I',audio:'A',still:true,preprocess:'full',enhancer:'gfpgan',fps:25},'env overrides rename the file fields; the built-in names go');
   assert.throws(()=>api.modelInput({SERE_INPUT_EXTRA:'{bad'},'I','A'),/config/);
 });
 test('startRender posts to Replicate with a signed webhook and refuses without keys',async()=>{

@@ -57,8 +57,10 @@ async function copyObject(env,bucket,from,to,fetcher){
 // eyes and expression move; several minutes and a few pence more). Versions can be overridden by env.
 const ENGINES={
   quick:   {version:env=>env.SERE_REPLICATE_VERSION||'85c698db7c0a66d5011435d0191db323034e1da04b912a6d365833141b6a285b',
+            keys:{image:'source_image',audio:'driven_audio'},
             input:(i,a)=>({source_image:i,driven_audio:a,still:true,preprocess:'full',enhancer:'gfpgan'})},
   lifelike:{version:env=>env.SERE_LIFELIKE_VERSION||'be54f93bc72d562ab2577f57b7eec44707efde55d058ee504c8b65a62d70fdf3',
+            keys:{image:'image',audio:'audio'},
             input:(i,a)=>({image:i,audio:a,resolution:512,fps:30,max_audio_seconds:60})}
 };
 // Text to speech for "Say it": Kokoro on Replicate (fast, runs while the request waits).
@@ -66,9 +68,10 @@ const TTS={version:env=>env.SERE_TTS_VERSION||'f559560eb822dc509045f3921a1921234
   voices:{bella:'af_bella',sarah:'af_sarah',nicole:'af_nicole',adam:'am_adam',michael:'am_michael',emma:'bf_emma',isabella:'bf_isabella',george:'bm_george',lewis:'bm_lewis'}};
 function engineFor(name){return ENGINES[name]?name:'quick';}
 function modelInput(env,imageUrl,audioUrl,engine){
-  const input=ENGINES[engineFor(engine)].input(imageUrl,audioUrl);
-  if(env.SERE_INPUT_IMAGE)input[env.SERE_INPUT_IMAGE]=imageUrl;
-  if(env.SERE_INPUT_AUDIO)input[env.SERE_INPUT_AUDIO]=audioUrl;
+  const e=ENGINES[engineFor(engine)],input=e.input(imageUrl,audioUrl);
+  // An env override renames the field (for a model with other input names); the built-in one goes.
+  if(env.SERE_INPUT_IMAGE){delete input[e.keys.image];input[env.SERE_INPUT_IMAGE]=imageUrl;}
+  if(env.SERE_INPUT_AUDIO){delete input[e.keys.audio];input[env.SERE_INPUT_AUDIO]=audioUrl;}
   if(env.SERE_INPUT_EXTRA){let extra;try{extra=JSON.parse(env.SERE_INPUT_EXTRA);}catch(_){throw Error('config');}Object.assign(input,extra);}
   return input;
 }
@@ -166,6 +169,11 @@ async function handler(req,res){
       const text=String(body.text||'').trim().slice(0,300);
       if(text.length<2)return res.status(400).json({error:'Type a few words first.'});
       if(!/^(jpg|png)$/.test(body.imageExt||''))return res.status(400).json({error:'Choose a photo first.'});
+      // Allowance first, so a member who is out of seres does not cost a voice render.
+      const mine=await fetch(`${SOTA_URL}/rest/v1/rpc/bv_sere_mine`,{method:'POST',headers:{apikey:SOTA_KEY,Authorization:req.headers.authorization,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(5000)});
+      const list=mine.ok?await mine.json().catch(()=>[]):[];
+      const dayAgo=Date.now()-86400000,usedToday=(Array.isArray(list)?list:[]).filter(g=>g.status!=='failed'&&new Date(g.created_at).getTime()>dayAgo).length;
+      if(usedToday>=5)return res.status(429).json({error:'Five a day — more tomorrow.',code:'OUT_OF_SERE'});
       const wav=await speak(env,text,String(body.voice||'bella'),fetch);
       const ms=wavDurationMs(wav);if(!ms||ms<1000)throw Error('provider');
       const rpc=await fetch(`${SOTA_URL}/rest/v1/rpc/bv_sere_create`,{method:'POST',headers:{apikey:SOTA_KEY,Authorization:req.headers.authorization,'Content-Type':'application/json'},
