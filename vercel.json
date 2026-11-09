@@ -1,61 +1,34 @@
 {
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "has": [
-        {
-          "type": "host",
-          "value": "sotakece.vercel.app"
-        }
-      ],
-      "source": "/(.*)",
-      "statusCode": 308,
-      "destination": "https://sotakece.com/$1"
-    },
-    {
-      "has": [
-        {
-          "type": "host",
-          "value": "bulavata.vercel.app"
-        }
-      ],
-      "source": "/(.*)",
-      "statusCode": 308,
-      "destination": "https://sotakece.com/$1"
-    }
-  ],
   "functions": {
-    "api/sere.js": {
-      "maxDuration": 60
-    },
-    "api/sere-callback.js": {
-      "maxDuration": 60
-    }
+    "api/sere.js": { "maxDuration": 60 },
+    "api/sere-callback.js": { "maxDuration": 60 }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "sere.sotakece.com"
-        }
-      ],
-      "destination": "/sere/index.html"
-    }
+      "src": "/(.*)",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(.*)",
+      "has": [{ "type": "host", "value": "sotakece.vercel.app" }],
+      "status": 308,
+      "headers": { "Location": "https://sotakece.com/$1" }
+    },
+    {
+      "src": "/(.*)",
+      "has": [{ "type": "host", "value": "bulavata.vercel.app" }],
+      "status": 308,
+      "headers": { "Location": "https://sotakece.com/$1" }
+    },
+    {
+      "src": "/",
+      "has": [{ "type": "host", "value": "sere.sotakece.com" }],
+      "dest": "/sere/index.html"
+    },
+    { "handle": "filesystem" }
   ]
 }
