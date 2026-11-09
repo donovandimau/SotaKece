@@ -424,3 +424,15 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
     border-color: CanvasText;
   }
 }
+
+/* One clear action per hero: anything else is a quiet second choice. */
+.sx-world-secondary{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:12px 6px;background:transparent;border:0;border-radius:12px;color:inherit;font:800 13px/1.4 Nunito,system-ui,sans-serif;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;cursor:pointer}
+.sx-world-secondary:hover{text-decoration-thickness:2px}
+.sx-world-secondary:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+.sx-world-more{margin:10px 0 0}
+.sx-world-more>summary{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;font:800 13px/1.4 Nunito,system-ui,sans-serif;cursor:pointer;list-style:none;color:inherit}
+.sx-world-more>summary::-webkit-details-marker{display:none}
+.sx-world-more>summary::after{content:'+';font-weight:900}
+.sx-world-more[open]>summary::after{content:'–'}
+.sx-world-more>summary span{text-decoration:underline;text-underline-offset:4px}
+.sx-world-more>summary:focus-visible{outline:3px solid currentColor;outline-offset:2px;border-radius:8px}

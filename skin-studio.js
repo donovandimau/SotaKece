@@ -133,9 +133,9 @@
   }
   let mediaUploads=[],mediaBusy=false;
   async function uploadRoomMedia(event) {
-    const kind=event.target.id==='bv-music-upload'?'music':'covers',file=event.target.files?.[0];if(!file)return;
+    const kind=event.target.id==='bv-cover-upload'?'covers':'music',onDevice=event.target.id==='bv-music-upload',file=event.target.files?.[0];if(!file)return;
     const dialog=studio,userId=S.user?.id;if(!dialog||!draft)return;
-    if(kind==='music'){
+    if(onDevice){
       const status=dialog.querySelector('#bv-upload-status'),saveButton=dialog.querySelector('#bv-save');
       mediaBusy=true;saveButton.disabled=true;event.target.disabled=true;status.textContent='Saving music on this device…';
       try{const result=await window.SotaLocalMusic.importFiles(Array.from(event.target.files||[]));if(studio===dialog){status.textContent=result.saved.length?'Music saved on this device. Tap Play in the preview or open Your music.':result.rejected.map(r=>r.reason).join(' ');drawPreview();}}
@@ -143,19 +143,19 @@
       finally{mediaBusy=false;if(studio===dialog){saveButton.disabled=false;event.target.disabled=false;event.target.value='';}}
       return;
     }
-    if(!userId)return;
     const status=dialog.querySelector('#bv-upload-status'),saveButton=dialog.querySelector('#bv-save');
+    if(!userId){status.textContent='Sign in to add a song or cover to your room.';event.target.value='';return;}
     mediaBusy=true;saveButton.disabled=true;status.textContent=kind==='music'?'Uploading your track…':'Uploading your artwork…';
     dialog.querySelectorAll('input[type=file]').forEach(input=>input.disabled=true);
     try{
       const uploaded=await window.SotaRoomMedia.api(sb,userId).upload(file,kind);
       if(studio!==dialog||!draft){await window.SotaRoomMedia.api(sb,userId).remove(uploaded.path);return;}
       mediaUploads.push({path:uploaded.path,userId});
-      if(kind==='music'){draft.trackPath=uploaded.path;draft.trackTitle=uploaded.title;draft.trackUrl='';dialog.querySelector('#bv-trackTitle').value=draft.trackTitle;dialog.querySelector('#bv-trackUrl').value='';}
+      if(kind==='music'){draft.trackPath=uploaded.path;draft.trackTitle=uploaded.title;draft.trackUrl='';draft.songRef='';dialog.querySelector('#bv-trackTitle').value=draft.trackTitle;dialog.querySelector('#bv-trackUrl').value='';}
       else draft.coverPath=uploaded.path;
-      status.textContent=kind==='music'?'Track uploaded. Save your room to add it.':'Cover uploaded. Save your room to use it.';drawPreview();
+      status.textContent=kind==='music'?'Song uploaded. Save your room and your friends can play it.':'Cover uploaded. Save your room to use it.';drawPreview();
     }catch(error){if(studio===dialog)status.textContent=error.message||'Upload interrupted. Your design is still here.';}
-    finally{mediaBusy=false;if(studio===dialog){saveButton.disabled=false;dialog.querySelectorAll('input[type=file]').forEach(input=>input.disabled=input.id==='bv-cover-upload');event.target.value='';}}
+    finally{mediaBusy=false;if(studio===dialog){saveButton.disabled=false;dialog.querySelectorAll('input[type=file]').forEach(input=>input.disabled=false);event.target.value='';}}
   }
   function discardUploads(keep=[]) {
     const pending=mediaUploads.filter(file=>!keep.includes(file.path));mediaUploads=[];
@@ -460,7 +460,7 @@
         <div class="bv-span"><label for="bv-note">Words on your cover</label><input id="bv-note" value="${esc(draft.note)}" maxlength="80" placeholder="Whatever feels like you"></div>
         <div class="bv-span"><label for="bv-interests">Your favourites, separated by commas</label><input id="bv-interests" value="${esc(draft.interests)}" maxlength="160" placeholder="Drua, music, sunsets, good company"></div>
         <div class="bv-span"><label for="bv-trackTitle">Your profile track</label><input id="bv-trackTitle" value="${esc(draft.trackTitle)}" maxlength="80" placeholder="Song name · artist"></div>
-        <div class="bv-upload-box"><h4>Bring your own music & artwork</h4><p>Uploaded music is saved on this device, like Fiji 3D Maps. Use a direct audio link below for a track your friends can hear. Cover uploads are being prepared.</p><label for="bv-music-upload">Upload music · MP3, M4A, AAC, WAV, OGG, FLAC or Opus · up to 250 MB per song</label><input id="bv-music-upload" type="file" accept=".mp3,.m4a,.aac,.wav,.ogg,.oga,.flac,.opus" multiple><button type="button" class="btn ghost" data-local-music-open>Your music</button><label for="bv-cover-upload">Upload cover artwork · JPG, PNG or WebP · up to 6 MB</label><input id="bv-cover-upload" type="file" accept=".jpg,.jpeg,.png,.webp" disabled><div class="bv-upload-status" id="bv-upload-status" role="status"></div><div class="bv-upload-actions"><button type="button" class="btn ghost" id="bv-remove-track">Remove track</button><button type="button" class="btn ghost" id="bv-remove-cover">Remove cover</button></div></div>
+        <div class="bv-upload-box"><h4>Bring your own music & artwork</h4><p>Add one song to your room for you and your friends to play, keep a bigger collection on this device just for you, and upload your own cover artwork. Room uploads are private: only you and friends you have accepted can open them.</p><label for="bv-room-track-upload">Room song · you and your friends can play it · MP3, M4A, OGG, Opus or WAV · up to 6 MB</label><input id="bv-room-track-upload" type="file" accept=".mp3,.m4a,.ogg,.opus,.wav"><label for="bv-music-upload">Music on this device · only you · MP3, M4A, AAC, WAV, OGG, FLAC or Opus · up to 250 MB per song</label><input id="bv-music-upload" type="file" accept=".mp3,.m4a,.aac,.wav,.ogg,.oga,.flac,.opus" multiple><button type="button" class="btn ghost" data-local-music-open>Your music</button><label for="bv-cover-upload">Cover artwork · JPG, PNG or WebP · up to 6 MB</label><input id="bv-cover-upload" type="file" accept=".jpg,.jpeg,.png,.webp"><div class="bv-upload-status" id="bv-upload-status" role="status"></div><div class="bv-upload-actions"><button type="button" class="btn ghost" id="bv-remove-track">Remove track</button><button type="button" class="btn ghost" id="bv-remove-cover">Remove cover</button></div></div>
         <div class="bv-span"><label for="bv-trackUrl">Or paste a direct audio link</label><input id="bv-trackUrl" type="url" value="${esc(draft.trackUrl)}" maxlength="320" placeholder="https://…/your-track.mp3"><p class="sub">Use an HTTPS MP3, M4A, OGG, Opus or WAV file you can share. Loads only when a visitor taps Play.</p></div></div></fieldset>
       ${S.user&&S.me?`<details><summary>Edit your profile</summary><div class="stack"><div><label for="d-name">Display name</label><input id="d-name" value="${esc(p.display_name||'')}" maxlength="40"></div>
         <div><label for="d-pro">Pronouns</label><input id="d-pro" value="${esc(p.pronouns||'')}" maxlength="24"></div>

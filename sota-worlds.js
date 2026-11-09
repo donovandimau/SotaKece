@@ -104,7 +104,7 @@
   let session=null;
   function move(node,parent){if(!node||!parent||node.parentNode===parent)return;if(typeof parent.moveBefore==='function'&&node.isConnected&&parent.isConnected){try{parent.moveBefore(node,null);return;}catch(_){}}parent.append(node);}
   function memberRouteFromHash(hash){const key=String(hash||'').replace(/^#/,'');if(key.startsWith('view=')){const p=key.slice(5);return memberPages.includes(p)?p:null;}return ({'':'pulse',home:'pulse',people:'friends',talanoa:'crews',music:'music',profile:'room',skins:'room',world:'connections'})[key]||null;}
-  function sereButton(w){return w.sere&&typeof window!=='undefined'&&window.SotaSere?` <button type="button" class="sx-world-primary sx-world-sere" data-world-sere="1">🎤 Make a photo sing</button>`:'';}
+  function sereButton(w){return w.sere&&typeof window!=='undefined'&&window.SotaSere?` <button type="button" class="sx-world-secondary sx-world-sere" data-world-sere="1">🎤 Make a photo sing</button>`:'';}
   function action(w){return actionMain(w)+sereButton(w);}
   function actionMain(w){if(w.member)return `<button type="button" class="sx-world-primary" data-world-member="${w.member}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;if(w.tool)return `<button type="button" class="sx-world-primary" data-world-tool="${w.tool}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;return `<button type="button" class="sx-world-primary" data-world-focus="${esc(w.focus||'')}">${esc(w.action||'Explore')} <span aria-hidden="true">↗</span></button>`;}
   function toolbar(member=false){return `<nav class="sx-world-toolbar" aria-label="Page tools"><div class="sx-world-crumb"><${member?'button type="button" data-world-member="pulse"':'a href="#home"'}>Home</${member?'button':'a'}><span aria-hidden="true">/</span><span data-world-label></span></div><div><button type="button" data-world-tool="explore" aria-haspopup="dialog">Explore Sota Kece <span aria-hidden="true">✦</span></button><button type="button" data-world-tool="design" aria-haspopup="dialog">Design this page <span aria-hidden="true">✎</span></button></div></nav>`;}
@@ -118,6 +118,29 @@
     return `<${target} class="sx-world-card${photo?' sx-world-card-photo':''}" data-world-tone="${w.tone}">${artwork}<span class="sx-world-card-copy"><small>EXPLORE YOUR WORLD</small><strong>${esc(w.label)}</strong><span>${esc(w.line)}</span><b aria-hidden="true">↗</b></span></${member?'button':'a'}>`;
   }
   function recommendations(page,member=false){const pages=member?({pulse:['moments','crews','room','music'],moments:['room','music','friends'],friends:['connections','crews','room'],crews:['circles','music','connections'],circles:['crews','music','friends'],room:['music','friends','moments'],music:['room','crews','moments'],connections:['friends','crews','room']}[page]||['room','music','friends']):({people:['world','talanoa','profile'],talanoa:['people','music','profile'],music:['profile','skins','talanoa'],profile:['skins','music','world'],skins:['profile','music','people'],world:['people','talanoa','profile']}[page]||[]);return `<section class="sx-world-next" aria-label="Keep exploring"><header><div><span class="sx-eyebrow">THERE’S MORE TO YOUR WORLD</span><h2>Where to next?</h2></div><button type="button" data-world-tool="explore">Explore everything <span aria-hidden="true">↗</span></button></header><div>${pages.map(p=>destinationCard(p,member,member?recommendationPhotos[p]:undefined)).join('')}</div></section>`;}
+  // New or returning: a member is greeted by name. The first visit on this device
+  // points at one thing to do; later visits say welcome back.
+  const visits={};
+  function firstName(state){return String(state?.me?.display_name||'').trim().split(/\s+/)[0].slice(0,24);}
+  function seenBefore(id){try{const key='sota.seen.'+id,had=!!root.localStorage.getItem(key);root.localStorage.setItem(key,String(Date.now()));root.localStorage.setItem('sota.known','1');return had;}catch{return true;}}
+  function knownVisitor(){try{return root.localStorage.getItem('sota.known')==='1';}catch{return false;}}
+  function greet(tools,state){
+    const title=tools.querySelector('.sx-world-hero h1'),line=tools.querySelector('.sx-world-hero [data-world-description]'),eyebrow=tools.querySelector('.sx-world-hero .sx-eyebrow');
+    if(!title||!state?.user?.id)return;
+    const name=firstName(state),returning=visits[state.user.id]??(visits[state.user.id]=seenBefore(state.user.id));
+    tools.querySelector('.sx-world-hero').dataset.worldVisit=returning?'returning':'first';
+    if(returning){title.textContent=name?`Welcome back, ${name}.`:'Welcome back.';return;}
+    if(eyebrow)eyebrow.textContent=name?`BULA, ${name.toUpperCase()}. YOU’RE IN.`:'BULA. YOU’RE IN.';
+    title.textContent='Start with one small moment.';
+    if(line)line.textContent='Share a photo, a thought or a song. Your friends will see it in their feed.';
+  }
+  function welcomeBack(app){
+    const primary=app.querySelector('.sx-hero .sx-actions [data-sx-auth="up"]'),small=app.querySelector('.sx-hero-copy small');
+    if(!primary||!knownVisitor())return;
+    primary.dataset.sxAuth='in';primary.innerHTML='Welcome back · Sign in <span aria-hidden="true">↗</span>';
+    const other=small?.querySelector('[data-sx-auth="in"]');
+    if(other){other.dataset.sxAuth='up';other.textContent='Create your space';small.firstChild.textContent='New here? ';}
+  }
   function choiceKey(s,page){return 'sota.world-choice.'+s.state.user.id+'.'+page;}
   function chosen(s,page){
     if(!s?.state.user?.id||!choices[page])return null;
@@ -129,10 +152,13 @@
   function choiceMenu(s,page,inDirectory=false){
     const group=choices[page],current=chosen(s,page);
     const options=group.options.map(([id,label])=>`<option value="${id}"${current?.[0]===id?' selected':''}>${esc(label)}</option>`).join('');
-    return `<div class="sx-world-choice${inDirectory?' sx-world-choice-compact':''}">
+    const menu=`<div class="sx-world-choice${inDirectory?' sx-world-choice-compact':''}">
       <label><span>${esc(group.label)}</span><select data-world-choice="${page}"><option value="">Choose a starting point</option>${options}</select></label>
       ${!inDirectory&&group.action?`<button type="button" data-world-choice-action="${page}"${current?'':' disabled'}>${esc(group.action)}</button>`:''}
     </div>`;
+    // On the page itself the ideas menu stays folded away until asked for, so the
+    // hero keeps one clear action. It opens by itself once a choice has been made.
+    return inDirectory?menu:`<details class="sx-world-more"${current?' open':''}><summary>Need an idea? <span>Pick a starting point</span></summary>${menu}</details>`;
   }
   function applyChoice(s=session){
     if(!s?.member)return;
@@ -225,12 +251,14 @@
           tools.insertAdjacentHTML('beforeend',choiceMenu(s,s.page));
         }
         view.prepend(tools);
+        if(s.page==='pulse')greet(tools,state);
         const old=view.querySelector('.sx-member-heading');old?.remove();
         const tabs=root.document.createElement('nav');tabs.className='sx-world-member-tabs';tabs.setAttribute('aria-label','Your Sota Kece worlds');tabs.innerHTML=memberPages.map(p=>`<button type="button" data-world-member="${p}" aria-current="${p===s.page?'page':'false'}">${esc(worlds[p].label)}</button>`).join('');tools.before(tabs);
         if(s.page==='pulse')tools.insertAdjacentHTML('afterend',homeListening());
         view.insertAdjacentHTML('beforeend',recommendations(s.page,true));
       }
     }else{
+      welcomeBack(app);
       for(const p of publicPages.filter(p=>p!=='home'))app.querySelector(`[data-sx-page="${p}"]`)?.insertAdjacentHTML('beforeend',recommendations(p));
       const paths=app.querySelector('.sx-home-paths');paths?.insertAdjacentHTML('afterend','<div class="sx-world-home-tools"><span>Your world. Your way.</span><button type="button" data-world-tool="explore">Explore everything ✦</button><button type="button" data-world-tool="design">Design this page ✎</button></div>');
     }
