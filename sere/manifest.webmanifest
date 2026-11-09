@@ -1,0 +1,12 @@
+{
+  "name": "Sere — make a photo sing",
+  "short_name": "Sere",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#87CEEB",
+  "theme_color": "#87CEEB",
+  "icons": [
+    { "src": "/sere/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/sere/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
