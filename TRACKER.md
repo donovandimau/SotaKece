@@ -18,6 +18,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-09 | Claude | Speed up the first paint on sotakece.com (real-visitor LCP 3.22s) and stop the Object.hasOwn error on older browsers, with no change to the look (Ops task 1020) | agent/claude/speed-up-sotakece-com-first-paint-lcp-and-fix-object-hasown-on-older-browsers/1 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
