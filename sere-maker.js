@@ -280,10 +280,10 @@
       } catch (e) { st.error = say(e, e && e.message); paint(); }
     });
     document.addEventListener('input', function (ev) {
+      var cap = ev.target.closest('[data-sere="caption"]'); if (cap) { st.caption = cap.value.slice(0, 140); return; }
       var t = ev.target.closest('[data-sere="start"]'); if (!t) return;
       st.startMs = Number(t.value) || 0; var win = pickWindow(st.startMs, st.audio.durationMs), b = document.querySelectorAll('.sere-trim-head b');
       if (b.length === 2) { b[0].textContent = fmt(win.startMs); b[1].textContent = fmt(win.endMs); }
-      var cap = ev.target.closest('[data-sere="caption"]'); if (cap) st.caption = cap.value.slice(0, 140);
     });
     document.addEventListener('click', function (ev) {
       var t = ev.target.closest('[data-sere]'); if (!t) return;
