@@ -1005,6 +1005,7 @@ async function render(){
   await refreshMeta();
   if(!currentView(run))return;
   if(S.tab==="pulse") return viewPulse();
+  if(S.tab==="wall"){ S.tab="pulse"; return viewPulse(); }   // bottom-bar Talanoa opens the wall (the Pulse view)
   if(S.tab==="moments") return viewMoments();
   if(S.tab==="room") return viewRoom();
   if(S.tab==="circles") return window.SotaKavaUI.view();
