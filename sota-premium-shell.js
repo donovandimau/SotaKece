@@ -6,10 +6,10 @@
   function member(){try{return typeof S==='object'&&S&&S.user&&S.me?S:null;}catch(_){return null;}}
   var pages=[
     {label:'Home',hint:'Welcome, today and your people',guest:'#home',member:'pulse',icon:'🏠'},
-    {label:'Pulse',hint:'The Talanoa Wall for every member',member:'pulse',icon:'🌊'},
+    {label:'Talanoa wall',hint:'The Talanoa Wall for every member',member:'pulse',icon:'🌊'},
     {label:'Moments',hint:'Photos and notes from your friends',member:'moments',icon:'🐚'},
     {label:'People',hint:'Find your people and send an ask',guest:'#people',member:'friends',icon:'🤝'},
-    {label:'Talanoa',hint:'Circles, Koro and conversations',guest:'#talanoa',member:'crews',icon:'🥥'},
+    {label:'Koro',hint:'Circles, Koro and conversations',guest:'#talanoa',member:'crews',icon:'🥥'},
     {label:'Circles',hint:'Your Talanoa Circles',member:'circles',icon:'🪸'},
     {label:'Music',hint:'Your island soundtrack',guest:'#music',member:'music',icon:'🎵'},
     {label:'My space',hint:'Your room, your rules',guest:'#profile',member:'room',icon:'🌺'},
