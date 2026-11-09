@@ -404,8 +404,12 @@ async function refreshMeta(){
 /* ================= WALLET ================= */
 const PAY_URL = "https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/pay";
 function fjd(minor,cur){
-  try{ return new Intl.NumberFormat(undefined,{style:"currency",currency:cur||"FJD",currencyDisplay:"narrowSymbol"}).format((Number(minor)||0)/100); }
-  catch(_){ return ((Number(minor)||0)/100).toFixed(2); }
+  const n = (Number(minor)||0)/100;
+  const c = String(cur||"FJD").toUpperCase();
+  const amount = n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(c==="FJD") return "FJ$"+amount;
+  try{ return new Intl.NumberFormat(undefined,{style:"currency",currency:c,currencyDisplay:"narrowSymbol"}).format(n); }
+  catch(_){ return c+" "+amount; }
 }
 async function viewWallet(){
   viewRun();
