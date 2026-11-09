@@ -1,0 +1,54 @@
+/* Sota Kece — Sere (singing photo): the maker sheet, the tip sheet and the video card on the wall. */
+.sere-scrim{position:fixed;inset:0;background:rgba(11,42,74,.35);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:60}
+.sere-sheet{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(560px,calc(100vw - 20px));
+  max-height:calc(100vh - 24px);overflow:auto;z-index:61;padding:16px 16px 18px;border-radius:22px;background:rgba(255,255,255,.92);
+  box-shadow:0 24px 60px rgba(11,42,74,.30);color:#0b2a4a}
+body.sere-open{overflow:hidden}
+.sere-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sere-head h2{margin:0;font-size:20px}
+.sere-close{border:0;background:rgba(20,59,82,.06);border-radius:999px;width:40px;height:40px;font:inherit;cursor:pointer;color:#0b2a4a}
+.sere-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sere-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:150px;padding:12px;text-align:center;
+  border-radius:18px;border:1.5px dashed rgba(79,168,216,.55);background:rgba(207,238,251,.45);cursor:pointer;position:relative;overflow:hidden;font-size:14.5px;font-weight:600}
+.sere-drop small{font-weight:500;color:#3C6B86;font-size:12px}
+.sere-drop.has{border-style:solid;background:rgba(255,255,255,.7)}
+.sere-drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sere-ico{font-size:30px;line-height:1}
+.sere-remix{cursor:default}
+.sere-trim{margin-top:12px;padding:12px;border-radius:16px;background:rgba(207,238,251,.45)}
+.sere-trim-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:8px}
+.sere-trim input[type=range]{width:100%;accent-color:#1E90FF}
+.sere-trim small{display:block;color:#3C6B86;font-size:12px;margin-top:4px}
+.sere-row{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:12px}
+.sere-row label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:#3C6B86}
+.sere-row select,.sere-row input{font:inherit;font-size:15px;padding:9px 11px;border-radius:12px;border:1px solid rgba(11,42,74,.16);background:#fff;color:#0b2a4a;min-height:44px}
+.sere-error{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#fdecea;color:#8a1c1c;font-size:14px}
+.sere-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.sere-working{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:6px 0}
+.sere-working-img{width:120px;height:120px;border-radius:50%;object-fit:cover;box-shadow:0 10px 30px rgba(11,42,74,.18);animation:sere-breathe 2.4s ease-in-out infinite}
+@keyframes sere-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.sere-working-title{margin:4px 0 0;font-weight:600}
+.sere-bar{width:100%;height:8px;border-radius:999px;background:rgba(11,42,74,.10);overflow:hidden}
+.sere-bar i{display:block;height:100%;background:linear-gradient(90deg,#5FB3D9,#1E90FF);border-radius:999px;transition:width .3s ease}
+.sere-working small{color:#3C6B86;font-size:12.5px}
+.sere-done{text-align:center}
+.sere-video,.tw-sere video{width:100%;max-height:420px;border-radius:16px;background:#0b2a4a;display:block}
+/* on the wall */
+.tw-sere{position:relative;margin:8px 0 4px;border-radius:16px;overflow:hidden;background:#0b2a4a}
+.tw-sere::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;opacity:0}
+.tw-sere[data-scene="golden-hour"]::after{opacity:.6;background:linear-gradient(180deg,rgba(255,196,102,.25),rgba(255,120,60,.35))}
+.tw-sere[data-scene="neon"]::after{opacity:.6;background:linear-gradient(135deg,rgba(60,120,255,.4),rgba(255,60,200,.4))}
+.tw-sere[data-scene="bure-night"]::after{opacity:.7;background:radial-gradient(circle at 50% 70%,rgba(255,170,60,.35),rgba(10,20,60,.6) 75%)}
+.tw-sere[data-scene="beach-day"]::after{opacity:.5;background:linear-gradient(180deg,rgba(135,206,235,.35),rgba(255,236,170,.3))}
+.tw-sere[data-scene="studio-soft"]::after{opacity:.4;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.5),rgba(0,0,0,.25) 80%)}
+.tw-sere-meta{position:absolute;left:10px;top:10px;display:flex;gap:6px;z-index:1}
+.tw-sere-meta span{padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.82);color:#0b2a4a;font-size:12px;font-weight:600}
+.tw-btn.tw-sere-open{color:#1E90FF;font-weight:700}
+/* tip sheet */
+.sere-tip{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(420px,calc(100vw - 20px));z-index:62;padding:14px;border-radius:20px;background:rgba(255,255,255,.95);box-shadow:0 24px 60px rgba(11,42,74,.30)}
+.sere-tip-title{margin:0 0 10px;font-weight:600;color:#0b2a4a}
+.sere-tip-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.sere-gift{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 4px;min-height:64px;border-radius:14px;border:1px solid rgba(79,168,216,.30);background:rgba(255,255,255,.66);font:inherit;color:#12344d;cursor:pointer}
+.sere-gift span{font-size:24px;line-height:1}
+.sere-gift small{font-size:11.5px;font-weight:600}
+@media (max-width:520px){.sere-grid{grid-template-columns:1fr}.sere-drop{min-height:120px}.sere-row{grid-template-columns:1fr}}

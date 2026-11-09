@@ -66,9 +66,16 @@
       '<div class="tw-head"><span>' + esc(q.avatar_emoji || '🌺') + '</span><span class="name">' + esc(q.display_name || q.handle) + '</span><span class="tw-handle">@' + esc(q.handle) + '</span><span class="spacer"></span><span class="ago">' + ago(q.created_at) + '</span></div>' +
       '<div class="tw-quote-body">' + rich(q.body) + '</div></div>';
   }
+  /** The singing photo on a post (see sere-maker.js). Poster first; the video only loads on tap. */
+  function sereBox(sr) {
+    if (!sr || !sr.video) return '';
+    return '<div class="tw-sere" data-scene="' + esc(sr.scene || 'none') + '">' +
+      '<div class="tw-sere-meta"><span>🎤 Sere</span>' + (sr.seconds ? '<span>' + num(sr.seconds) + 's</span>' : '') + (sr.remix_of ? '<span>🔁 remix</span>' : '') + '</div>' +
+      '<video data-sere="' + esc(sr.id) + '" controls playsinline preload="none"' + (sr.poster ? ' poster="' + esc(sr.poster) + '"' : '') + ' src="' + esc(sr.video) + '"></video></div>';
+  }
   function card(p, opts) {
     opts = opts || {};
-    var likes = num(p.like_count), reposts = num(p.repost_count), replies = num(p.reply_count);
+    var likes = num(p.like_count), reposts = num(p.repost_count), replies = num(p.reply_count), sr = p.sere || null;
     return '<article class="tw-post' + (opts.expanded ? ' tw-expanded' : '') + (opts.reply ? ' tw-reply' : '') + '" data-id="' + p.id + '" data-author="' + esc(p.author) + '">' +
       avatar(p) +
       '<div class="tw-main">' +
@@ -76,12 +83,15 @@
           '<time class="ago" datetime="' + esc(p.created_at) + '">' + ago(p.created_at) + '</time></div>' +
         '<div class="tw-body"' + (opts.expanded ? '' : ' data-tw="open" data-id="' + p.id + '"') + '>' + rich(p.body) + '</div>' +
         quoteBox(p.quote) +
+        sereBox(sr) +
         '<div class="tw-bar">' +
           '<button type="button" class="tw-btn" data-tw="reply" data-id="' + p.id + '" aria-label="Reply, ' + replies + '">💬<b data-count="reply">' + (replies || '') + '</b></button>' +
           '<button type="button" class="tw-btn tw-repost' + (p.i_reposted ? ' on' : '') + '" data-tw="repost" data-id="' + p.id + '" aria-pressed="' + (p.i_reposted ? 'true' : 'false') + '" aria-label="Repost, ' + reposts + '">🔁<b data-count="repost">' + (reposts || '') + '</b></button>' +
           '<button type="button" class="tw-btn tw-like' + (p.i_liked ? ' on' : '') + '" data-tw="like" data-id="' + p.id + '" aria-pressed="' + (p.i_liked ? 'true' : 'false') + '" aria-label="Like, ' + likes + '">' + (p.i_liked ? '♥' : '♡') + '<b data-count="like">' + (likes || '') + '</b></button>' +
           '<button type="button" class="tw-btn" data-tw="quote" data-id="' + p.id + '" aria-label="Quote">❝</button>' +
           '<button type="button" class="tw-btn" data-tw="share" data-id="' + p.id + '" aria-label="Share">↗</button>' +
+          (sr && !p.mine ? '<button type="button" class="tw-btn" data-tw="tip" data-id="' + esc(sr.id) + '" aria-label="Tip the maker, ' + num(sr.tips) + '">🎁<b>' + (num(sr.tips) || '') + '</b></button>' : '') +
+          (sr ? '<button type="button" class="tw-btn" data-tw="remix" data-id="' + esc(sr.id) + '" aria-label="Remix this sound with your photo">🎤</button>' : '') +
           (p.mine ? '<button type="button" class="tw-btn tw-del" data-tw="del" data-id="' + p.id + '" aria-label="Remove your post">✕</button>' : '') +
         '</div>' +
       '</div></article>';
@@ -95,7 +105,8 @@
         '<textarea name="body" maxlength="' + MAX + '" rows="2" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?') + '"></textarea>' +
       '</div>' +
       (st.quote && !opts.replyTo ? '<div class="tw-quoting">' + quoteBox(st.quote) + '<button type="button" class="tw-btn tw-unquote" data-tw="unquote" aria-label="Remove the quote">✕</button></div>' : '') +
-      '<div class="tw-compose-bar"><span class="tw-count" aria-live="polite">' + MAX + '</span><span class="spacer"></span>' +
+      '<div class="tw-compose-bar">' + (opts.replyTo || !window.SotaSere ? '' : '<button type="button" class="tw-btn tw-sere-open" data-tw="sere" aria-label="Make a photo sing">🎤 Sere</button>') +
+        '<span class="tw-count" aria-live="polite">' + MAX + '</span><span class="spacer"></span>' +
         '<button type="submit" class="btn sm" disabled>' + (opts.replyTo ? 'Reply' : 'Post') + '</button></div>' +
     '</form>';
   }
@@ -372,6 +383,9 @@
       if (act === 'quote') return startQuote(id);
       if (act === 'share') return share(id);
       if (act === 'del') return remove(id);
+      if (act === 'sere') return window.SotaSere && window.SotaSere.open();
+      if (act === 'tip') return window.SotaSere && window.SotaSere.tip(id, t);
+      if (act === 'remix') return window.SotaSere && window.SotaSere.open({ remixOf: id });
       if (act === 'unquote') { st.quote = null; var f = $('[data-tw-form="post"]'); if (f) f.outerHTML = composer(); return; }
       if (act === 'mode') return setMode(t.dataset.mode);
       if (act === 'new') return showNew();
@@ -426,7 +440,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    card: card, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();

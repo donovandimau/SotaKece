@@ -37,5 +37,13 @@
       "statusCode": 308,
       "destination": "https://sotakece.com/$1"
     }
-  ]
+  ],
+  "functions": {
+    "api/sere.js": {
+      "maxDuration": 60
+    },
+    "api/sere-callback.js": {
+      "maxDuration": 60
+    }
+  }
 }
