@@ -29,7 +29,9 @@ test('page: floating search button and overlay follow the shell contract and are
 test('navigation carries the shell roles without changing labels or handlers',()=>{
  assert.match(experience,/<nav class="sx-nav" data-dps-nav aria-label="Main navigation">/);
  assert.match(experience,/data-dps-tab="\$\{key\}" aria-current=/);
- for(const sel of ['body.sx-enabled .sx-nav{position:fixed','grid-auto-flow:column','env(safe-area-inset-bottom','@media(min-width:761px)','width:min(560px,calc(100vw - 32px))','body.sx-enabled .sx-rail>.sx-brand,body.sx-enabled .sx-rail-caption,body.sx-enabled .sx-rail-bottom,body.sx-enabled .sx-world-rail-links{display:none'])assert.ok(adapterCss.includes(sel),sel);
+ for(const sel of ['@media(max-width:760px)','body.sx-enabled .sx-nav{position:fixed','grid-auto-flow:column','env(safe-area-inset-bottom','@media(min-width:761px)','body.sx-enabled.dps-has-nav{padding-bottom:0!important}','body.sx-enabled .sx-rail>.sx-brand,body.sx-enabled .sx-rail-caption,body.sx-enabled .sx-rail-bottom,body.sx-enabled .sx-world-rail-links{display:none','body.sx-enabled .dps-fab{display:none!important}','.sx-header-search{','body.sx-enabled > [data-dimau-group-footer]{position:static!important'])assert.ok(adapterCss.includes(sel),sel);
+ assert.ok(!/width:min\(560px/.test(adapterCss),'no floating dock on wider screens: the left rail is the one primary navigation there');
+ assert.match(experience,/class="sx-header-search" data-dps-search-open/,'search opens from the header');
  assert.ok(!/prefers-color-scheme/.test(adapterCss),'light sky-blue only; no dark theme');
 });
 test('search provider: syntax, no storage, no new hosts, registers with the shell',()=>{
