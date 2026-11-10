@@ -257,7 +257,7 @@
         if(s.page==='pulse')greet(tools,state);
         const old=view.querySelector('.sx-member-heading');old?.remove();
         const group=tabGroups[s.page]||[];if(group.length>1){const tabs=root.document.createElement('nav');tabs.className='sx-world-member-tabs';tabs.setAttribute('aria-label','Your Sota Kece worlds');tabs.innerHTML=group.map(p=>`<button type="button" data-world-member="${p}" aria-current="${p===s.page?'page':'false'}">${esc(worlds[p].label)}</button>`).join('');tools.before(tabs);const current=tabs.querySelector('[aria-current="page"]');if(current&&tabs.scrollWidth>tabs.clientWidth)tabs.scrollLeft=Math.max(0,current.offsetLeft-(tabs.clientWidth-current.offsetWidth)/2);}
-        if(s.page==='pulse')tools.insertAdjacentHTML('afterend',homeListening());
+        if(s.page==='pulse'){const wall=[...view.children].find(n=>n.classList?.contains('tw-wrap'));(wall||tools).insertAdjacentHTML('afterend',homeListening());}
         view.insertAdjacentHTML('beforeend',recommendations(s.page,true));
       }
     }else{
