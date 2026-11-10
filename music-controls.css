@@ -19,3 +19,35 @@
 .sk-playlist .sk-deck :focus-visible{outline:3px solid #994dbd;outline-offset:3px}.sk-playlist .sk-deck-switch input:focus-visible+.sk-deck-knob{outline:3px solid #994dbd;outline-offset:3px}
 @media(max-width:760px){.sk-playlist .sk-deck{padding:18px;gap:14px}.sk-playlist .sk-deck-main{gap:22px}.sk-playlist .sk-deck-extra .sk-deck-share{flex:1 1 100%;width:100%}.sk-playlist .sk-deck-volume{flex-basis:100%}.sk-playlist .sk-deck-switch{font-size:10px;gap:6px}.sk-playlist .sk-deck-options{gap:8px}}
 @media(prefers-reduced-motion:reduce){.sk-playlist .sk-deck button,.sk-playlist .sk-deck-knob:after{transition:none}}@media(forced-colors:active){.sk-playlist .sk-deck button,.sk-playlist .sk-deck-knob{border:1px solid ButtonText}.sk-playlist .sk-deck .sk-deck-mode[aria-pressed=true]{outline:2px solid Highlight}}
+
+/* Library: playlist tabs, per-song add/remove and the add-to-playlist menu. */
+.sk-playlist .sk-lib{display:flex;flex-wrap:wrap;gap:8px}
+.sk-playlist .sk-lib-chip{display:inline-flex;align-items:center;gap:7px;width:auto!important;min-height:40px;padding:8px 14px;border:1px solid #d5c2ea;border-radius:999px;background:#fff;color:#3f2556;font:800 13px Nunito,system-ui,sans-serif;cursor:pointer;box-shadow:none}
+.sk-playlist .sk-lib-chip small{font:700 11px Nunito,system-ui,sans-serif;padding:2px 7px;border-radius:999px;background:#f1e4fb;color:#5b3a78}
+.sk-playlist .sk-lib-chip[aria-pressed=true]{background:#6d34c9;border-color:#6d34c9;color:#fff}
+.sk-playlist .sk-lib-chip[aria-pressed=true] small{background:#ffffff33;color:#fff}
+.sk-playlist .sk-lib-chip svg,.sk-playlist .sk-lib-action svg{width:15px;height:15px;flex:none}
+.sk-playlist .sk-lib-new{border-style:dashed;background:transparent}
+.sk-playlist .sk-lib-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+.sk-playlist .sk-lib-tools[hidden]{display:none}
+.sk-playlist .sk-lib-form{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 100%}
+.sk-playlist .sk-lib-form input{flex:1 1 180px;min-height:42px;padding:8px 12px;border:1px solid #cbb0e6;border-radius:12px;background:#fff;color:#2f1b3f;font:600 14px Nunito,system-ui,sans-serif}
+.sk-playlist .sk-lib-action{display:inline-flex;align-items:center;gap:7px;width:auto!important;min-height:42px;padding:8px 14px;border:1px solid #d5c2ea;border-radius:12px;background:#fff;color:#3f2556;font:800 13px Nunito,system-ui,sans-serif;cursor:pointer}
+.sk-playlist .sk-lib-primary{background:#6d34c9;border-color:#6d34c9;color:#fff}
+.sk-playlist .sk-lib-danger{color:#a3213f;border-color:#eab8c4}
+.sk-playlist .sk-lib-note{flex:1 1 100%;font:600 12px/1.4 Nunito,system-ui,sans-serif;color:#6d5a7b}
+.sk-playlist .sk-playlist-songs>li.sk-song-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.sk-playlist .sk-playlist-songs>li.sk-song-row>button:first-child{flex:1 1 0;min-width:0;width:auto}
+.sk-playlist .sk-playlist-songs .sk-song-act{flex:none;display:grid;place-items:center;width:40px!important;min-width:40px;height:40px;min-height:40px!important;padding:0;border:1px solid transparent!important;border-radius:50%!important;background:transparent;color:#6a4a86;cursor:pointer}
+.sk-playlist .sk-playlist-songs .sk-song-act::after{content:none}
+.sk-playlist .sk-playlist-songs .sk-song-act:hover,.sk-playlist .sk-playlist-songs .sk-song-act[aria-expanded=true]{background:#f1e4fb!important;border-color:#d5c2ea!important}
+.sk-playlist .sk-song-act svg{width:18px;height:18px}
+.sk-playlist .sk-song-remove{color:#a3213f}
+.sk-playlist .sk-pl-menu{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 10px 12px}
+.sk-playlist .sk-pl-menu-title{flex:1 1 100%;font:800 11px Nunito,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6d5a7b}
+.sk-playlist .sk-playlist-songs .sk-pl-option{display:inline-flex;align-items:center;gap:6px;width:auto!important;min-height:38px!important;padding:6px 12px;border:1px solid #d5c2ea!important;border-radius:999px!important;background:#fff!important;color:#3f2556;font:700 13px Nunito,system-ui,sans-serif;cursor:pointer}
+.sk-playlist .sk-playlist-songs .sk-pl-option::after{content:none}
+.sk-playlist .sk-playlist-songs .sk-pl-option[aria-pressed=true]{background:#eddbff!important;border-color:#8353b0!important}
+.sk-playlist .sk-pl-fresh{border-style:dashed!important}
+.sk-playlist .sk-lib :focus-visible,.sk-playlist .sk-lib-tools :focus-visible,.sk-playlist .sk-song-act:focus-visible,.sk-playlist .sk-pl-option:focus-visible{outline:3px solid #994dbd;outline-offset:2px}
+@media(forced-colors:active){.sk-playlist .sk-lib-chip,.sk-playlist .sk-lib-action,.sk-playlist .sk-song-act,.sk-playlist .sk-pl-option{border:1px solid ButtonText!important}.sk-playlist .sk-lib-chip[aria-pressed=true],.sk-playlist .sk-pl-option[aria-pressed=true]{outline:2px solid Highlight}}

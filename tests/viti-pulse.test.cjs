@@ -150,11 +150,10 @@ test('a failed join leaves the pill ready to try again',dom,async()=>{
 });
 
 // ---------------------------------------------------------------- page wiring
-test('Home drops the Where to next cards; other signed-in pages hide them on phones',()=>{
+test('no page ends on Where to next cards: the rail and bottom bar own the switching',()=>{
   const worlds=read('sota-worlds.js'),css=read('sota-worlds.css');
-  assert.match(worlds,/if\(s\.page!=='pulse'\)view\.insertAdjacentHTML\('beforeend',recommendations\(s\.page,true\)\);/);
-  assert.match(worlds,/class="sx-world-next\$\{member\?' sx-world-next-member':''\}"/);
-  assert.match(css,/@media\(max-width:760px\)\{\.sx-world-next\.sx-world-next-member\{display:none\}\}/);
+  assert.doesNotMatch(worlds,/recommendations\(|sx-world-next-member|Where to next/);
+  assert.doesNotMatch(css,/sx-world-next-member/);
 });
 test('index.html loads the hubs, stands the card in for an empty Top Mates panel and the worker caches it',()=>{
   const html=read('index.html'),sw=read('sw.js'),css=read('sota-hubs.css');
@@ -165,7 +164,7 @@ test('index.html loads the hubs, stands the card in for an empty Top Mates panel
   assert.match(css,/\.sota-social-host\.sota-social-no-mates \[data-social-panel="mates"\]\{display:none\}/);
   assert.match(html,/window\.SotaHubs\?\.reset\(\);S\.user=null/,'sign-out forgets the last member\'s hubs');
   assert.match(sw,/'\/sota-hubs\.js','\/sota-hubs\.css'/);
-  assert.equal((html.match(/sota-kece-shell-20261110-v166-first-paint-lean/g)||[]).length,1);
+  assert.equal((html.match(/sota-kece-shell-20261110-v167-music-tidy/g)||[]).length,1);
 });
 
 // ---------------------------------------------------------------- public listen pages
