@@ -225,6 +225,23 @@
     window.SotaProfilePhotos?.mountRoom(view,profile,{isOwner:!!room.is_me});
     window.SotaMotionRoom?.mount(view.querySelector('#room-head .bv-cover'),s,sb);
   }
+  /** Shows a draft skin on the room that is already on the page: colours, type, pattern, layout and cover.
+      Nothing is saved; re-rendering the room puts the saved skin back. */
+  function previewLive(settings) {
+    const view=document.querySelector('#view.bv-room');
+    if(!view||!S.me)return false;
+    const s=skins.normalize(settings),preset=skins.presets.find(p=>p.id===s.id);
+    if(!preset)return false;
+    view.dataset.layout=s.layout;view.dataset.musicPosition=s.musicPosition;view.dataset.bvLook=preset.look;
+    view.dataset.bvIdentity=discovery?.layout(preset)||'social';
+    let style=document.querySelector('#bv-active-skin');
+    if(!style){style=document.createElement('style');style.id='bv-active-skin';document.head.appendChild(style);}
+    style.textContent='body.bv-room-active{'+skins.inline(s)+'}';
+    document.body.classList.add('bv-room-active');
+    const cover=view.querySelector('#room-head .bv-cover');
+    if(cover){cover.dataset.pattern=s.pattern;cover.innerHTML=coverContent(s);}
+    return true;
+  }
   function applyChat(profile) {
     if(!profile||!document.querySelector('#msgs'))return;
     const s=skins.read(profile.room_css).settings;
@@ -577,6 +594,8 @@
     studio.querySelectorAll('[data-preview-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.previewMode===studioPreviewMode)));
     wireMedia(studio.querySelector('#bv-studio-preview'));
     studio.querySelector('#bv-preview-name').textContent=draft.customName||skins.presets.find(p=>p.id===draft.id).name;
+    // The Studio drawer listens for this to show the draft on the member's real room while they edit.
+    document.dispatchEvent(new CustomEvent('sota-skin-draft',{detail:{settings:{...draft}}}));
     if(!S.user)showWelcome(draft);
   }
   let saving=false;
@@ -623,6 +642,6 @@
     if(pending.length)setTimeout(()=>pending.forEach(file=>window.SotaRoomMedia.api(sb,file.userId).remove(file.path).catch(()=>{})),0);
   }
   window.SotaPlayback?.register('sample',stopSampleOnly);
-  window.BulaSkinStudio={musicMarkup,apply,applyChat,reset,open,preview,chatPreview,showcasePortrait,closeForOwnerChange};
+  window.BulaSkinStudio={musicMarkup,apply,previewLive,applyChat,reset,open,preview,chatPreview,showcasePortrait,closeForOwnerChange};
 })();
 
