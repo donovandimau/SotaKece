@@ -25,6 +25,15 @@ test('sweep lists the member folder, walks one level and deletes every file thro
   assert.deepStrictEqual(JSON.parse(del.body).prefixes.sort(),[`${UID}/job1/v.mp4`,`${UID}/p.jpg`]);
   assert.ok(calls.every(c=>!c.url.includes('/rest/v1/')),'the sweep never touches the database directly');
 });
+test('a failed nested listing is an error, not a silent skip',async()=>{
+  const f=async(url,opts)=>{
+    const p=JSON.parse(opts.body||'{}').prefix||'';
+    if(url.includes('/object/list/')&&p===`${UID}/`)return {ok:true,status:200,json:async()=>[{name:'job1',id:null}]};
+    if(url.includes('/object/list/'))return {ok:false,status:500,json:async()=>({})};
+    return {ok:true,status:200,json:async()=>[]};
+  };
+  await assert.rejects(()=>wipeBucket(env,'sere-video',UID,f),/storage list 500/);
+});
 test('a missing bucket is skipped, not fatal',async()=>{
   const n=await wipeBucket(env,'nope',UID,async()=>({ok:false,status:404,json:async()=>({})}));
   assert.strictEqual(n,0);

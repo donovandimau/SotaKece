@@ -39,7 +39,8 @@ async function wipeBucket(env,bucket,uid,fetcher){
         const s=await fetcher(`${SOTA_URL}/storage/v1/object/list/${bucket}`,{
           method:'POST',headers:svcHeaders(env,{'Content-Type':'application/json'}),
           body:JSON.stringify({prefix:`${uid}/${o.name}/`,limit:1000,offset:0}),signal:AbortSignal.timeout(10000)});
-        if(s.ok)for(const f of await s.json())if(f&&f.name&&f.id)paths.push(`${uid}/${o.name}/${f.name}`);
+        if(!s.ok)throw Error('storage list '+s.status);
+        for(const f of await s.json())if(f&&f.name&&f.id)paths.push(`${uid}/${o.name}/${f.name}`);
       }
     }
     if(!paths.length)return removed;
@@ -67,9 +68,14 @@ async function handler(req,res){
       method:'POST',headers:{apikey:SOTA_KEY,Authorization:auth,'Content-Type':'application/json'},
       body:'{}',signal:AbortSignal.timeout(15000)});
     if(!r.ok){const t=await r.text();console.error('account-delete rpc',r.status,t.slice(0,200));res.statusCode=502;return res.end(JSON.stringify({error:'could not delete the account'}));}
-    const late=await wipeAll(process.env,uid,fetcher).catch(()=>0);
+    // The profile is gone by now, so a failed late sweep is reported, not hidden:
+    // the page still shows success (the data is deleted) and the leftover files
+    // are logged by member id for support to clear.
+    let late=0,sweep='done';
+    try{late=await wipeAll(process.env,uid,fetcher);}
+    catch(e){sweep='failed';console.error('account-delete late sweep',uid,e&&e.message);}
     res.setHeader('Content-Type','application/json');
-    res.end(JSON.stringify({ok:true,files:files+late}));
+    res.end(JSON.stringify({ok:true,files:files+late,sweep}));
   }catch(e){
     console.error('account-delete',e&&e.message);
     res.statusCode=500;res.end(JSON.stringify({error:'could not delete the account'}));
