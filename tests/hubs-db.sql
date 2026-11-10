@@ -73,6 +73,8 @@ SELECT pg_temp.ok((public.bv_people_to_meet()->0->>'handle')='di' AND (public.bv
 SELECT pg_temp.ok((public.bv_people_to_meet()->1->>'handle')='bo' AND (public.bv_people_to_meet()->1->>'posts')='2','then the member with recent wall posts');
 SELECT pg_temp.ok((public.bv_people_to_meet()->2->>'posts')='0','posts older than 30 days do not count');
 SELECT pg_temp.ok(NOT (public.bv_people_to_meet(12) @> '[{"handle":"cy"}]'),'the caller is never suggested');
+SELECT pg_temp.ok((public.bv_people_to_meet(1)->0->>'handle')='di','with room for one, the hub-mate is the one kept');
+SELECT pg_temp.ok((public.bv_people_to_meet(2)->0->>'handle')='di' AND (public.bv_people_to_meet(2)->1->>'handle')='bo','with room for two, the quiet member is the one dropped');
 SELECT pg_temp.ok(jsonb_array_length(public.bv_people_to_meet(1))=1 AND jsonb_array_length(public.bv_people_to_meet(999))=3,'the limit is honoured and capped');
 RESET ROLE;
 INSERT INTO bulavata.friendships(requester,addressee) VALUES ('33333333-3333-3333-3333-333333333333','44444444-4444-4444-4444-444444444444'),('22222222-2222-2222-2222-222222222222','33333333-3333-3333-3333-333333333333');
