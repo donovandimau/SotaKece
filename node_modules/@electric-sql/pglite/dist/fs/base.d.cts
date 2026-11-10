@@ -1,1 +1,0 @@
-export { B as BaseFilesystem, C as ERRNO_CODES, E as EmscriptenBuiltinFilesystem, G as Filesystem, F as FsStats, H as FsType } from '../interface-ymvJB3xs.cjs';
