@@ -9,6 +9,48 @@ if(!track||typeof track.id!=='string'||!/^[a-z0-9-]{1,80}$/.test(track.id)||ids.
 ids.add(track.id);return {id:track.id,title:track.title.trim(),url:AUDIO_BASE+track.path};
 });
 }
+// Turns a raw upload name ("DJ JORDAN_-_LAUTI AU REMIX #2024") into a clean
+// title and a credit line. Display only: ids, paths and search keep the raw name.
+const ARTIST_FIRST=/^(?:dj\b|(?:beenie man|brenda fassie|cynthia schloss|daniel rae costello|fiji|j boog|lagani rabukawaqa|maoli|marcia griffiths|master kg|natalie raikadroka|rootstrata|sassy|susan cadogan|ub40|vkm)(?=$|\s+(?:ft\.?|feat\.?|x|&)\s))/i;
+const KEEP_CAPS=new Set(['DJ','UB40','VKM','VNT','LC','OG','KG','TNI','FJ','NZ','USA','UK']);
+const YEAR=/(?:^|\s)(?:(?:19|20)\d{2}|2k\d{2})(?=\s|$)/gi;
+function tidyWords(text){
+const words=text.replace(YEAR,' ').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
+const shout=words.length>1&&words.every(w=>!/[a-z]/.test(w));
+return words.map(w=>{
+if(/^dj$/i.test(w))return 'DJ';
+if(/^rmx$/i.test(w))return 'Remix';
+if(/[a-z]/.test(w)||!/[A-Z]/.test(w)||/\d/.test(w)||KEEP_CAPS.has(w))return w;
+if(!shout&&w.length<4)return w;
+return w.charAt(0)+w.slice(1).toLowerCase();
+}).join(' ').replace(/^[\s\-–·,]+|[\s\-–·,]+$/g,'');
+}
+function describe(raw){
+let text=String(raw??'').replace(/\.(?:mp3|m4a|aac|wav|ogg|flac)$/i,'').replace(/_/g,' ').replace(/#/g,' ');
+text=text.replace(/\b(?:[A-Za-z] ){3,}[A-Za-z]\b/g,m=>m.replace(/ /g,''));
+text=text.replace(/^\s*\d{1,2}(?:\s*[.)\-]\s*|\s+)(?=[A-Za-z])/,'').replace(/\bpromo\b/gi,' ');
+const notes=[];
+text=text.replace(/[\[(]([^\])]*)[\])]/g,(_,inner)=>{notes.push(inner);return ' ';});
+let parts=text.split(/\s+[-–]\s+|\s+[-–]$|^[-–]\s+/).map(part=>part.trim()).filter(Boolean);
+if(!parts.length)parts=[text.trim()];
+let title,credit;
+if(parts.length>1&&ARTIST_FIRST.test(parts[0])){credit=parts[0];title=parts[1];notes.unshift(...parts.slice(2));}
+else{title=parts[0];credit=parts[1]||'';notes.unshift(...parts.slice(2));}
+let featured='';
+const guest=title.match(/^(.*?)\s+((?:ft|feat)\.?\s+.+)$/i);
+if(guest&&guest[1].trim()){title=guest[1];featured=guest[2];}
+let version='';
+const trailing=/\s+(?:remix|rmx)$/i;
+if(trailing.test(tidyWords(title))){title=tidyWords(title).replace(trailing,'');version='Remix';}
+title=tidyWords(title);credit=tidyWords([credit,featured].filter(Boolean).join(' '));
+if(trailing.test(' '+credit)&&/^(?:remix|rmx)$/i.test(credit)){credit='';version='Remix';}
+const lines=[];
+for(const note of [credit,...notes]){const clean=tidyWords(note);if(!clean)continue;if(/^(?:remix|rmx)$/i.test(clean)){version='Remix';continue;}if(!lines.some(line=>line.toLowerCase()===clean.toLowerCase()))lines.push(clean);}
+if(version&&!lines.some(line=>/remix|rework|mashup|\bmix\b/i.test(line)))lines.push(version);
+if(!title){title=lines.shift()||String(raw??'').trim();}
+return {title,artist:lines.join(' · ')};
+}
+function tidy(track){const d=describe(track.title);return {...track,rawTitle:track.title,title:d.title||track.title,artist:d.artist};}
 let ext=null,catalogue=[];
 const view=()=>ext?.items?.()||catalogue;
 let dialog=null,audio=null,tracks=[],current=-1,selectedTrack=null,authoritative=false,loading=null,attempt=0,beforePlay=()=>{},focusBefore=null,inlineHost=null,message='Choose a song to start listening.';
@@ -30,7 +72,7 @@ if(!dialog)return;
 title.textContent=selected?selected.title:'Your island soundtrack';status.textContent=message;
 dialog.classList.toggle('is-playing',playing);
 mood.textContent=selected?(playing?'Now playing':'On pause'):'Turn up the island vibes';
-subtitle.textContent=selected?'Track '+(current+1)+' of '+tracks.length+' · Sota Kece':'Pick a song. Find your rhythm.';
+subtitle.textContent=selected?(selected.artist||'Track '+(current+1)+' of '+tracks.length+' · Sota Kece'):'Pick a song. Find your rhythm.';
 play.replaceChildren(el('span',playing?'Ⅱ':'▶','sk-playlist-play-icon'),el('span',playing?'Pause':'Play'));
 play.firstChild.setAttribute('aria-hidden','true');play.disabled=previous.disabled=next.disabled=!tracks.length;
 list.querySelectorAll('[data-track-index]').forEach(b=>{
@@ -58,9 +100,11 @@ function render(){
 list.replaceChildren();const query=filter.value.trim().toLocaleLowerCase();let shown=0;
 const items=view();
 items.forEach((track,index)=>{
-if(query&&!track.title.toLocaleLowerCase().includes(query))return;
-shown++;const row=el('li'),pick=button('',()=>playKey(track.key));pick.dataset.trackIndex=String(index);pick.dataset.trackKey=track.key;pick.setAttribute('aria-label','Play '+track.title);
-const number=el('span',String(index+1).padStart(2,'0'),'sk-playlist-number');number.setAttribute('aria-hidden','true');pick.append(number,el('span',track.title,'sk-playlist-song-name'));row.append(pick);ext?.row?.(track,row);list.append(row);
+if(query&&!(track.rawTitle||track.title).toLocaleLowerCase().includes(query)&&!(track.title+' '+(track.artist||'')).toLocaleLowerCase().includes(query))return;
+shown++;const row=el('li'),pick=button('',()=>playKey(track.key));pick.dataset.trackIndex=String(index);pick.dataset.trackKey=track.key;pick.setAttribute('aria-label','Play '+track.title+(track.artist?', '+track.artist:''));
+const number=el('span',String(index+1).padStart(2,'0'),'sk-playlist-number');number.setAttribute('aria-hidden','true');
+const name=el('span','','sk-playlist-song-name');name.append(el('strong',track.title,'sk-playlist-song-title'));const credit=track.artist||(String(track.key).startsWith('mix:')?'Island Mix':'');if(credit)name.append(el('small',credit,'sk-playlist-song-artist'));
+pick.append(number,name);row.append(pick);ext?.row?.(track,row);list.append(row);
 });
 if(!shown)list.append(el('li',items.length?'No songs match your search.':ext?.empty?.()||'The playlist could not load.'));
 count.textContent=query?shown+' of '+items.length+' songs':items.length+' songs';sync();
@@ -84,7 +128,7 @@ loading=(async()=>{
 try{
 const result=await readCatalogue();
 const selectedId=(tracks[current]||selectedTrack)?.id;
-catalogue=result.tracks.map(t=>({...t,key:'mix:'+t.id}));
+catalogue=result.tracks.map(t=>({...tidy(t),key:'mix:'+t.id}));
 if(!selectedTrack||selectedTrack.key?.startsWith('mix:')){tracks=catalogue.slice();current=selectedId?tracks.findIndex(track=>track.id===selectedId):-1;if(current>=0)selectedTrack=tracks[current];}
 message=result.stale?'Saved playlist · Connection unavailable. Music needs an internet connection.':selectedTrack?(live()?'Playing · ':'Paused · ')+selectedTrack.title:'Choose a song to start listening.';
 retry.hidden=!result.stale;render();ext?.loaded?.();
@@ -117,7 +161,7 @@ const extras=el('div','','sk-lib-host');
 dialog.append(head,hero,audio,transport,visuals,status,retry,extras,search,queue,list);root.document.body.append(dialog);
 const docHead=root.document.head;
 if(root.SotaMusicLibrary)extend(root.SotaMusicLibrary);
-else if(docHead){const s=el('script');s.src='/music-library.js?v=20261104-player-polish-3';s.async=true;docHead.append(s);}
+else if(docHead){const s=el('script');s.src='/music-library.js?v=20261110-music-tidy-1';s.async=true;docHead.append(s);}
 audio.addEventListener('play',()=>{
 root.SotaPlayback?.activate('playlist',audio);
 beforePlay();root.document.querySelectorAll('audio').forEach(other=>{if(other!==audio)other.pause();});
@@ -192,6 +236,6 @@ b.dataset.playlistBound='true';b.setAttribute('aria-haspopup','dialog');b.setAtt
 // Shared song / music links open the player; the add-on picks the song.
 if(root.location&&/[?&](?:song|music)=/.test(root.location.search||''))root.addEventListener?.('load',()=>root.setTimeout(open,600),{once:true});
 if(root.document)root.document.addEventListener('play',event=>{if(event.target.tagName==='AUDIO'&&event.target!==audio)pause();},true);
-return {validateCatalog,mount,open,pause,extend,showInline,hideInline,prepareVisual,detachInline:hideInline,isInline:()=>!!inlineHost&&!!dialog?.open&&inlineHost.isConnected};
+return {validateCatalog,describe,mount,open,pause,extend,showInline,hideInline,prepareVisual,detachInline:hideInline,isInline:()=>!!inlineHost&&!!dialog?.open&&inlineHost.isConnected};
 });
 

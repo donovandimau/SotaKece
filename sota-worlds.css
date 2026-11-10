@@ -480,5 +480,44 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
 .sx-world-more[open]>summary::after{content:'–'}
 .sx-world-more>summary span{text-decoration:underline;text-underline-offset:4px}
 .sx-world-more>summary:focus-visible{outline:3px solid currentColor;outline-offset:2px;border-radius:8px}
-/* Signed-in phones: the bottom bar already goes to these places, so the big cards stay off the page. */
-@media(max-width:760px){.sx-world-next.sx-world-next-member{display:none}}
+
+/* Music page tidy (10 Nov 2026): compact hero, no tab bar, track list beside the player. */
+#app.sx-app .sx-world-hero.sx-world-hero-compact{min-height:124px;grid-template-columns:minmax(0,1.6fr) minmax(0,.55fr)}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-copy{padding:16px 28px;justify-content:center}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-copy:before{display:none}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-copy h1{font-size:30px!important;max-width:none!important;margin:6px 0 0}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-copy>p{margin:8px 0 0;font-size:13px}
+#app.sx-app .sx-world-hero-compact .sx-world-actions:empty{display:none}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-photo{position:relative;height:auto;min-height:0;overflow:hidden}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+#app.sx-app .sx-world-hero-compact .sx-world-hero-photo>span{display:none}
+#app.sx-app #sota-music-home .sota-music-view-tabs[hidden]{display:none!important}
+html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline[open]{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);grid-template-rows:auto auto 1fr;align-items:start}
+#app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playlist-head{padding-bottom:10px!important;margin-bottom:0!important}
+#app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playlist-head h2{font-size:22px!important;margin:2px 0 0!important}
+#app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-now{grid-column:1;grid-row:2}
+#app.sx-app #sk-music-playlist.sk-playlist-inline .sx-music-visuals{grid-column:1;grid-row:3}
+#app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-library{grid-column:2;grid-row:2/span 2;padding:18px 0 4px;gap:12px;align-self:stretch}
+#app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-library>*{margin:0 18px;width:auto}
+html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playlist-songs{flex:1 1 0;min-height:430px;max-height:none!important;margin:0 6px 0 18px}
+#app.sx-app #sk-music-playlist .sk-playlist-number{display:none}
+#app.sx-app #sk-music-playlist .sk-playlist-song-name{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+#app.sx-app #sk-music-playlist .sk-playlist-song-title{font:800 14px/1.25 Nunito,system-ui,sans-serif;color:#2f1b3f;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app.sx-app #sk-music-playlist .sk-playlist-song-artist{font:600 12px/1.3 Nunito,system-ui,sans-serif;color:#6d5a7b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#app.sx-app .sx-player-sere{align-self:flex-start;min-height:44px;padding:10px 16px;border:1px solid #cbb0e6;border-radius:999px;background:#fff;color:#4b2a66;font:800 13px Nunito,system-ui,sans-serif;cursor:pointer}
+#app.sx-app .sx-player-sere:hover{background:#f6ecff}
+#app.sx-app .sx-player-sere:focus-visible{outline:3px solid var(--world-accent,#6d34c9);outline-offset:2px}
+@media(max-width:1100px){
+ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline[open]{grid-template-columns:minmax(0,1fr);grid-template-rows:none}
+ #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-now{grid-row:auto}
+ #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-library{grid-column:1!important;grid-row:auto;order:2}
+ #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-music-visuals{grid-row:auto;order:3}
+ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playlist-songs{flex:none;min-height:0;max-height:420px!important}
+}
+@media(max-width:760px){
+ #app.sx-app .sx-world-hero.sx-world-hero-compact{grid-template-columns:minmax(0,1fr)}
+ #app.sx-app .sx-world-hero-compact .sx-world-hero-photo{display:none}
+ #app.sx-app .sx-world-hero-compact .sx-world-hero-copy{padding:16px 18px}
+ #app.sx-app .sx-world-hero-compact .sx-world-hero-copy h1{font-size:24px!important}
+}
+@media(forced-colors:active){#app.sx-app .sx-player-sere{background:ButtonFace;color:ButtonText;border-color:ButtonText}}
