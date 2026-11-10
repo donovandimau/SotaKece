@@ -164,7 +164,7 @@ test('index.html loads the hubs, stands the card in for an empty Top Mates panel
   assert.match(css,/\.sota-social-host\.sota-social-no-mates \[data-social-panel="mates"\]\{display:none\}/);
   assert.match(html,/window\.SotaHubs\?\.reset\(\);S\.user=null/,'sign-out forgets the last member\'s hubs');
   assert.match(sw,/'\/sota-hubs\.js','\/sota-hubs\.css'/);
-  assert.equal((html.match(/sota-kece-shell-20261110-v169-home-feed/g)||[]).length,1);
+  assert.equal((html.match(/sota-kece-shell-20261110-v170-share-engine/g)||[]).length,1);
 });
 
 // ---------------------------------------------------------------- public listen pages

@@ -317,10 +317,10 @@
   function back() { return '<button type="button" class="sp-link" data-sp="view" data-view="moments">‹ Back to Moments</button>'; }
 
   /* ---------------------------------------------------------------- activity (notifications) */
-  var ACT_WORDS = { reaction: 'reacted to your', reply: 'replied to your', mention: 'mentioned you in a', friend_request: 'wants to be friends',
+  var ACT_WORDS = { joined: 'joined Sota Kece through your link', reaction: 'reacted to your', reply: 'replied to your', mention: 'mentioned you in a', friend_request: 'wants to be friends',
     friend_accepted: 'accepted your friend request', wall: 'scrawled on your wall', rsvp: 'answered your event' };
   var ACT_ICON = { reaction: '👋', reply: '💬', mention: '＠', friend_request: '🤝', friend_accepted: '✅', wall: '🖊️', rsvp: '📅' };
-  var ACT_TARGET = { moment: 'moment', pulse: 'pulse', wall: 'wall scrawl', comment: 'reply', story: 'story', event: 'event', friendship: '' };
+  var ACT_TARGET = { profile: '', moment: 'moment', pulse: 'pulse', wall: 'wall scrawl', comment: 'reply', story: 'story', event: 'event', friendship: '' };
   function actLine(n) {
     var sn = n.snippet || '', pre = '', text = sn, i = sn.indexOf('|');
     if ((n.kind === 'reaction' || n.kind === 'rsvp') && i >= 0) { pre = sn.slice(0, i); text = sn.slice(i + 1); }

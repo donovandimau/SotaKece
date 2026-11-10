@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  var MAX = 280, PAGE = 20, PREFETCH_PX = 900, DEFAULT_MODE = 'latest', CHANNEL = 'talanoa-wall';
+  var MAX = 280, PAGE = 20, PREFETCH_PX = 900, DEFAULT_MODE = 'latest', CHANNEL = 'talanoa-wall', SITE = 'https://sotakece.com';
   var SAY = {
     NOT_SIGNED_IN: 'Sign in first.', EMPTY: 'Write something first.', TOO_LONG: 'Keep it under 280 characters.',
     GONE: 'That post is gone.', NOT_YOURS: 'That is not yours to remove.'
@@ -462,14 +462,35 @@
       toast(say(e));
     }
   }
+  /* The words that travel with a shared post: the first line, then who said it. */
+  function shareText(p) {
+    var name = (p && (p.display_name || p.handle)) || 'Someone', body = String((p && p.body) || '').replace(/\s+/g, ' ').trim();
+    if (body.length > 90) body = body.slice(0, 89).trimEnd() + '…';
+    return (body ? '\u201c' + body + '\u201d \u2014 ' : '') + name + ' on Sota Kece';
+  }
   async function share(id) {
     var p = findPost(id), url = shareUrl(id), text = p ? p.body : 'On the Talanoa Wall';
     // A singing photo shared by the member who made it goes out as a public page that plays without
     // an account (made for WhatsApp family chats and Facebook groups). Only the maker can get that
     // link; everyone else shares the in-app link as before.
+    var publicLink = false;
     if (p && p.mine && p.sere && window.SotaSere && window.SotaSere.shareLink) {
       var pub = await window.SotaSere.shareLink(p.sere.id);
-      if (pub) { url = pub; text = (p.body ? p.body + ' ' : '') + '🎤 Tap to watch my singing photo'; }
+      if (pub) { url = pub; text = (p.body ? p.body + ' ' : '') + '🎤 Tap to watch my singing photo'; publicLink = true; }
+    }
+    // Every other post leaves the app as a public page, /p/<post>/<token>, that reads without an
+    // account. The token is minted for this member, so opens and sign-ups through the link come back
+    // to them in Activity. If minting fails the in-app link still works for members.
+    if (!publicLink && p && S && S.user) {
+      try {
+        var mint = await rpc('bv_talanoa_share', { p_id: Number(id) });
+        if (mint && mint.path) { url = SITE + mint.path; text = shareText(p); }
+      } catch (_) {}
+    }
+    // The app's own sheet: native share on phones, WhatsApp first everywhere else.
+    if (window.SotaShare && typeof window.SotaShare.share === 'function') {
+      try { await window.SotaShare.share({ url: url, title: 'Sota Kece', text: text }); } catch (_) {}
+      return;
     }
     try {
       if (navigator.share) { await navigator.share({ title: 'Sota Kece', text: text, url: url }); return; }
@@ -629,7 +650,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    cleanShare: cleanShare, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, shareText: shareText, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261110-v169-home-feed">
+<meta name="sota-release" content="sota-kece-shell-20261110-v170-share-engine">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -370,6 +370,7 @@ async function signUp(){
   }
   const {error:pe} = await sb.from("bv_profiles").insert({id:data.user.id,handle,display_name:name,age_band:band,...initialSkin()});
   if(pe){ err.textContent=pe.message; b.disabled=false; return; }
+  await claimReferral();
   boot();
 }
 
@@ -1048,6 +1049,7 @@ async function render(){
 }
 async function boot(){
   if(typeof location==='object'&&location.hash==="#connections=example")return window.SotaConnections.preview();
+  rememberReferral();
   const run=typeof viewRun==='function'?viewRun():null,stillHere=()=>!run||currentView(run);
   const personal=typeof location==='object'&&location.hash==='#connections=mine';
   const circleRoute=typeof location==='object'&&/^#(?:circle-invite|circle-graph|friends-graph)=/.test(location.hash);
@@ -1091,6 +1093,29 @@ async function boot(){
   }else {const destination=typeof location==='object'&&location.hash?window.SotaWorlds?.memberRouteFromHash(location.hash):null;if(destination)S.tab=destination;await render();if(typeof location==='object'&&location.hash==='#skins')window.BulaSkinStudio?.open(null,'All');}
   await window.SotaCircles?.resumeDraft?.();
 }
+/* Share engine: a link from a shared post carries ?ref=<token>. Keep it on this device (30 days) and
+   clean the address; the hash that opens the post stays. The token is only ever sent back once, by
+   claimReferral, right after this person creates their room. */
+const REF_KEY='sota-ref',REF_TTL=30*86400000;
+function rememberReferral(){
+  try{
+    const q=new URLSearchParams(location.search),ref=(q.get('ref')||'').toLowerCase();
+    if(!/^[a-f0-9]{32}$/.test(ref))return false;
+    try{localStorage.setItem(REF_KEY,JSON.stringify({token:ref,at:Date.now()}));}catch(_){}
+    q.delete('ref');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash);
+    return true;
+  }catch(_){return false;}
+}
+async function claimReferral(){
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(REF_KEY)||'null');}catch(_){}
+  try{localStorage.removeItem(REF_KEY);}catch(_){}
+  if(!saved||!/^[a-f0-9]{32}$/.test(saved.token||'')||!(Date.now()-saved.at<REF_TTL))return null;
+  try{
+    const {data}=await sb.rpc('bv_referral_claim',{p_token:saved.token});
+    if(data&&data.claimed&&data.sharer)toast('@'+data.sharer+' brought you here. Say bula.');
+    return data||null;
+  }catch(_){return null;}
+}
 function restoreMemberPage(){if(!S.user||!S.me)return;const destination=window.SotaWorlds?.memberRouteFromHash(location.hash);if(destination&&destination!==S.tab)go(destination,{history:false});}
 /* Signed in, but no room yet. Never sign them out - let them finish. */
 function finishRoom(){
@@ -1124,6 +1149,7 @@ function finishRoom(){
       age_band:bandFor(year),...initialSkin()});
     if(error){ err.textContent=error.message; b.disabled=false; return; }
     try{ localStorage.removeItem("bv_pending"); }catch(_){}
+    await claimReferral();
     boot();
   };
   app.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#f-go").click()}));
@@ -1160,7 +1186,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/connections.js?v=20261026-spatial-life-1"></script>
 <script src="/icon-controls.js?v=20261109-fast-paint-1"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261106-security-1"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-home-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261110-share-engine-1"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-share-engine-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaSere?.init({client:sb,state:S,toast,esc,go});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script>
 <script src="/bula-welcome.js?v=20261030" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
 <script src="/bula-top-20261030.js?v=20261110-pill-row-1" defer></script>
