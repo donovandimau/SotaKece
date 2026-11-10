@@ -1,3 +1,15 @@
+## 10 November 2026 — Largest paint, second pass (Ops task 1037)
+
+Release `sota-kece-shell-20261110-v162-lcp`. Real visitors on 10 November: largest paint p75 3.77s over 32 samples (target 2.5s), layout shift fine. Task 1020 already preloads the veranda guitar photo; what was still slow:
+
+- **Too many bytes ahead of the first paint.** Phones and 2x screens downloaded the 1536px photo (218 KB) for a 304–412px slot. A new `friends-guitar-clean-1024.webp` (127 KB) sits in the `srcset` and the preload, so those screens now take the 1024px file; it is still sharper than the screen can show. `music-playlist.css` carried the woven mat as a 57 KB base64 picture inside a render-blocking stylesheet; it is now `/assets/music-weave-20261110.webp`, loaded only when the player opens (and saved for offline use once used).
+- **A hidden 3D graph did its WebGL set-up and a full-page layout read while the welcome was being drawn.** `life-graph3d.js` now starts WebGL only when the graph comes near the screen (IntersectionObserver); without IntersectionObserver it starts at once as before. `revised/live/life-graph3d.js` kept identical.
+- **2.3 MB of pictures nobody sees on Home were downloaded during the first seconds** (fetched while the old welcome is drawn and swapped). The 1.16 MB tiled blue pattern (shown at 420px) is now a 1260px WebP (375 KB) and the 695 KB mobile reference picture is a WebP (446 KB), same size and look. Old files are kept for cached copies.
+
+Lab, 3-run medians, local static server: phone 390px (4x CPU, 1.6 Mbps, 150 ms) largest paint 5.6–5.7s → 4.7s, first paint 2.5s → 2.4s, layout shift 0.003 unchanged; desktop 1440px 0.77s → 0.69s. Full-page screenshots before/after at 390@3x, 1440@1x and 1440@2x match except a few dozen pixels of photo resampling (random bubbles and the Bula pill masked). All node tests pass (364 pass, 271 skipped, 0 fail).
+
+Found, not changed: the Bula pill sometimes lands in the header and sometimes floats bottom-left on the same build (seen on main before this change). Still slow: the page is drawn by JavaScript after about 50 scripts and 40 stylesheets load, so on slow phones the photo waits for them; the real fix is to draw the guest welcome before the feature scripts.
+
 ## 10 November 2026 — Navigation tidy: one primary nav per viewport
 
 Release `sota-kece-shell-20261110-v160-legal`. The owner's review of the live desktop (1440×900) and phone (390×844) views found three navigation systems showing at once, fixed widgets sitting over content on phones, and the composer pushed under the fold. What changed, and where:
