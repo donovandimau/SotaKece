@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261110-v177-share-engine">
+<meta name="sota-release" content="sota-kece-shell-20261110-v178-coins">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -29,7 +29,7 @@
 <style>@layer dimau-premium-shell;.social-signin{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:rgba(255,255,255,.85)}
 .social-or{text-align:center;margin-top:2px}
-</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1024.webp 1024w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261110-voice-2"><link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-2"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
+</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1024.webp 1024w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261110-voice-2"><link rel="stylesheet" href="/sota-coins.css?v=20261110-coins-1"><link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-2"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
 <link rel="shortcut icon" href="/favicon-20261027g.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/sota-favicon-32-20261027g.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/sota-apple-touch-icon-20261027g.png">
@@ -433,6 +433,7 @@ async function viewWallet(){
     <div class="empty"><em>💰</em>Your wallet opens together with your room. Pull the page again in a moment.</div></div>`);
   const left = Math.max(0,(w.daily_limit_minor||0)-(w.spent_today_minor||0));
   const tx = w.transactions||[];
+  const coins = await (window.SotaCoins?window.SotaCoins.load(true).catch(()=>null):null);
   shell(`
   <div class="grid two"><div class="stack">
     <div class="glass card">
@@ -444,6 +445,7 @@ async function viewWallet(){
       </div>
       <div class="sub" id="w-pay-note" style="margin-top:8px"></div>
     </div>
+    ${window.SotaCoins?.walletCards(coins)||''}
     <div class="glass card">
       <h3>Send to a mate</h3>
       <div class="sub" style="margin-bottom:10px">Straight into their wallet. Nothing leaves until you press send.</div>
@@ -748,7 +750,7 @@ function installAuthLifecycle(){
     if(event!=='SIGNED_OUT'&&next===previous){owner=next;return;}
     owner=next;const revision=++change;
     viewRun();
-    window.SotaHubs?.reset();S.user=null;S.me=null;S.friends=[];S.pending=[];S.wallet=null;S.crew=null;S.roomHandle=null;S.tab='pulse';S.luv=0;S.metaErrors={};S.sendingMessage=false;
+    window.SotaCoins?.reset();window.SotaHubs?.reset();S.user=null;S.me=null;S.friends=[];S.pending=[];S.wallet=null;S.crew=null;S.roomHandle=null;S.tab='pulse';S.luv=0;S.metaErrors={};S.sendingMessage=false;
     window.SotaSpaceDesign?.apply();
     S.searchRevision=(S.searchRevision||0)+1;
     window.SotaCircles?.stop();window.SotaConnections?.stop();window.SotaKavaUI?.stop();window.SotaRoomSocial?.stop();window.SotaRoomSocialLayout?.stop();window.BulaSkinStudio?.closeForOwnerChange?.();
@@ -1050,6 +1052,7 @@ async function render(){
 async function boot(){
   if(typeof location==='object'&&location.hash==="#connections=example")return window.SotaConnections.preview();
   rememberReferral();
+  window.SotaCoins?.init({client:sb,state:S,toast,esc,fjd,ago,go:(t,o)=>go(t,o)});
   const run=typeof viewRun==='function'?viewRun():null,stillHere=()=>!run||currentView(run);
   const personal=typeof location==='object'&&location.hash==='#connections=mine';
   const circleRoute=typeof location==='object'&&/^#(?:circle-invite|circle-graph|friends-graph)=/.test(location.hash);
@@ -1186,7 +1189,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/connections.js?v=20261026-spatial-life-1"></script>
 <script src="/icon-controls.js?v=20261109-fast-paint-1"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261110-share-engine-2"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-share-engine-2"></script><script src="/sota-live.js?v=20261110-live-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261110-coins-2"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-coins-2"></script><script src="/sota-coins.js?v=20261110-coins-1"></script><script src="/sota-live.js?v=20261110-live-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaLive?.init({client:sb,state:S,app,go:t=>go(t),openKoro:id=>{S.tab='crews';S.crew=id;history.pushState({sotaView:'crews'},'','#view=crews');render();}});window.SotaStudio?.init({getPage:()=>S.user?S.tab:null,go:t=>go(t),rerender:()=>render(),isOwnRoom:()=>!!S.user&&!!S.me&&S.tab==='room'&&(!S.roomHandle||S.roomHandle===S.me.handle)});window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaSere?.init({client:sb,state:S,toast,esc,go});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script>
 <script src="/bula-welcome.js?v=20261030" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
 <script src="/bula-top-20261030.js?v=20261110-pill-row-1" defer></script>
