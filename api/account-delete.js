@@ -1,7 +1,7 @@
 // POST /api/account-delete — the signed-in member deletes their own account.
 // Order matters: files first through the storage API (so the bytes go, not
-// just the rows), then bv_account_delete() as the member (profile, cascades,
-// auth user), then a second file sweep to catch an upload that raced the
+// just the rows), then bv_account_delete() as the member (profile and its
+// cascades — the shared Dimau login is kept), then a second file sweep to catch an upload that raced the
 // delete. Needs SOTA_SERVICE_KEY (same as /api/sere).
 'use strict';
 const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';

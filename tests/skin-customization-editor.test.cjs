@@ -214,7 +214,7 @@ editorTest('custom CSS budget failure leaves the new design editable and sends n
   h.input('#d-css','.card{color:red}');h.get('#bv-save').click();await tick();
   assert.equal(h.calls.writes.length,1,'Shortening only CSS allows the same design to retry');
   assert.equal(h.skins.read(h.calls.writes[0].patch.room_css).settings.customName,'🌺'.repeat(20));
-  assert.match(h.get('#bv-studio-error').textContent,/No response configured/);assert.equal(h.get('#bv-cover-upload').disabled,true);h.clean();
+  assert.match(h.get('#bv-studio-error').textContent,/No response configured/);assert.equal(h.get('#bv-cover-upload').disabled,false);h.clean();
 });
 
 editorTest('incomplete setup and account changes cannot save a creator draft to another profile',async t=>{

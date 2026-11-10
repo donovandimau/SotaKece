@@ -63,6 +63,7 @@ CREATE TABLE public.bv_circle_comments (id bigint GENERATED ALWAYS AS IDENTITY P
 INSERT INTO auth.users VALUES ('11111111-1111-1111-1111-111111111111','ana@x'),('22222222-2222-2222-2222-222222222222','bo@x'),('33333333-3333-3333-3333-333333333333','cy@x');
 `);
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109240000_sota_account_delete.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261110010000_sota_account_delete_sota_only.sql'),'utf8'));
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109220000_sota_sere_engines.sql'),'utf8'));
   const results=await db.exec(fs.readFileSync(path.join(root,'tests/sere-db.sql'),'utf8'));
   const checks=results.flatMap(r=>r.rows||[]).flatMap(row=>Object.values(row)).filter(v=>typeof v==='string'&&v.startsWith('PASS '));
