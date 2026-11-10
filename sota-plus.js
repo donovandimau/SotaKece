@@ -317,16 +317,17 @@
   function back() { return '<button type="button" class="sp-link" data-sp="view" data-view="moments">‹ Back to Moments</button>'; }
 
   /* ---------------------------------------------------------------- activity (notifications) */
-  var ACT_WORDS = { joined: 'joined Sota Kece through your link', reaction: 'reacted to your', reply: 'replied to your', mention: 'mentioned you in a', friend_request: 'wants to be friends',
+  var ACT_WORDS = { joined: 'joined Sota Kece through your link', tip: 'tipped your', reaction: 'reacted to your', reply: 'replied to your', mention: 'mentioned you in a', friend_request: 'wants to be friends',
     friend_accepted: 'accepted your friend request', wall: 'scrawled on your wall', rsvp: 'answered your event' };
   var ACT_ICON = { reaction: '👋', reply: '💬', mention: '＠', friend_request: '🤝', friend_accepted: '✅', wall: '🖊️', rsvp: '📅' };
-  var ACT_TARGET = { profile: '', moment: 'moment', pulse: 'pulse', wall: 'wall scrawl', comment: 'reply', story: 'story', event: 'event', friendship: '' };
+  var ACT_TARGET = { profile: '', post: 'post', moment: 'moment', pulse: 'pulse', wall: 'wall scrawl', comment: 'reply', story: 'story', event: 'event', friendship: '' };
   function actLine(n) {
     var sn = n.snippet || '', pre = '', text = sn, i = sn.indexOf('|');
-    if ((n.kind === 'reaction' || n.kind === 'rsvp') && i >= 0) { pre = sn.slice(0, i); text = sn.slice(i + 1); }
+    if ((n.kind === 'reaction' || n.kind === 'rsvp' || n.kind === 'tip') && i >= 0) { pre = sn.slice(0, i); text = sn.slice(i + 1); }
     var verb = ACT_WORDS[n.kind] || n.kind, what = ACT_TARGET[n.target_kind] || '';
     if (n.kind === 'reaction') verb = (RX[pre] ? RX[pre].icon + ' ' : '') + verb;
     if (n.kind === 'rsvp') verb = ({ going: '✅ is going to', maybe: '🤔 might come to', no: '❌ can\'t make' })[pre] || verb;
+    if (n.kind === 'tip') verb = '🪙 ' + (Number(pre) || 0) + ' coins, ' + verb;
     return '<span class="name">@' + esc(n.handle || '') + '</span> ' + esc(verb) + (what ? ' ' + esc(what) : '') +
       (text ? ' <span class="sub">“' + esc(text.length > 70 ? text.slice(0, 70) + '…' : text) + '”</span>' : '');
   }
