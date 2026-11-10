@@ -113,5 +113,26 @@ SELECT pg_temp.ok((SELECT count(*) FROM bulavata.talanoa_posts WHERE body='Vude 
 RESET ROLE;
 SELECT pg_temp.ok((SELECT count(*) FROM bulavata.gifts WHERE sere_id IS NOT NULL)=0,'the tip no longer points at the sere');
 SELECT pg_temp.ok((SELECT count(*) FROM bulavata.gifts)=1,'the gift itself is kept');
+-- account deletion: Cy deletes himself; everything of his goes, nobody else's does
+RESET ROLE;
+INSERT INTO public.bv_circles(host,name) VALUES ('33333333-3333-3333-3333-333333333333','Cy circle'),('11111111-1111-1111-1111-111111111111','Ana circle');
+INSERT INTO public.bv_circle_people(circle,member) SELECT id,'33333333-3333-3333-3333-333333333333' FROM public.bv_circles WHERE name='Ana circle';
+INSERT INTO public.bv_circle_comments(circle,author,body) SELECT id,'33333333-3333-3333-3333-333333333333','hi' FROM public.bv_circles WHERE name='Ana circle';
+INSERT INTO storage.objects(bucket_id,name,owner_id) VALUES ('sere-video','33333333-3333-3333-3333-333333333333/x/v.mp4','33333333-3333-3333-3333-333333333333'),('sere-video','11111111-1111-1111-1111-111111111111/y/v.mp4','11111111-1111-1111-1111-111111111111');
+SELECT set_config('request.jwt.claim.sub','',false);
+SET ROLE authenticated;
+SELECT pg_temp.fails($$SELECT public.bv_account_delete()$$,'not signed in','deletion needs a signed-in member');
+RESET ROLE;
+SET ROLE anon;
+SELECT pg_temp.fails($$SELECT public.bv_account_delete()$$,'42501','anon cannot call account deletion');
+RESET ROLE;
+SELECT pg_temp.as_member('cy');
+SELECT public.bv_account_delete();
+RESET ROLE;
+SELECT pg_temp.ok((SELECT count(*) FROM auth.users WHERE id='33333333-3333-3333-3333-333333333333')=1,'the shared Dimau login is kept');
+SELECT pg_temp.ok((SELECT count(*) FROM bulavata.profiles WHERE id='33333333-3333-3333-3333-333333333333')=0,'profile removed');
+SELECT pg_temp.ok((SELECT count(*) FROM public.bv_circles)=1 AND (SELECT count(*) FROM public.bv_circle_people)=0 AND (SELECT count(*) FROM public.bv_circle_comments)=0,'his circle, memberships and comments removed');
+SELECT pg_temp.ok((SELECT count(*) FROM storage.objects)=2,'file rows are left to the storage API, not deleted in SQL');
+SELECT pg_temp.ok((SELECT count(*) FROM auth.users)=3 AND (SELECT count(*) FROM bulavata.profiles)=2,'other members untouched');
 SELECT 'PASS suite completed';
 ROLLBACK;

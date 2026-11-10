@@ -52,6 +52,18 @@ ORDER BY name;
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109200000_sota_sere.sql'),'utf8'));
   assert.deepEqual((await db.query(snapshot)).rows,before,'Existing tables keep their grants and row security');
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109210000_sota_sere_service_grants.sql'),'utf8'));
+  // Account deletion (20261109240000): stubs for the Supabase tables it touches.
+  await db.exec(String.raw`
+CREATE TABLE auth.users (id uuid PRIMARY KEY, email text);
+CREATE SCHEMA storage;
+CREATE TABLE storage.objects (id uuid DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id text, name text, owner uuid, owner_id text);
+CREATE TABLE public.bv_circles (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, host uuid NOT NULL REFERENCES bulavata.profiles(id), name text);
+CREATE TABLE public.bv_circle_people (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, circle bigint REFERENCES public.bv_circles(id) ON DELETE CASCADE, member uuid NOT NULL REFERENCES bulavata.profiles(id));
+CREATE TABLE public.bv_circle_comments (id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY, circle bigint REFERENCES public.bv_circles(id) ON DELETE CASCADE, author uuid NOT NULL REFERENCES bulavata.profiles(id), body text);
+INSERT INTO auth.users VALUES ('11111111-1111-1111-1111-111111111111','ana@x'),('22222222-2222-2222-2222-222222222222','bo@x'),('33333333-3333-3333-3333-333333333333','cy@x');
+`);
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109240000_sota_account_delete.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261110010000_sota_account_delete_sota_only.sql'),'utf8'));
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109220000_sota_sere_engines.sql'),'utf8'));
   const results=await db.exec(fs.readFileSync(path.join(root,'tests/sere-db.sql'),'utf8'));
   const checks=results.flatMap(r=>r.rows||[]).flatMap(row=>Object.values(row)).filter(v=>typeof v==='string'&&v.startsWith('PASS '));
