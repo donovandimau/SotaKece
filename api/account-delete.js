@@ -7,7 +7,7 @@
 const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
 const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos'];
+const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice'];
 
 function svcHeaders(env,extra){
   const key=String(env.SOTA_SERVICE_KEY||'');

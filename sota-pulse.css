@@ -135,3 +135,18 @@
 .tw-moment-copy>span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 @media(forced-colors:active){.tw-quick-act,.tw-moment,.tw-track-link{border:1px solid ButtonText}}
 #app .tw-moments h2{font-size:15px!important;line-height:1.3!important;margin:0!important;letter-spacing:0}
+
+/* Voice notes and the playable song card inside a post (10 Nov 2026). */
+.tw-voice{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid var(--line-hard,var(--line));border-radius:14px;background:var(--shell)}
+.tw-voice[hidden]{display:none}
+.tw-voice audio,.tw-voice-note audio{width:100%;height:40px}
+.tw-voice-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tw-voice-time{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.tw-voice-dot{width:10px;height:10px;border-radius:50%;background:#d6336c;animation:tw-voice-pulse 1s ease-in-out infinite}
+@keyframes tw-voice-pulse{50%{opacity:.25}}
+.tw-voice-open.tw-btn{min-width:44px;min-height:44px}
+.tw-voice-note{display:flex;flex-direction:column;gap:6px;margin:8px 0 2px;padding:10px 12px;border:1px solid var(--line-hard,var(--line));border-radius:14px;background:var(--shell)}
+.tw-voice-meta{font-size:12px;font-weight:700;opacity:.85}
+.tw-body .tw-track{margin:6px 0 2px;padding:8px 10px;border:1px solid var(--line-hard,var(--line));border-radius:14px;background:var(--shell)}
+@media(prefers-reduced-motion:reduce){.tw-voice-dot{animation:none}}
+@media(forced-colors:active){.tw-voice,.tw-voice-note,.tw-body .tw-track{border:1px solid CanvasText}.tw-voice-dot{background:Highlight}}
