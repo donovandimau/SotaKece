@@ -25,3 +25,4 @@ jobs:
       - run: node tests/run-talanoa-db.cjs
       - run: node tests/run-talanoa-wall-db.cjs
       - run: node tests/run-hubs-db.cjs
+      - run: node tests/run-talanoa-voice-db.cjs
