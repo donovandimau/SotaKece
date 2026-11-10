@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261110-v164-first-paint">
+<meta name="sota-release" content="sota-kece-shell-20261110-v165-viti-pulse">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -29,7 +29,7 @@
 <style>@layer dimau-premium-shell;.social-signin{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:rgba(255,255,255,.85)}
 .social-or{text-align:center;margin-top:2px}
-</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1024.webp 1024w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261109-labels-1"><link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-2"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
+</style><link rel="preload" as="image" href="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" imagesrcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1024.webp 1024w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" imagesizes="(max-width:760px) calc(100vw - 72px), 440px" fetchpriority="high"><link rel="stylesheet" href="/dimau-header-standard.css?v=20261029-header-v4"><link rel="stylesheet" href="/dimau-premium-shell.css?v=20261109-shell-1"><link rel="stylesheet" href="/native-header.css?v=20261029-header-v4"><link rel="stylesheet" href="/sota-plus.css?v=20261031-activity-1"><link rel="stylesheet" href="/sota-pulse.css?v=20261110-viti-1"><link rel="stylesheet" href="/sere-maker.css?v=20261109-sere-2"><link rel="stylesheet" href="/sota-wellbeing.css?v=20261102-1"><script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script><style>@layer dimau-premium,dimau-history-lighting;</style>
 <link rel="shortcut icon" href="/favicon-20261027g.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/sota-favicon-32-20261027g.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/sota-apple-touch-icon-20261027g.png">
@@ -515,7 +515,7 @@ async function walletSend(){
    daily Spark and hands it to the wall as a card so the two load side by side, not in a queue. */
 async function viewPulse(){
   if(!window.SotaPulse){viewError('the Pulse','viewPulse()');return;}
-  window.SotaPulse.init({client:sb,state:S,toast,esc,ago,openRoom,shell,spark:sparkCard});
+  window.SotaPulse.init({client:sb,state:S,toast,esc,ago,openRoom,shell,spark:sparkCard,go:t=>go(t)});
   await window.SotaPulse.view();
   mountPulseSocial();
 }
@@ -547,6 +547,19 @@ function mountPulseSocial(){
   const heading=view.querySelector(".sx-home-listen")||view.querySelector(".sx-member-world-heading");
   if(heading)heading.insertAdjacentHTML("afterend",window.SotaRoomSocial?.markup()||"");else view.insertAdjacentHTML("afterbegin",window.SotaRoomSocial?.markup()||"");
   window.SotaRoomSocial?.mount(view);
+  // New members meet people straight under the wall, not at the foot of the page.
+  if(window.SotaHubs)mountHubs(view.querySelector(':scope > .tw-wrap')||view.querySelector('.sota-social-host'),'mates');
+}
+/* Starter Koro and people to meet (sota-hubs.js). On Home it takes the place of the empty Top Mates
+   panel while the member has no accepted friends; if the database is not ready the panel comes back. */
+function mountHubs(anchor,context){
+  if(!window.SotaHubs||!S.user||!S.me||!anchor||(context==='mates'&&(S.friends.length||S.metaErrors?.friends)))return;
+  window.SotaHubs.init({client:sb,state:S,toast,esc,openRoom,openKoro:id=>{if(!id)return go('crews');S.tab='crews';S.crew=id;history.pushState({sotaView:'crews'},'','#view=crews');render();}});
+  anchor.insertAdjacentHTML('afterend',window.SotaHubs.html(context));
+  const host=context==='mates'?$('#view .sota-social-host'):null;
+  host?.classList.add('sota-social-no-mates');
+  anchor.nextElementSibling.addEventListener('sota-hubs-unavailable',()=>host?.classList.remove('sota-social-no-mates'),{once:true});
+  window.SotaHubs.fill(anchor.parentNode);
 }
 async function answerSpark(id){
   const b=$("#sp-a").value.trim(); if(!b) return;
@@ -732,7 +745,7 @@ function installAuthLifecycle(){
     if(event!=='SIGNED_OUT'&&next===previous){owner=next;return;}
     owner=next;const revision=++change;
     viewRun();
-    S.user=null;S.me=null;S.friends=[];S.pending=[];S.wallet=null;S.crew=null;S.roomHandle=null;S.tab='pulse';S.luv=0;S.metaErrors={};S.sendingMessage=false;
+    window.SotaHubs?.reset();S.user=null;S.me=null;S.friends=[];S.pending=[];S.wallet=null;S.crew=null;S.roomHandle=null;S.tab='pulse';S.luv=0;S.metaErrors={};S.sendingMessage=false;
     window.SotaSpaceDesign?.apply();
     S.searchRevision=(S.searchRevision||0)+1;
     window.SotaCircles?.stop();window.SotaConnections?.stop();window.SotaKavaUI?.stop();window.SotaRoomSocial?.stop();window.SotaRoomSocialLayout?.stop();window.BulaSkinStudio?.closeForOwnerChange?.();
@@ -860,7 +873,7 @@ async function viewCrews(){
   if(!currentView(run))return;
   if(error)return viewError('your Koro','viewCrews()');
   shell(`<div class="koro-page">
-    <section class="koro-hero" aria-labelledby="koro-title"><div class="koro-hero-top"><span class="koro-eyebrow">YOUR COMMUNITY, CLOSE BY</span><span class="koro-private"><span aria-hidden="true">◇</span> Invite-only groups</span></div><h1 id="koro-title">Your people. Your Koro.</h1><p>A small, private place for friends, family or your community. Start a Koro or join one with an invitation.</p></section>
+    <section class="koro-hero" aria-labelledby="koro-title"><div class="koro-hero-top"><span class="koro-eyebrow">YOUR COMMUNITY, CLOSE BY</span><span class="koro-private"><span aria-hidden="true">◇</span> Your Koro are invite-only</span></div><h1 id="koro-title">Your people. Your Koro.</h1><p>A small, private place for friends, family or your community. Start a Koro or join one with an invitation.</p></section>
     <div class="koro-layout"><section class="glass card koro-communities" aria-labelledby="koro-list-title">
       <div class="koro-section-head"><div><span class="koro-section-kicker">A PLACE TO BELONG</span><h2 id="koro-list-title">Your Koro</h2></div>${(crews||[]).length?`<span class="koro-count">${crews.length} Koro</span>`:''}</div>
       ${(crews||[]).length? `<div class="koro-list">${crews.map(c=>`
@@ -870,13 +883,14 @@ async function viewCrews(){
             <div class="handle">${c.members} member${c.members==1?'':'s'}${c.last_at?' · '+ago(c.last_at):''}</div></div><span class="koro-open-arrow" aria-hidden="true">↗</span>
         </button>`).join("")}</div>` : `<div class="koro-empty"><div class="koro-empty-art" aria-hidden="true"><span>🪸</span></div><h3>Your Koro starts with you.</h3><p>Bring your people into one private space.<br>Create your first Koro, or join with a code shared with you.</p><div class="koro-empty-actions"><button type="button" class="btn" onclick="$('#koro-create input').focus()">Start your first Koro <span aria-hidden="true">↗</span></button><button type="button" class="koro-text-button" onclick="$('#c-code').focus()">I have an invite code</button></div></div>`}
       <div class="koro-tools" aria-label="More ways to connect"><button type="button" class="btn sm ghost" onclick="go('connections')">See my connections <span aria-hidden="true">↗</span></button><a class="btn sm ghost" href="/communications.html?app=sota-kece">Chat, discussions & calls <span aria-hidden="true">↗</span></a></div>
-      <p class="koro-privacy-note"><span aria-hidden="true">◇</span> Membership stays invite-only. You choose whether the graph is public.</p>
+      <p class="koro-privacy-note"><span aria-hidden="true">◇</span> A Koro you start stays invite-only. The three starter Koro are open to every member. You choose whether the graph is public.</p>
     </section>
     <aside class="koro-forms" aria-label="Create or join a Koro">
       <section class="glass card koro-form-card" id="koro-create" aria-label="Start a circle">${window.SotaCircles.createHTML()}</section>
       <section class="glass card koro-form-card koro-join-card" aria-labelledby="koro-join-title"><span class="koro-form-icon" aria-hidden="true">↗</span><h2 id="koro-join-title">Join with a code</h2><p>Already invited? Your place is waiting.</p><label for="c-code">Koro join code</label><input id="c-code" aria-label="Koro join code" placeholder="Paste your invite code" autocapitalize="off"><button type="button" class="btn ghost koro-submit" onclick="joinCrew()">Join Koro <span aria-hidden="true">↗</span></button><small>Use the code shared with you.</small></section>
     </aside></div></div>`);
   window.SotaCircles.mountCreate($('#koro-create'),group=>{if(currentView(run)){S.crew=group.id;render();}});
+  const koroLayout=window.SotaHubs?$('#view .koro-layout'):null;if(koroLayout){koroLayout.insertAdjacentHTML('beforebegin','<span data-hubs-anchor hidden></span>');mountHubs(koroLayout.previousElementSibling,'koro');}
   window.SotaWorlds?.applyChoice?.();
 }
 async function makeCrew(){
@@ -976,7 +990,7 @@ async function viewFriends(){
     </div></div>
     <div class="stack">
       <div class="glass card"><h3>Find someone</h3>
-        <div class="sub" style="margin-bottom:11px">By handle only. There is no people-you-may-know here.</div>
+        <div class="sub" style="margin-bottom:11px">By handle. Or join a starter Koro and meet the people there.</div>
         <div class="row"><input id="s-q" aria-label="Find a friend by handle" placeholder="handle" autocapitalize="off">
           <button class="btn sm" onclick="search()">Find</button></div>
         <div id="s-res" role="status" aria-live="polite" style="margin-top:12px"></div>
@@ -989,6 +1003,7 @@ async function viewFriends(){
       <div class="glass card"><button class="btn ghost" onclick="sb.auth.signOut().then(()=>location.reload())">Sign out</button></div>
     </div></div>`);
   $("#s-q").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
+  const people=window.SotaHubs?$("#view .grid.two"):null;if(people){people.insertAdjacentHTML('beforebegin','<span data-hubs-anchor hidden></span>');mountHubs(people.previousElementSibling,'people');}
 }
 async function search(){
   const q=$("#s-q").value.trim().toLowerCase().replace(/^@/,""); if(!q) return;
@@ -1127,7 +1142,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/music-home.js?v=20261104-premium-worlds-1"></script>
 <script src="/front-pages.js?v=20261109-fast-paint-1"></script>
 <script src="/space-design.js?v=photo-themes-20261029"></script>
-<script src="/sota-worlds.js?v=20261110-nav-2"></script>
+<script src="/sota-worlds.js?v=20261110-viti-1"></script>
 <script src="/sota-experience.js?v=20261110-lcp-1"></script>
 <script src="/motion-engine.js?v=20261109-motion-room-1"></script>
 <script src="/motion-room.js?v=20261109-motion-room-1"></script>
@@ -1143,9 +1158,9 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/connections.js?v=20261026-spatial-life-1"></script>
 <script src="/icon-controls.js?v=20261109-fast-paint-1"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261106-security-1"></script><script src="/sere-maker.js?v=20261109-sere-2"></script><script src="/sota-pulse.js?v=20261110-share-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261106-security-1"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-viti-1"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaSere?.init({client:sb,state:S,toast,esc,go});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script>
-<link rel="stylesheet" href="/sota-worlds.css?v=20261110-nav-2">
+<link rel="stylesheet" href="/sota-worlds.css?v=20261110-viti-1"><link rel="stylesheet" href="/sota-hubs.css?v=20261110-hubs-1">
 <link rel="stylesheet" href="/phone-tidy-20261029.css?v=20261104-premium-worlds-1">
 <script src="/bula-welcome.js?v=20261030" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
 <script src="/bula-top-20261030.js?v=20261110-pill-row-1" defer></script>

@@ -5,9 +5,13 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const read=f=>fs.readFileSync(path.join(__dirname,'..',f),'utf8');
 const worlds=read('sota-worlds.js'),css=read('sota-worlds.css'),studio=read('skin-studio.js');
 
-test('the hero has one primary action; Sere is a quiet second choice',()=>{
+test('each hero has one primary action; on Home it is the singing photo, elsewhere Sere is the quiet second choice',()=>{
   assert.match(worlds,/class="sx-world-secondary sx-world-sere" data-world-sere="1"/);
-  assert.doesNotMatch(worlds,/sx-world-primary sx-world-sere/);
+  // 10 Nov 2026: voice and music lead on Home only. One primary button there too; the written moment is the quiet one.
+  assert.match(worlds,/function sereFirst\(w\)\{return `<button type="button" class="sx-world-primary sx-world-sere" data-world-sere="1">[^`]*<button type="button" class="sx-world-secondary" data-world-member=/);
+  assert.equal((worlds.match(/sx-world-primary sx-world-sere/g)||[]).length,1);
+  assert.equal((worlds.match(/sereFirst:true/g)||[]).length,1,'only Home leads with Sere');
+  assert.match(worlds,/pulse:\{[^}]*sereFirst:true\}/);
   assert.match(css,/\.sx-world-secondary\{[^}]*background:transparent/);
 });
 test('the ideas menu is folded away on the page and stays plain in the directory',()=>{

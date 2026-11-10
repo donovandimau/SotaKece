@@ -231,12 +231,12 @@ test('shared-in words wait for sign-in, never replace a draft, and are cleaned a
 
 test('index.html hands the Pulse tab to the wall, keeps the Spark, stops the wall on tab change, and the worker caches the new files',()=>{
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  assert.match(html,/window\.SotaPulse\.init\(\{client:sb,state:S,toast,esc,ago,openRoom,shell,spark:sparkCard\}\)/);
+  assert.match(html,/window\.SotaPulse\.init\(\{client:sb,state:S,toast,esc,ago,openRoom,shell,spark:sparkCard,go:t=>go\(t\)\}\)/);
   assert.match(html,/async function sparkCard\(\)/);
   assert.match(html,/window\.SotaPulse\?\.stop\(\); S\.tab=t;/);
   assert.match(html,/<script src="\/sota-pulse\.js\?v=/);assert.match(html,/<link rel="stylesheet" href="\/sota-pulse\.css\?v=/);
   assert.doesNotMatch(html,/bv_pulse_feed|postPulse\(/,'the old one-line-per-friend pulse is gone from the tab');
   const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
   assert.match(sw,/ON_DEMAND=\['\/sota-pulse\.js','\/sota-pulse\.css'/);
-  assert.match(sw,/sota-kece-shell-20261110-v164-first-paint/);
+  assert.match(sw,/sota-kece-shell-20261110-v165-viti-pulse/);
 });

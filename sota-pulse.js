@@ -15,11 +15,13 @@
   };
 
   var client, S, toast, esc, ago, openRoom, shell, spark;
-  var st = fresh(), wired = false;
+  var st = fresh(), wired = false, player = null, goTo = null;
+  var AUDIO_BASE = 'https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/fiji-audio/';
+  var CAUGHT_UP = 'You\'re caught up with your mates — here\'s what\'s happening across Viti &amp; the diaspora.';
 
   function fresh() {
     return { mode: DEFAULT_MODE, asOf: null, posts: [], offset: 0, done: false, loading: false,
-             pending: 0, newest: null, thread: null, quote: null, channel: null, io: null, seq: 0, sparkHtml: null, share: null };
+             pending: 0, newest: null, thread: null, quote: null, channel: null, io: null, seq: 0, sparkHtml: null, share: null, tracks: null };
   }
   function say(err, fallback) {
     var m = (err && err.message) || '';
@@ -141,15 +143,23 @@
     opts = opts || {};
     var me = S.me || {};
     return '<form class="tw-compose glass card" data-tw-form="' + (opts.replyTo ? 'reply' : 'post') + '"' + (opts.replyTo ? ' data-reply-to="' + opts.replyTo + '"' : '') + '>' +
+      (opts.replyTo ? '' : makeRow()) +
       '<div class="tw-compose-row">' +
         '<div class="av" style="background:' + esc(me.room_accent || '#4FA8D8') + '18" aria-hidden="true">' + esc(me.avatar_emoji || '🌺') + '</div>' +
-        '<textarea name="body" maxlength="' + MAX + '" rows="2" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?') + '"></textarea>' +
+        '<textarea name="body" maxlength="' + MAX + '" rows="' + (opts.replyTo || !window.SotaSere ? 2 : 1) + '" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : !window.SotaSere ? 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?' : 'Or write a few words…') + '"></textarea>' +
       '</div>' +
       (st.quote && !opts.replyTo ? '<div class="tw-quoting">' + quoteBox(st.quote) + '<button type="button" class="tw-btn tw-unquote" data-tw="unquote" aria-label="Remove the quote">✕</button></div>' : '') +
-      '<div class="tw-compose-bar">' + (opts.replyTo || !window.SotaSere ? '' : '<button type="button" class="tw-btn tw-sere-open" data-tw="sere" aria-label="Make a photo sing">🎤 Make a singing photo</button>') +
+      '<div class="tw-compose-bar">' +
         '<span class="tw-count" aria-live="polite">' + MAX + ' letters left</span><span class="spacer"></span>' +
         '<button type="submit" class="btn sm" disabled>' + (opts.replyTo ? 'Reply' : 'Post') + '</button></div>' +
     '</form>';
+  }
+  /** Voice and music come first: one big button to make a photo sing, one to make it speak. */
+  function makeRow() {
+    if (!window.SotaSere) return '';
+    return '<div class="tw-make" role="group" aria-label="Make a singing photo">' +
+      '<button type="button" class="tw-make-main tw-sere-open" data-tw="sere" aria-label="Make a photo sing"><span class="tw-make-icon" aria-hidden="true">🎤</span><span><b>Make a photo sing</b><small>Pick a photo, add a song or your voice</small></span></button>' +
+      '<button type="button" class="tw-make-say" data-tw="say" aria-label="Make a photo say my words"><span aria-hidden="true">💬</span> Say my words</button></div>';
   }
   function tabs() {
     return '<div class="tw-tabs" role="tablist" aria-label="Order">' +
@@ -165,9 +175,69 @@
   }
   function endMark() {
     return st.done
-      ? (st.posts.length ? '<div class="tw-end">That is everything on the wall right now.</div>' : '')
+      ? (st.posts.length ? '<div class="tw-end">' + CAUGHT_UP + '</div>' : '') + vitiPulse()
       : '<div class="tw-sentinel" aria-hidden="true"></div><div class="tw-loading" role="status">' + (st.loading ? 'Loading…' : '') + '</div>';
   }
+  /* ---------------------------------------------------------------- Viti Pulse */
+  /* Shown where the wall ends, so a short wall is never a dead end. Nothing here is invented:
+     the songs are today's three from the Island Mix that already ships with the app, and the
+     buttons open things the member can do now. No member's post is ever faked. */
+  function dayNumber(d) { return Math.floor((d || new Date()).getTime() / 86400000); }
+  /** Three songs for the day; the pick moves on each day and wraps round the list. */
+  function featured(tracks, day, count) {
+    var list = (Array.isArray(tracks) ? tracks : []).filter(function (t) { return t && /^[a-z0-9-]{1,80}$/.test(String(t.id || '')) && typeof t.title === 'string' && t.title.trim() && /^[a-z0-9-]{1,80}\.mp3$/.test(String(t.path || '')); });
+    var n = Math.min(count || 3, list.length), out = [];
+    for (var i = 0; i < n; i++) out.push(list[((day * n + i) % list.length + list.length) % list.length]);
+    return out;
+  }
+  function trackUrl(id) { return 'https://sotakece.com/t/' + encodeURIComponent(id); }
+  function trackRow(t) {
+    return '<div class="tw-track" data-track="' + esc(t.id) + '">' +
+      '<button type="button" class="tw-track-play" data-tw="play" data-id="' + esc(t.id) + '" data-src="' + esc(AUDIO_BASE + t.path) + '" aria-pressed="false" aria-label="Play ' + esc(t.title) + '">▶</button>' +
+      '<span class="tw-track-title">' + esc(t.title) + '</span>' +
+      '<button type="button" class="tw-btn" data-sota-share data-share-url="' + esc(trackUrl(t.id)) + '" data-share-title="' + esc(t.title + ' · Sota Kece') + '" data-share-text="' + esc('Listen to ' + t.title + ' on Sota Kece 🎶') + '" aria-label="Share ' + esc(t.title) + '">↗</button></div>';
+  }
+  function tracksBlock() {
+    if (!st.tracks || !st.tracks.length) return '';
+    return '<div class="tw-viti-block"><h3>🎶 Playing across the islands today</h3>' + st.tracks.map(trackRow).join('') +
+      '<button type="button" class="tw-viti-more" data-tw="music">Open the Island Mix ↗</button></div>';
+  }
+  function vitiPulse() {
+    return '<section class="tw-viti" aria-labelledby="tw-viti-title">' +
+      '<header><span class="tw-viti-kicker">VITI PULSE</span><h2 id="tw-viti-title">Across Viti & the diaspora</h2></header>' +
+      '<div id="tw-viti-tracks">' + tracksBlock() + '</div>' +
+      '<div class="tw-viti-block tw-viti-start"><h3>Start something</h3><div class="tw-viti-actions">' +
+        (window.SotaSere ? '<button type="button" class="tw-viti-act" data-tw="sere"><span aria-hidden="true">🎤</span> Make a photo sing</button>' : '') +
+        (st.sparkHtml ? '<button type="button" class="tw-viti-act" data-tw="spark"><span aria-hidden="true">✨</span> Answer today\'s Spark</button>' : '') +
+        '<button type="button" class="tw-viti-act" data-tw="people"><span aria-hidden="true">🤝</span> Find your people</button>' +
+        '<button type="button" class="tw-viti-act" data-sota-share data-share-text="Come and join me on Sota Kece. Make your space, share music and catch up over Talanoa."><span aria-hidden="true">↗</span> Invite someone</button>' +
+      '</div></div></section>';
+  }
+  async function loadTracks() {
+    if (st.tracks || typeof fetch !== 'function') return;
+    var seq = st.seq;
+    try {
+      var r = await fetch('/music-playlist.json', { credentials: 'omit' });
+      var picked = featured(r.ok ? await r.json() : [], dayNumber(), 3);
+      if (seq !== st.seq) return;
+      st.tracks = picked;
+      var el = $('#tw-viti-tracks'); if (el) el.innerHTML = tracksBlock();
+    } catch (_) { st.tracks = []; }
+  }
+  /** One small player for the three songs: tap to play, tap again to stop, one at a time. */
+  function playTrack(btn) {
+    var same = player && player.dataset.id === btn.dataset.id && !player.paused;
+    if (player) { player.pause(); }
+    $$('.tw-track-play').forEach(function (b) { b.textContent = '▶'; b.setAttribute('aria-pressed', 'false'); });
+    if (same) return;
+    if (!player) { player = new Audio(); player.preload = 'none'; player.addEventListener('ended', function () { $$('.tw-track-play').forEach(function (b) { b.textContent = '▶'; b.setAttribute('aria-pressed', 'false'); }); }); }
+    if (player.dataset.id !== btn.dataset.id) { player.src = btn.dataset.src; player.dataset.id = btn.dataset.id; }
+    btn.textContent = '❚❚'; btn.setAttribute('aria-pressed', 'true');
+    var started = player.play();
+    if (started && started.catch) started.catch(function () { btn.textContent = '▶'; btn.setAttribute('aria-pressed', 'false'); toast('That song could not start. Check your signal.'); });
+  }
+  function stopTrack() { if (player) { try { player.pause(); } catch (_) {} } }
+
   function wall() {
     return '<section class="tw-wrap" aria-label="The Talanoa Wall">' +
       '<div class="tw-top"><h1 class="tw-title">Talanoa</h1>' + tabs() + '</div>' +
@@ -343,6 +413,13 @@
   }
   async function share(id) {
     var p = findPost(id), url = shareUrl(id), text = p ? p.body : 'On the Talanoa Wall';
+    // A singing photo shared by the member who made it goes out as a public page that plays without
+    // an account (made for WhatsApp family chats and Facebook groups). Only the maker can get that
+    // link; everyone else shares the in-app link as before.
+    if (p && p.mine && p.sere && window.SotaSere && window.SotaSere.shareLink) {
+      var pub = await window.SotaSere.shareLink(p.sere.id);
+      if (pub) { url = pub; text = (p.body ? p.body + ' ' : '') + '🎤 Tap to watch my singing photo'; }
+    }
     try {
       if (navigator.share) { await navigator.share({ title: 'Sota Kece', text: text, url: url }); return; }
       await navigator.clipboard.writeText(url); toast('Link copied.');
@@ -425,6 +502,11 @@
       if (act === 'share') return share(id);
       if (act === 'del') return remove(id);
       if (act === 'sere') return window.SotaSere && window.SotaSere.open();
+      if (act === 'say') return window.SotaSere && window.SotaSere.open({ mode: 'say' });
+      if (act === 'play') return playTrack(t);
+      if (act === 'music') return goTo && goTo('music');
+      if (act === 'people') return goTo && goTo('friends');
+      if (act === 'spark') { var sp = $('#tw-spark'); if (sp) { sp.scrollIntoView({ block: 'center', behavior: 'smooth' }); var a = sp.querySelector('textarea'); if (a) a.focus({ preventScroll: true }); } return; }
       if (act === 'tip') return window.SotaSere && window.SotaSere.tip(id, t);
       if (act === 'remix') return window.SotaSere && window.SotaSere.open({ remixOf: id });
       if (act === 'unquote') { st.quote = null; var f = $('[data-tw-form="post"]'); if (f) f.outerHTML = composer(); return; }
@@ -468,16 +550,18 @@
     shell(wall());
     paintPill(); watchSentinel();
     applyShare();
+    loadTracks();
   }
   function stop() {
     st.seq += 1;
     if (st.io) { st.io.disconnect(); st.io = null; }
     if (st.channel && client && typeof client.removeChannel === 'function') { try { client.removeChannel(st.channel); } catch (_) {} }
-    var keepMode = st.mode, keepShare = st.share; st = fresh(); st.mode = keepMode; st.share = keepShare;
+    stopTrack();
+    var keepMode = st.mode, keepShare = st.share, keepTracks = st.tracks; st = fresh(); st.mode = keepMode; st.share = keepShare; st.tracks = keepTracks;
   }
   function init(cfg) {
     client = cfg.client; S = cfg.state; toast = cfg.toast; esc = cfg.esc; ago = cfg.ago;
-    openRoom = cfg.openRoom; shell = cfg.shell; spark = cfg.spark || null;
+    openRoom = cfg.openRoom; shell = cfg.shell; spark = cfg.spark || null; goTo = cfg.go || null;
   }
 
   // Keep the words as soon as the page loads, before sign-in or any tab change can drop the link.
@@ -487,7 +571,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    cleanShare: cleanShare, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();
