@@ -91,7 +91,7 @@ html:root body:not(#dimau-pill-unused) :is(nav.bottom){scrollbar-color:auto!impo
 #app.bv-welcome .sk-site-header.sk-pattern-masthead {
  display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;
  gap:16px;min-height:104px;padding:16px 24px;margin-bottom:0;
- background:#123d58 url('/assets/sota-blue-white-background-20261021.png') center/420px 420px repeat;
+ background:#123d58 url('/assets/sota-blue-white-background-20261110-1260.webp') center/420px 420px repeat;
 }
 #app.bv-welcome .sk-site-header.sk-pattern-masthead .sk-pattern-heading {
  box-sizing:border-box;min-width:0;margin:0;padding:0;text-align:center;
