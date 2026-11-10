@@ -29,8 +29,8 @@ browserTest('player, visual choices, filter and audio survive switching between 
  h.get('.sk-playlist-transport button').click();assert.equal(h.calls.play,1);assert.equal(h.calls.pause,0);assert.equal(mode.value,'halo');assert.equal(h.get('#sk-playlist-filter').value,'keep my filter');assert.equal(h.get('.sx-player-library').open,true,'A deliberate reveal survives view changes');assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);assert.equal(h.d.querySelectorAll('#sota-playlist-audio').length,1);
  h.w.SotaWorlds.enhanceMusic();assert.equal(h.player.querySelectorAll('.sx-player-library').length,1);assert.equal(h.player.querySelectorAll('.sx-player-now').length,1);
 });
-browserTest('each signed-in destination retains its content and exposes all eight existing worlds',t=>{
- const h=harness(t);for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});if(page==='pulse'){
+browserTest('each signed-in destination retains its content and the pill strip lists only its group',t=>{
+ const h=harness(t);const strip={pulse:4,moments:4,crews:4,circles:4,friends:2,connections:2,music:0,room:0},seen=new Set();for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});if(page==='pulse'){
     assert(h.get('.sx-world-next [data-world-member=room]'));
     h.get('.sx-world-next [data-world-member=music]').click();
     assert.equal(h.calls.go.at(-1),'music');
