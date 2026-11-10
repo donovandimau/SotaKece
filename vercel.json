@@ -2,7 +2,8 @@
   "functions": {
     "api/sere.js": { "maxDuration": 60 },
     "api/sere-callback.js": { "maxDuration": 60 },
-    "api/account-delete.js": { "maxDuration": 60 }
+    "api/account-delete.js": { "maxDuration": 60 },
+    "api/listen.js": { "maxDuration": 15, "includeFiles": "music-playlist.json" }
   },
   "routes": [
     {
@@ -30,6 +31,8 @@
       "has": [{ "type": "host", "value": "sere.sotakece.com" }],
       "dest": "/sere/index.html"
     },
+    { "src": "/s/([0-9a-fA-F-]{36})/([0-9a-f]{32})/?", "dest": "/api/listen?sere=$1&k=$2" },
+    { "src": "/t/([a-z0-9-]{1,80})/?", "dest": "/api/listen?track=$1" },
     { "handle": "filesystem" }
   ]
 }

@@ -355,14 +355,29 @@
     var scenes = st.scenes;
     if (st.step !== 'working') { st = fresh(); st.scenes = scenes; }
     st.open = true; st.remixOf = opts.remixOf || null;
+    if (opts.mode === 'say' && !st.remixOf && st.step !== 'working') st.mode = 'say';
     paint();
     if (!st.scenes) { try { var r = await client.from('bv_sere_scenes').select('id,label'); if (r && r.data && r.data.length) { st.scenes = r.data; if (st.open) paint(); } } catch (_) {} }
   }
   function close() { st.open = false; paint(); }
+  /** The public, playable page for one of the member's own seres (see api/listen.js). Null if the
+      server will not give one (not the maker, not finished, or the server is not set up). */
+  var links = {};
+  async function shareLink(id) {
+    if (links[id]) return links[id];
+    try {
+      var sess = await client.auth.getSession(), tok = sess && sess.data && sess.data.session && sess.data.session.access_token;
+      if (!tok) return null;
+      var r = await fetch('/api/sere', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ action: 'share', id: id }) });
+      var d = r.ok ? await r.json() : null;
+      if (d && typeof d.url === 'string' && /^https:\/\/sotakece\.com\/s\//.test(d.url)) { links[id] = d.url; return d.url; }
+    } catch (_) {}
+    return null;
+  }
   function init(cfg) { client = cfg.client; S = cfg.state; toast = cfg.toast; esc = cfg.esc; go = cfg.go || null; wire(); resume(); }
 
   return {
-    init: init, open: open, close: close, tip: tip, resume: resume, check: check,
+    init: init, open: open, close: close, shareLink: shareLink, tip: tip, resume: resume, check: check,
     // pure helpers (tested)
     pickWindow: pickWindow, checkImageDims: checkImageDims, encodeWav: encodeWav, mixWindow: mixWindow, say: say, VOICES: VOICES, ENGINES: ENGINES,
     state: function () { return st; }, LIMITS: LIMITS

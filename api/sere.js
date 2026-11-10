@@ -4,6 +4,7 @@
 // pending row, uploads, the wall post) happens in the database or the browser.
 //   POST /api/sere  { action:'start', id }  — member only; signs the two inputs, starts the render
 //   POST /api/sere  { action:'check', id }  — member only; re-reads a job that looks stuck
+//   POST /api/sere  { action:'share', id }  — the maker only; the public page link for a finished sere
 // Env: SOTA_SERVICE_KEY (service role), REPLICATE_API_TOKEN, SERE_SECRET (webhook signing),
 //      SERE_REPLICATE_MODEL ("owner/name", used when SERE_REPLICATE_VERSION is empty),
 //      SERE_REPLICATE_VERSION (version hash), SERE_INPUT_IMAGE (default source_image),
@@ -201,6 +202,14 @@ async function handler(req,res){
       const providerJobId=await startRender(env,job,image,audio,fetch);
       await patchJob(env,job.id,{status:'processing',provider:'replicate',provider_job_id:providerJobId,attempts:(job.attempts||0)+1},fetch,'&status=eq.pending');
       return res.status(200).json({ok:true,status:'processing'});
+    }
+
+    if(body.action==='share'){
+      // The maker asks for the public "tap to watch" page of their own finished sere (api/listen.js).
+      // Nobody else reaches this line: the job was checked against the caller just above.
+      if(job.status!=='completed'||!job.output_video_url)return res.status(409).json({error:'That sere is not finished yet.'});
+      const secret=String(env.SERE_SECRET||'');if(secret.length<16)throw Error('config');
+      return res.status(200).json({ok:true,url:require('./listen.js').shareUrl(secret,job.id)});
     }
 
     if(body.action==='check'){
