@@ -248,15 +248,49 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
 }
 
 @media (max-width: 760px) {
+  /* Every pill of the active group stays reachable: the strip scrolls sideways, with a fade at the edge as the cue. */
   body.sx-member .sx-world-member-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-right: 36px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 30px), transparent);
+  }
+  body.sx-member .sx-world-member-tabs::-webkit-scrollbar {
+    display: none;
   }
   body.sx-member .sx-world-member-tabs button {
+    flex: 0 0 auto;
     min-width: 0;
     min-height: 44px;
+    white-space: nowrap;
+    scroll-snap-align: start;
   }
-  body.sx-member .sx-world-member-tabs button:not([data-world-member="moments"],[data-world-member="circles"],[data-world-member="connections"]) {
+  /* The dock already says where you are; the breadcrumb only repeated it. Page tools share one row. */
+  body.sx-member .sx-member-world-heading .sx-world-toolbar {
+    margin: 10px 0 12px;
+  }
+  body.sx-member .sx-member-world-heading .sx-world-crumb {
+    display: none;
+  }
+  /* A returning member gets a short greeting so the composer reaches the first screen. */
+  body.sx-member .sx-member-world-heading .sx-world-hero[data-world-visit="returning"] .sx-world-hero-copy {
+    padding: 18px;
+  }
+  body.sx-member .sx-member-world-heading .sx-world-hero[data-world-visit="returning"] .sx-world-hero-copy::before {
+    font-size: 40px;
+  }
+  body.sx-member .sx-member-world-heading .sx-world-hero[data-world-visit="returning"] h1 {
+    font-size: 24px !important;
+  }
+  body.sx-member .sx-member-world-heading .sx-world-hero[data-world-visit="returning"] .sx-world-hero-photo {
     display: none;
   }
   body.sx-member #app.sx-app #view.sx-member-content {
