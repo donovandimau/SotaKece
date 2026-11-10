@@ -1,3 +1,16 @@
+## 10 November 2026 — Navigation tidy: one primary nav per viewport
+
+Release `sota-kece-shell-20261110-v159-nav-tidy`. The owner's review of the live desktop (1440×900) and phone (390×844) views found three navigation systems showing at once, fixed widgets sitting over content on phones, and the composer pushed under the fold. What changed, and where:
+
+- **Dock only on phones.** `sota-premium-shell.css` now scopes the bottom dock to 760px and under. Wider screens get the left rail from `sota-experience.css` back as the single primary navigation (brand, five destinations, the "Make it yours" links); no floating dock, and nothing reserves space for one.
+- **Secondary pills follow the active dock tab.** `sota-worlds.js` renders `.sx-world-member-tabs` from `tabGroups`: Home and Talanoa (both land on the wall) share Your feed · Moments · Your Koro · Talanoa circles; People shows Friends · Your connections; Music and My space show no strip. On phones the strip scrolls sideways with an edge fade (`sota-worlds.css`) instead of hiding five of eight pills; the current pill is scrolled into view. The dock now highlights Talanoa on the Koro and circles pages (`sota-experience.js` nav map).
+- **Search in the header.** `sota-experience.js` adds a `[data-dps-search-open]` button beside the menu; the shell's floating search button is hidden on every `.sx-enabled` page and kept only for sign-in/welcome screens (bottom-right).
+- **Dimau Group badge never floats.** `dimau-consistency.js` (shared, external) still injects it; `sota-premium-shell.css` forces it to render as a static page footer under everything, clear of the dock, and the header menu carries a "Dimau Group ↗" link.
+- **Composer in the first screen.** On Your feed the Music visuals block now follows the wall (`.tw-wrap`), so the composer sits straight under the hero; the phone breadcrumb is folded (the dock already says where you are) and a returning member's greeting is compact (`[data-world-visit=returning]`).
+- **Make a photo sing** is a bordered, softly glowing second button beside the primary action at every width (`.sx-world-secondary.sx-world-sere`).
+
+Tests: `tests/sota-worlds.test.cjs` now expects the group sizes above and that every secondary world is reachable from some strip.
+
 ## 9 November 2026 — Rolling upgrade Phase 1: the Dimau Premium Shell
 
 Owner's fleet strategy: one universal premium shell, applied one app at a time, Sota Kece first. The shell lives in `dimau-platform-standard/premium-shell` (PR #27) and is copied here byte-for-byte (`dimau-premium-shell.css`, `dimau-premium-shell.js`; `tests/premium-shell-sha256.json` holds the hashes and `tests/premium-shell.test.cjs` checks them). Light sky-blue stays, as the owner confirmed on 9 Nov; no dark theme is shipped.
