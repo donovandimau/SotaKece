@@ -33,13 +33,35 @@
     const player=root.document.querySelector('#sk-music-playlist'),visual=player?.querySelector(':scope > dimau-music-visualiser');
     if(visual){const details=root.document.createElement('details');details.className='sx-music-visuals';const summary=root.document.createElement('summary');summary.textContent='Show music visuals';details.append(summary);visual.before(details);details.append(visual);}
   }
+  // The soundtrack follows the member around the app: title and credit, previous / play / next,
+  // a progress line and the page-lights switch, all driving the one existing player.
   function miniPlayer(s){
-    const bar=root.document.createElement('section');bar.className='sx-mini-player';bar.hidden=true;bar.setAttribute('aria-label','Now playing');bar.innerHTML=`<span class="sx-mini-icon">${icon('music')}</span><button class="sx-mini-open" type="button"><small>YOUR SOUNDTRACK</small><b></b></button><button class="sx-mini-toggle" type="button" aria-label="Pause music">Ⅱ</button>`;s.app.append(bar);
-    const current=()=>root.document.querySelector('#sota-playlist-audio');
-    function update(){const audio=current();bar.hidden=!audio?.getAttribute('src')||s.page==='music';s.app.classList.toggle('sx-has-mini',!bar.hidden);if(bar.hidden)return;bar.querySelector('b').textContent=root.document.querySelector('.sk-playlist-title')?.textContent||'Your soundtrack';const button=bar.querySelector('.sx-mini-toggle');button.textContent=audio.paused?'▶':'Ⅱ';button.setAttribute('aria-label',audio.paused?'Resume music':'Pause music');}
-    for(const event of ['play','pause','ended','loadedmetadata','emptied']){root.document.addEventListener(event,update,true);s.listeners.push(()=>root.document.removeEventListener(event,update,true));}
+    const glyph={prev:'M6 5v14M19 5 9 12l10 7Z',next:'M18 5v14M5 5l10 7-10 7Z',play:'M7 4l13 8-13 8Z',pause:'M7 4v16M17 4v16',lights:'M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z'};
+    const draw=name=>`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${glyph[name]}"/></svg>`;
+    const bar=root.document.createElement('section');bar.className='sx-mini-player';bar.hidden=true;bar.setAttribute('aria-label','Now playing');
+    bar.innerHTML=`<span class="sx-mini-progress" aria-hidden="true"><i></i></span><span class="sx-mini-icon">${icon('music')}</span><button class="sx-mini-open" type="button" title="Open Music"><small>YOUR SOUNDTRACK</small><b></b><em></em></button><div class="sx-mini-controls" role="group" aria-label="Playback"><button class="sx-mini-skip" type="button" data-mini="prev" aria-label="Previous song">${draw('prev')}</button><button class="sx-mini-toggle" type="button" aria-label="Pause music">${draw('pause')}</button><button class="sx-mini-skip" type="button" data-mini="next" aria-label="Next song">${draw('next')}</button><button class="sx-mini-lights" type="button" data-sota-lights-toggle="icon" aria-pressed="true" aria-label="Page lights" title="Page lights">${draw('lights')}</button></div>`;
+    s.app.append(bar);
+    const doc=root.document,current=()=>doc.querySelector('#sota-playlist-audio'),player=()=>doc.querySelector('#sk-music-playlist');
+    const fill=bar.querySelector('.sx-mini-progress i'),toggle=bar.querySelector('.sx-mini-toggle'),state=bar.querySelector('small'),credit=bar.querySelector('em');
+    function progress(){const audio=current(),d=audio?.duration;fill.style.width=(Number.isFinite(d)&&d>0?Math.min(100,audio.currentTime/d*100):0)+'%';}
+    function update(){
+      const audio=current();bar.hidden=!audio?.getAttribute('src')||s.page==='music';s.app.classList.toggle('sx-has-mini',!bar.hidden);if(bar.hidden)return;
+      const paused=audio.paused||audio.ended;
+      bar.querySelector('b').textContent=doc.querySelector('.sk-playlist-title')?.textContent||'Your soundtrack';
+      const line=doc.querySelector('.sk-playlist-subtitle')?.textContent||'';credit.textContent=line;credit.hidden=!line;
+      state.textContent=paused?'PAUSED':'NOW PLAYING';bar.classList.toggle('is-playing',!paused);
+      toggle.innerHTML=draw(paused?'play':'pause');toggle.setAttribute('aria-label',paused?'Resume music':'Pause music');
+      progress();root.SotaMusicBadge?.updateControls?.();
+    }
+    for(const event of ['play','pause','ended','loadedmetadata','emptied']){doc.addEventListener(event,update,true);s.listeners.push(()=>doc.removeEventListener(event,update,true));}
+    doc.addEventListener('timeupdate',progress,true);s.listeners.push(()=>doc.removeEventListener('timeupdate',progress,true));
     listen(s,root,'sota-front-page-change',update);
-    listen(s,bar.querySelector('.sx-mini-toggle'),'click',()=>{root.document.querySelector('#sk-music-playlist .sk-deck-play,#sk-music-playlist .sk-playlist-play')?.click();});
+    listen(s,toggle,'click',()=>{player()?.querySelector('.sk-deck-play,.sk-playlist-play')?.click();});
+    listen(s,bar.querySelector('.sx-mini-controls'),'click',event=>{
+      const skip=event.target.closest('[data-mini]');if(!skip)return;
+      const next=skip.dataset.mini==='next',deck=[...(player()?.querySelectorAll('.sk-deck-skip')||[])],basic=[...(player()?.querySelectorAll('.sk-playlist-transport button')||[])];
+      (deck.length>1?deck[next?deck.length-1:0]:basic.length>2?basic[next?basic.length-1:0]:null)?.click();root.setTimeout(update,0);
+    });
     listen(s,bar.querySelector('.sx-mini-open'),'click',()=>{if(s.member){config.go?.('music');}else{root.history.pushState(null,'','#music');s.show?.('music');}});update();
   }
   function welcome(){return `<section class="sx-hero" aria-labelledby="sx-welcome-title"><div class="sx-hero-copy"><span class="sx-eyebrow">FIJI ROOTS. EVERYWHERE ENERGY.</span><h1 id="sx-welcome-title" tabindex="-1">Your people.<br>Your music.<br><em>Your space.</em></h1><p>Choose your look. Bring your soundtrack. Make a place for your people.</p><div class="sx-actions"><button class="sx-button sx-primary" data-sx-auth="up">Create your space <span aria-hidden="true">↗</span></button></div><small>Already part of the circle? <button class="sx-inline" data-sx-auth="in">Sign in</button><br><a class="sx-inline" href="#profile">Take a look around</a></small><picture class="sx-hero-social"><img src="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" srcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1024.webp 1024w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" sizes="(max-width:760px) calc(100vw - 72px), 440px" width="1536" height="1024" alt="Illustrative scene of four friends chatting while one plays guitar on a veranda at sunset" fetchpriority="high" decoding="async"></picture></div><section class="sx-hero-room" aria-label="Sema’s example room"><header><span>SEMA’S SPACE</span><small>EXAMPLE ROOM</small></header><div data-sx-room-home></div><footer><button type="button" data-sx-customise>Try Room Studio ↗</button><a href="#profile">Open this space ↗</a></footer></section><div class="sx-hero-caption">SOTA KECE <span>Come as you are.</span></div></section><nav class="sx-home-paths" aria-label="Explore Sota Kece"><a href="#people">${icon('people')} Find your people</a><a href="#talanoa">${icon('talanoa')} Pull up a seat</a><a href="#music">${icon('music')} Build your soundtrack</a><a href="#skins">${icon('profile')} Find your look</a><a href="#world">${icon('home')} Your 3D world</a></nav><section class="sx-intro"><div><span class="sx-eyebrow">MORE CONNECTION. MORE YOU.</span><h2>All the things that<br>bring us together.</h2></div><p>Catch up with your people, share a favourite song and build a space that tells your story.</p></section><div class="sx-discover sx-scene-grid">

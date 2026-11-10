@@ -75,7 +75,7 @@ begin
     select jsonb_agg(jsonb_build_object('id', x.id, 'handle', x.handle, 'display_name', x.display_name,
              'avatar_emoji', x.avatar_emoji, 'accent', x.room_accent, 'posts', x.posts, 'hub', x.hub)
              order by (x.hub is not null) desc, x.posts desc, x.last_seen desc nulls last, x.handle)
-    from (
+    from (select y.* from (
       select p.id, p.handle, p.display_name, p.avatar_emoji, p.room_accent, p.last_seen,
         (select count(*) from bulavata.talanoa_posts t
           where t.author = p.id and t.reply_to is null and t.created_at > now() - interval '30 days') as posts,
@@ -87,7 +87,9 @@ begin
       where p.id <> v_uid
         and not exists (select 1 from bulavata.friendships f
           where (f.requester = v_uid and f.addressee = p.id) or (f.requester = p.id and f.addressee = v_uid))
-      order by 7 nulls last, 6 desc, p.last_seen desc nulls last, p.handle
+      ) y
+      -- The cut to the limit uses the same order as the list, so the best matches are the ones kept.
+      order by (y.hub is not null) desc, y.posts desc, y.last_seen desc nulls last, y.handle
       limit v_limit
     ) x), '[]'::jsonb);
 end; $$;

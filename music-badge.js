@@ -17,7 +17,10 @@
     document?.querySelectorAll('[data-sota-lights-toggle]').forEach(button=>{
       button.disabled=!!motion?.matches;
       button.setAttribute('aria-pressed',String(lights&&!motion?.matches));
-      button.textContent=motion?.matches?'Page lights · reduced motion':'Page lights: '+(lights?'On':'Off');
+      const words=motion?.matches?'Page lights · reduced motion':'Page lights: '+(lights?'On':'Off');
+      // An icon-only switch (the mini-player) keeps its symbol; the words become its name.
+      if(button.dataset.sotaLightsToggle==='icon'){button.setAttribute('aria-label',words);button.title=words;}
+      else button.textContent=words;
     });
   }
   function paintColours(){

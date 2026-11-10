@@ -64,7 +64,7 @@ WHERE n.nspname='bulavata' AND c.relname IN ('profiles','crews','crew_members','
   const results=await db.exec(fs.readFileSync(path.join(root,'tests/hubs-db.sql'),'utf8'));
   const checks=results.flatMap(result=>result.rows||[]).flatMap(row=>Object.values(row)).filter(value=>typeof value==='string'&&value.startsWith('PASS '));
   for(const check of checks)process.stdout.write(check+'\n');
-  assert.ok(checks.length>=18&&checks.includes('PASS suite completed'),'Expected the full hubs SQL suite to execute');
+  assert.ok(checks.length>=30&&checks.includes('PASS suite completed'),'Expected the full hubs SQL suite to execute');
   process.stdout.write(`Hubs isolated Postgres: ${checks.length} SQL checks + preservation snapshot passed.\n`);
  } finally {await db.close();}
 })().catch(error=>{process.stderr.write((error.stack||String(error))+'\n');process.exitCode=1;});
