@@ -1,7 +1,7 @@
 name: Verify production deployment
 # Runs when Vercel reports the production deployment ready. The live page must answer with the security
-# headers, carry the release the commit shipped, and pass the Premium Shell check (bottom dock geometry, 44px
-# targets, no horizontal overflow, floating search behaviour, cumulative layout shift under 0.05) at 390 and 1440.
+# headers, carry the release the commit shipped, and pass the Premium Shell check (bottom dock at 390, left rail at 1440,
+# 44px targets, no horizontal overflow, header search behaviour, cumulative layout shift under 0.05).
 on:
   deployment_status:
   workflow_dispatch:
