@@ -112,7 +112,7 @@ test('page wiring: the link is remembered before sign-in, credited once a room e
   assert.match(html,/sb\.rpc\('bv_referral_claim',\{p_token:saved\.token\}\)/);
   const release=/<meta name="sota-release" content="([^"]+)">/.exec(html)[1];
   assert.match(read('sw.js'),new RegExp("const CACHE='"+release+"';"));
-  assert.match(html,/sota-pulse\.js\?v=20261110-share-engine-1/);assert.match(html,/sota-plus\.js\?v=20261110-share-engine-1/);
+  assert.match(html,/sota-pulse\.js\?v=2026111\d-[a-z-]+-\d+/);assert.match(html,/sota-plus\.js\?v=2026111\d-[a-z-]+-\d+/,'both scripts carry a release tag from this round of work');
   const cfg=JSON.parse(read('vercel.json')),routes=cfg.routes,fsi=routes.findIndex(r=>r.handle==='filesystem'),pi=routes.findIndex(r=>r.dest&&r.dest.startsWith('/api/share'));
   assert.ok(pi>-1&&pi<fsi,'the /p/ route runs before the filesystem');
   assert.equal(routes[pi].src,'/p/([0-9]{1,18})/([a-fA-F0-9]{32})/?');

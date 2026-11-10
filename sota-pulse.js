@@ -138,9 +138,18 @@
           '<button type="button" class="tw-btn" data-tw="share" data-id="' + p.id + '" aria-label="Share">↗</button>' +
           (sr && !p.mine ? '<button type="button" class="tw-btn" data-tw="tip" data-id="' + esc(sr.id) + '" aria-label="Tip the maker, ' + num(sr.tips) + '">🎁<b>' + (num(sr.tips) || '') + '</b></button>' : '') +
           (sr ? '<button type="button" class="tw-btn" data-tw="remix" data-id="' + esc(sr.id) + '" aria-label="Remix this sound with your photo">🎤</button>' : '') +
+          coinButton(p) +
           (p.mine ? '<button type="button" class="tw-btn tw-del" data-tw="del" data-id="' + p.id + '" aria-label="Remove your post">✕</button>' : '') +
         '</div>' +
       '</div></article>';
+  }
+  /* Coins: shown only while the wallet is switched on (window.SOTA_WALLET_ON). Others can tip a
+     post; the author sees the total their post has earned. */
+  function coinButton(p) {
+    if (typeof window === 'undefined' || !window.SOTA_WALLET_ON) return '';
+    var coins = num(p.tip_coins);
+    if (p.mine) return coins ? '<span class="tw-btn tw-coin on" aria-label="Tipped ' + coins + ' coins">🪙<b data-count="coin">' + coins + '</b></span>' : '';
+    return '<button type="button" class="tw-btn tw-coin' + (coins ? ' on' : '') + '" data-tw="coin" data-id="' + p.id + '" aria-label="Tip coins, ' + coins + '">🪙<b data-count="coin">' + (coins || '') + '</b></button>';
   }
   function composer(opts) {
     opts = opts || {};
@@ -582,6 +591,7 @@
       if (act === 'people') return goTo && goTo('friends');
       if (act === 'spark') { var sp = $('#tw-spark'); if (sp) { sp.scrollIntoView({ block: 'center', behavior: 'smooth' }); var a = sp.querySelector('textarea'); if (a) a.focus({ preventScroll: true }); } return; }
       if (act === 'tip') return window.SotaSere && window.SotaSere.tip(id, t);
+      if (act === 'coin') return window.SotaCoins ? window.SotaCoins.tip(id, t) : toast('Coins open together with the wallet.');
       if (act === 'remix') return window.SotaSere && window.SotaSere.open({ remixOf: id });
       if (act === 'unquote') { st.quote = null; var f = $('[data-tw-form="post"]'); if (f) f.outerHTML = composer(); return; }
       if (act === 'mode') return setMode(t.dataset.mode);
@@ -650,7 +660,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    cleanShare: cleanShare, shareText: shareText, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, shareText: shareText, coinButton: coinButton, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();
