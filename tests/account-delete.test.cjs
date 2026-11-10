@@ -39,5 +39,5 @@ test('a missing bucket is skipped, not fatal',async()=>{
   assert.strictEqual(n,0);
 });
 test('every bucket members upload to is swept',()=>{
-  for(const b of ['sere-video','sere-images','sere-audio','bv-room-media','profile-photos'])assert.ok(BUCKETS.includes(b),b);
+  for(const b of ['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice'])assert.ok(BUCKETS.includes(b),b);
 });
