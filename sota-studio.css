@@ -1,0 +1,42 @@
+/* The Studio drawer (sota-studio.js): the page-design editor, the room-skin studio and the lights
+   panel all dock to the right edge and share one tab strip. */
+dialog.sd-drawer[open]{position:fixed;inset:0 0 0 auto;margin:0;height:100dvh;max-height:none;border-radius:22px 0 0 22px;animation:sd-slide .22s ease-out}
+dialog.ssd-editor.sd-drawer[open],dialog.sd-lights.sd-drawer[open]{width:min(520px,100vw)}
+dialog.bv-studio.sd-drawer[open]{width:min(1180px,calc(100vw - 224px));height:100dvh}
+/* While the page-design or lights tab is open the page stays in view, so every change is seen on the real page. */
+dialog.ssd-editor.sd-drawer::backdrop,dialog.sd-lights.sd-drawer::backdrop{background:#14263d1f;backdrop-filter:none}
+@keyframes sd-slide{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+
+.sd-tabs{display:flex;align-items:center;gap:12px;flex:none;box-sizing:border-box;padding:10px 12px;background:#2a1747;color:#fff;font-family:Nunito,system-ui,sans-serif}
+dialog.ssd-editor.sd-drawer>.sd-tabs{position:sticky;top:-18px;z-index:5;margin:-18px -18px 14px;border-radius:20px 0 0 0}
+dialog.sd-lights>.sd-tabs{border-radius:20px 0 0 0}
+.sd-title{font:800 12px/1 Nunito,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#e9d9ff;flex:none}
+.sd-tab-row{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.sd-tab-row::-webkit-scrollbar{display:none}
+dialog.sd-drawer .sd-tabs button{flex:none;min-height:44px;padding:8px 14px;border:1px solid #ffffff40;border-radius:999px;background:transparent;color:#fff;font:800 13px/1.2 Nunito,system-ui,sans-serif;cursor:pointer;white-space:nowrap;box-shadow:none;width:auto}
+dialog.sd-drawer .sd-tabs button:hover{background:#ffffff1f}
+dialog.sd-drawer .sd-tabs button[aria-current=page]{background:#fff;color:#2a1747;border-color:#fff}
+dialog.sd-drawer .sd-tabs button:focus-visible{outline:3px solid #ffd76a;outline-offset:2px}
+
+dialog.sd-lights{padding:0;border:1px solid #cdbbe6;background:#fffaf5;color:#2f1b3f;font:15px/1.5 Nunito,system-ui,sans-serif;box-shadow:0 24px 100px #102c3d44;overflow:auto}
+.sd-lights-body{display:flex;flex-direction:column;gap:14px;padding:22px}
+.sd-lights-body header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sd-lights-body h2{margin:0;font-size:24px;color:#3b1d5c}
+.sd-lights-body p{margin:0}
+.sd-note{font-size:13px;color:#5d4770}
+.sd-close{width:44px;height:44px;flex:none;border:1px solid #cdbbe6;border-radius:50%;background:#fff;color:#3b1d5c;font:400 24px/1 system-ui;cursor:pointer}
+.sd-lights-toggle{align-self:flex-start;min-height:48px;padding:10px 20px;border:0;border-radius:999px;background:#6d34c9;color:#fff;font:800 15px Nunito,system-ui,sans-serif;cursor:pointer}
+.sd-lights-toggle[aria-pressed=false]{background:#e8def5;color:#3b1d5c}
+.sd-lights-toggle:disabled{opacity:.6;cursor:not-allowed}
+.sd-link{align-self:flex-start;min-height:44px;padding:8px 0;border:0;background:none;color:#5b2fb0;font:800 14px Nunito,system-ui,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+dialog.sd-lights :focus-visible{outline:3px solid #6d34c9;outline-offset:2px}
+
+@media(max-width:1100px){dialog.bv-studio.sd-drawer[open]{width:100%;max-width:100%;border-radius:0}}
+@media(max-width:760px){
+ dialog.sd-drawer[open]{width:100%!important;max-width:100%!important;border-radius:0}
+ dialog.ssd-editor.sd-drawer>.sd-tabs,dialog.sd-lights>.sd-tabs{border-radius:0}
+ .sd-title{display:none}
+}
+@media(prefers-reduced-motion:reduce){dialog.sd-drawer[open]{animation:none}}
+@media(forced-colors:active){.sd-tabs{background:Canvas;color:CanvasText;border-bottom:1px solid CanvasText}dialog.sd-drawer .sd-tabs button{border:1px solid ButtonText;color:ButtonText;background:ButtonFace}dialog.sd-drawer .sd-tabs button[aria-current=page]{outline:2px solid Highlight}.sd-lights-toggle{border:1px solid ButtonText}}
+dialog.ssd-editor.sd-drawer[open]{padding:18px;border-width:0 0 0 1px}
