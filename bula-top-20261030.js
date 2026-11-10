@@ -6,6 +6,9 @@
     if(!acts||!pill)return;
     var el=pill.closest('.bw-group')||pill;
     if(el.parentNode!==acts)acts.insertBefore(el,acts.firstChild);
+    // If bula-welcome floated it first (the header was not drawn yet), take off the floating position so it sits in the row,
+    // exactly as when it is placed in the header directly. Without this the pill landed bottom-left on some loads.
+    if(!pill.classList.contains('bw-inline')){pill.classList.add('bw-inline');el.classList.remove('bw-float');['top','right','bottom','left'].forEach(function(p){el.style.removeProperty(p);pill.style.removeProperty(p);});}
     if(el.classList.contains('bw-own-line'))el.classList.remove('bw-own-line');
     var small=window.matchMedia('(max-width: 640px)').matches;
     var set=function(e,p,v){if(e&&(e.style.getPropertyValue(p)!==v||e.style.getPropertyPriority(p)!=='important'))e.style.setProperty(p,v,'important');};

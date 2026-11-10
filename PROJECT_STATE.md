@@ -1,3 +1,16 @@
+## 10 November 2026 — Guest welcome before the feature scripts (Ops task 1041)
+
+Release `sota-kece-shell-20261110-v163-first-paint`. After task 1037 the phone largest paint was still about 4.7s in the lab, because the veranda photo was only drawn once about 45 scripts had downloaded and run.
+
+- **Static first paint.** `index.html` carries `<template id="sx-first-paint">`: the header, bottom navigation and Home welcome exactly as `sota-experience.js` renders them (the example room body is left empty; it is below the first screen). A tiny inline script after `#app` clones it in only when the screen is 760px or narrower, the hash is empty or `#home`, there is no `code`/`sid`/`error` in the query, and there is no Supabase session in localStorage (`sb-aqfzpaczyodhugsgqvxi-auth-token`). The app's first render replaces it; the photo, text and positions are the same, so nothing moves. `tests/first-paint.test.cjs` fails if the welcome copy in `sota-experience.js` changes without the template.
+- **Head scripts moved.** `vendor/supabase`, `room-media.js`, `skin-identities.js`, `pacific-themes.js`, `skin-visuals.js` and `skins.js` were parser-blocking in `<head>`; they now sit just before `communications-core.js`, same order, still before the app script.
+- **Bula pill.** `bula-top-20261030.js` now takes the floating position off the pill when it moves it into the top bar, so it no longer ends up bottom-left on some loads (the race noted in task 1037).
+- **Live check.** `tests/tools/lcp-phone.mjs` measures slow-phone largest paint; `deploy-verify.yml` runs it against sotakece.com after each production deploy (report only).
+
+Lab, local static server, 5-run medians: phone 390px (4x CPU, 1.6 Mbps, 150 ms) largest paint 4.86s → 3.39s, first paint 2.4s → 1.7s, layout shift 0.003 → 0.005 (a small font swap on the early text); desktop 1440px 0.65s → 0.64s. The phone runs split into two groups, 2.0–2.2s and 3.3–3.4s: on the lab's HTTP/1.1 server the photo either gets one of the six connections at once or waits behind 36 render-blocking stylesheets. Production serves HTTP/2, where that queue does not exist. Screenshots 390@3x, 1440@1x, 1440@2x match pixel for pixel with the pill in the top bar.
+
+Still possible: fewer, combined stylesheets (36 render-blocking files) would remove the connection queue on HTTP/1.1 and shave first paint everywhere.
+
 ## 10 November 2026 — Largest paint, second pass (Ops task 1037)
 
 Release `sota-kece-shell-20261110-v162-lcp`. Real visitors on 10 November: largest paint p75 3.77s over 32 samples (target 2.5s), layout shift fine. Task 1020 already preloads the veranda guitar photo; what was still slow:

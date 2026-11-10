@@ -36,3 +36,5 @@ jobs:
           npm i --no-save --no-audit --no-fund playwright@1.63.0
           npx playwright install --with-deps chromium
           node tests/tools/check-shell.mjs https://sotakece.com/
+      - name: Largest paint on a slow phone, signed out (report only)
+        run: node tests/tools/lcp-phone.mjs https://sotakece.com/ 3 || true

@@ -17,7 +17,7 @@ test('page: layer declared first, shell stylesheet after the header standard, ad
  assert.match(html,/<body class="dps-shell dps-has-nav">/);
 });
 test('page: floating search button and overlay follow the shell contract and are static markup (no layout shift on mount)',()=>{
- assert.equal((html.match(/data-dps-search-open/g)||[]).length,1,'one opener: the floating button');
+ assert.equal((html.replace(/<template id="sx-first-paint">[\s\S]*?<\/template>/,'').match(/data-dps-search-open/g)||[]).length,1,'one opener: the floating button (the inert first-paint copy of the header is replaced on first render)');
  assert.match(html,/<button type="button" class="dps-fab" data-dps-search-open aria-expanded="false" aria-label="Search Sota Kece"/);
  assert.match(html,/<div class="dps-search" data-dps-search hidden/);
  assert.match(html,/role="dialog" aria-modal="true" aria-labelledby="dps-search-title"/);
