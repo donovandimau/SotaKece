@@ -6,7 +6,7 @@ Nothing moves yet. The wallet is held until the Reserve Bank of Fiji approves it
 
 Migration `supabase/migrations/20261110200000_sota_coins.sql`: five tables with RLS (members read their own rows, nothing is writable), an append-only coin ledger whose legs are grouped and sum to zero, `tip_count` / `tip_coins` on wall posts, the wallet ledger kinds `coin_buy` / `coin_payout`, the Activity kind `tip`, and the five `bv_coin*` functions with per-member advisory locks and ordered row locks. `sota-coins.js` + `.css`, wiring in `sota-pulse.js`, `sota-plus.js` and `index.html`. Release v171.
 
-Verified locally: `tests/run-coins-db.cjs` (65 isolated Postgres checks + preservation snapshot, including that every balance, earned pile and the fee total equal the ledger and that coins minted minus paid out equal coins held plus fees) and `tests/coins.test.cjs` (7); full suite green with and without jsdom; the tip sheet and wallet cards rendered at 390px. Not verified: a purchase against the live wallet. Branch stacked on the share engine. Notes: `docs/coins-20261110.md`.
+Verified locally: `tests/run-coins-db.cjs` (65 isolated Postgres checks + preservation snapshot, including that every balance, earned pile and the fee total equal the ledger and that coins minted minus paid out equal coins held plus fees) and `tests/coins.test.cjs` (7); full suite green with and without jsdom; the tip sheet and wallet cards rendered at 390px. The migration was applied to dimau-core-sydney on 10 November with the owner's approval, switches off. Not verified: a purchase against the live wallet. Branch stacked on the share engine. Notes: `docs/coins-20261110.md`.
 
 ## 10 November 2026 — The share engine: public post links with referral credit
 
