@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Real-Chromium check of a page that uses the Dimau Premium Shell.
 //   node premium-shell/scripts/check-shell.mjs <url-or-file> [--json]
-// Asserts at 390x844 and 1440x900: bottom nav fixed to the viewport bottom, every nav target >= 44px,
+// Asserts at 390x844: bottom nav fixed to the viewport bottom; at 1440x900: the nav sits in a rail fixed to the
+// left edge for the full viewport height (Sota Kece, 10 Nov 2026: one primary navigation per viewport). Every nav target >= 44px,
 // no horizontal overflow, the search overlay opens, traps focus, closes on Escape and restores focus,
 // and cumulative layout shift stays under 0.05 through load + nav + search open/close.
 import { pathToFileURL } from 'node:url';
@@ -32,7 +33,12 @@ for (const vp of viewports) {
   if (await nav.count() !== 1) { fail(vp.name, 'exactly one [data-dps-nav] expected'); await page.close(); continue; }
   const box = await nav.boundingBox();
   r.nav = { x: Math.round(box.x), y: Math.round(box.y), w: Math.round(box.width), h: Math.round(box.height) };
-  if (Math.abs(box.y + box.height - vp.height) > (vp.width > 760 ? 24 : 1)) fail(vp.name, `nav not at viewport bottom (bottom edge ${Math.round(box.y + box.height)} of ${vp.height})`);
+  if (vp.width > 760) {
+    const rail = await nav.evaluate(el => { const host = el.closest('.sx-rail') || el; const cs = getComputedStyle(host); const b = host.getBoundingClientRect(); return { position: cs.position, x: Math.round(b.x), top: Math.round(b.y), bottom: Math.round(b.bottom), w: Math.round(b.width) }; });
+    r.rail = rail;
+    if (rail.position !== 'fixed' || rail.x !== 0 || rail.bottom < vp.height - 1) fail(vp.name, `rail not fixed to the left edge for the full height (${rail.position}, x=${rail.x}, bottom=${rail.bottom} of ${vp.height})`);
+    if (box.y + box.height > vp.height - 24) fail(vp.name, 'no bottom dock expected on wide screens');
+  } else if (Math.abs(box.y + box.height - vp.height) > 1) fail(vp.name, `nav not at viewport bottom (bottom edge ${Math.round(box.y + box.height)} of ${vp.height})`);
   const targets = await nav.locator('a,button').evaluateAll(els => els.map(el => { const b = el.getBoundingClientRect(); return { label: el.textContent.trim(), w: Math.round(b.width), h: Math.round(b.height) }; }));
   r.targets = targets;
   for (const t of targets) if (t.w < 44 || t.h < 44) fail(vp.name, `nav target "${t.label}" is ${t.w}x${t.h}, under 44px`);
@@ -70,7 +76,7 @@ await browser.close();
 if (json) console.log(JSON.stringify(report, null, 2));
 else {
   for (const [name, r] of Object.entries(report.viewports)) {
-    console.log(`${name}: nav ${r.nav ? `${r.nav.w}x${r.nav.h} at y=${r.nav.y}` : 'missing'} · targets ${r.targets ? r.targets.map(t => `${t.w}x${t.h}`).join(' ') : '-'} · overflow ${r.overflow}px · search ${typeof r.search === 'object' ? `${r.search.w}x${r.search.h}` : r.search} · results ${r.results ?? '-'} · CLS ${r.cls}`);
+    console.log(`${name}: nav ${r.nav ? `${r.nav.w}x${r.nav.h} at y=${r.nav.y}` : 'missing'}${r.rail ? ` · rail ${r.rail.w}px ${r.rail.position} at x=${r.rail.x}` : ''} · targets ${r.targets ? r.targets.map(t => `${t.w}x${t.h}`).join(' ') : '-'} · overflow ${r.overflow}px · search ${typeof r.search === 'object' ? `${r.search.w}x${r.search.h}` : r.search} · results ${r.results ?? '-'} · CLS ${r.cls}`);
     for (const f of r.failures || []) console.log('  FAIL ' + f);
   }
   console.log(report.ok ? 'PASS' : 'FAIL');
