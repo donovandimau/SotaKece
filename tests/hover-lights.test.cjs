@@ -20,3 +20,8 @@ test('hover lights is loaded by the page and known to the offline worker',()=>{
   assert.match(page,/hover-lights\.js\?v=/);assert.match(page,/hover-lights\.css\?v=/);
   assert.ok(sw.includes("'/hover-lights.js'")&&sw.includes("'/hover-lights.css'"));
 });
+test('hover lights does not relight after the pointer has left the page',()=>{
+  const src=fs.readFileSync(path.join(root,'hover-lights.js'),'utf8');
+  assert.match(src,/function run\(\)\{queued=false;if\(!target\)return;/);
+  assert.match(src,/function off\(\)\{target=null;/);
+});

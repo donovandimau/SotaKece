@@ -72,13 +72,13 @@
     CSS.highlights.set('sota-word-'+(wordTurn++%COLOURS.length),new Highlight(range));
   }
   let queued=false,px=0,py=0,target=null;
-  function run(){queued=false;light(target);lightWord(px,py);}
+  function run(){queued=false;if(!target)return;light(target);lightWord(px,py);}
   document.addEventListener('pointermove',event=>{
     if(event.pointerType&&event.pointerType!=='mouse'&&event.pointerType!=='pen')return;
     px=event.clientX;py=event.clientY;target=event.target;
     if(!queued){queued=true;requestAnimationFrame(run);}
   },{passive:true});
-  function off(){current.item=current.panel=null;place('panel');place('item');clearWord();}
+  function off(){target=null;current.item=current.panel=null;place('panel');place('item');clearWord();}
   document.documentElement.addEventListener('pointerleave',off);
   window.addEventListener('blur',off);
   window.addEventListener('scroll',()=>{if(current.item||current.panel){place('panel');place('item');}},{passive:true,capture:true});
