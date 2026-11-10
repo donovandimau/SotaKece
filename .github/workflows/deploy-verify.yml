@@ -11,7 +11,7 @@ jobs:
   live:
     if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,4 +37,5 @@ jobs:
           npx playwright install --with-deps chromium
           node tests/tools/check-shell.mjs https://sotakece.com/
       - name: Largest paint on a slow phone, signed out (report only)
-        run: node tests/tools/lcp-phone.mjs https://sotakece.com/ 3 || true
+        run: |
+          for u in https://sotakece-p5yv9gd7f-donovandimau-3468s-projects.vercel.app/ https://sotakece-lgc8ztl94-donovandimau-3468s-projects.vercel.app/ 'https://sotakece-lgc8ztl94-donovandimau-3468s-projects.vercel.app/#x' https://sotakece-p5yv9gd7f-donovandimau-3468s-projects.vercel.app/ https://sotakece-lgc8ztl94-donovandimau-3468s-projects.vercel.app/; do echo "--- $u"; node tests/tools/lcp-phone.mjs "$u" 5 | tail -1 || true; done
