@@ -33,14 +33,14 @@ browserTest('each signed-in destination retains its content and the pill strip l
  const h=harness(t);const strip={pulse:4,moments:4,crews:4,circles:4,friends:2,connections:2,music:0,room:0},seen=new Set();for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});assert.equal(h.app.querySelector('.sx-world-next'),null,'no repeated destination cards under the page');if(page==='music'){assert.equal(h.app.querySelector('.sx-world-more'),null,'Music has no second visual-style picker');assert.equal(h.app.querySelector('.sx-world-hero [data-world-tool]'),null,'the Music hero has no visuals button');assert(h.app.querySelector('.sx-world-hero-compact'));  }assert.equal(h.get('#draft'),draft);assert.equal(draft.value,'keep my draft');const pills=[...h.app.querySelectorAll('.sx-world-member-tabs button')];pills.forEach(b=>seen.add(b.dataset.worldMember));assert.equal(pills.length,strip[page],'the pill strip lists only the active dock group');if(strip[page])assert.equal(h.app.querySelector('.sx-world-member-tabs [aria-current="page"]').dataset.worldMember,page);else assert.equal(h.app.querySelector('.sx-world-member-tabs'),null,'Music and My space have no secondary pills');assert.equal(h.app.querySelectorAll('.sx-nav [aria-current="page"]').length,1);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page==='room'?'profile':page);}
  assert.deepEqual([...seen].sort(),['circles','connections','crews','friends','moments','pulse'],'every secondary world is reachable from its dock tab; Music and My space are dock tabs themselves');
 });
-browserTest('Home leads with Sere while the compact Music hero stays action-free',t=>{
+browserTest('the slim Home greeting and the compact Music hero are both action-free',t=>{
  const h=harness(t);h.w.SotaSere={open(){}};
  for(const page of ['pulse','music']){
    h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"></main>';
    h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture'},tab:page});
    const actions=h.app.querySelector('.sx-world-hero [data-world-actions]');
-   if(page==='pulse'){assert.match(actions.querySelector('.sx-world-primary').textContent,/Make a photo sing/);assert.match(actions.querySelector('.sx-world-secondary').textContent,/Share a moment/);}
-   else assert.equal(actions.querySelector('button'),null);
+   assert.equal(actions.querySelector('button'),null);
+   if(page==='pulse'){assert(h.app.querySelector('.sx-world-hero-slim'));assert.equal(h.app.querySelector('.sx-world-hero-photo'),null,'no banner artwork on Home');assert.equal(h.app.querySelector('.sx-world-more'),null,'no ideas menu on Home');assert.match(h.app.querySelector('.sx-world-hero h1').textContent,/Start with one small moment|Welcome back/);}
  }
 });
 test('member deep links are bounded and leave invitation and public graph routes to their existing owners',()=>{

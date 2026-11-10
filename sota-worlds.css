@@ -521,3 +521,17 @@ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playl
  #app.sx-app .sx-world-hero-compact .sx-world-hero-copy h1{font-size:24px!important}
 }
 @media(forced-colors:active){#app.sx-app .sx-player-sere{background:ButtonFace;color:ButtonText;border-color:ButtonText}}
+
+/* Home (10 Nov 2026): a slim greeting replaces the big banner; the composer below it is the starting point. */
+#app.sx-app .sx-world-hero.sx-world-hero-slim{display:block;min-height:0;border-radius:18px;background:linear-gradient(115deg,#fff9,transparent),var(--world-tint)}
+#app.sx-app .sx-world-hero-slim .sx-world-hero-copy{padding:14px 22px;color:var(--world-dark)}
+#app.sx-app .sx-world-hero-slim .sx-world-hero-copy:before{display:none}
+#app.sx-app .sx-world-hero-slim .sx-eyebrow{color:inherit;opacity:.8}
+#app.sx-app .sx-world-hero-slim .sx-world-hero-copy h1{font-size:24px!important;max-width:none!important;margin:4px 0 0;color:inherit}
+#app.sx-app .sx-world-hero-slim .sx-world-hero-copy>p{margin:4px 0 0;font-size:13px;max-width:none;color:inherit}
+#app.sx-app .sx-world-hero-slim .sx-world-actions:empty{display:none}
+@media(max-width:760px){#app.sx-app .sx-world-hero-slim .sx-world-hero-copy{padding:12px 16px}#app.sx-app .sx-world-hero-slim .sx-world-hero-copy h1{font-size:20px!important}}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero.sx-world-hero-slim{min-height:0;background:linear-gradient(115deg,#fff9,transparent),var(--world-tint,#ffe3ee);border:1px solid #fff}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero.sx-world-hero-slim::before{display:none;content:none}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-slim .sx-world-hero-copy{max-width:none;color:var(--world-dark,#502475)}
+body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-slim .sx-world-hero-copy :is(h1,p,.sx-eyebrow){color:var(--world-dark,#502475)!important;text-shadow:none!important}
