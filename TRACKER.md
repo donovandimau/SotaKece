@@ -21,6 +21,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-10 | Copilot | Resolve Music page tidy merge conflicts | claude/music-page-tidy-20261110 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
@@ -124,4 +125,3 @@ Source kept read-only at https://github.com/donovandimau/sota-kece (`src/skins.t
 - 2026-10-30 — claude — Dimau Pay: load the widget from a host every app security policy already allows  The Supabase function address was blocked by script-src on the live sites.  Co-Authored-By: Claude Fable 5.1 <noreply@a
 
 _Seeded 2026-11-02 from the Ops Room. From here on, this file is the record for this project._
-
