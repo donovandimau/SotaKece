@@ -246,9 +246,11 @@
     on(canvas,'webglcontextrestored',()=>{if(disposed)return;renderer=null;start();});
     on(doc,'visibilitychange',()=>{if(active())draw();schedule();});
     if(media?.addEventListener)on(media,'change',()=>{draw();schedule();});
-    const observer=win.IntersectionObserver?new win.IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);if(active())draw();schedule();},{rootMargin:'120px'}):null;observer?.observe(host);
+    // WebGL setup and the first layout read wait until the graph is near the screen, so a hidden graph never slows the first paint.
+    let started=false;function begin(){if(started||disposed)return;started=true;start();}
+    const observer=win.IntersectionObserver?new win.IntersectionObserver(entries=>{inView=entries.some(e=>e.isIntersecting);if(inView)begin();if(active())draw();schedule();},{rootMargin:'120px'}):null;observer?.observe(host);
     const resizeObserver=win.ResizeObserver?new win.ResizeObserver(resize):null;resizeObserver?.observe(stage);if(!resizeObserver)on(win,'resize',resize);
-    rebuild();start();
+    rebuild();if(!observer)begin();
     return {update(next){if(disposed)return;const normalized=normalize(next);if(JSON.stringify(normalized)===JSON.stringify(graph))return;end();graph=normalized;points=layout(graph);for(const [id,p] of movedPoints){if(points.has(id))points.set(id,p);else movedPoints.delete(id);}if(storageKey)saveLayout();if(!graph.nodes.some(n=>n.id===selected))selected=graph.nodes.find(n=>n.kind==='you')?.id||'';rebuild();},select,setMotion(value){requestedMotion=!!value;if(active())draw();schedule();},zoom,reset,
       dispose(){if(disposed)return;end();disposed=true;cancel();observer?.disconnect();resizeObserver?.disconnect();listeners.forEach(fn=>fn());if(!lost)renderer?.dispose();try{gl?.getExtension('WEBGL_lose_context')?.loseContext();}catch(_){}renderer=null;gl=null;graph={nodes:[],edges:[]};points.clear();movedPoints.clear();labelButtons.clear();host.replaceChildren();host.classList.remove('lg3d','lg3d-unavailable');delete host.dataset.renderer;delete host.dataset.background;}};
   }

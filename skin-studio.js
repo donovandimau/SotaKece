@@ -267,7 +267,7 @@
     return `<section class="bv-discovery" id="bv-your-room" tabindex="-1" aria-labelledby="bv-discovery-title"><header><div><span class="bv-discovery-kicker">MAKE IT YOURS</span><h2 id="bv-discovery-title">Make it yours.</h2><p>Browse a look, or start with your own ideas.</p><small class="bv-discovery-selected">Selected skin · <span id="bv-welcome-skin-name"></span></small></div><button type="button" class="bv-discovery-all">Explore all ${skins.presets.length} skins <span aria-hidden="true">↗</span></button></header>${discovery?`<div class="bv-collection-grid">${collectionMarkup()}</div>`:''}<p class="bv-discovery-note">Original cover artwork. Community-made designs. A space to make your own.</p></section>`;
   }
   function originalCrop(x,y,w,h,label) {
-    return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="/assets/mobile-front-reference.png" width="1008" height="1792"/></svg>`;
+    return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="/assets/mobile-front-reference-20261110.webp" width="1008" height="1792"/></svg>`;
   }
   function originalMate(index,label) {
     // Native portraits from Donovan's original mobile artwork, without re-encoding.
