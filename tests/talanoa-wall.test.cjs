@@ -187,6 +187,48 @@ test('the deep link #talanoa=ID opens that post and cleans the hash',{skip:!JSDO
   assert.equal(w.location.hash,'');
 });
 
+test('a shared-in link fills the composer once, cleans the link, and never posts by itself',{skip:!JSDOM},async()=>{
+  const {w,calls,toasts}=boot(feed([post(1)]));
+  const text='“Sa noqu i vakatawa ko Jiova” — Same 23:1 (Vakavakadewa Vou 2010)\nhttps://fijianbible.com/?book=19&chapter=23&verse=1&edition=fij2010';
+  w.location.hash='#talanoa-share='+encodeURIComponent(text);
+  await w.SotaPulse.view();await flush();
+  const form=w.document.querySelector('[data-tw-form="post"]'),ta=form.querySelector('textarea');
+  assert.equal(ta.value,text);assert.equal(w.location.hash,'','the words leave the address bar');
+  assert.ok(!form.querySelector('button[type=submit]').disabled,'Post is ready to tap');
+  assert.equal(form.querySelector('.tw-count').textContent,(280-text.length)+' letters left');
+  assert.ok(!calls.some(c=>c.name==='bv_talanoa_post'),'nothing is posted from a link');
+  assert.ok(toasts.some(t=>/tap Post/.test(t)));
+  assert.equal(w.sessionStorage.getItem('sota-talanoa-share'),null,'used once');
+  // Opening the wall again does not bring the words back.
+  ta.value='';w.SotaPulse.stop();await w.SotaPulse.view();await flush();
+  assert.equal(w.document.querySelector('[data-tw-form="post"] textarea').value,'');
+});
+
+test('shared-in words wait for sign-in, never replace a draft, and are cleaned and capped',{skip:!JSDOM},async()=>{
+  // The link is opened signed out: the words are kept for this tab and the link is cleaned at once.
+  const dom=new JSDOM('<!doctype html><body><div id="app"><main id="view"></main></div></body>',{runScripts:'outside-only',pretendToBeVisual:true,url:'http://test.invalid/#talanoa-share='+encodeURIComponent('Bula vinaka')});
+  const w=dom.window;windows.push(w);w.IntersectionObserver=class{observe(){}disconnect(){}};w.scrollTo=()=>{};
+  w.eval(src);
+  assert.equal(w.location.hash,'');assert.match(w.sessionStorage.getItem('sota-talanoa-share'),/Bula vinaka/);
+  const channel={on(){return channel;},subscribe(){return channel;}};
+  const state={user:null,me:null,tab:'pulse'};
+  w.SotaPulse.init({client:{rpc:async()=>({data:[],error:null}),channel:()=>channel,removeChannel(){}},state,toast(){},esc,ago:()=>'now',openRoom(){},shell:html=>{w.document.getElementById('view').innerHTML=html;}});
+  await w.SotaPulse.view();await flush();
+  assert.equal(w.document.querySelector('[data-tw-form="post"] textarea').value,'','not signed in: nothing is filled yet');
+  state.user={id:'u-ana'};state.me=ana;w.SotaPulse.stop();
+  await w.SotaPulse.view();await flush();
+  assert.equal(w.document.querySelector('[data-tw-form="post"] textarea').value,'Bula vinaka');
+  // A second link while a draft is being written does not overwrite it.
+  const ta=w.document.querySelector('[data-tw-form="post"] textarea');ta.value='my own words';
+  w.location.hash='#talanoa-share=other';w.dispatchEvent(new w.Event('hashchange'));await flush();
+  assert.equal(ta.value,'my own words');
+  const P=w.SotaPulse;
+  assert.equal(P.cleanShare('%E0%A4%A'),'','a broken link is ignored');
+  assert.equal(P.cleanShare(encodeURIComponent('a\u0000b‮c\r\n\n\n\nd')),'abc\n\nd','control and direction-flipping characters are removed');
+  const long=P.cleanShare(encodeURIComponent('x'.repeat(400)));assert.equal(long.length,280);assert.ok(long.endsWith('…'));
+  assert.equal(P.cleanShare(encodeURIComponent('<img src=x onerror=alert(1)>')),'<img src=x onerror=alert(1)>','kept as plain words; only ever set as a textarea value');
+});
+
 test('index.html hands the Pulse tab to the wall, keeps the Spark, stops the wall on tab change, and the worker caches the new files',()=>{
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
   assert.match(html,/window\.SotaPulse\.init\(\{client:sb,state:S,toast,esc,ago,openRoom,shell,spark:sparkCard\}\)/);
@@ -196,5 +238,5 @@ test('index.html hands the Pulse tab to the wall, keeps the Spark, stops the wal
   assert.doesNotMatch(html,/bv_pulse_feed|postPulse\(/,'the old one-line-per-friend pulse is gone from the tab');
   const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
   assert.match(sw,/ON_DEMAND=\['\/sota-pulse\.js','\/sota-pulse\.css'/);
-  assert.match(sw,/sota-kece-shell-20261110-v159-nav-tidy/);
+  assert.match(sw,/sota-kece-shell-20261110-v160-share-in/);
 });

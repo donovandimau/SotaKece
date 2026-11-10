@@ -19,7 +19,7 @@
 
   function fresh() {
     return { mode: DEFAULT_MODE, asOf: null, posts: [], offset: 0, done: false, loading: false,
-             pending: 0, newest: null, thread: null, quote: null, channel: null, io: null, seq: 0, sparkHtml: null };
+             pending: 0, newest: null, thread: null, quote: null, channel: null, io: null, seq: 0, sparkHtml: null, share: null };
   }
   function say(err, fallback) {
     var m = (err && err.message) || '';
@@ -55,6 +55,47 @@
   }
   function pillText(n) { return n === 1 ? '1 new post' : n + ' new posts'; }
   function shareUrl(id) { return location.origin + location.pathname + '#talanoa=' + id; }
+
+  /* ---------------------------------------------------------------- shared-in posts */
+  /* Another Dimau site (the Fijian Bible's "Post this verse") opens sotakece.com/#talanoa-share=<text>.
+     The words are kept for this tab only, the link is cleaned, and the next time the wall opens they
+     are placed in the composer for the member to read, change and post themselves. Nothing is ever
+     posted from a link, and the words are only ever set as plain text. */
+  var SHARE_HASH = /^#talanoa-share=(.*)$/, SHARE_KEY = 'sota-talanoa-share', SHARE_TTL = 30 * 60 * 1000;
+  function cleanShare(raw) {
+    var text;
+    try { text = decodeURIComponent(String(raw || '')); } catch (_) { return ''; }
+    text = text.replace(/\r\n?/g, '\n').replace(/[\u0000-\u0009\u000B-\u001F\u007F​-‏‪-‮⁦-⁩]/g, '')
+      .replace(/\n{3,}/g, '\n\n').trim();
+    return text.length > MAX ? text.slice(0, MAX - 1).trimEnd() + '…' : text;
+  }
+  function captureShare() {
+    var m = SHARE_HASH.exec(location.hash || ''); if (!m) return false;
+    var text = cleanShare(m[1]);
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (_) {}
+    if (!text) return false;
+    try { sessionStorage.setItem(SHARE_KEY, JSON.stringify({ text: text, at: Date.now() })); } catch (_) { st.share = text; }
+    return true;
+  }
+  function pendingShare() {
+    if (st.share) return st.share;
+    try {
+      var saved = JSON.parse(sessionStorage.getItem(SHARE_KEY) || 'null');
+      if (saved && typeof saved.text === 'string' && Date.now() - saved.at < SHARE_TTL) return cleanShare(encodeURIComponent(saved.text));
+      if (saved) sessionStorage.removeItem(SHARE_KEY);
+    } catch (_) {}
+    return '';
+  }
+  function applyShare() {
+    var text = pendingShare(); if (!text || !S || !S.user) return false;
+    var ta = document.querySelector('[data-tw-form="post"] textarea'); if (!ta || ta.value.trim()) return false;
+    ta.value = text;
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    st.share = null; try { sessionStorage.removeItem(SHARE_KEY); } catch (_) {}
+    try { ta.focus({ preventScroll: false }); ta.setSelectionRange(text.length, text.length); } catch (_) {}
+    if (toast) toast('Your post is ready. Read it, then tap Post.');
+    return true;
+  }
 
   /* ---------------------------------------------------------------- markup */
   function avatar(p) {
@@ -419,28 +460,34 @@
     if (spark && st.sparkHtml === null) {
       Promise.resolve().then(spark).then(function (html) { st.sparkHtml = html || ''; var el = $('#tw-spark'); if (el && seq === st.seq) el.innerHTML = st.sparkHtml; }).catch(function () { st.sparkHtml = ''; });
     }
+    captureShare();
     var deep = /^#talanoa=(\d+)$/.exec(location.hash || '');
     if (deep) { history.replaceState(null, '', location.pathname + location.search); return openThread(Number(deep[1])); }
     try { await loadFirst(); } catch (e) { if (seq === st.seq) shell(errorBox()); return; }
     if (seq !== st.seq) return;
     shell(wall());
     paintPill(); watchSentinel();
+    applyShare();
   }
   function stop() {
     st.seq += 1;
     if (st.io) { st.io.disconnect(); st.io = null; }
     if (st.channel && client && typeof client.removeChannel === 'function') { try { client.removeChannel(st.channel); } catch (_) {} }
-    var keepMode = st.mode; st = fresh(); st.mode = keepMode;
+    var keepMode = st.mode, keepShare = st.share; st = fresh(); st.mode = keepMode; st.share = keepShare;
   }
   function init(cfg) {
     client = cfg.client; S = cfg.state; toast = cfg.toast; esc = cfg.esc; ago = cfg.ago;
     openRoom = cfg.openRoom; shell = cfg.shell; spark = cfg.spark || null;
   }
 
+  // Keep the words as soon as the page loads, before sign-in or any tab change can drop the link.
+  captureShare();
+  if (typeof window.addEventListener === 'function') window.addEventListener('hashchange', function () { if (captureShare() && S && S.tab === 'pulse' && !st.thread) applyShare(); });
+
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();
