@@ -11,8 +11,12 @@
   var MAX = 280, PAGE = 20, PREFETCH_PX = 900, DEFAULT_MODE = 'latest', CHANNEL = 'talanoa-wall', SITE = 'https://sotakece.com';
   var SAY = {
     NOT_SIGNED_IN: 'Sign in first.', EMPTY: 'Write something first.', TOO_LONG: 'Keep it under 280 characters.',
-    GONE: 'That post is gone.', NOT_YOURS: 'That is not yours to remove.'
+    GONE: 'That post is gone.', NOT_YOURS: 'That is not yours to remove.',
+    VOICE_BAD: 'That recording could not be used. Record it again.', VOICE_LIMIT: 'That is plenty of voice notes for today. Try again tomorrow.'
   };
+  var VOICE_BUCKET = 'talanoa-voice', VOICE_MAX = 60, VOICE_PATH = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(?:webm|m4a|ogg)$/;
+  var VOICE_TYPES = [['audio/webm;codecs=opus', 'audio/webm', 'webm'], ['audio/webm', 'audio/webm', 'webm'], ['audio/mp4', 'audio/mp4', 'm4a'], ['audio/ogg;codecs=opus', 'audio/ogg', 'ogg']];
+  var rec = null, voiceOff = false;
 
   var client, S, toast, esc, ago, openRoom, shell, spark;
   var st = fresh(), wired = false, player = null, goTo = null;
@@ -42,9 +46,15 @@
         return pre + '<button type="button" class="tw-mention" data-tw="room" data-handle="' + esc(h) + '">@' + esc(h) + '</button>';
       })
       .replace(/https:\/\/sotakece\.com\/t\/([a-z0-9-]{1,80})(?![a-z0-9-])/g, function (_, id) {
-        return '<a class="tw-track-link" href="/t/' + id + '" target="_blank" rel="noopener"><span aria-hidden="true">🎵</span> Listen on Sota Kece</a>';
+        var known = trackById(id);
+        return known ? trackRow(known) : '<a class="tw-track-link" data-track-link="' + id + '" href="/t/' + id + '" target="_blank" rel="noopener"><span aria-hidden="true">🎵</span> Listen on Sota Kece</a>';
       })
       .replace(/\n/g, '<br>');
+  }
+  function trackById(id) { var list = st.catalogue || []; for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+  /** Once the Island Mix is known, a shared song link becomes a card that plays right in the post. */
+  function hydrateTracks() {
+    $$('a.tw-track-link[data-track-link]').forEach(function (a) { var t = trackById(a.dataset.trackLink); if (t) a.outerHTML = trackRow(t); });
   }
   function newest(posts) {
     var m = null;
@@ -119,6 +129,125 @@
       '<div class="tw-sere-meta"><span>🎤 Sere</span>' + (sr.seconds ? '<span>' + num(sr.seconds) + 's</span>' : '') + (sr.remix_of ? '<span>🔁 remix</span>' : '') + '</div>' +
       '<video data-sere="' + esc(sr.id) + '" controls playsinline preload="none"' + (sr.poster ? ' poster="' + esc(sr.poster) + '"' : '') + ' src="' + esc(sr.video) + '"></video></div>';
   }
+  /* ---------------------------------------------------------------- voice notes */
+  function voiceUrl(path) {
+    if (!VOICE_PATH.test(String(path || ''))) return '';
+    try { var r = client.storage.from(VOICE_BUCKET).getPublicUrl(path); return (r && r.data && r.data.publicUrl) || ''; } catch (_) { return ''; }
+  }
+  function clock(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+  /** A voice note on a post. Nothing downloads until the member presses play. */
+  function voiceBox(v) {
+    var url = v && voiceUrl(v.path);
+    if (!url) return '';
+    return '<div class="tw-voice-note"><span class="tw-voice-meta"><span aria-hidden="true">🎙️</span> Voice note' + (num(v.seconds) ? ' · ' + clock(num(v.seconds)) : '') + '</span>' +
+      '<audio controls preload="none" src="' + esc(url) + '" aria-label="Voice note"></audio></div>';
+  }
+  function canRecord() {
+    return !voiceOff && typeof window.MediaRecorder === 'function' && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && !!(client && client.storage);
+  }
+  function voiceType() {
+    for (var i = 0; i < VOICE_TYPES.length; i++) { try { if (window.MediaRecorder.isTypeSupported(VOICE_TYPES[i][0])) return VOICE_TYPES[i]; } catch (_) {} }
+    return null;
+  }
+  function voiceButton(reply) {
+    return canRecord() ? '<button type="button" class="' + (reply ? 'tw-btn tw-voice-open' : 'tw-quick-act tw-voice-open') + '" data-tw="voice" aria-label="Record a voice note"><span aria-hidden="true">🎙️</span>' + (reply ? '' : ' Voice note') + '</button>' : '';
+  }
+  function voicePanel(form) { return form && form.querySelector('.tw-voice'); }
+  function dropRec() {
+    if (!rec) return;
+    if (rec.timer) clearInterval(rec.timer);
+    try { if (rec.recorder && rec.recorder.state !== 'inactive') { rec.recorder.onstop = null; rec.recorder.stop(); } } catch (_) {}
+    if (rec.stream) rec.stream.getTracks().forEach(function (t) { try { t.stop(); } catch (_) {} });
+    if (rec.url) { try { URL.revokeObjectURL(rec.url); } catch (_) {} }
+    var panel = voicePanel(rec.form); if (panel) { panel.hidden = true; panel.innerHTML = ''; }
+    rec = null;
+  }
+  function paintRec() {
+    var panel = rec && voicePanel(rec.form); if (!panel) return;
+    panel.hidden = false;
+    if (rec.blob) {
+      panel.innerHTML = '<audio controls src="' + esc(rec.url) + '" aria-label="Your recording"></audio>' +
+        '<div class="tw-voice-row"><span class="tw-voice-time">' + clock(rec.seconds) + '</span><span class="spacer"></span>' +
+        '<button type="button" class="tw-btn" data-tw="voice-drop">Discard</button>' +
+        '<button type="button" class="btn sm" data-tw="voice-send"' + (rec.sending ? ' disabled' : '') + '>' + (rec.sending ? 'Sending…' : rec.form.dataset.replyTo ? 'Reply with voice' : 'Post voice note') + '</button></div>';
+    } else {
+      panel.innerHTML = '<div class="tw-voice-row" role="status"><span class="tw-voice-dot" aria-hidden="true"></span><span class="tw-voice-time">Recording ' + clock(rec.seconds) + ' / ' + clock(VOICE_MAX) + '</span><span class="spacer"></span>' +
+        '<button type="button" class="tw-btn" data-tw="voice-drop">Cancel</button><button type="button" class="btn sm" data-tw="voice-stop">Stop</button></div>';
+    }
+  }
+  /** Asked once, before the microphone: is the voice-note database change in place? A deliberately
+      empty request is refused with VOICE_BAD when it is, and "no such function" when it is not. */
+  var voiceCheck = null;
+  function voiceReady() {
+    if (voiceOff) return Promise.resolve(false);
+    if (!voiceCheck) voiceCheck = client.rpc('bv_talanoa_post_voice', { p_path: '', p_seconds: 0, p_body: null, p_reply_to: null }).then(function (r) {
+      if (r && r.error && voiceMissing(r.error)) { voiceOff = true; return false; }
+      return true;
+    }, function () { voiceCheck = null; return true; });
+    return voiceCheck;
+  }
+  async function startVoice(form) {
+    if (!S.user) return toast(SAY.NOT_SIGNED_IN);
+    if (!canRecord()) return toast('This browser cannot record a voice note.');
+    var kind = voiceType(); if (!kind) return toast('This browser cannot record a voice note.');
+    dropRec();
+    if (!(await voiceReady())) { $$('.tw-voice-open').forEach(function (b) { b.remove(); }); return toast('Voice notes are not switched on yet.'); }
+    if (!form.isConnected) return;
+    var stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (_) { return toast('The microphone is blocked. Allow it for Sota Kece in your browser settings, then try again.'); }
+    if (!form.isConnected) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
+    var recorder;
+    try { recorder = new window.MediaRecorder(stream, { mimeType: kind[0], audioBitsPerSecond: 32000 }); }
+    catch (_) { stream.getTracks().forEach(function (t) { t.stop(); }); return toast('This browser cannot record a voice note.'); }
+    var mine = rec = { form: form, stream: stream, recorder: recorder, chunks: [], seconds: 0, started: Date.now(), kind: kind, blob: null, url: '', timer: 0, sending: false };
+    recorder.ondataavailable = function (ev) { if (ev.data && ev.data.size) mine.chunks.push(ev.data); };
+    recorder.onstop = function () {
+      if (rec !== mine) return;
+      clearInterval(mine.timer); mine.timer = 0;
+      stream.getTracks().forEach(function (t) { try { t.stop(); } catch (_) {} });
+      mine.seconds = Math.min(VOICE_MAX, Math.max(1, Math.round((Date.now() - mine.started) / 1000)));
+      mine.blob = new Blob(mine.chunks, { type: kind[1] }); mine.chunks = [];
+      if (!mine.blob.size) { dropRec(); return toast(SAY.VOICE_BAD); }
+      mine.url = URL.createObjectURL(mine.blob); paintRec();
+    };
+    mine.timer = setInterval(function () {
+      if (rec !== mine) return;
+      mine.seconds = Math.floor((Date.now() - mine.started) / 1000);
+      if (mine.seconds >= VOICE_MAX) { try { recorder.stop(); } catch (_) {} return; }
+      var t = voicePanel(form) && voicePanel(form).querySelector('.tw-voice-time'); if (t) t.textContent = 'Recording ' + clock(mine.seconds) + ' / ' + clock(VOICE_MAX);
+    }, 500);
+    recorder.start(); paintRec();
+  }
+  function voiceMissing(e) {
+    var m = String((e && (e.message || e.error || e.code)) || '');
+    return /PGRST202|Could not find the function|Bucket not found|bucket.*not.*found|42883/i.test(m + ' ' + String((e && e.code) || ''));
+  }
+  async function sendVoice() {
+    var mine = rec; if (!mine || !mine.blob || mine.sending) return;
+    if (!S.user) return toast(SAY.NOT_SIGNED_IN);
+    var form = mine.form, ta = form.querySelector('textarea'), words = (ta.value || '').trim();
+    if (words.length > MAX) return toast(SAY.TOO_LONG);
+    var replyTo = form.dataset.replyTo ? Number(form.dataset.replyTo) : null;
+    var path = S.user.id + '/' + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '') + '.' + mine.kind[2];
+    if (!VOICE_PATH.test(path)) return toast('This browser cannot send a voice note.');
+    mine.sending = true; paintRec();
+    var uploaded = false;
+    try {
+      var up = await client.storage.from(VOICE_BUCKET).upload(path, mine.blob, { contentType: mine.kind[1], cacheControl: '31536000', upsert: false });
+      if (up && up.error) throw up.error;
+      uploaded = true;
+      var post = await rpc('bv_talanoa_post_voice', { p_path: path, p_seconds: mine.seconds, p_body: words || null, p_reply_to: replyTo });
+      if (rec === mine) dropRec();
+      ta.value = '';
+      landed(post, replyTo, form);
+      toast(replyTo ? 'Replied.' : 'Posted.');
+    } catch (e) {
+      if (uploaded) { try { await client.storage.from(VOICE_BUCKET).remove([path]); } catch (_) {} }
+      if (voiceMissing(e)) { voiceOff = true; if (rec === mine) dropRec(); $$('.tw-voice-open').forEach(function (b) { b.remove(); }); return toast('Voice notes are not switched on yet.'); }
+      mine.sending = false; if (rec === mine) paintRec(); toast(say(e, 'That voice note could not be sent. Check your signal and try again.'));
+    }
+  }
   function card(p, opts) {
     opts = opts || {};
     var likes = num(p.like_count), reposts = num(p.repost_count), replies = num(p.reply_count), sr = p.sere || null;
@@ -130,6 +259,7 @@
         '<div class="tw-body"' + (opts.expanded ? '' : ' data-tw="open" data-id="' + p.id + '"') + '>' + rich(p.body) + '</div>' +
         quoteBox(p.quote) +
         sereBox(sr) +
+        voiceBox(p.voice) +
         '<div class="tw-bar">' +
           '<button type="button" class="tw-btn" data-tw="reply" data-id="' + p.id + '" aria-label="Reply, ' + replies + '">💬<b data-count="reply">' + (replies || '') + '</b></button>' +
           '<button type="button" class="tw-btn tw-repost' + (p.i_reposted ? ' on' : '') + '" data-tw="repost" data-id="' + p.id + '" aria-pressed="' + (p.i_reposted ? 'true' : 'false') + '" aria-label="Repost, ' + reposts + '">🔁<b data-count="repost">' + (reposts || '') + '</b></button>' +
@@ -161,8 +291,10 @@
         '<textarea name="body" maxlength="' + MAX + '" rows="' + (opts.replyTo || !window.SotaSere ? 2 : 1) + '" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : !window.SotaSere ? 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?' : 'Or write a few words…') + '"></textarea>' +
       '</div>' +
       (st.quote && !opts.replyTo ? '<div class="tw-quoting">' + quoteBox(st.quote) + '<button type="button" class="tw-btn tw-unquote" data-tw="unquote" aria-label="Remove the quote">✕</button></div>' : '') +
+      '<div class="tw-voice" hidden></div>' +
       '<div class="tw-compose-bar">' +
         '<span class="tw-count" aria-live="polite">' + MAX + ' letters left</span><span class="spacer"></span>' +
+        (opts.replyTo ? voiceButton(true) : '') +
         '<button type="submit" class="btn sm" disabled>' + (opts.replyTo ? 'Reply' : 'Post') + '</button></div>' +
     '</form>';
   }
@@ -177,6 +309,7 @@
   function clean(title) { var d = window.SotaPlaylist && window.SotaPlaylist.describe ? window.SotaPlaylist.describe(title) : null; return d && d.title ? d : { title: String(title || ''), artist: '' }; }
   function quickRow() {
     return '<div class="tw-quick" role="group" aria-label="More to share">' +
+      voiceButton(false) +
       '<button type="button" class="tw-quick-act" data-tw="moment"><span aria-hidden="true">📷</span> Drop a moment</button>' +
       '<button type="button" class="tw-quick-act" data-tw="track" aria-expanded="' + (st.picking ? 'true' : 'false') + '" aria-controls="tw-track-pick"><span aria-hidden="true">🎵</span> Share a track</button></div>' +
       '<div class="tw-track-pick" id="tw-track-pick"' + (st.picking ? '' : ' hidden') + '>' + trackPicker() + '</div>';
@@ -280,6 +413,7 @@
       if (seq !== st.seq) return;
       st.tracks = picked; st.catalogue = featured(all, 0, Array.isArray(all) ? all.length : 0);
       var pick = $('#tw-track-pick'); if (pick) pick.innerHTML = trackPicker();
+      hydrateTracks();
       var el = $('#tw-viti-tracks'); if (el) el.innerHTML = tracksBlock();
     } catch (_) { st.tracks = []; st.catalogue = []; var failed = $('#tw-track-pick'); if (failed) failed.innerHTML = trackPicker(); }
   }
@@ -518,7 +652,9 @@
   async function remove(id) {
     if (!confirm('Remove this post from the wall?')) return;
     try {
+      var gone = st.posts.concat(st.thread ? [st.thread].concat(st.thread.replies || []) : []).filter(function (p) { return Number(p.id) === Number(id); })[0];
       await rpc('bv_talanoa_delete', { p_id: Number(id) });
+      if (gone && gone.mine && gone.voice && VOICE_PATH.test(String(gone.voice.path || '')) && client.storage) { try { client.storage.from(VOICE_BUCKET).remove([gone.voice.path]); } catch (_) {} }
       $$('.tw-post[data-id="' + id + '"]').forEach(function (el) { el.remove(); });
       st.posts = st.posts.filter(function (p) { return Number(p.id) !== Number(id); });
       if (st.thread && Number(st.thread.id) === Number(id)) return backToWall();
@@ -533,6 +669,22 @@
     var form = $('[data-tw-form="post"]'); if (form) form.outerHTML = composer();
     $('[data-tw-form="post"] textarea')?.focus();
   }
+  /** Puts a freshly made post or reply on the page. */
+  function landed(post, replyTo, form) {
+    if (replyTo) {
+      if (st.thread && Number(st.thread.id) === Number(replyTo)) {
+        st.thread.replies = (st.thread.replies || []).concat([post]);
+        var rep = $('#tw-replies'); if (rep) rep.insertAdjacentHTML('beforeend', card(post, { reply: true }));
+        $('.tw-thread .tw-end')?.remove();
+        $$('.tw-expanded [data-count="reply"]').forEach(function (b) { b.textContent = st.thread.replies.length; });
+      }
+    } else {
+      st.posts = merge([post], st.posts); st.newest = newest(st.posts); if (st.mode === 'hot') st.offset += 1;
+      var listEl = $('#tw-list');
+      if (listEl) { if (listEl.querySelector('.tw-empty')) listEl.innerHTML = list(st.posts); else listEl.insertAdjacentHTML('afterbegin', card(post)); }
+      form.outerHTML = composer();
+    }
+  }
   async function submit(form) {
     if (!S.user) return toast(SAY.NOT_SIGNED_IN);
     var ta = form.querySelector('textarea'), body = (ta.value || '').trim(), btn = form.querySelector('button[type=submit]');
@@ -543,19 +695,7 @@
     try {
       var post = await rpc('bv_talanoa_post', { p_body: body, p_quote: replyTo ? null : (st.quote ? Number(st.quote.id) : null), p_reply_to: replyTo });
       ta.value = ''; ta.disabled = false; st.quote = null;
-      if (replyTo) {
-        if (st.thread && Number(st.thread.id) === Number(replyTo)) {
-          st.thread.replies = (st.thread.replies || []).concat([post]);
-          var rep = $('#tw-replies'); if (rep) rep.insertAdjacentHTML('beforeend', card(post, { reply: true }));
-          $('.tw-thread .tw-end')?.remove();
-          $$('.tw-expanded [data-count="reply"]').forEach(function (b) { b.textContent = st.thread.replies.length; });
-        }
-      } else {
-        st.posts = merge([post], st.posts); st.newest = newest(st.posts); if (st.mode === 'hot') st.offset += 1;
-        var listEl = $('#tw-list');
-        if (listEl) { if (listEl.querySelector('.tw-empty')) listEl.innerHTML = list(st.posts); else listEl.insertAdjacentHTML('afterbegin', card(post)); }
-        form.outerHTML = composer();
-      }
+      landed(post, replyTo, form);
       toast(replyTo ? 'Replied.' : 'Posted.');
     } catch (e) {
       ta.disabled = false; btn.disabled = false; toast(say(e));
@@ -584,6 +724,10 @@
       if (act === 'del') return remove(id);
       if (act === 'sere') return window.SotaSere && window.SotaSere.open();
       if (act === 'say') return window.SotaSere && window.SotaSere.open({ mode: 'say' });
+      if (act === 'voice') return startVoice(t.closest('.tw-compose'));
+      if (act === 'voice-stop') { if (rec && rec.recorder && rec.recorder.state !== 'inactive') { try { rec.recorder.stop(); } catch (_) {} } return; }
+      if (act === 'voice-drop') return dropRec();
+      if (act === 'voice-send') return sendVoice();
       if (act === 'moment') return goTo && goTo('moments');
       if (act === 'track') { st.picking = !st.picking; var box = $('#tw-track-pick'); if (box) { box.hidden = !st.picking; if (st.picking) { loadTracks(); var sel = box.querySelector('select'); if (sel) sel.focus(); } } t.setAttribute('aria-expanded', String(st.picking)); return; }
       if (act === 'play') return playTrack(t);
@@ -645,7 +789,7 @@
     st.seq += 1;
     if (st.io) { st.io.disconnect(); st.io = null; }
     if (st.channel && client && typeof client.removeChannel === 'function') { try { client.removeChannel(st.channel); } catch (_) {} }
-    stopTrack();
+    stopTrack(); dropRec();
     var keepMode = st.mode, keepShare = st.share, keepTracks = st.tracks, keepCatalogue = st.catalogue; st = fresh(); st.mode = keepMode; st.share = keepShare; st.tracks = keepTracks; st.catalogue = keepCatalogue;
   }
   function init(cfg) {
@@ -660,7 +804,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    cleanShare: cleanShare, shareText: shareText, coinButton: coinButton, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, shareText: shareText, coinButton: coinButton, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, voiceBox: voiceBox, clock: clock, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();

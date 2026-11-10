@@ -27,3 +27,4 @@ jobs:
       - run: node tests/run-share-engine-db.cjs
       - run: node tests/run-coins-db.cjs
       - run: node tests/run-hubs-db.cjs
+      - run: node tests/run-talanoa-voice-db.cjs

@@ -164,7 +164,7 @@ test('index.html loads the hubs, stands the card in for an empty Top Mates panel
   assert.match(css,/\.sota-social-host\.sota-social-no-mates \[data-social-panel="mates"\]\{display:none\}/);
   assert.match(html,/window\.SotaHubs\?\.reset\(\);S\.user=null/,'sign-out forgets the last member\'s hubs');
   assert.match(sw,/'\/sota-hubs\.js','\/sota-hubs\.css'/);
-  assert.equal((html.match(/sota-kece-shell-20261110-v171-coins/g)||[]).length,1);
+  assert.equal((html.match(/sota-kece-shell-20261110-v178-coins/g)||[]).length,1);
 });
 
 // ---------------------------------------------------------------- public listen pages
@@ -244,9 +244,12 @@ test('the Home composer can drop a moment or share an Island Mix song, and shows
   h.w.SotaPlus={feedCompat:async()=>({data:moments,error:null})};
   await h.w.SotaPulse.view();await flush();
   // A shared song link becomes one safe tap target; everything else stays escaped text.
-  const link=h.q('.tw-post .tw-track-link');assert.equal(link.getAttribute('href'),'/t/fiji-remix-2026-01');assert.equal(link.getAttribute('rel'),'noopener');assert.equal(h.q('.tw-post .tw-body b'),null);
+  // Once the Island Mix is known, a shared song link is a card that plays inside the post; everything else stays escaped text.
+  assert.equal(h.q('.tw-post .tw-track-link'),null);const song=h.q('.tw-post .tw-body .tw-track');assert.equal(song.dataset.track,'fiji-remix-2026-01');
+  song.querySelector('.tw-track-play').click();assert.match(h.played.at(-1),/fiji-remix-01\.mp3$/);assert.equal(h.went.includes('thread'),false);assert.equal(h.q('.tw-thread'),null,'playing a song does not open the post');assert.equal(h.all('.tw-post .tw-body b').filter(b=>!b.closest('.tw-track')).length,0);assert.match(h.q('.tw-post .tw-body').textContent,/<b>x<\/b>/);
+  // A link to a song that is not in the mix stays a plain link to its listen page.
   const hostile=h.w.SotaPulse.rich('https://sotakece.com/t/x" onclick="y https://evil.test/t/abc <script>');
-  assert.equal((hostile.match(/<a /g)||[]).length,1,'only the Sota Kece song link is linked');const frag=h.w.document.createElement('div');frag.innerHTML=hostile;assert.equal(frag.querySelectorAll('*').length,2,'one link and its icon, no other element');assert.equal(frag.querySelector('a').getAttribute('href'),'/t/x');assert.equal(frag.querySelector('a').attributes.length,4,'class, href, target and rel only');assert(frag.textContent.includes('" onclick="y https://evil.test/t/abc <script>'),'everything else stays visible text');
+  assert.equal((hostile.match(/<a /g)||[]).length,1,'only the Sota Kece song link is linked');const frag=h.w.document.createElement('div');frag.innerHTML=hostile;assert.equal(frag.querySelectorAll('*').length,2,'one link and its icon, no other element');assert.equal(frag.querySelector('a').getAttribute('href'),'/t/x');assert.deepEqual([...frag.querySelector('a').attributes].map(a=>a.name).sort(),['class','data-track-link','href','rel','target']);assert.equal(frag.querySelector('a').dataset.trackLink,'x');assert(frag.textContent.includes('" onclick="y https://evil.test/t/abc <script>'),'everything else stays visible text');
   // Latest moments: names and words as text, a photo-only moment gets plain words.
   const cards=h.all('.tw-moment');assert.equal(cards.length,2);assert.match(cards[0].textContent,/Mere.*Lovo at four <i>today<\/i>/);assert.equal(cards[0].querySelector('i'),null);assert.match(cards[1].textContent,/Shared a photo/);
   cards[0].click();assert.equal(h.went.at(-1),'moments');
@@ -262,4 +265,61 @@ test('Viti Pulse shows clean song names when the playlist parser is loaded',dom,
   const h=bootWall({posts:[]});h.w.eval(read('music-playlist.js'));
   await h.w.SotaPulse.view();await flush();
   for(const row of h.all('.tw-track-title'))assert.doesNotMatch(row.textContent,/[_#\[\]]| - /);
+});
+
+// Voice notes and inline media (10 Nov 2026).
+function voiceWindow(h,{missing=false}={}){
+  const w=h.w,sent=[],uploads=[],removed=[];
+  w.MediaRecorder=class{static isTypeSupported(t){return t.startsWith('audio/webm');}constructor(stream,o){this.o=o;this.state='inactive';w.__rec=this;}start(){this.state='recording';}stop(){this.state='inactive';this.ondataavailable({data:new w.Blob(['abc'],{type:'audio/webm'})});this.onstop&&this.onstop();}};
+  Object.defineProperty(w.navigator,'mediaDevices',{value:{getUserMedia:async()=>({getTracks:()=>[{stop(){w.__stopped=(w.__stopped||0)+1;}}]})},configurable:true});
+  w.URL.createObjectURL=()=>'blob:x';w.URL.revokeObjectURL=()=>{};
+  Object.defineProperty(w,'crypto',{value:{randomUUID:()=>'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'},configurable:true});
+  const storage={from:b=>({getPublicUrl:p=>({data:{publicUrl:'https://files.test/'+b+'/'+p}}),upload:async(p,blob,o)=>{uploads.push([b,p,o.contentType,o.upsert]);return {data:{},error:null};},remove:async l=>{removed.push(...l);return {error:null};}})};
+  return {sent,uploads,removed,storage,rpc:async(name,args)=>{
+    if(name==='bv_talanoa_post_voice'){if(missing)return {data:null,error:{code:'PGRST202',message:'Could not find the function'}};if(!args.p_path)return {data:null,error:{message:'VOICE_BAD'}};sent.push(args);return {data:post(50,{author:'11111111-1111-4111-8111-111111111111',mine:true,body:args.p_body||'🎙️ Voice note',reply_to:args.p_reply_to,voice:{path:args.p_path,seconds:args.p_seconds}}),error:null};}
+    return null;}};
+}
+function bootVoice(opts){
+  const h=bootWall({posts:[post(1,{voice:{path:'22222222-2222-4222-8222-222222222222/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.m4a',seconds:75}}),post(2,{voice:{path:'../etc/passwd',seconds:5}})]});
+  const v=voiceWindow(h,opts),channel={on(){return channel;},subscribe(){return channel;}};
+  const client={storage:v.storage,channel:()=>channel,removeChannel(){},rpc:async(name,args)=>{const r=await v.rpc(name,args);if(r)return r;return {data:name==='bv_talanoa_feed'?[post(1,{voice:{path:'22222222-2222-4222-8222-222222222222/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.m4a',seconds:75}}),post(2,{voice:{path:'../etc/passwd',seconds:5}})]:null,error:null};}};
+  const toasts=[];
+  h.w.SotaPulse.init({client,state:{user:{id:'11111111-1111-4111-8111-111111111111'},me:{handle:'ana',display_name:'Ana'},tab:'pulse'},toast:m=>toasts.push(m),esc,ago:()=>'now',openRoom(){},shell:html=>{h.w.document.getElementById('view').innerHTML=html;},go(){}});
+  return Object.assign(h,v,{toasts});
+}
+test('a voice note on a post plays from the voice bucket and never loads until asked; a bad path shows nothing',dom,async()=>{
+  const h=bootVoice();await h.w.SotaPulse.view();await flush();
+  const notes=h.all('.tw-voice-note');assert.equal(notes.length,1,'the post with a path outside the pattern gets no player');
+  const audio=notes[0].querySelector('audio');assert.equal(audio.getAttribute('src'),'https://files.test/talanoa-voice/22222222-2222-4222-8222-222222222222/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.m4a');assert.equal(audio.getAttribute('preload'),'none');
+  assert.match(notes[0].textContent,/Voice note · 1:15/);assert.equal(h.w.SotaPulse.voiceBox(null),'');assert.equal(h.w.SotaPulse.clock(5),'0:05');
+});
+test('one tap records, a second posts: the file goes to the member\'s own folder and the words ride along',dom,async()=>{
+  const h=bootVoice();await h.w.SotaPulse.view();await flush();
+  const open=h.q('.tw-quick [data-tw="voice"]');assert.ok(open,'the voice button leads the quick row');assert.equal(h.q('.tw-quick').firstElementChild,open);
+  h.q('[data-tw-form="post"] textarea').value='Bula vinaka';
+  open.click();await flush();
+  const panel=h.q('[data-tw-form="post"] .tw-voice');assert.equal(panel.hidden,false);assert.match(panel.textContent,/Recording 0:00 \/ 1:00/);assert.equal(h.w.__rec.o.mimeType,'audio/webm;codecs=opus');
+  h.q('[data-tw="voice-stop"]').click();await flush();
+  assert.ok(panel.querySelector('audio'));assert.equal(h.w.__stopped,1,'the microphone is released as soon as recording stops');
+  h.q('[data-tw="voice-send"]').click();await flush();
+  assert.deepEqual(h.uploads,[['talanoa-voice','11111111-1111-4111-8111-111111111111/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.webm','audio/webm',false]]);
+  assert.equal(h.sent.length,1);assert.equal(h.sent[0].p_path,h.uploads[0][1]);assert.equal(h.sent[0].p_body,'Bula vinaka');assert.equal(h.sent[0].p_reply_to,null);assert.ok(h.sent[0].p_seconds>=1&&h.sent[0].p_seconds<=60);
+  const mine=h.q('.tw-post[data-id="50"]');assert.ok(mine.querySelector('.tw-voice-note audio'));assert.equal(h.q('#tw-list').firstElementChild,mine);assert.equal(h.toasts.at(-1),'Posted.');
+  assert.equal(h.q('[data-tw-form="post"] .tw-voice').hidden,true);
+});
+test('discarding a recording sends nothing, and voice notes hide themselves until the database change is in place',dom,async()=>{
+  const h=bootVoice();await h.w.SotaPulse.view();await flush();
+  h.q('.tw-quick [data-tw="voice"]').click();await flush();h.q('[data-tw="voice-drop"]').click();await flush();
+  assert.equal(h.q('[data-tw-form="post"] .tw-voice').hidden,true);assert.equal(h.uploads.length,0);assert.equal(h.sent.length,0);assert.equal(h.w.__stopped,1);
+  const off=bootVoice({missing:true});await off.w.SotaPulse.view();await flush();
+  off.q('.tw-quick [data-tw="voice"]').click();await flush();
+  assert.equal(off.q('[data-tw="voice"]'),null);assert.equal(off.toasts.at(-1),'Voice notes are not switched on yet.');assert.equal(off.w.__rec,undefined,'the microphone is never asked for');
+  const none=bootWall({posts:[post(1)]});await none.w.SotaPulse.view();await flush();
+  assert.equal(none.q('[data-tw="voice"]'),null,'a browser that cannot record shows no voice button');
+});
+test('the account delete sweep and the release know about the voice bucket',()=>{
+  assert.ok(require('../api/account-delete.js').BUCKETS.includes('talanoa-voice'));
+  const m=read('supabase/migrations/20261110150000_sota_talanoa_voice.sql');
+  assert.match(m,/'talanoa-voice', 'talanoa-voice', true, 1572864/);assert.match(m,/revoke execute on function public\.bv_talanoa_post_voice\(text, integer, text, bigint\) from public, anon;/);
+  assert.match(read('.github/workflows/talanoa-security.yml'),/run-talanoa-voice-db\.cjs/);
 });
