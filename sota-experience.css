@@ -508,3 +508,25 @@ body.sx-member #app.sx-app[data-world-page="pulse"] :is(
 .sx-legal{display:flex;gap:14px;font-size:12.5px}
 .sx-legal a{color:inherit;opacity:.8}
 .sx-legal a:hover{opacity:1}
+
+/* Mini-player upgrade (10 Nov 2026): credit line, previous / next, progress line and page lights. */
+.sx-mini-player{width:520px;overflow:hidden;transform:translateX(-30%)}
+.sx-mini-progress{position:absolute;left:0;right:0;top:0;height:3px;background:#ffffff26;pointer-events:none}
+.sx-mini-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd76a,#ff8fc8);border-radius:0 3px 3px 0;transition:width .25s linear}
+.sx-mini-open small{font-size:9px!important;letter-spacing:1.4px;margin-bottom:2px;color:inherit;opacity:.75}
+.sx-mini-open b{font-size:13px!important;line-height:1.25}
+.sx-mini-open em{display:block;font-style:normal;font-size:11px;line-height:1.3;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sx-mini-open em[hidden]{display:none}
+.sx-mini-controls{display:flex;align-items:center;gap:6px;flex:none}
+.sx-mini-controls button{display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:50%;cursor:pointer}
+.sx-mini-skip,.sx-mini-lights{border:1px solid transparent;background:transparent;color:inherit}
+.sx-mini-skip:hover,.sx-mini-lights:hover{background:#ffffff1f;border-color:#ffffff40}
+.sx-mini-lights{opacity:.55}.sx-mini-lights[aria-pressed=true]{opacity:1;color:#ffd76a}.sx-mini-lights:disabled{opacity:.3;cursor:not-allowed}
+.sx-mini-player :focus-visible{outline:3px solid #ffd76a;outline-offset:2px}
+.sx-mini-player.is-playing .sx-mini-icon{animation:sx-mini-pulse 1.6s ease-in-out infinite}
+@keyframes sx-mini-pulse{50%{transform:scale(1.14)}}
+body.sx-enabled #app.sx-app[data-space-designed] :is(.sx-mini-skip,.sx-mini-lights){color:inherit!important}
+@media(max-width:760px){.sx-mini-player{width:auto;transform:none;gap:8px!important;padding:10px 10px 8px 12px!important}.sx-mini-icon{display:none!important}.sx-mini-controls{gap:2px}.sx-mini-open b{font-size:12px!important}}
+@media(max-width:380px){.sx-mini-lights{display:none!important}}
+@media(prefers-reduced-motion:reduce){.sx-mini-player.is-playing .sx-mini-icon{animation:none}.sx-mini-progress i{transition:none}}
+@media(forced-colors:active){.sx-mini-controls button{border:1px solid ButtonText!important}.sx-mini-progress i{background:Highlight}.sx-mini-lights[aria-pressed=true]{outline:2px solid Highlight}}
