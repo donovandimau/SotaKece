@@ -246,7 +246,7 @@ test('the Home composer can drop a moment or share an Island Mix song, and shows
   // A shared song link becomes one safe tap target; everything else stays escaped text.
   const link=h.q('.tw-post .tw-track-link');assert.equal(link.getAttribute('href'),'/t/fiji-remix-2026-01');assert.equal(link.getAttribute('rel'),'noopener');assert.equal(h.q('.tw-post .tw-body b'),null);
   const hostile=h.w.SotaPulse.rich('https://sotakece.com/t/x" onclick="y https://evil.test/t/abc <script>');
-  assert.equal((hostile.match(/<a /g)||[]).length,1,'only the Sota Kece song link is linked');assert.doesNotMatch(hostile,/" onclick="|<script>|href="[^"]*evil/);assert.match(hostile,/&quot; onclick=&quot;y https:\/\/evil\.test\/t\/abc &lt;script&gt;/);
+  assert.equal((hostile.match(/<a /g)||[]).length,1,'only the Sota Kece song link is linked');const frag=h.w.document.createElement('div');frag.innerHTML=hostile;assert.equal(frag.querySelectorAll('*').length,2,'one link and its icon, no other element');assert.equal(frag.querySelector('a').getAttribute('href'),'/t/x');assert.equal(frag.querySelector('a').attributes.length,4,'class, href, target and rel only');assert(frag.textContent.includes('" onclick="y https://evil.test/t/abc <script>'),'everything else stays visible text');
   // Latest moments: names and words as text, a photo-only moment gets plain words.
   const cards=h.all('.tw-moment');assert.equal(cards.length,2);assert.match(cards[0].textContent,/Mere.*Lovo at four <i>today<\/i>/);assert.equal(cards[0].querySelector('i'),null);assert.match(cards[1].textContent,/Shared a photo/);
   cards[0].click();assert.equal(h.went.at(-1),'moments');
