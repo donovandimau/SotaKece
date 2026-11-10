@@ -18,7 +18,8 @@ for (let i = 0; i < runs; i++) {
     new PerformanceObserver(l => { for (const e of l.getEntries()) { window.__lcp = e.startTime; window.__el = e.element ? e.element.tagName + (e.url ? ' ' + e.url.split('/').pop() : '') : ''; } }).observe({ type: 'largest-contentful-paint', buffered: true });
     new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });
   });
-  await page.goto(url + (url.includes('?') ? '&' : '?') + 'lcp-check=' + Date.now(), { waitUntil: 'load', timeout: 120000 });
+  const [base, hash = ''] = url.split('#');
+  await page.goto(base + (base.includes('?') ? '&' : '?') + 'lcp-check=' + Date.now() + (hash ? '#' + hash : ''), { waitUntil: 'load', timeout: 120000 });
   await page.waitForTimeout(4000);
   const r = await page.evaluate(() => ({ lcp: Math.round(window.__lcp), cls: +window.__cls.toFixed(4), el: window.__el, fcp: Math.round(performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0) }));
   console.log(`run ${i + 1}: largest paint ${r.lcp} ms (${r.el}), first paint ${r.fcp} ms, layout shift ${r.cls}`);
