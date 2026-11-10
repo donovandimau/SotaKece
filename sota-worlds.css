@@ -463,6 +463,16 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
 .sx-world-secondary{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:12px 6px;background:transparent;border:0;border-radius:12px;color:inherit;font:800 13px/1.4 Nunito,system-ui,sans-serif;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;cursor:pointer}
 .sx-world-secondary:hover{text-decoration-thickness:2px}
 .sx-world-secondary:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+/* The Sere action reads as a real second button, not a text link, so the signature feature holds its own beside the primary action. */
+.sx-world-secondary.sx-world-sere{padding:12px 16px;border:1.5px solid color-mix(in srgb,currentColor 55%,transparent);border-radius:12px;background:color-mix(in srgb,#fff 30%,transparent);text-decoration:none;box-shadow:0 0 0 3px color-mix(in srgb,#ffd447 40%,transparent),0 4px 0 #0000000b}
+.sx-world-secondary.sx-world-sere:hover{background:color-mix(in srgb,#fff 48%,transparent);text-decoration:none}
+@media(max-width:1100px){.sx-world-secondary.sx-world-sere{width:100%;justify-content:space-between;font-size:12px}}
+@media(forced-colors:active){.sx-world-secondary.sx-world-sere{border:1px solid CanvasText;box-shadow:none}}
+/* Returning members see a compact greeting at every width; the first visit keeps the full welcome. */
+.sx-member-world-heading .sx-world-hero[data-world-visit="returning"]{min-height:0}
+.sx-member-world-heading .sx-world-hero[data-world-visit="returning"] .sx-world-hero-copy{padding:20px 26px}
+.sx-member-world-heading .sx-world-hero[data-world-visit="returning"] h1{font-size:28px!important;margin:6px 0!important}
+.sx-member-world-heading .sx-world-hero[data-world-visit="returning"] .sx-world-hero-copy>p{margin:6px 0 12px}
 .sx-world-more{margin:10px 0 0}
 .sx-world-more>summary{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px;font:800 13px/1.4 Nunito,system-ui,sans-serif;cursor:pointer;list-style:none;color:inherit}
 .sx-world-more>summary::-webkit-details-marker{display:none}
