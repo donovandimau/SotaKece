@@ -238,5 +238,5 @@ test('index.html hands the Pulse tab to the wall, keeps the Spark, stops the wal
   assert.doesNotMatch(html,/bv_pulse_feed|postPulse\(/,'the old one-line-per-friend pulse is gone from the tab');
   const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
   assert.match(sw,/ON_DEMAND=\['\/sota-pulse\.js','\/sota-pulse\.css'/);
-  assert.match(sw,/sota-kece-shell-20261110-v169-home-feed/);
+  assert.match(sw,/sota-kece-shell-20261110-v173-wide/);
 });

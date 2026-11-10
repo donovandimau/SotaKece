@@ -535,3 +535,17 @@ body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx
 body.sx-member #app.sx-app[data-world-page="pulse"] .sx-member-world-heading .sx-world-hero.sx-world-hero-slim::before{display:none;content:none}
 body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-slim .sx-world-hero-copy{max-width:none;color:var(--world-dark,#502475)}
 body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-slim .sx-world-hero-copy :is(h1,p,.sx-eyebrow){color:var(--world-dark,#502475)!important;text-shadow:none!important}
+
+/* Wider desktop (10 Nov 2026): the page uses the room beside the rail instead of leaving a gutter,
+   and on Home the blocks that sat under the wall dock beside it as a right-hand panel. */
+@media(min-width:1101px){
+ body.sx-member #app.sx-app .sx-member-content{max-width:1560px;padding-left:clamp(24px,3vw,56px);padding-right:clamp(24px,3vw,56px)}
+}
+@media(min-width:1360px){
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view.sx-member-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,400px);column-gap:28px;align-items:start;align-content:start}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>*{grid-column:2;min-width:0}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>:is(.sx-world-member-tabs,.sx-member-world-heading,.view-error,.empty){grid-column:1/-1}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>.tw-wrap{grid-column:1;grid-row:3/span 12;width:100%;max-width:880px;margin:0}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>:is(.sx-home-listen,.sota-social-host,.sota-hubs,[class*="hubs"]){margin:0 0 18px}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sota-social-host{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:14px}
+}
