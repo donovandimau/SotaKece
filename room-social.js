@@ -98,7 +98,7 @@
         if(!result.mates.length)mates.append(span(host,'sota-social-empty','Your accepted friends will appear here as you connect.'));
         else{
           const list=span(host,'sota-social-mates');list.setAttribute('role','list');
-          for(const friend of result.mates){const row=span(host,'sota-social-mate');row.setAttribute('role','listitem');const avatar=span(host,'sota-social-avatar',friend.avatar_emoji);avatar.setAttribute('aria-hidden','true');row.append(avatar,span(host,'sota-social-mate-name',friend.display_name||'@'+friend.handle));list.append(row);}
+          for(const friend of result.mates){const row=span(host,'sota-social-mate');row.setAttribute('role','listitem');const avatar=span(host,'sota-social-avatar',friend.avatar_emoji);avatar.setAttribute('aria-hidden','true');avatar.dataset.handle=friend.handle||'';row.append(avatar,span(host,'sota-social-mate-name',friend.display_name||'@'+friend.handle));list.append(row);}
           mates.append(list);
         }
         mates.append(span(host,'sota-social-count',`${result.friendCount} accepted ${result.friendCount===1?'friend':'friends'}`));

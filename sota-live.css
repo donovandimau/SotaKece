@@ -1,0 +1,29 @@
+/* Presence rings and the Koro quick-switch (sota-live.js). */
+.sl-online,.sl-recent{position:relative}
+.sl-online{box-shadow:0 0 0 2px var(--shell,#fff),0 0 0 4px #1fa971!important}
+.sl-recent{box-shadow:0 0 0 2px var(--shell,#fff),0 0 0 3px #e0a43a!important}
+.sl-online::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:#1fa971;border:2px solid var(--shell,#fff);box-sizing:border-box}
+.sl-online-text{color:#0f7a50!important;font-weight:800}
+@media(forced-colors:active){.sl-online,.sl-recent{outline:2px solid Highlight;outline-offset:2px;box-shadow:none!important}.sl-recent{outline-style:dashed}.sl-online::after{background:Highlight;border-color:Canvas}}
+
+#app.sx-app .sx-rail .sl-koro{margin:-4px 0 0 14px;padding-left:12px;border-left:2px solid #d9c6ee}
+#app.sx-app .sx-rail .sl-koro>summary{display:flex;align-items:center;gap:8px;min-height:36px;padding:4px 8px;border-radius:10px;cursor:pointer;list-style:none;font:800 10px/1 Nunito,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#5d4770}
+#app.sx-app .sx-rail .sl-koro>summary::-webkit-details-marker{display:none}
+#app.sx-app .sx-rail .sl-koro>summary::after{content:"⌄";margin-left:auto;font-size:14px;letter-spacing:0;transition:transform .15s}
+#app.sx-app .sx-rail .sl-koro[open]>summary::after{transform:rotate(180deg)}
+#app.sx-app .sx-rail .sl-koro>summary b{padding:2px 7px;border-radius:999px;background:#eadcf7;color:#4b2a66;font-size:10px;letter-spacing:0}
+#app.sx-app .sx-rail .sl-koro-list{display:flex;flex-direction:column;gap:0;padding:0 0 2px}
+#app.sx-app .sx-rail .sl-koro-list button{display:flex;align-items:center;gap:9px;width:100%;min-height:34px;padding:3px 8px;border:0;border-radius:10px;background:transparent;color:#34204a;font:700 13px/1.2 Nunito,system-ui,sans-serif;text-align:left;cursor:pointer;box-shadow:none}
+#app.sx-app .sx-rail .sl-koro-list button:hover{background:#f1e6fb}
+#app.sx-app .sx-rail .sl-koro-list button[aria-current=page]{background:#e6d6f8;color:#3b1d5c}
+#app.sx-app .sx-rail .sl-koro-mark{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:#fff;font-size:15px;flex:none}
+#app.sx-app .sx-rail .sl-koro-name{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app.sx-app .sx-rail .sl-koro-all{font-size:12px!important;color:#5b3a8c!important}
+#app.sx-app .sx-rail .sl-koro :focus-visible{outline:3px solid #6d34c9;outline-offset:1px}
+body.sx-enabled #app.sx-app[data-space-designed] .sl-koro :is(summary,button){color:inherit!important}
+@media(max-width:1100px){#app.sx-app .sx-rail .sl-koro{display:none}}
+@media(prefers-reduced-motion:reduce){#app.sx-app .sx-rail .sl-koro>summary::after{transition:none}}
+@media(forced-colors:active){#app.sx-app .sx-rail .sl-koro-list button[aria-current=page]{outline:2px solid Highlight}}
+/* The rail can now be taller than a short window: let it scroll so the profile block stays reachable. */
+@media(min-width:1101px){#app.sx-app .sx-rail:has(.sl-koro){overflow-y:auto;scrollbar-width:thin}}
+@media(pointer:coarse){#app.sx-app .sx-rail .sl-koro-list button{min-height:44px}}
