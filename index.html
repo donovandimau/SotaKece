@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261110-v178-coins">
+<meta name="sota-release" content="sota-kece-shell-20261110-v179-wide">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -223,7 +223,7 @@ nav.bottom button.on{background:#fff;color:var(--accent);box-shadow:0 2px 10px r
 <link rel="stylesheet" href="/sota-experience.css?v=20261110-mini-1">
 <link rel="stylesheet" href="/premium-finish.css?v=20261029-1">
 <link rel="stylesheet" href="/sota-premium-shell.css?v=20261110-nav-2">
-<link rel="stylesheet" href="/sota-worlds.css?v=20261110-home-1"><link rel="stylesheet" href="/sota-hubs.css?v=20261110-hubs-1"><link rel="stylesheet" href="/sota-live.css?v=20261110-live-1"><link rel="stylesheet" href="/sota-studio.css?v=20261110-studio-2">
+<link rel="stylesheet" href="/sota-worlds.css?v=20261110-wide-2"><link rel="stylesheet" href="/sota-hubs.css?v=20261110-hubs-1"><link rel="stylesheet" href="/sota-live.css?v=20261110-live-1"><link rel="stylesheet" href="/sota-studio.css?v=20261110-studio-2">
 <link rel="stylesheet" href="/phone-tidy-20261029.css?v=20261104-premium-worlds-1">
 <script src="/dimau-premium-shell.js?v=20261109-shell-1" defer></script>
 <script src="/sota-premium-shell.js?v=20261109-nav-1" defer></script>
@@ -1192,7 +1192,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261110-coins-2"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-coins-2"></script><script src="/sota-coins.js?v=20261110-coins-1"></script><script src="/sota-live.js?v=20261110-live-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 <script>window.SotaLive?.init({client:sb,state:S,app,go:t=>go(t),openKoro:id=>{S.tab='crews';S.crew=id;history.pushState({sotaView:'crews'},'','#view=crews');render();}});window.SotaStudio?.init({getPage:()=>S.user?S.tab:null,go:t=>go(t),rerender:()=>render(),isOwnRoom:()=>!!S.user&&!!S.me&&S.tab==='room'&&(!S.roomHandle||S.roomHandle===S.me.handle)});window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaSere?.init({client:sb,state:S,toast,esc,go});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script>
 <script src="/bula-welcome.js?v=20261030" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
-<script src="/bula-top-20261030.js?v=20261110-pill-row-1" defer></script>
+<script src="/bula-top-20261030.js?v=20261110-fold-1" defer></script>
 <script src="https://fijian-assistant-api.vercel.app/dimau-pay.js" data-product="sotakece-plus-30d" data-pill="Sota Kece Plus · FJ$9.90 / 30 days" data-blurb="Back the build of Fiji’s own social network. Plus perks land first for members; gifts and everything you use today stay free." defer></script>
 <script src="https://fijian-assistant-api.vercel.app/dimau-consistency.js" defer></script>
 <!-- Wallet receipts (#403): wired in but hidden until the Reserve Bank of Fiji approves the wallet. To show it, remove "hidden" from the button. -->
