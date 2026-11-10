@@ -25,6 +25,9 @@
   };
   const publicPages=['home','people','talanoa','music','profile','skins','world'];
   const memberPages=['pulse','moments','friends','crews','circles','room','music','connections'];
+  // The pill strip only lists the worlds that belong to the active dock tab. Home and Talanoa both
+  // land on the wall, so that cluster shares one strip; Music and My space have nothing to add and show none.
+  const tabGroups={pulse:['pulse','moments','crews','circles'],moments:['pulse','moments','crews','circles'],crews:['pulse','moments','crews','circles'],circles:['pulse','moments','crews','circles'],friends:['friends','connections'],connections:['friends','connections'],music:[],room:[]};
   const choices={
     pulse:{
       label:'What are you sharing?',
