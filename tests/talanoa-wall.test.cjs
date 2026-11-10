@@ -150,7 +150,7 @@ test('opening a post loads root and replies in parallel and replying appends',{s
   const {w,calls}=boot(feed(rows));
   await w.SotaPulse.view();await flush();
   w.document.querySelector('.tw-post[data-id="1"] .tw-body').click();await flush();
-  const names=calls.slice(1).map(c=>c.name+':'+(c.args.p_post_id?'post':c.args.p_reply_to?'thread':'?'));
+  const names=calls.filter(c=>c.name==='bv_talanoa_feed').slice(1).map(c=>c.name+':'+(c.args.p_post_id?'post':c.args.p_reply_to?'thread':'?'));
   assert.deepEqual(names.slice(0,2),['bv_talanoa_feed:post','bv_talanoa_feed:thread']);
   assert.ok(w.document.querySelector('.tw-thread .tw-expanded[data-id="1"]'));
   assert.equal(w.document.querySelectorAll('#tw-replies .tw-post').length,1);
@@ -238,5 +238,5 @@ test('index.html hands the Pulse tab to the wall, keeps the Spark, stops the wal
   assert.doesNotMatch(html,/bv_pulse_feed|postPulse\(/,'the old one-line-per-friend pulse is gone from the tab');
   const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
   assert.match(sw,/ON_DEMAND=\['\/sota-pulse\.js','\/sota-pulse\.css'/);
-  assert.match(sw,/sota-kece-shell-20261110-v168-mini-player/);
+  assert.match(sw,/sota-kece-shell-20261110-v169-home-feed/);
 });
