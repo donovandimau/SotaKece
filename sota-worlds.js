@@ -6,7 +6,7 @@
     home:{label:'Home',title:'A little closer to your people.',line:'Your people, music and space, together.',tone:'sun',photo:null},
     people:{label:'People',title:'Good people. Great connections.',line:'Find a familiar face. Bring your friends. See your world grow.',tone:'rose',photo:photos.social,action:'Find a mate',focus:'#bv-find-mate,#s-q'},
     talanoa:{label:'Talanoa',title:'Pull up a seat. Stay a while.',line:'Your stories, your circles and a little time together.',tone:'coral',photo:photos.social,action:'Explore a circle',tool:'circle'},
-    music:{label:'Music',title:'Your music. In full colour.',line:'Choose your soundtrack, remix the visuals and make the moment yours.',tone:'violet',photo:photos.music,action:'Choose music visuals',tool:'visuals',sere:true},
+    music:{label:'Music',title:'Your music. In full colour.',line:'Choose your soundtrack, remix the visuals and make the moment yours.',tone:'violet',photo:photos.music,compact:true},
     profile:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio',sere:true},
     skins:{label:'Skins & Room Studio',title:'Your space. Your choice.',line:'Browse colours, artwork and layouts, or create your own.',tone:'sun',photo:null,action:'Browse every skin',tool:'skins'},
     world:{label:'3D world',title:'Every connection has a story.',line:'Explore your people and places from a different perspective.',tone:'lime',photo:null,action:'Explore the map',focus:'#sota-connections'},
@@ -17,11 +17,6 @@
     crews:{label:'Your Koro',title:'Your people. Your Koro.',line:'Private groups for the people you want to bring together.',tone:'coral',photo:photos.social,action:'Start a Koro',focus:'#koro-create input'},
     circles:{label:'Talanoa circles',title:'A place for every voice.',line:'Familiar voices, fresh stories and space for your circle.',tone:'coral',photo:photos.social,action:'Explore your circles',focus:'#kc-retry,.kava-room button'},
     connections:{label:'Your connections',title:'Every connection has a story.',line:'Discover the friendships and Koro that make up your world.',tone:'lime',photo:null,action:'Explore the map',focus:'#sc-search,.sc-map,#sota-connections'}
-  };
-  const recommendationPhotos={
-    moments:'/assets/feature-scenes/moments-studio-20261105-880.webp',
-    crews:'/assets/feature-scenes/koro-market-20261105-880.webp',
-    connections:'/assets/feature-scenes/connections-ferry-20261105-880.webp'
   };
   const publicPages=['home','people','talanoa','music','profile','skins','world'];
   const memberPages=['pulse','moments','friends','crews','circles','room','music','connections'];
@@ -79,10 +74,6 @@
       action:'Preview this skin',
       options:[['lagoon','Lagoon Club'],['studio-masi','Masi'],['kula','Kula Classic'],['sunset','Golden Hour'],['midnight','Midnight Mixtape']]
     },
-    music:{
-      label:'How should your music look?',
-      options:[['spectrum','Spectrum'],['waveform','Waveform'],['halo','Halo'],['ocean','Ocean waves'],['orbit','Orbit']]
-    },
     connections:{
       label:'How do you want to explore?',
       action:'Open this map view',
@@ -108,10 +99,10 @@
   function move(node,parent){if(!node||!parent||node.parentNode===parent)return;if(typeof parent.moveBefore==='function'&&node.isConnected&&parent.isConnected){try{parent.moveBefore(node,null);return;}catch(_){}}parent.append(node);}
   function memberRouteFromHash(hash){const key=String(hash||'').replace(/^#/,'');if(key.startsWith('view=')){const p=key.slice(5);return memberPages.includes(p)?p:null;}return ({'':'pulse',home:'pulse',people:'friends',talanoa:'crews',music:'music',profile:'room',skins:'room',world:'connections'})[key]||null;}
   function sereButton(w){return w.sere&&typeof window!=='undefined'&&window.SotaSere?` <button type="button" class="sx-world-secondary sx-world-sere" data-world-sere="1">🎤 Make a photo sing</button>`:'';}
-  function action(w){return actionMain(w)+sereButton(w);}
+  function action(w){return w.compact?'':actionMain(w)+sereButton(w);}
   function actionMain(w){if(w.member)return `<button type="button" class="sx-world-primary" data-world-member="${w.member}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;if(w.tool)return `<button type="button" class="sx-world-primary" data-world-tool="${w.tool}">${esc(w.action)} <span aria-hidden="true">↗</span></button>`;return `<button type="button" class="sx-world-primary" data-world-focus="${esc(w.focus||'')}">${esc(w.action||'Explore')} <span aria-hidden="true">↗</span></button>`;}
   function toolbar(member=false){return `<nav class="sx-world-toolbar" aria-label="Page tools"><div class="sx-world-crumb"><${member?'button type="button" data-world-member="pulse"':'a href="#home"'}>Home</${member?'button':'a'}><span aria-hidden="true">/</span><span data-world-label></span></div><div><button type="button" data-world-tool="explore" aria-haspopup="dialog">Explore Sota Kece <span aria-hidden="true">✦</span></button><button type="button" data-world-tool="design" aria-haspopup="dialog">Design this page <span aria-hidden="true">✎</span></button></div></nav>`;}
-  function banner(w,member=false,key='home'){return `${toolbar(member)}<section class="sx-world-hero" data-world-tone="${w.tone}"><div class="sx-world-hero-copy"><span class="sx-eyebrow">YOUR PEOPLE. YOUR POSSIBILITIES.</span><h1 tabindex="-1">${esc(w.title)}</h1><p data-world-description>${esc(w.line)}</p><div class="sx-world-actions" data-world-actions>${action(w)}</div></div><div class="sx-world-hero-photo">${heroVisual(w,key)}</div></section>`;}
+  function banner(w,member=false,key='home'){return `${toolbar(member)}<section class="sx-world-hero${w.compact?' sx-world-hero-compact':''}" data-world-tone="${w.tone}"><div class="sx-world-hero-copy"><span class="sx-eyebrow">YOUR PEOPLE. YOUR POSSIBILITIES.</span><h1 tabindex="-1">${esc(w.title)}</h1><p data-world-description>${esc(w.line)}</p><div class="sx-world-actions" data-world-actions>${action(w)}</div></div><div class="sx-world-hero-photo">${heroVisual(w,key)}</div></section>`;}
   function destinationCard(key,member=false,photo){
     const w=worlds[key];
     const target=member?'button type="button" data-world-member="'+key+'"':'a href="#'+key+'"';
@@ -120,7 +111,6 @@
       : `<span class="sx-world-card-art" aria-hidden="true">${symbol(key)}</span>`;
     return `<${target} class="sx-world-card${photo?' sx-world-card-photo':''}" data-world-tone="${w.tone}">${artwork}<span class="sx-world-card-copy"><small>EXPLORE YOUR WORLD</small><strong>${esc(w.label)}</strong><span>${esc(w.line)}</span><b aria-hidden="true">↗</b></span></${member?'button':'a'}>`;
   }
-  function recommendations(page,member=false){const pages=member?({pulse:['moments','crews','room','music'],moments:['room','music','friends'],friends:['connections','crews','room'],crews:['circles','music','connections'],circles:['crews','music','friends'],room:['music','friends','moments'],music:['room','crews','moments'],connections:['friends','crews','room']}[page]||['room','music','friends']):({people:['world','talanoa','profile'],talanoa:['people','music','profile'],music:['profile','skins','talanoa'],profile:['skins','music','world'],skins:['profile','music','people'],world:['people','talanoa','profile']}[page]||[]);return `<section class="sx-world-next" aria-label="Keep exploring"><header><div><span class="sx-eyebrow">THERE’S MORE TO YOUR WORLD</span><h2>Where to next?</h2></div><button type="button" data-world-tool="explore">Explore everything <span aria-hidden="true">↗</span></button></header><div>${pages.map(p=>destinationCard(p,member,member?recommendationPhotos[p]:undefined)).join('')}</div></section>`;}
   // New or returning: a member is greeted by name. The first visit on this device
   // points at one thing to do; later visits say welcome back.
   const visits={};
@@ -178,13 +168,6 @@
         type.dispatchEvent(new root.Event('change',{bubbles:true}));
       }
     }
-    if(page==='music'&&selection){
-      const mode=root.document.querySelector('#sk-music-playlist dimau-music-visualiser,[data-world-visual-stage] dimau-music-visualiser')?.shadowRoot?.querySelector('.mode');
-      if(mode&&mode.value!==selection[0]&&[...mode.options].some(option=>option.value===selection[0])){
-        mode.value=selection[0];
-        mode.dispatchEvent(new root.Event('input',{bubbles:true}));
-      }
-    }
   }
   function openChoice(s,page){
     const option=chosen(s,page);
@@ -200,29 +183,31 @@
     target.scrollIntoView?.({block:'center'});
     (id==='summary'?target.querySelector('summary'):target)?.focus?.({preventScroll:true});
   }
-  function directory(s){if(s.directory?.isConnected)return s.directory;const d=root.document.createElement('dialog');d.className='sx-world-directory';d.setAttribute('aria-labelledby','sx-directory-title');const pages=s.member?memberPages:publicPages;d.innerHTML=`<header><div><span class="sx-eyebrow">A WORLD OF POSSIBILITIES</span><h2 id="sx-directory-title">What feels like you today?</h2></div><button type="button" data-world-close aria-label="Close Explore">×</button></header><div class="sx-world-directory-grid">${pages.map(p=>s.member?`<div class="sx-world-directory-tile">${destinationCard(p,true)}${choiceMenu(s,p,true)}</div>`:destinationCard(p,false)).join('')}</div><footer><button type="button" data-world-tool="studio">Room Studio</button><button type="button" data-world-tool="skins">Browse skins</button><button type="button" data-world-tool="design">Design this page</button><a href="/communications.html?app=sota-kece">Chats & calls ↗</a></footer>`;s.app.append(d);s.directory=d;d.addEventListener('close',()=>s.returnFocus?.isConnected&&s.returnFocus.focus({preventScroll:true}));return d;}
+  function directory(s){if(s.directory?.isConnected)return s.directory;const d=root.document.createElement('dialog');d.className='sx-world-directory';d.setAttribute('aria-labelledby','sx-directory-title');const pages=s.member?memberPages:publicPages;d.innerHTML=`<header><div><span class="sx-eyebrow">A WORLD OF POSSIBILITIES</span><h2 id="sx-directory-title">What feels like you today?</h2></div><button type="button" data-world-close aria-label="Close Explore">×</button></header><div class="sx-world-directory-grid">${pages.map(p=>s.member?`<div class="sx-world-directory-tile">${destinationCard(p,true)}${choices[p]?choiceMenu(s,p,true):''}</div>`:destinationCard(p,false)).join('')}</div><footer><button type="button" data-world-tool="studio">Room Studio</button><button type="button" data-world-tool="skins">Browse skins</button><button type="button" data-world-tool="design">Design this page</button><a href="/communications.html?app=sota-kece">Chats & calls ↗</a></footer>`;s.app.append(d);s.directory=d;d.addEventListener('close',()=>s.returnFocus?.isConnected&&s.returnFocus.focus({preventScroll:true}));return d;}
   function stop(){if(!session)return;const visual=session.app.querySelector('[data-world-home-visual] dimau-music-visualiser'),player=root.document?.querySelector('#sk-music-playlist');if(visual&&player){visual.removeAttribute('compact');move(visual,player.querySelector('[data-world-inline-visual]')||player);}session.remove.forEach(fn=>fn());session.directory?.remove();session=null;}
   function enhanceMusic(){
     const doc=root.document;let player=doc?.querySelector('#sk-music-playlist');if(!player){root.SotaPlaylist?.prepareVisual?.();player=doc?.querySelector('#sk-music-playlist');}if(!player)return;
     let now=player.querySelector('.sx-player-now');
     if(!now){now=doc.createElement('div');now.className='sx-player-now';now.setAttribute('aria-label','Now playing');player.querySelector('.sk-playlist-head')?.after(now);for(const n of [...player.children])if(n.matches('.sk-playlist-hero,audio,.sk-playlist-transport,.sk-deck,.sk-playlist-status')||n.tagName==='BUTTON')move(n,now);}
+    // The track list is the page's main content: always open, beside the player.
     let library=player.querySelector('.sx-player-library');
-    if(!library){library=doc.createElement('details');library.className='sx-player-library';library.setAttribute('aria-label','Music library');const summary=doc.createElement('summary');summary.innerHTML='<span class="sx-library-symbol" aria-hidden="true">'+symbol('music')+'</span><span><strong><span class="sx-library-closed-label">Browse music</span><span class="sx-library-open-label">Hide music library</span></strong><small>Island Mix, your playlists and music from your device</small></span><span class="sx-library-chevron" aria-hidden="true">⌄</span>';library.append(summary);player.append(library);for(const n of [...player.children])if(n.matches('.sk-lib-host,.sk-playlist-search,.sk-playlist-queue,.sk-playlist-songs'))move(n,library);}
+    if(!library){library=doc.createElement('section');library.className='sx-player-library';library.setAttribute('aria-label','Music library');player.append(library);for(const n of [...player.children])if(n.matches('.sk-lib-host,.sk-playlist-search,.sk-playlist-queue,.sk-playlist-songs'))move(n,library);}
+    if(!now.querySelector('[data-world-sere]')&&root.SotaSere){const sing=doc.createElement('button');sing.type='button';sing.className='sx-player-sere';sing.setAttribute('data-world-sere','1');sing.textContent='🎤 Make a photo sing';now.append(sing);}
     let region=player.querySelector('.sx-music-visuals');
     if(region?.tagName==='DETAILS'){const old=region;region=doc.createElement('section');region.className=old.className;for(const n of [...old.children])if(n.tagName!=='SUMMARY')region.append(n);old.replaceWith(region);}
     if(!region){region=doc.createElement('section');region.className='sx-music-visuals';now.after(region);}
     region.setAttribute('aria-label','Music visuals');
     if(!region.querySelector('[data-world-inline-visual]')){const header=doc.createElement('header');header.innerHTML='<span class="sx-eyebrow">MAKE YOUR MUSIC MOVE</span><h3>Music visuals</h3><p>Choose a visual style and colour. Page lights respond to the playing track.</p>'+lightsToggle;const host=doc.createElement('div');host.setAttribute('data-world-inline-visual','');region.prepend(header);region.append(host);}
-    const section=doc.querySelector('#sota-music-home'),panel=section?.querySelector('[data-music-panel="visualiser"]');
-    let stage=panel?.querySelector('[data-world-visual-stage]');if(panel&&!stage){stage=doc.createElement('div');stage.setAttribute('data-world-visual-stage','');stage.className='sx-visual-studio';stage.innerHTML='<header><span class="sx-eyebrow">YOUR SOUND, YOUR WAY</span><h2>A whole different atmosphere.</h2><p>Five visual styles and five colour moods, with lighting synced to your soundtrack.</p><button type="button" data-world-tool="playlist">Back to player & library ↗</button>'+lightsToggle+'</header>';panel.append(stage);}
+    // One view: player, visuals and library share the card, so the old two-tab bar is retired.
+    const section=doc.querySelector('#sota-music-home'),tabs=section?.querySelector('.sota-music-view-tabs'),panel=section?.querySelector('[data-music-panel="playlist"]');
+    if(tabs)tabs.hidden=true;
+    if(panel){panel.setAttribute('role','region');panel.setAttribute('aria-label','Player and library');panel.removeAttribute('aria-labelledby');}
     root.SotaMusicBadge?.updateControls?.();
     const homeHost=session?.app.querySelector('[data-world-home-visual]');
-    const visual=player.querySelector('dimau-music-visualiser')||stage?.querySelector('dimau-music-visualiser')||homeHost?.querySelector('dimau-music-visualiser');if(!visual)return;
+    const visual=player.querySelector('dimau-music-visualiser')||homeHost?.querySelector('dimau-music-visualiser');if(!visual)return;
     const atHome=!!homeHost&&(session.member?session.page==='pulse':session.app.dataset.sxPage==='home');
     if(atHome)visual.setAttribute('compact','');else visual.removeAttribute('compact');
-    const target=atHome?homeHost:section?.dataset.activeMusicView==='visualiser'&&stage?stage:region.querySelector('[data-world-inline-visual]');move(visual,target);visual.wake?.();
-    const oldStage=panel?.querySelector('.sk-music-stage');if(oldStage)oldStage.hidden=true;
-    for(const [key,label] of [['playlist','Player & library'],['visualiser','Music visuals']]){const tab=section?.querySelector(`[data-music-view="${key}"]`);if(tab)tab.textContent=label;}
+    const target=atHome?homeHost:region.querySelector('[data-world-inline-visual]');move(visual,target);visual.wake?.();
     const close=player.querySelector('.sk-playlist-close');if(close&&player.classList.contains('sk-playlist-inline'))close.hidden=true;
   }
   function mount(app,{member=false,state={},go}={}){
@@ -258,15 +243,13 @@
         const old=view.querySelector('.sx-member-heading');old?.remove();
         const group=tabGroups[s.page]||[];if(group.length>1){const tabs=root.document.createElement('nav');tabs.className='sx-world-member-tabs';tabs.setAttribute('aria-label','Your Sota Kece worlds');tabs.innerHTML=group.map(p=>`<button type="button" data-world-member="${p}" aria-current="${p===s.page?'page':'false'}">${esc(worlds[p].label)}</button>`).join('');tools.before(tabs);const current=tabs.querySelector('[aria-current="page"]');if(current&&tabs.scrollWidth>tabs.clientWidth)tabs.scrollLeft=Math.max(0,current.offsetLeft-(tabs.clientWidth-current.offsetWidth)/2);}
         if(s.page==='pulse'){const wall=[...view.children].find(n=>n.classList?.contains('tw-wrap'));(wall||tools).insertAdjacentHTML('afterend',homeListening());}
-        view.insertAdjacentHTML('beforeend',recommendations(s.page,true));
       }
     }else{
       welcomeBack(app);
-      for(const p of publicPages.filter(p=>p!=='home'))app.querySelector(`[data-sx-page="${p}"]`)?.insertAdjacentHTML('beforeend',recommendations(p));
       const paths=app.querySelector('.sx-home-paths');paths?.insertAdjacentHTML('afterend','<div class="sx-world-home-tools"><span>Your world. Your way.</span><button type="button" data-world-tool="explore">Explore everything ✦</button><button type="button" data-world-tool="design">Design this page ✎</button></div>');
     }
     const rail=app.querySelector('.sx-rail');if(rail){const links=root.document.createElement('nav');links.className='sx-world-rail-links';links.setAttribute('aria-label','Create and explore');links.innerHTML=`<span>MAKE IT YOURS</span><button type="button" data-world-tool="studio">Room Studio <i aria-hidden="true">↗</i></button><button type="button" data-world-tool="skins">Skins & collections <i aria-hidden="true">↗</i></button><button type="button" data-world-tool="explore">Explore every world <i aria-hidden="true">✦</i></button><a href="/communications.html?app=sota-kece">Chats & calls <i aria-hidden="true">↗</i></a>`;rail.querySelector('.sx-nav')?.after(links);}
-    function update(page){if(!worlds[page])return;s.page=page;app.dataset.worldPage=page;const w=worlds[page];app.querySelectorAll('[data-world-label]').forEach(n=>n.textContent=w.label);if(!heading)return;heading.querySelector('[data-world-label]').textContent=w.label;heading.querySelector('h1').textContent=w.title;heading.querySelector('.sx-world-hero').dataset.worldTone=w.tone;heading.querySelector('[data-world-description]').textContent=w.line;heading.querySelector('[data-world-actions]').innerHTML=action(w);heading.querySelector('.sx-world-hero-photo').innerHTML=heroVisual(w,page);}
+    function update(page){if(!worlds[page])return;s.page=page;app.dataset.worldPage=page;const w=worlds[page];app.querySelectorAll('[data-world-label]').forEach(n=>n.textContent=w.label);if(!heading)return;heading.querySelector('[data-world-label]').textContent=w.label;heading.querySelector('h1').textContent=w.title;heading.querySelector('.sx-world-hero').dataset.worldTone=w.tone;heading.querySelector('.sx-world-hero').classList.toggle('sx-world-hero-compact',!!w.compact);heading.querySelector('[data-world-description]').textContent=w.line;heading.querySelector('[data-world-actions]').innerHTML=action(w);heading.querySelector('.sx-world-hero-photo').innerHTML=heroVisual(w,page);}
     update(s.page);enhanceMusic();
     if(s.page!=='crews')applyChoice(s);
     on(root,'sota-front-page-change',event=>{if(!member)update(event.detail?.view);enhanceMusic();});
@@ -301,7 +284,7 @@
       if(tool==='design'){root.SotaSpaceDesign?.open(member&&s.page==='room'?'profile':s.page);return;}
       if(tool==='studio'||tool==='skins'){root.BulaSkinStudio?.open(null,tool==='skins'?'All':undefined);return;}
       if(tool==='visuals'||tool==='playlist'){
-        root.SotaMusicHome?.choose('playlist');enhanceMusic();if(tool==='playlist'){const library=root.document.querySelector('.sx-player-library');if(library)library.open=true;}const target=tool==='visuals'?root.document.querySelector('.sx-music-visuals'):root.document.querySelector('#sk-playlist-filter');target?.scrollIntoView?.({block:'center',behavior:'auto'});const focus=tool==='visuals'?target?.querySelector('dimau-music-visualiser')?.shadowRoot?.querySelector('.mode'):target;focus?.focus?.({preventScroll:true});
+        root.SotaMusicHome?.choose('playlist');enhanceMusic();const target=tool==='visuals'?root.document.querySelector('.sx-music-visuals'):root.document.querySelector('#sk-playlist-filter');target?.scrollIntoView?.({block:'center',behavior:'auto'});const focus=tool==='visuals'?target?.querySelector('dimau-music-visualiser')?.shadowRoot?.querySelector('.mode'):target;focus?.focus?.({preventScroll:true});
       }
     });
     return ()=>{if(session===s)stop();};

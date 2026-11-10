@@ -111,7 +111,7 @@ for(const e of ['timeupdate','loadedmetadata','durationchange'])audio.addEventLi
 api.dialog.querySelector('.sk-playlist-transport')?.setAttribute('hidden','');
 audio.controls=false;audio.hidden=true;
 api.dialog.querySelector('.sk-playlist-hero').after(deck);
-if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='stylesheet';l.href='/music-controls.css?v=20261104-player-polish-3';l.dataset.skDeck='1';doc.head.append(l);}
+if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='stylesheet';l.href='/music-controls.css?v=20261110-music-tidy-1';l.dataset.skDeck='1';doc.head.append(l);}
 const session=navigator.mediaSession,set=(a,h)=>{try{session.setActionHandler(a,h);}catch(_){}};
 if(session){set('play',()=>{if(!api.live())start();});set('pause',api.pause);set('previoustrack',back);set('nexttrack',()=>api.move(1));set('seekto',d=>{if(Number.isFinite(d?.seekTime))audio.currentTime=d.seekTime;});}
 loud();modes();tick();
@@ -132,7 +132,7 @@ save();
 }
 async function loadDevice(){
 const store=root.SotaLocalMusic?.createStore?.();if(!store)return;
-try{device=(await store.list()).map(r=>({key:'dev:'+r.id,id:r.id,title:r.title||r.fileName||'Saved song',blob:r.blob}));}catch(_){device=[];}
+try{device=(await store.list()).map(r=>{const raw=r.title||r.fileName||'Saved song',d=root.SotaPlaylist?.describe?.(raw)||{title:raw,artist:''};return {key:'dev:'+r.id,id:r.id,title:d.title||raw,artist:d.artist,rawTitle:raw,blob:r.blob};});}catch(_){device=[];}
 draw();api.render();
 }
 picker.addEventListener('change',async()=>{
@@ -192,7 +192,7 @@ draw();loadDevice();
 return {
 next,ended,
 sync(s,playing){modes();playBtn.innerHTML=playing?ICON.pause:ICON.play;label(playBtn,playing?'Pause':'Play');tick();
-if(session&&s)try{if(root.MediaMetadata&&session.metadata?.title!==s.title)session.metadata=new MediaMetadata({title:s.title,artist:'Sota Kece'});session.playbackState=playing?'playing':'paused';}catch(_){}},
+if(session&&s)try{if(root.MediaMetadata&&session.metadata?.title!==s.title)session.metadata=new MediaMetadata({title:s.title,artist:s.artist||'Sota Kece'});session.playbackState=playing?'playing':'paused';}catch(_){}},
 loaded(){draw();if(!pendingSong)return;const t=api.catalogue().find(x=>x.id===pendingSong);pendingSong='';if(t&&!api.live()){setView('mix');api.select(t.key);api.say('Shared with you · '+t.title+'. Tap Play to listen.');}},
 items:()=>view==='device'?device:view.startsWith('pl:')?(current()?.items||[]).map(byKey).filter(Boolean):null,
 name:()=>view==='device'?'My music':current()?.name||'Island Mix',

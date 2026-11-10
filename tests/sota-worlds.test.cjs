@@ -17,33 +17,20 @@ function harness(t){
 }
 browserTest('all seven guest worlds expose page design, discovery and valid related destinations',t=>{
  const h=harness(t);let previews=0;h.get('#bv-circle button').addEventListener('click',()=>previews++);const pages=['people','talanoa','music','profile','skins','world'];
- for(const page of pages){h.app.querySelector(`a[href="#${page}"]`).click();assert.equal(h.app.dataset.worldPage,page);assert.equal(h.app.querySelector('img[src*="friends-natural"]'),null);assert.equal(h.app.querySelector('img[src*="talanoa-natural"]'),null);assert.equal(h.app.querySelector('.sx-world-toolbar [data-world-label]').textContent,h.w.SotaWorlds.worlds[page].label);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page);const panel=h.get(`.sx-panel[data-sx-page="${page}"]`);assert.equal(panel.querySelectorAll('.sx-world-next .sx-world-card').length,3);if(page==='talanoa'){h.get('[data-world-tool="circle"]').click();assert.equal(previews,1,'The hero opens the native circle preview');}for(const a of panel.querySelectorAll('.sx-world-card'))assert(['#home','#people','#talanoa','#music','#profile','#skins','#world'].includes(a.getAttribute('href')));}
+ for(const page of pages){h.app.querySelector(`a[href="#${page}"]`).click();assert.equal(h.app.dataset.worldPage,page);assert.equal(h.app.querySelector('img[src*="friends-natural"]'),null);assert.equal(h.app.querySelector('img[src*="talanoa-natural"]'),null);assert.equal(h.app.querySelector('.sx-world-toolbar [data-world-label]').textContent,h.w.SotaWorlds.worlds[page].label);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page);const panel=h.get(`.sx-panel[data-sx-page="${page}"]`);assert.equal(panel.querySelector('.sx-world-next'),null,'pages end on their own content; the rail already links every page');if(page==='talanoa'){h.get('[data-world-tool="circle"]').click();assert.equal(previews,1,'The hero opens the native circle preview');}}
 });
 browserTest('Explore is a working directory and skin tools open the native catalogue without saving a choice',t=>{
  const h=harness(t);h.get('.sx-world-home-tools [data-world-tool="explore"]').click();const dialog=h.get('.sx-world-directory');assert(dialog.open);assert.equal(dialog.querySelectorAll('.sx-world-card').length,7);assert.equal(dialog.querySelectorAll('img').length,0);assert.equal(new Set([...dialog.querySelectorAll('.sx-world-card-art path')].map(n=>n.getAttribute('d'))).size,7);dialog.querySelector('a[href="#music"]').click();assert.equal(h.app.dataset.sxPage,'music');assert(!dialog.open);h.get('.sx-world-rail-links [data-world-tool="skins"]').click();assert.deepEqual(h.calls.skins.at(-1),[null,'All']);h.get('.sx-world-rail-links [data-world-tool="studio"]').click();assert.equal(h.calls.skins.length,2);h.w.SotaWorlds.stop();assert.equal(h.get('.sx-world-directory'),null);
 });
 browserTest('player, visual choices, filter and audio survive switching between music views',t=>{
  const h=harness(t);h.app.querySelector('a[href="#music"]').click();const mode=h.visual.shadowRoot.querySelector('.mode');mode.value='halo';
- assert.equal(h.get('.sx-music-visuals').tagName,'SECTION');assert(h.get('[data-world-inline-visual]').contains(h.visual));assert(h.get('.sx-player-library').contains(h.get('#sk-playlist-filter')));assert.equal(h.get('.sx-player-library').tagName,'DETAILS');assert.equal(h.get('.sx-player-library').open,false);h.get('.sx-player-library').open=true;assert(h.get('.sx-player-now').contains(h.audio));
- for(let i=0;i<3;i++){h.get('[data-music-view="visualiser"]').click();assert(h.get('[data-world-visual-stage]').contains(h.visual));h.get('[data-music-view="playlist"]').click();assert(h.get('[data-world-inline-visual]').contains(h.visual));}
- h.get('.sk-playlist-transport button').click();assert.equal(h.calls.play,1);assert.equal(h.calls.pause,0);assert.equal(mode.value,'halo');assert.equal(h.get('#sk-playlist-filter').value,'keep my filter');assert.equal(h.get('.sx-player-library').open,true,'A deliberate reveal survives view changes');assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);assert.equal(h.d.querySelectorAll('#sota-playlist-audio').length,1);
+ assert.equal(h.get('.sx-music-visuals').tagName,'SECTION');assert(h.get('[data-world-inline-visual]').contains(h.visual));assert(h.get('.sx-player-library').contains(h.get('#sk-playlist-filter')));assert.equal(h.get('.sx-player-library').tagName,'SECTION','the track list is always open');assert.equal(h.get('.sota-music-view-tabs').hidden,true,'the two-tab bar is retired');assert(h.get('.sx-player-now').contains(h.audio));
+ for(let i=0;i<3;i++){h.w.SotaWorlds.enhanceMusic();assert.equal(h.get('[data-world-visual-stage]'),null);assert(h.get('[data-world-inline-visual]').contains(h.visual));}
+ h.get('.sk-playlist-transport button').click();assert.equal(h.calls.play,1);assert.equal(h.calls.pause,0);assert.equal(mode.value,'halo');assert.equal(h.get('#sk-playlist-filter').value,'keep my filter');assert.equal(h.d.querySelectorAll('dimau-music-visualiser').length,1);assert.equal(h.d.querySelectorAll('#sota-playlist-audio').length,1);
  h.w.SotaWorlds.enhanceMusic();assert.equal(h.player.querySelectorAll('.sx-player-library').length,1);assert.equal(h.player.querySelectorAll('.sx-player-now').length,1);
 });
 browserTest('each signed-in destination retains its content and the pill strip lists only its group',t=>{
- const h=harness(t);const strip={pulse:4,moments:4,crews:4,circles:4,friends:2,connections:2,music:0,room:0},seen=new Set();for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});if(page==='pulse'){
-    assert(h.get('.sx-world-next [data-world-member=room]'));
-    h.get('.sx-world-next [data-world-member=music]').click();
-    assert.equal(h.calls.go.at(-1),'music');
-    const cards=[...h.app.querySelectorAll('.sx-world-next .sx-world-card-photo')];
-    assert.deepEqual(cards.map(card=>card.dataset.worldMember),['moments','crews']);
-    assert.equal(new Set(cards.map(card=>card.querySelector('img').getAttribute('src'))).size,2);
-  }
-  if(page==='friends'){
-    const connections=h.get('.sx-world-next .sx-world-card-photo[data-world-member=connections]');
-    assert(connections.querySelector('img').getAttribute('src').includes('connections-ferry'));
-    connections.click();
-    assert.equal(h.calls.go.at(-1),'connections');
-  }assert.equal(h.get('#draft'),draft);assert.equal(draft.value,'keep my draft');const pills=[...h.app.querySelectorAll('.sx-world-member-tabs button')];pills.forEach(b=>seen.add(b.dataset.worldMember));assert.equal(pills.length,strip[page],'the pill strip lists only the active dock group');if(strip[page])assert.equal(h.app.querySelector('.sx-world-member-tabs [aria-current="page"]').dataset.worldMember,page);else assert.equal(h.app.querySelector('.sx-world-member-tabs'),null,'Music and My space have no secondary pills');assert.equal(h.app.querySelectorAll('.sx-nav [aria-current="page"]').length,1);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page==='room'?'profile':page);}
+ const h=harness(t);const strip={pulse:4,moments:4,crews:4,circles:4,friends:2,connections:2,music:0,room:0},seen=new Set();for(const page of ['pulse','moments','friends','crews','circles','room','music','connections']){h.w.SotaExperience.stop();h.app.innerHTML='<header class="top"></header><main id="view"><section class="glass card"><input id="draft" value="keep my draft"></section></main>';const draft=h.get('#draft');h.w.SotaExperience.mountMember(h.app,{user:{id:'fixture'},me:{handle:'fixture',display_name:'Fixture'},tab:page});assert.equal(h.app.querySelector('.sx-world-next'),null,'no repeated destination cards under the page');if(page==='music'){assert.equal(h.app.querySelector('.sx-world-more'),null,'Music has no second visual-style picker');assert.equal(h.app.querySelector('.sx-world-hero [data-world-tool]'),null,'the Music hero has no visuals button');assert(h.app.querySelector('.sx-world-hero-compact'));  }assert.equal(h.get('#draft'),draft);assert.equal(draft.value,'keep my draft');const pills=[...h.app.querySelectorAll('.sx-world-member-tabs button')];pills.forEach(b=>seen.add(b.dataset.worldMember));assert.equal(pills.length,strip[page],'the pill strip lists only the active dock group');if(strip[page])assert.equal(h.app.querySelector('.sx-world-member-tabs [aria-current="page"]').dataset.worldMember,page);else assert.equal(h.app.querySelector('.sx-world-member-tabs'),null,'Music and My space have no secondary pills');assert.equal(h.app.querySelectorAll('.sx-nav [aria-current="page"]').length,1);h.get('.sx-world-toolbar [data-world-tool="design"]').click();assert.equal(h.calls.design.at(-1),page==='room'?'profile':page);}
  assert.deepEqual([...seen].sort(),['circles','connections','crews','friends','moments','pulse'],'every secondary world is reachable from its dock tab; Music and My space are dock tabs themselves');
 });
 test('member deep links are bounded and leave invitation and public graph routes to their existing owners',()=>{
@@ -93,7 +80,7 @@ browserTest('member Home moves one compact visualiser back to the existing playe
  }
 });
 
-browserTest('the eight signed-in worlds have five choices and a feed choice changes the prompt without writing a post',t=>{
+browserTest('seven signed-in worlds have five choices and a feed choice changes the prompt without writing a post',t=>{
  const h=harness(t);
  const {app,w}=h;
  const user={id:'choice-test-member'};
@@ -105,7 +92,7 @@ browserTest('the eight signed-in worlds have five choices and a feed choice chan
  home(user);
  h.get('.sx-world-toolbar [data-world-tool="explore"]').click();
  const menus=[...h.get('.sx-world-directory').querySelectorAll('[data-world-choice]')];
- assert.equal(menus.length,8);
+ assert.equal(menus.length,7,'Music keeps its visual style on the visualiser card only');assert(!menus.some(menu=>menu.dataset.worldChoice==='music'));
  assert(menus.every(menu=>menu.options.length===6));
  const faith=menus.find(menu=>menu.dataset.worldChoice==='pulse');
  faith.value='faith';
