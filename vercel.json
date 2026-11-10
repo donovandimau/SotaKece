@@ -1,9 +1,18 @@
 {
   "functions": {
-    "api/sere.js": { "maxDuration": 60 },
-    "api/sere-callback.js": { "maxDuration": 60 },
-    "api/account-delete.js": { "maxDuration": 60 },
-    "api/listen.js": { "maxDuration": 15, "includeFiles": "music-playlist.json" }
+    "api/sere.js": {
+      "maxDuration": 60
+    },
+    "api/sere-callback.js": {
+      "maxDuration": 60
+    },
+    "api/account-delete.js": {
+      "maxDuration": 60
+    },
+    "api/listen.js": {
+      "maxDuration": 15,
+      "includeFiles": "music-playlist.json"
+    }
   },
   "routes": [
     {
@@ -16,23 +25,54 @@
     },
     {
       "src": "/(.*)",
-      "has": [{ "type": "host", "value": "sotakece.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "sotakece.vercel.app"
+        }
+      ],
       "status": 308,
-      "headers": { "Location": "https://sotakece.com/$1" }
+      "headers": {
+        "Location": "https://sotakece.com/$1"
+      }
     },
     {
       "src": "/(.*)",
-      "has": [{ "type": "host", "value": "bulavata.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "bulavata.vercel.app"
+        }
+      ],
       "status": 308,
-      "headers": { "Location": "https://sotakece.com/$1" }
+      "headers": {
+        "Location": "https://sotakece.com/$1"
+      }
     },
     {
       "src": "/",
-      "has": [{ "type": "host", "value": "sere.sotakece.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "sere.sotakece.com"
+        }
+      ],
       "dest": "/sere/index.html"
     },
-    { "src": "/s/([0-9a-fA-F-]{36})/([0-9a-f]{32})/?", "dest": "/api/listen?sere=$1&k=$2" },
-    { "src": "/t/([a-z0-9-]{1,80})/?", "dest": "/api/listen?track=$1" },
-    { "handle": "filesystem" }
+    {
+      "src": "/s/([0-9a-fA-F-]{36})/([0-9a-f]{32})/?",
+      "dest": "/api/listen?sere=$1&k=$2"
+    },
+    {
+      "src": "/t/([a-z0-9-]{1,80})/?",
+      "dest": "/api/listen?track=$1"
+    },
+    {
+      "src": "/p/([0-9]{1,18})/([a-fA-F0-9]{32})/?",
+      "dest": "/api/share?post=$1&t=$2"
+    },
+    {
+      "handle": "filesystem"
+    }
   ]
 }

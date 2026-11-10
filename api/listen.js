@@ -137,4 +137,4 @@ async function handler(req,res){
   }
 }
 module.exports=handler;
-Object.assign(module.exports,{shareKey,sameKey,shareUrl,ourVideo,findTrack,serePage,trackPage,gone,readSere,esc});
+Object.assign(module.exports,{shareKey,sameKey,shareUrl,ourVideo,findTrack,serePage,trackPage,gone,readSere,esc,page});

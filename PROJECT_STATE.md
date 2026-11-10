@@ -1,3 +1,11 @@
+## 10 November 2026 — The share engine: public post links with referral credit
+
+Owner asked for the next Day 1 feature from the blueprint, the share engine with deep links. Tapping Share on a wall post now mints a link for that member, `https://sotakece.com/p/<post>/<token>`, and opens the app's own share sheet (native on phones, WhatsApp first elsewhere) with the first line of the post and who said it. The link opens a small public page with the post, the author and the preview tags messaging apps read, so the chat shows a card. One button opens the post in Sota Kece: a member lands on the post, a new person lands on sign-up with the link remembered on the device, and once their room exists the sharer is credited and told in Activity ("@newbie joined Sota Kece through your link"). Credit is given once per member, never to oneself, and only for accounts under a day old. Recognition only: the wallet stays off.
+
+Migration `supabase/migrations/20261110160000_sota_share_engine.sql` adds `bulavata.talanoa_shares` and `bulavata.referrals` (member-only read of their own rows), the Activity kind `joined`, and `bv_talanoa_share`, `bv_talanoa_shared` (the only anon-callable piece: one card for exactly that post and token, counting the open) and `bv_referral_claim`. `api/share.js` renders the page with the publishable key only, routed by `vercel.json` ahead of the filesystem; it reuses the page frame of `api/listen.js`. `index.html` remembers `?ref=` at boot and claims it after both room-creation paths; `sota-pulse.js` mints and hands off; `sota-plus.js` words the new Activity kind. Release v170.
+
+Verified locally: `tests/run-share-engine-db.cjs` (38 isolated Postgres checks + preservation snapshot, in the Talanoa privacy workflow) and `tests/share-engine.test.cjs` (7); full suite 411 pass with jsdom, 383 as CI runs it; the public page rendered at 390px light and dark. Not verified: a live WhatsApp preview fetch and a real sign-up through a link on production. Full notes: `docs/share-engine-20261110.md`.
+
 ## 10 November 2026 — Guest welcome before the feature scripts (Ops task 1041)
 
 Release `sota-kece-shell-20261110-v164-first-paint`. After task 1037 the phone largest paint was still about 4.7s in the lab, because the veranda photo was only drawn once about 45 scripts had downloaded and run.
