@@ -236,3 +236,30 @@ test('the routes send /s and /t to the listen function ahead of the static files
   assert.equal(new RegExp('^'+routes[s].src+'$').test('/sere/index.html'),false);
   assert.ok(cfg.functions['api/listen.js']);
 });
+
+// Home live feed and composer (10 Nov 2026).
+test('the Home composer can drop a moment or share an Island Mix song, and shows the latest moments',dom,async()=>{
+  const h=bootWall({posts:[post(1,{body:'Tune of the week https://sotakece.com/t/fiji-remix-2026-01 <b>x</b>'})]});
+  const moments=[{id:9,display_name:'Mere',handle:'mere',avatar_emoji:'🌴',accent:'#e0559b',body:'Lovo at four <i>today</i>',created_at:new Date().toISOString()},{id:8,display_name:'Bo',handle:'bo',body:'',media_url:'https://example.test/a.jpg',created_at:new Date().toISOString()}];
+  h.w.SotaPlus={feedCompat:async()=>({data:moments,error:null})};
+  await h.w.SotaPulse.view();await flush();
+  // A shared song link becomes one safe tap target; everything else stays escaped text.
+  const link=h.q('.tw-post .tw-track-link');assert.equal(link.getAttribute('href'),'/t/fiji-remix-2026-01');assert.equal(link.getAttribute('rel'),'noopener');assert.equal(h.q('.tw-post .tw-body b'),null);
+  const hostile=h.w.SotaPulse.rich('https://sotakece.com/t/x" onclick="y https://evil.test/t/abc <script>');
+  assert.equal((hostile.match(/<a /g)||[]).length,1,'only the Sota Kece song link is linked');const frag=h.w.document.createElement('div');frag.innerHTML=hostile;assert.equal(frag.querySelectorAll('*').length,2,'one link and its icon, no other element');assert.equal(frag.querySelector('a').getAttribute('href'),'/t/x');assert.equal(frag.querySelector('a').attributes.length,4,'class, href, target and rel only');assert(frag.textContent.includes('" onclick="y https://evil.test/t/abc <script>'),'everything else stays visible text');
+  // Latest moments: names and words as text, a photo-only moment gets plain words.
+  const cards=h.all('.tw-moment');assert.equal(cards.length,2);assert.match(cards[0].textContent,/Mere.*Lovo at four <i>today<\/i>/);assert.equal(cards[0].querySelector('i'),null);assert.match(cards[1].textContent,/Shared a photo/);
+  cards[0].click();assert.equal(h.went.at(-1),'moments');
+  h.q('[data-tw="moment"]').click();assert.equal(h.went.filter(t=>t==='moments').length,2);
+  // Share a track: opens the picker with clean names, puts the song and its listen link in the box, ready to post.
+  const open=h.q('.tw-quick [data-tw="track"]'),box=h.q('#tw-track-pick');assert.equal(box.hidden,true);open.click();assert.equal(box.hidden,false);assert.equal(open.getAttribute('aria-expanded'),'true');
+  const pick=h.q('[data-tw-track]');assert.equal(pick.options.length,playlist.length+1);assert.equal(pick.options[2].textContent,'Lauti Au — DJ Jordan · Remix'.replace('Lauti Au — DJ Jordan · Remix',h.w.SotaPlaylist?'Lauti Au — DJ Jordan · Remix':playlist[1].title));
+  pick.value=playlist[1].id;pick.dispatchEvent(new h.w.Event('change',{bubbles:true}));
+  const ta=h.q('[data-tw-form="post"] textarea');assert.match(ta.value,/^🎶 .+ https:\/\/sotakece\.com\/t\/fiji-remix-2026-01$/);assert.equal(h.q('[data-tw-form="post"] button[type=submit]').disabled,false);assert.equal(box.hidden,true);
+  assert(ta.value.length<=280);
+});
+test('Viti Pulse shows clean song names when the playlist parser is loaded',dom,async()=>{
+  const h=bootWall({posts:[]});h.w.eval(read('music-playlist.js'));
+  await h.w.SotaPulse.view();await flush();
+  for(const row of h.all('.tw-track-title'))assert.doesNotMatch(row.textContent,/[_#\[\]]| - /);
+});

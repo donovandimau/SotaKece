@@ -21,7 +21,7 @@
 
   function fresh() {
     return { mode: DEFAULT_MODE, asOf: null, posts: [], offset: 0, done: false, loading: false,
-             pending: 0, newest: null, thread: null, quote: null, channel: null, io: null, seq: 0, sparkHtml: null, share: null, tracks: null };
+             pending: 0, newest: null, thread: null, quote: null, channel: null, io: null, seq: 0, sparkHtml: null, share: null, tracks: null, catalogue: null, moments: null, picking: false };
   }
   function say(err, fallback) {
     var m = (err && err.message) || '';
@@ -40,6 +40,9 @@
     return esc(text || '')
       .replace(/(^|[\s(])@([a-z0-9_]{2,32})/gi, function (_, pre, h) {
         return pre + '<button type="button" class="tw-mention" data-tw="room" data-handle="' + esc(h) + '">@' + esc(h) + '</button>';
+      })
+      .replace(/https:\/\/sotakece\.com\/t\/([a-z0-9-]{1,80})(?![a-z0-9-])/g, function (_, id) {
+        return '<a class="tw-track-link" href="/t/' + id + '" target="_blank" rel="noopener"><span aria-hidden="true">🎵</span> Listen on Sota Kece</a>';
       })
       .replace(/\n/g, '<br>');
   }
@@ -143,7 +146,7 @@
     opts = opts || {};
     var me = S.me || {};
     return '<form class="tw-compose glass card" data-tw-form="' + (opts.replyTo ? 'reply' : 'post') + '"' + (opts.replyTo ? ' data-reply-to="' + opts.replyTo + '"' : '') + '>' +
-      (opts.replyTo ? '' : makeRow()) +
+      (opts.replyTo ? '' : makeRow() + quickRow()) +
       '<div class="tw-compose-row">' +
         '<div class="av" style="background:' + esc(me.room_accent || '#4FA8D8') + '18" aria-hidden="true">' + esc(me.avatar_emoji || '🌺') + '</div>' +
         '<textarea name="body" maxlength="' + MAX + '" rows="' + (opts.replyTo || !window.SotaSere ? 2 : 1) + '" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : !window.SotaSere ? 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?' : 'Or write a few words…') + '"></textarea>' +
@@ -160,6 +163,52 @@
     return '<div class="tw-make" role="group" aria-label="Make a singing photo">' +
       '<button type="button" class="tw-make-main tw-sere-open" data-tw="sere" aria-label="Make a photo sing"><span class="tw-make-icon" aria-hidden="true">🎤</span><span><b>Make a photo sing</b><small>Pick a photo, add a song or your voice</small></span></button>' +
       '<button type="button" class="tw-make-say" data-tw="say" aria-label="Make a photo say my words"><span aria-hidden="true">💬</span> Say my words</button></div>';
+  }
+  /** Everything a member can start from Home, in one place: words, a singing photo, a moment or a song. */
+  function clean(title) { var d = window.SotaPlaylist && window.SotaPlaylist.describe ? window.SotaPlaylist.describe(title) : null; return d && d.title ? d : { title: String(title || ''), artist: '' }; }
+  function quickRow() {
+    return '<div class="tw-quick" role="group" aria-label="More to share">' +
+      '<button type="button" class="tw-quick-act" data-tw="moment"><span aria-hidden="true">📷</span> Drop a moment</button>' +
+      '<button type="button" class="tw-quick-act" data-tw="track" aria-expanded="' + (st.picking ? 'true' : 'false') + '" aria-controls="tw-track-pick"><span aria-hidden="true">🎵</span> Share a track</button></div>' +
+      '<div class="tw-track-pick" id="tw-track-pick"' + (st.picking ? '' : ' hidden') + '>' + trackPicker() + '</div>';
+  }
+  function trackPicker() {
+    var list = st.catalogue || [];
+    if (!list.length) return '<span class="tw-track-pick-note" role="status">' + (st.catalogue ? 'The Island Mix could not load. Try again in a moment.' : 'Loading the Island Mix…') + '</span>';
+    return '<label><span>Pick a song from the Island Mix</span><select data-tw-track><option value="">Choose a song…</option>' +
+      list.map(function (t) { var d = clean(t.title); return '<option value="' + esc(t.id) + '">' + esc(d.title + (d.artist ? ' — ' + d.artist : '')) + '</option>'; }).join('') + '</select></label>';
+  }
+  function trackWords(t) { var d = clean(t.title); return '🎶 ' + d.title + (d.artist ? ' — ' + d.artist : '') + ' ' + trackUrl(t.id); }
+  function addTrack(id) {
+    var t = (st.catalogue || []).filter(function (x) { return x.id === id; })[0], ta = $('[data-tw-form="post"] textarea');
+    if (!t || !ta) return;
+    var words = trackWords(t), next = ta.value.trim() ? ta.value.replace(/\s+$/, '') + '\n' + words : words;
+    if (next.length > MAX) { toast('That song will not fit with what you have written. Shorten your words first.', true); return; }
+    ta.value = next; ta.dispatchEvent(new Event('input', { bubbles: true }));
+    st.picking = false; var box = $('#tw-track-pick'), btn = $('[data-tw="track"]');
+    if (box) { box.hidden = true; box.innerHTML = trackPicker(); } if (btn) btn.setAttribute('aria-expanded', 'false');
+    ta.focus();
+  }
+  /* A few of the newest moments from friends, so Home shows what people are doing, not what the app is. */
+  function momentsStrip() {
+    var list = (st.moments || []).slice(0, 3);
+    if (!list.length) return '';
+    return '<section class="tw-moments" aria-labelledby="tw-moments-title"><header><h2 id="tw-moments-title">Latest moments</h2><button type="button" class="tw-viti-more" data-tw="moment">See all moments ↗</button></header><div class="tw-moments-row">' +
+      list.map(function (m) {
+        var text = String(m.body || (m.repost && m.repost.body) || '').trim();
+        return '<button type="button" class="tw-moment" data-tw="moment"><span class="av sm" style="background:' + esc(m.accent || '#4FA8D8') + '18" aria-hidden="true">' + esc(m.avatar_emoji || '🌺') + '</span>' +
+          '<span class="tw-moment-copy"><b>' + esc(m.display_name || m.handle || 'A friend') + '</b><small>' + esc(ago(m.created_at)) + '</small>' +
+          '<span>' + esc(text ? (text.length > 110 ? text.slice(0, 107) + '…' : text) : m.media_url ? 'Shared a photo' : 'Shared a moment') + '</span></span></button>';
+      }).join('') + '</div></section>';
+  }
+  async function loadMoments() {
+    var seq = st.seq;
+    try {
+      var r = window.SotaPlus && window.SotaPlus.feedCompat ? await window.SotaPlus.feedCompat(client) : await client.rpc('bv_moments_feed', { lim: 3 });
+      if (seq !== st.seq || !r || r.error) return;
+      st.moments = Array.isArray(r.data) ? r.data.slice(0, 3) : [];
+      var el = $('#tw-moments'); if (el) el.innerHTML = momentsStrip();
+    } catch (_) {}
   }
   function tabs() {
     return '<div class="tw-tabs" role="tablist" aria-label="Order">' +
@@ -193,8 +242,8 @@
   function trackUrl(id) { return 'https://sotakece.com/t/' + encodeURIComponent(id); }
   function trackRow(t) {
     return '<div class="tw-track" data-track="' + esc(t.id) + '">' +
-      '<button type="button" class="tw-track-play" data-tw="play" data-id="' + esc(t.id) + '" data-src="' + esc(AUDIO_BASE + t.path) + '" aria-pressed="false" aria-label="Play ' + esc(t.title) + '">▶</button>' +
-      '<span class="tw-track-title">' + esc(t.title) + '</span>' +
+      '<button type="button" class="tw-track-play" data-tw="play" data-id="' + esc(t.id) + '" data-src="' + esc(AUDIO_BASE + t.path) + '" aria-pressed="false" aria-label="Play ' + esc(clean(t.title).title) + '">▶</button>' +
+      '<span class="tw-track-title"><b>' + esc(clean(t.title).title) + '</b>' + (clean(t.title).artist ? '<small>' + esc(clean(t.title).artist) + '</small>' : '') + '</span>' +
       '<button type="button" class="tw-btn" data-sota-share data-share-url="' + esc(trackUrl(t.id)) + '" data-share-title="' + esc(t.title + ' · Sota Kece') + '" data-share-text="' + esc('Listen to ' + t.title + ' on Sota Kece 🎶') + '" aria-label="Share ' + esc(t.title) + '">↗</button></div>';
   }
   function tracksBlock() {
@@ -214,15 +263,16 @@
       '</div></div></section>';
   }
   async function loadTracks() {
-    if (st.tracks || typeof fetch !== 'function') return;
+    if ((st.tracks && st.catalogue) || typeof fetch !== 'function') return;
     var seq = st.seq;
     try {
       var r = await fetch('/music-playlist.json', { credentials: 'omit' });
-      var picked = featured(r.ok ? await r.json() : [], dayNumber(), 3);
+      var all = r.ok ? await r.json() : [], picked = featured(all, dayNumber(), 3);
       if (seq !== st.seq) return;
-      st.tracks = picked;
+      st.tracks = picked; st.catalogue = featured(all, 0, Array.isArray(all) ? all.length : 0);
+      var pick = $('#tw-track-pick'); if (pick) pick.innerHTML = trackPicker();
       var el = $('#tw-viti-tracks'); if (el) el.innerHTML = tracksBlock();
-    } catch (_) { st.tracks = []; }
+    } catch (_) { st.tracks = []; st.catalogue = []; var failed = $('#tw-track-pick'); if (failed) failed.innerHTML = trackPicker(); }
   }
   /** One small player for the three songs: tap to play, tap again to stop, one at a time. */
   function playTrack(btn) {
@@ -242,6 +292,7 @@
     return '<section class="tw-wrap" aria-label="The Talanoa Wall">' +
       '<div class="tw-top"><h1 class="tw-title">Talanoa</h1>' + tabs() + '</div>' +
       composer() +
+      '<div id="tw-moments">' + momentsStrip() + '</div>' +
       '<div id="tw-spark">' + (st.sparkHtml || '') + '</div>' +
       pill() +
       '<div class="tw-list" id="tw-list">' + list(st.posts) + '</div>' +
@@ -503,6 +554,8 @@
       if (act === 'del') return remove(id);
       if (act === 'sere') return window.SotaSere && window.SotaSere.open();
       if (act === 'say') return window.SotaSere && window.SotaSere.open({ mode: 'say' });
+      if (act === 'moment') return goTo && goTo('moments');
+      if (act === 'track') { st.picking = !st.picking; var box = $('#tw-track-pick'); if (box) { box.hidden = !st.picking; if (st.picking) { loadTracks(); var sel = box.querySelector('select'); if (sel) sel.focus(); } } t.setAttribute('aria-expanded', String(st.picking)); return; }
       if (act === 'play') return playTrack(t);
       if (act === 'music') return goTo && goTo('music');
       if (act === 'people') return goTo && goTo('friends');
@@ -526,6 +579,10 @@
       c.textContent = left + ' letters left'; c.classList.toggle('low', left < 20);
       form.querySelector('button[type=submit]').disabled = !ta.value.trim();
       ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 220) + 'px';
+    });
+    app.addEventListener('change', function (ev) {
+      var pick = ev.target; if (!pick.matches || !pick.matches('[data-tw-track]')) return;
+      if (pick.value) addTrack(pick.value);
     });
     app.addEventListener('submit', function (ev) {
       var form = ev.target.closest('.tw-compose'); if (!form) return;
@@ -551,13 +608,14 @@
     paintPill(); watchSentinel();
     applyShare();
     loadTracks();
+    loadMoments();
   }
   function stop() {
     st.seq += 1;
     if (st.io) { st.io.disconnect(); st.io = null; }
     if (st.channel && client && typeof client.removeChannel === 'function') { try { client.removeChannel(st.channel); } catch (_) {} }
     stopTrack();
-    var keepMode = st.mode, keepShare = st.share, keepTracks = st.tracks; st = fresh(); st.mode = keepMode; st.share = keepShare; st.tracks = keepTracks;
+    var keepMode = st.mode, keepShare = st.share, keepTracks = st.tracks, keepCatalogue = st.catalogue; st = fresh(); st.mode = keepMode; st.share = keepShare; st.tracks = keepTracks; st.catalogue = keepCatalogue;
   }
   function init(cfg) {
     client = cfg.client; S = cfg.state; toast = cfg.toast; esc = cfg.esc; ago = cfg.ago;
@@ -571,7 +629,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    cleanShare: cleanShare, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();

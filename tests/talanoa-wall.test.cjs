@@ -150,7 +150,7 @@ test('opening a post loads root and replies in parallel and replying appends',{s
   const {w,calls}=boot(feed(rows));
   await w.SotaPulse.view();await flush();
   w.document.querySelector('.tw-post[data-id="1"] .tw-body').click();await flush();
-  const names=calls.slice(1).map(c=>c.name+':'+(c.args.p_post_id?'post':c.args.p_reply_to?'thread':'?'));
+  const names=calls.filter(c=>c.name==='bv_talanoa_feed').slice(1).map(c=>c.name+':'+(c.args.p_post_id?'post':c.args.p_reply_to?'thread':'?'));
   assert.deepEqual(names.slice(0,2),['bv_talanoa_feed:post','bv_talanoa_feed:thread']);
   assert.ok(w.document.querySelector('.tw-thread .tw-expanded[data-id="1"]'));
   assert.equal(w.document.querySelectorAll('#tw-replies .tw-post').length,1);
