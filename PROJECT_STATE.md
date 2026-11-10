@@ -1,6 +1,6 @@
 ## 10 November 2026 — Guest welcome before the feature scripts (Ops task 1041)
 
-Release `sota-kece-shell-20261110-v163-first-paint`. After task 1037 the phone largest paint was still about 4.7s in the lab, because the veranda photo was only drawn once about 45 scripts had downloaded and run.
+Release `sota-kece-shell-20261110-v164-first-paint`. After task 1037 the phone largest paint was still about 4.7s in the lab, because the veranda photo was only drawn once about 45 scripts had downloaded and run.
 
 - **Static first paint.** `index.html` carries `<template id="sx-first-paint">`: the header, bottom navigation and Home welcome exactly as `sota-experience.js` renders them (the example room body is left empty; it is below the first screen). A tiny inline script after `#app` clones it in only when the screen is 760px or narrower, the hash is empty or `#home`, there is no `code`/`sid`/`error` in the query, and there is no Supabase session in localStorage (`sb-aqfzpaczyodhugsgqvxi-auth-token`). The app's first render replaces it; the photo, text and positions are the same, so nothing moves. `tests/first-paint.test.cjs` fails if the welcome copy in `sota-experience.js` changes without the template.
 - **Head scripts moved.** `vendor/supabase`, `room-media.js`, `skin-identities.js`, `pacific-themes.js`, `skin-visuals.js` and `skins.js` were parser-blocking in `<head>`; they now sit just before `communications-core.js`, same order, still before the app script.

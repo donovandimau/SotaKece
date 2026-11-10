@@ -1,0 +1,17 @@
+/* Hover lights: every word, bullet, button and panel lights up in its own colour under the pointer.
+   Mouse and trackpad only. Nothing here changes layout; the glow is drawn on two overlay frames. */
+.sota-hover-frame{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:2147483000;opacity:0;box-sizing:border-box;
+ border:2px solid var(--hl,#38bdf8);background:color-mix(in srgb,var(--hl,#38bdf8) 9%,transparent);
+ box-shadow:0 0 0 3px color-mix(in srgb,var(--hl,#38bdf8) 28%,transparent),0 0 26px color-mix(in srgb,var(--hl,#38bdf8) 60%,transparent),inset 0 0 18px color-mix(in srgb,var(--hl,#38bdf8) 16%,transparent);
+ transition:opacity .14s ease,border-color .14s ease,box-shadow .14s ease;contain:strict}
+.sota-hover-frame.on{opacity:1}
+.sota-hover-frame[data-kind="item"]{border-width:2px;background:color-mix(in srgb,var(--hl,#38bdf8) 16%,transparent)}
+@media (prefers-reduced-motion:reduce){.sota-hover-frame{transition:none}}
+::highlight(sota-word-0){background-color:#ffd84d;color:#10243a}
+::highlight(sota-word-1){background-color:#7ee8ff;color:#10243a}
+::highlight(sota-word-2){background-color:#ff9ecb;color:#10243a}
+::highlight(sota-word-3){background-color:#9df5b4;color:#10243a}
+::highlight(sota-word-4){background-color:#c9b3ff;color:#10243a}
+::highlight(sota-word-5){background-color:#ffb37a;color:#10243a}
+::highlight(sota-word-6){background-color:#8fd0ff;color:#10243a}
+::highlight(sota-word-7){background-color:#ff9a9a;color:#10243a}
