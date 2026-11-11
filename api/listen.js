@@ -11,7 +11,7 @@ const {createHmac,timingSafeEqual}=require('node:crypto');
 const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
 const AUDIO_BASE='https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/fiji-audio/';
 const SITE='https://sotakece.com';
-const OG_IMAGE=SITE+'/assets/og-sota-kece-20261104.jpg';
+const OG_IMAGE=SITE+'/assets/og-sota-kece-premium-20261111.jpg';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const TRACK=/^[a-z0-9-]{1,80}$/;
 
@@ -81,7 +81,7 @@ function serePage(job,name,url){
 function trackPage(track){
   const url=`${SITE}/t/${track.id}`;
   return page({title:`${track.title} · Sota Kece`,description:'Tap to listen. Island music on Sota Kece.',url,image:OG_IMAGE,audio:track.url,
-    body:`<article class="card"><img class="art" src="/assets/og-sota-kece-20261104.jpg" alt="" width="1200" height="630">
+    body:`<article class="card"><img class="art" src="/assets/og-sota-kece-premium-20261111.jpg" alt="" width="1200" height="630">
 <div class="words"><h1>${esc(track.title)}</h1><p>From the Island Mix on Sota Kece.</p>
 <audio controls preload="none" src="${esc(track.url)}"></audio></div></article>
 <a class="cta" href="${SITE}/?song=${encodeURIComponent(track.id)}">Hear the whole Island Mix ↗</a>`});
