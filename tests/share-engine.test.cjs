@@ -23,7 +23,7 @@ test('the public page carries preview tags, escapes the words, and sends everyon
   assert.match(html,/<meta property="og:title" content="Lusi Vakatawa on Sota Kece">/);
   assert.match(html,/<meta property="og:description" content="Sunset at Suva &lt;b&gt;harbour&lt;\/b&gt;\nwas unreal">/);
   assert.match(html,/<meta property="og:url" content="https:\/\/sotakece.com\/p\/7\/0123456789abcdef0123456789abcdef">/);
-  assert.match(html,/<meta property="og:image" content="https:\/\/sotakece.com\/assets\/og-sota-kece-20261104.jpg">/);
+  assert.match(html,/<meta property="og:image" content="https:\/\/sotakece.com\/assets\/og-sota-kece-premium-20261111.jpg">/);
   assert.match(html,/Sunset at Suva &lt;b&gt;harbour&lt;\/b&gt;<br>was unreal/,'words are escaped and keep their line breaks');
   assert.doesNotMatch(html,/<b>harbour<\/b>/);
   assert.match(html,/class="quote"><b>Joji<\/b> @joji<br>orig &lt;i&gt;/,'the quoted post is shown and escaped');

@@ -184,7 +184,7 @@ test('a song page plays without an account and carries the preview tags chat app
   assert.equal(r.code,200);assert.match(r.headers['content-type'],/text\/html/);assert.equal(r.headers['x-content-type-options'],'nosniff');
   assert.ok(r.body.includes(`<meta property="og:title" content="${esc(track.title)} · Sota Kece">`));
   assert.ok(r.body.includes(`<meta property="og:audio" content="https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/fiji-audio/${track.path}">`));
-  assert.match(r.body,/<meta property="og:image" content="https:\/\/sotakece\.com\/assets\/og-sota-kece-20261104\.jpg">/);
+  assert.match(r.body,/<meta property="og:image" content="https:\/\/sotakece\.com\/assets\/og-sota-kece-premium-20261111\.jpg">/);
   assert.match(r.body,/<audio controls preload="none" src="https:\/\/xnxmumbvgtmlpenutlii/);
   assert.ok(r.body.includes(`href="https://sotakece.com/?song=${track.id}"`));
   assert.ok(r.body.indexOf('og:image')<r.body.indexOf('<style>'),'preview tags come before the styling');
