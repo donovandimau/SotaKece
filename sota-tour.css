@@ -1,0 +1,24 @@
+/* Sota Kece guided tour (sota-tour.js). Warm editorial card, the app's lagoon accent, no new fonts. */
+.sk-tour-ring{position:fixed;z-index:9990;pointer-events:none;border-radius:16px;border:3px solid var(--accent,#086779);box-shadow:0 0 0 9999px rgba(18,50,71,.42);transition:top .3s,left .3s,width .3s,height .3s}
+.sk-tour-card{position:fixed;z-index:9991;box-sizing:border-box;right:24px;bottom:24px;width:min(380px,calc(100vw - 32px));padding:16px 18px;border-radius:16px;background:#f5f3ee;color:#123247;border:1px solid #d3dfe7;box-shadow:0 18px 48px rgba(18,50,71,.28);font-family:Arial,Helvetica,sans-serif}
+.sk-tour-card[hidden],.sk-tour-ring[hidden]{display:none!important}
+.sk-tour-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sk-tour-step{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#4a6272}
+.sk-tour-dots{display:flex;gap:4px;flex:1}
+.sk-tour-dots i{width:16px;height:4px;border-radius:2px;background:#d3dfe7}
+.sk-tour-dots i.on{background:var(--accent,#086779)}
+.sk-tour-skip{border:0;background:none;color:#4a6272;font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;padding:6px 2px;min-height:32px}
+.sk-tour-title{margin:4px 0 6px;font-size:20px;line-height:1.2;font-weight:700;color:#123247;outline:none}
+.sk-tour-title:focus{outline:none}
+/* When the card would cover the part being explained, it moves to the top, under the header. */
+.sk-tour-card.sk-tour-card--top{top:calc(var(--dimau-header-height,64px) + 12px + env(safe-area-inset-top,0px));bottom:auto}
+.sk-tour-text{margin:0 0 14px;font-size:15px;line-height:1.5;color:#2c4656}
+.sk-tour-actions{display:flex;justify-content:flex-end;gap:10px}
+.sk-tour-actions button{min-height:44px;padding:10px 18px;border-radius:999px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.sk-tour-back{background:#fff;color:#123247;border:1px solid #c4d3dc}
+.sk-tour-back[hidden]{display:none}
+.sk-tour-next{background:var(--accent,#086779);color:#fff;border:1px solid var(--accent,#086779)}
+.sk-tour-card button:focus-visible{outline:3px solid #f2b84b;outline-offset:2px}
+/* Phones: sit the card above the bottom dock, full width inside the gutter. */
+@media (max-width:640px){.sk-tour-card{left:16px;right:16px;width:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));padding:14px 16px}.sk-tour-title{font-size:18px}.sk-tour-text{font-size:14px}}
+@media (prefers-reduced-motion:reduce){.sk-tour-ring{transition:none}}
