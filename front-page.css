@@ -704,3 +704,8 @@
 html.sota-music-playing .sk-hero-play::before,html.sota-music-playing #app.bv-welcome .sk-hero-artwork>.sk-artwork-play::before{animation-play-state:running}
 @keyframes sk-music-badge-turn{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.sk-hero-play::before,#app.bv-welcome .sk-hero-artwork>.sk-artwork-play::before{animation:none}}
+
+/* Guest Home hand-over (skin-studio.js): the classic welcome is replaced in the same task, so its background
+   pictures are not fetched; the example room's pictures wait for the welcome photo. */
+#app.sk-handover,#app.sk-handover *,#app.sk-handover *::before,#app.sk-handover *::after{background-image:none!important}
+.bv-preview.sk-media-hold{--bv-hero:none!important;--bv-art:none!important}

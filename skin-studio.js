@@ -283,6 +283,24 @@
   function discoveryMarkup() {
     return `<section class="bv-discovery" id="bv-your-room" tabindex="-1" aria-labelledby="bv-discovery-title"><header><div><span class="bv-discovery-kicker">MAKE IT YOURS</span><h2 id="bv-discovery-title">Make it yours.</h2><p>Browse a look, or start with your own ideas.</p><small class="bv-discovery-selected">Selected skin · <span id="bv-welcome-skin-name"></span></small></div><button type="button" class="bv-discovery-all">Explore all ${skins.presets.length} skins <span aria-hidden="true">↗</span></button></header>${discovery?`<div class="bv-collection-grid">${collectionMarkup()}</div>`:''}<p class="bv-discovery-note">Original cover artwork. Community-made designs. A space to make your own.</p></section>`;
   }
+  // Guest Home: the example room under the welcome photo waits for that photo (the largest paint) before
+  // fetching its own pictures (about 700 KB), so on a slow phone they do not share the line with it.
+  // Until then they show what an unloaded picture shows, nothing; once fetched the room looks the same.
+  function holdRoomMedia(markup) {
+    return markup.replace('<div class="bv-preview bv-art-room"','<div class="bv-preview bv-art-room sk-media-hold"').replace(/<image href=/g,'<image data-sk-hold-href=');
+  }
+  function releaseRoomMedia(root) {
+    let done=false;
+    const release=()=>{
+      if(done)return;done=true;
+      root.querySelectorAll('image[data-sk-hold-href]').forEach(image=>{image.setAttribute('href',image.getAttribute('data-sk-hold-href'));image.removeAttribute('data-sk-hold-href');});
+      root.querySelectorAll('.sk-media-hold').forEach(node=>node.classList.remove('sk-media-hold'));
+    };
+    const photo=root.querySelector('img[fetchpriority="high"]');
+    if(!photo||photo.complete)return release();
+    photo.addEventListener('load',release,{once:true});photo.addEventListener('error',release,{once:true});
+    addEventListener('load',release,{once:true});
+  }
   function originalCrop(x,y,w,h,label) {
     return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="/assets/mobile-front-reference-20261110.webp" width="1008" height="1792"/></svg>`;
   }
@@ -334,6 +352,10 @@
     authNode.querySelector('#a-pass').autocomplete=mode==='up'?'new-password':'current-password';
     const auth=authNode.outerHTML;
     app.classList.add('bv-welcome');
+    // When the Sota experience takes over (below), this classic welcome only lives for this one task and is
+    // never painted. Its background pictures (the 375 KB blue pattern, the 284 KB galaxy) were still fetched
+    // because the mounts below read layout. Hold them for the task; kept parts fetch theirs when shown.
+    if(window.SotaExperience?.mountGuest){app.classList.add('sk-handover');queueMicrotask(()=>app.classList.remove('sk-handover'));}
     app.innerHTML=`<a class="sota-skip" href="#bv-neon">Skip to content</a><header class="sk-site-header sk-pattern-masthead" aria-label="Sota Kece header"><a class="sk-site-brand" href="/" aria-label="Sota Kece home"><img class="dimau-owner-logo" src="/assets/dimau-owner-logo-20260920.png" alt="Dimau Fintech" width="36" height="36"></a><div class="sk-pattern-heading" aria-hidden="true">Sota Kece</div><button class="sk-hero-play" id="sk-hero-play" type="button" data-playlist-open aria-label="Open music playlist" aria-pressed="false" aria-describedby="sk-hero-status" title="Open music playlist"></button><span class="sk-hero-status" id="sk-hero-status" data-playlist-status role="status">Music playlist · tap to choose a song</span></header><section class="sk-front sk-original-front" aria-label="Sota Kece original supplied design">
       <div class="sk-hero-artwork"><picture class="sk-original-picture"><source media="(max-width:760px)" srcset="/assets/mobile-front-reference-brand.jpg" width="1008" height="1896"><img class="sk-original-design" src="/assets/front-reference-brand.jpg" width="1360" height="832" loading="lazy" decoding="async" alt="Sota Kece: Create your own space with friends. Sunset room artwork, masi border and music player."></picture>${window.SotaRoomSocial?.markup({hero:true})||`<section class="sota-social-host sota-social-hero" aria-label="Your Talanoa and mates"><button type="button" class="sota-social-panel" data-social-panel="wall" onclick="renderAuth('in',true)"><span class="sota-social-heading">Talanoa</span><span>Your conversations, together.</span></button><button type="button" class="sota-social-panel" data-social-panel="mates" onclick="renderAuth('in',true)"><span class="sota-social-heading">Top Mates</span><span>Your closest connections.</span></button></section>`}<div class="sk-hero-visualiser" hidden data-state="idle" role="img" aria-label="Music visualiser · choose a song to begin"><canvas aria-hidden="true"></canvas></div><button class="sk-artwork-play" hidden type="button" data-playlist-open aria-label="Choose music for live visualiser" aria-pressed="false" aria-describedby="sk-hero-status"></button><button class="sk-hero-create" type="button" onclick="renderAuth('up',true)" aria-label="Create your space" title="Create your space"></button></div>
       ${musicMarkup()}
@@ -389,7 +411,8 @@
     wireInvite($('#sk-share-app'),$('#sk-share-status'),{input:$('#sk-invite-url')});
     wireInvite($('#sk-copy-invite'),$('#sk-share-status'),{copyOnly:true,input:$('#sk-invite-url')});
     showWelcome(picked(),homeSkinChosen);
-    window.SotaExperience?.mountGuest(app,{roomMarkup:preview(example,picked())});
+    window.SotaExperience?.mountGuest(app,{roomMarkup:holdRoomMedia(preview(example,picked()))});
+    app.classList.remove('sk-handover');releaseRoomMedia(app);
     wireMedia(app.querySelector('.sx-room-example')||app);
     if(expanded){account.showModal();$(mode==='up'?'#a-handle':'#a-email').focus();}
   };

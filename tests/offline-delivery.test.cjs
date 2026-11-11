@@ -73,7 +73,7 @@ test('a private or no-store essential file rejects installation without replacin
 test('first offline visit resolves versioned shell files from their installed entries',async()=>{
   const app=worker();await app.install();
   app.setNetwork(async()=>{throw Error('offline');});
-  for(const url of ['/front-page.css?v=20261024-cohesive','/skins.js?v=20261014-core-skins','/music-playlist.json?v=20261020','/dimau-install.js?v=20261019']){
+  for(const url of ['/sota-styles-head.css?v=0123456789ab','/skins.js?v=20261014-core-skins','/music-playlist.json?v=20261020','/dimau-install.js?v=20261019']){
     const result=await app.request(url);assert(result.intercepted);assert.equal(result.response.status,200);assert.match(await result.response.text(),/^public /);
   }
   const store=app.stores.get(app.cacheName);assert(![...store.keys()].some(url=>url.includes('?')),'Version labels should not create duplicate cache entries');
