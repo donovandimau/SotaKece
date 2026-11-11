@@ -16,6 +16,7 @@
     {label:'Skins',hint:'Fiji-first looks for your room',guest:'#skins',member:'skins',icon:'🎨'},
     {label:'3D connections',hint:'Your people as a map',guest:'#people',member:'connections',icon:'🧭'},
     {label:'Communications',hint:'Chat, boards and calls',href:'/communications.html?app=sota-kece',icon:'📞'},
+    {label:'Hub map',hint:'The starter Koro on a satellite map of Fiji',memberOnly:true,run:function(){window.SotaHubMap&&window.SotaHubMap.open();},icon:'🗺️'},
     {label:'Show me around',hint:'A one-minute tour of Sota Kece',memberOnly:true,run:function(){window.SotaTour&&window.SotaTour.start();},icon:'🧭'}
   ];
   function goTo(p){

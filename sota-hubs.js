@@ -73,6 +73,7 @@
     return '<header class="hub-head"><span class="hub-kicker">' + (mates ? 'TOP MATES START HERE' : 'FIND YOUR PEOPLE') + '</span>' +
       '<h2>Where are your people?</h2><p>One tap puts you in an open Koro. Your own Koro stay invite-only.</p></header>' +
       '<div class="hub-pills" role="group" aria-label="Starter Koro">' + hubs.map(pill).join('') + '</div>' +
+      (typeof window !== 'undefined' && window.SotaHubMap ? '<button type="button" class="btn sm ghost hub-map-btn" data-hubmap>See them on the map</button>' : '') +
       peopleBlock(list);
   }
   /** A placeholder the page can drop anywhere; fill() turns it into the card. */
@@ -139,11 +140,23 @@
     client = cfg.client; S = cfg.state; toast = cfg.toast; esc = cfg.esc; openRoom = cfg.openRoom; openKoro = cfg.openKoro;
     wire();
   }
+  /** Join from somewhere other than the card (the hub map). Same database call and cache as the pills. */
+  async function joinHub(slug) {
+    if (!S || !S.user) throw new Error('NOT_SIGNED_IN');
+    try {
+      var row = await rpc('bv_hub_join', { p_slug: slug });
+      cache = (cache || []).map(function (h) { return h.slug === slug ? row : h; });
+      repaint();
+      toast('You are in ' + row.name + '. Say bula.');
+      return row;
+    } catch (e) { toast(say(e)); throw e; }
+  }
+  function openHub(crew) { if (openKoro) openKoro(num(crew)); }
   /** Sign-out or a change of member: forget everything. */
   function reset() { cache = null; loading = null; people = null; asked = {}; }
 
   var api = {
-    init: init, html: html, fill: fill, reset: reset, load: load,
+    init: init, html: html, fill: fill, reset: reset, load: load, joinHub: joinHub, openHub: openHub,
     // exposed for tests
     pill: pill, person: person, body: body, isMissing: isMissing, clean: clean, joinedAny: joinedAny,
     state: function () { return { cache: cache, people: people, missing: missing, asked: asked }; },
