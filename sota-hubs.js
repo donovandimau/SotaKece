@@ -76,6 +76,7 @@
       (typeof window !== 'undefined' && window.SotaHubMap ? '<button type="button" class="btn sm ghost hub-map-btn" data-hubmap>See them on the map</button>' : '') +
       peopleBlock(list);
   }
+  function announce(h) { try { h.dispatchEvent(new CustomEvent('sota-hubs-ready', { bubbles: true })); } catch (_) {} }
   /** A placeholder the page can drop anywhere; fill() turns it into the card. */
   function html(context) {
     return '<section class="hub-card glass card" data-hubs="' + esc(context || 'wall') + '" aria-label="Find your people" hidden></section>';
@@ -90,12 +91,12 @@
     }
     // People are suggested from the start: a member who skips the pills still sees who to greet.
     var list = await loadPeople();
-    hosts.forEach(function (h) { if (!h.isConnected) return; h.innerHTML = body(h.dataset.hubs, hubs, list); h.hidden = false; });
+    hosts.forEach(function (h) { if (!h.isConnected) return; h.innerHTML = body(h.dataset.hubs, hubs, list); h.hidden = false; announce(h); });
     return true;
   }
   function repaint() {
     Array.prototype.slice.call(document.querySelectorAll('[data-hubs]')).forEach(function (h) {
-      if (cache) { h.innerHTML = body(h.dataset.hubs, cache, people); h.hidden = false; }
+      if (cache) { h.innerHTML = body(h.dataset.hubs, cache, people); h.hidden = false; announce(h); }
     });
   }
 
@@ -152,11 +153,30 @@
     } catch (e) { toast(say(e)); throw e; }
   }
   function openHub(crew) { if (openKoro) openKoro(num(crew)); }
+  /** For the people bubbles: a longer list of people to greet (same database function, up to 12). */
+  async function peopleToMeet(limit) {
+    if (!S || !S.user) return [];
+    try { var list = await rpc('bv_people_to_meet', { p_limit: Math.min(12, Math.max(1, num(limit) || 12)) }); return Array.isArray(list) ? list : []; }
+    catch (_) { return []; }
+  }
+  /** Ask from outside the card. Same insert and messages as the card's button; resolves true once asked. */
+  async function askFriend(id) {
+    if (!S || !S.user || !id) return false;
+    if (asked[id]) return true;
+    try {
+      var r = await client.from('bv_friendships').insert({ requester: S.user.id, addressee: id });
+      asked[id] = true; toast(r && r.error ? 'Already asked.' : 'Request sent.');
+      return true;
+    } catch (_) { toast('That did not go through. Try again in a moment.'); return false; }
+  }
+  function hasAsked(id) { return !!asked[id]; }
+  function visitRoom(handle) { if (openRoom && handle) openRoom(handle); }
   /** Sign-out or a change of member: forget everything. */
   function reset() { cache = null; loading = null; people = null; asked = {}; }
 
   var api = {
     init: init, html: html, fill: fill, reset: reset, load: load, joinHub: joinHub, openHub: openHub,
+    peopleToMeet: peopleToMeet, askFriend: askFriend, hasAsked: hasAsked, visitRoom: visitRoom,
     // exposed for tests
     pill: pill, person: person, body: body, isMissing: isMissing, clean: clean, joinedAny: joinedAny,
     state: function () { return { cache: cache, people: people, missing: missing, asked: asked }; },

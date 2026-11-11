@@ -1,0 +1,27 @@
+/* Sota Kece people bubbles (sota-people-bubbles.js). Sits inside the starter Koro card. */
+.pb-wrap{margin-top:14px}
+/* The card's own list stays in the page as the fallback, out of sight while the bubbles show. */
+.hub-card .hub-people[hidden]{display:none!important}
+.pb-title{margin:0 0 8px;font-size:15px;color:#123247}
+.pb-stage{position:relative;height:280px;border-radius:16px;background:#f5f3ee radial-gradient(rgba(18,50,71,.06) 1px,transparent 1px) 0 0/18px 18px;border:1px solid #d3dfe7;overflow:hidden;touch-action:none}
+.pb-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.pb-lines line{stroke:#9fb6c3;stroke-width:1.5;stroke-dasharray:3 4}
+.pb-lines line.hot{stroke:var(--accent,#086779);stroke-width:2;stroke-dasharray:none}
+.pb-b{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;border-radius:999px;cursor:grab;font:inherit;color:#123247;background:#fff;border:2px solid var(--pb-ring,#4FA8D8);box-shadow:0 4px 14px rgba(18,50,71,.14);will-change:transform;user-select:none;-webkit-user-select:none}
+.pb-b:active{cursor:grabbing}
+.pb-b .pb-face{font-size:22px;line-height:1}
+.pb-b .pb-name{max-width:86%;font-size:11px;font-weight:700;line-height:1.1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb-hub{background:#e6f1f3;border-color:var(--accent,#086779);border-style:dashed}
+.pb-hub.on{border-style:solid;background:#fdf3dd;border-color:#d99a2b}
+.pb-hub .pb-face{font-size:18px}
+.pb-b.focus{box-shadow:0 0 0 5px rgba(8,103,121,.22),0 8px 22px rgba(18,50,71,.22);z-index:2}
+.pb-b:focus-visible{outline:3px solid #f2b84b;outline-offset:2px}
+.pb-detail:empty{display:none}
+.pb-card{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border-radius:14px;background:#fff;border:1px solid #d3dfe7}
+.pb-card .pb-face{font-size:26px}
+.pb-who{display:flex;flex-direction:column;min-width:0;flex:1}
+.pb-who b{font-size:15px;color:#123247}
+.pb-who small{font-size:12px;color:#4a6272}
+.pb-acts{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:480px){.pb-stage{height:250px}}
+@media (prefers-reduced-motion:reduce){.pb-b{transition:none}}
