@@ -29,6 +29,16 @@ The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 
 - **Profile sections on/off and reorder**: show or hide About, Photos, Top friends, Now playing and Guestbook, and move them up or down
 Source kept read-only at https://github.com/donovandimau/sota-kece (`src/skins.ts`, `src/App.tsx`).
 
+## Ideas from the 11 Nov 2026 prototype (not started — each needs Donovan's design approval)
+Claude built a standalone claude.ai prototype on 11 Nov from two owner mockups. It sat outside this repo, was reported in the Ops Room (#1493), and Donovan chose to fold its ideas in here. Full mapping, data sources and build rules: `docs/prototype-ideas-20261111.md`. One revision at a time, in this suggested order:
+- **Guided tour** for new members (Talanoa Wall → Koro hubs → Music → Sere → My room). No backend needed.
+- **Hub zoom map** (overseas → Fiji → Suva/West) with hub figures that add detail as you zoom. Build this after the Ireland move (#1500).
+- **People bubbles** for People to meet and the starter Koro (`bv_people_to_meet`, `bv_hubs`).
+- **Share stats** you can tap and filter (`talanoa_shares` opens/joins, `referrals`).
+- **Card stack** for Highlights/Activity.
+- **Liquid goal ring**: on hold with the wallet and coins until the Reserve Bank decides. A Sere/gift daily-allowance version is possible if approved.
+Do not carry over the prototype's dark theme, its invented village content or its artifact data store.
+
 ## Do not change
 - Owner image direction (4 November 2026): every new or replacement Sota Kece promotional photograph must show visibly happy young adults. No people-free scenic, guitar-only or fabric-only photographs. Use photorealistic, inclusive, relaxed social scenes in an ordinary Pacific setting, with soft sunset light; no phones, laptops, work activity or luxury styling. Use different happy young adults and different settings across feature photos rather than repeating one cast/location. Retain Fijian/Pacific identity and Chinese/Indian inclusion. Check anatomy, seating/floor contact and physically attached plants before delivery. Logos, navigation symbols and user-selected skins remain their existing controls/artwork.
 
