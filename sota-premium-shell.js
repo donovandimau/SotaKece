@@ -15,10 +15,12 @@
     {label:'My space',hint:'Your room, your rules',guest:'#profile',member:'room',icon:'🌺'},
     {label:'Skins',hint:'Fiji-first looks for your room',guest:'#skins',member:'skins',icon:'🎨'},
     {label:'3D connections',hint:'Your people as a map',guest:'#people',member:'connections',icon:'🧭'},
-    {label:'Communications',hint:'Chat, boards and calls',href:'/communications.html?app=sota-kece',icon:'📞'}
+    {label:'Communications',hint:'Chat, boards and calls',href:'/communications.html?app=sota-kece',icon:'📞'},
+    {label:'Show me around',hint:'A one-minute tour of Sota Kece',memberOnly:true,run:function(){window.SotaTour&&window.SotaTour.start();},icon:'🧭'}
   ];
   function goTo(p){
     var me=member();
+    if(p.run){p.run();return;}
     if(p.href){location.href=p.href;return;}
     if(me&&p.member){if(p.member==='skins'){try{window.BulaSkinStudio&&window.BulaSkinStudio.open(null,'All');}catch(_){}return;}if(typeof go==='function')go(p.member);return;}
     var hash=p.guest||'#home';if(location.hash!==hash)location.hash=hash;else window.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -53,7 +55,7 @@
   }
   async function provider(query,signal){
     var q=norm(query).trim(),me=member();
-    var visible=pages.filter(function(p){return p.href||(me?p.member:p.guest);});
+    var visible=pages.filter(function(p){return p.href||(me?(p.member||p.run):p.guest);});
     if(!q)return visible.slice(0,6).map(function(p){return {label:p.label,hint:p.hint,icon:p.icon,run:function(){goTo(p);}};});
     var found=visible.filter(function(p){return hit(p.label,q)||hit(p.hint,q);}).map(function(p){return {label:p.label,hint:p.hint,icon:p.icon,run:function(){goTo(p);}};});
     var more=await Promise.all([people(q,signal).catch(function(){return [];}),Promise.resolve(skins(q)),tracks(q).catch(function(){return [];})]);
