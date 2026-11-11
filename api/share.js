@@ -10,7 +10,7 @@ const listen=require('./listen.js');
 const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
 const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
 const SITE='https://sotakece.com';
-const OG_IMAGE=SITE+'/assets/og-sota-kece-20261104.jpg';
+const OG_IMAGE=SITE+'/assets/og-sota-kece-premium-20261111.jpg';
 const POST=/^[0-9]{1,18}$/,TOKEN=/^[a-f0-9]{32}$/;
 const esc=listen.esc;
 
