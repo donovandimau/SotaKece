@@ -22,6 +22,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-11 | Claude | Phone largest paint, fourth pass: inline critical CSS for the guest welcome, load the two combined stylesheets without blocking paint, run feature scripts after the welcome photo (Ops task 1048) | agent/claude/sota-kece-phone-lcp-fourth-pass-…/1 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
