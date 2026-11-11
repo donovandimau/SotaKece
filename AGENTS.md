@@ -7,3 +7,6 @@ Before any work in this repo, read `TRACKER.md` (what is done, in progress and n
 
 ## Stylesheets are combined
 `index.html` loads `sota-styles-head.css` and `sota-styles.css`, built from the separate `.css` files listed in the `<!-- css-bundle ... -->` comments beside them (same order as the old `<link>` tags). Edit the source file (and its `?v=` in the list), then run `node scripts/build-css.cjs`; `tests/css-bundle.test.cjs` fails if a bundle is out of date. To add a stylesheet to the page, add its `<link>` line inside the right list and rebuild.
+
+## Scripts and the phone guest first paint
+Phone guests on Home are painted from critical CSS (generated beside each bundle) before any stylesheet or script loads; see PROJECT_STATE.md, task 1048. Every script after the `window.SK` decision in `<head>` lives in a `<!-- js-later ... --><script>SK.js()</script>` block (inline ones as `type="text/x-sk-later"` + `SK.run()`). Add or move a script inside those blocks, never as a bare `<script>`, then run `node scripts/build-css.cjs` (it also refreshes the critical CSS and preload list); `tests/first-paint.test.cjs` and `tests/css-bundle.test.cjs` enforce this.
