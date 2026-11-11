@@ -1271,9 +1271,9 @@ function finishRoom(){
   app.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#f-go").click()}));
 }
 /* Funnel events for the Dimau event spine (view -> signup -> first_action). Sent without the member's
-   token on purpose: the spine is another Supabase project, and the shared beacon's batches are dropped
-   when they carry this project's token, so nothing a signed-in member did was being counted. No words,
-   names or ids are sent: only the event name, a kind, and the anonymous visitor id the beacon already uses. */
+   token: the spine is another Supabase project and cannot read this project's token, so every Sota Kece
+   event is anonymous there either way. No words, names or ids are sent: only the event name, a kind,
+   and the anonymous visitor id the beacon already uses. */
 window.SKTrack=function(name,props,once){try{
   if(once){if(localStorage.getItem(once))return;localStorage.setItem(once,"1");}
   var v=(window.dimau&&window.dimau.visitor)||localStorage.getItem("dimau.visitor");if(!v)return;
