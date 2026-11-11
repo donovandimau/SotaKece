@@ -5,6 +5,11 @@ name: Verify production deployment
 on:
   deployment_status:
   workflow_dispatch:
+    inputs:
+      lcp_urls:
+        description: 'Only measure slow-phone largest paint on these space-separated URLs (skips the release checks)'
+        required: false
+        default: ''
 permissions:
   contents: read
 jobs:
@@ -20,6 +25,7 @@ jobs:
         with:
           node-version: '22'
       - name: Live site answers with headers, body and the shipped release
+        if: github.event.inputs.lcp_urls == ''
         run: |
           set -e
           headers=$(curl -sS -D - -o /tmp/body.html https://sotakece.com/ -A "sota-release-check")
@@ -31,11 +37,16 @@ jobs:
           grep -q "content=\"$expected\"" /tmp/body.html || { echo "live release is not $expected yet"; exit 1; }
           code=$(curl -sS -o /dev/null -w '%{http_code}' https://sotakece.vercel.app/)
           [ "$code" = "308" ] || { echo "vercel.app alias should redirect (308), got $code"; exit 1; }
-      - name: Premium Shell check on the live page (Chromium, 390 and 1440)
+      - name: Install Chromium
         run: |
           npm i --no-save --no-audit --no-fund playwright@1.63.0
           npx playwright install --with-deps chromium
-          node tests/tools/check-shell.mjs https://sotakece.com/
+      - name: Premium Shell check on the live page (Chromium, 390 and 1440)
+        if: github.event.inputs.lcp_urls == ''
+        run: node tests/tools/check-shell.mjs https://sotakece.com/
       - name: Largest paint on a slow phone, signed out (report only)
+        env:
+          LCP_URLS: ${{ github.event.inputs.lcp_urls }}
+          LCP_DETAIL: ${{ github.event.inputs.lcp_urls != '' && '1' || '' }}
         run: |
-          for u in https://sotakece-p5yv9gd7f-donovandimau-3468s-projects.vercel.app/ https://sotakece-lgc8ztl94-donovandimau-3468s-projects.vercel.app/ 'https://sotakece-lgc8ztl94-donovandimau-3468s-projects.vercel.app/#x' https://sotakece-p5yv9gd7f-donovandimau-3468s-projects.vercel.app/ https://sotakece-lgc8ztl94-donovandimau-3468s-projects.vercel.app/; do echo "--- $u"; node tests/tools/lcp-phone.mjs "$u" 5 | tail -1 || true; done
+          for u in ${LCP_URLS:-https://sotakece.com/}; do echo "--- $u"; node tests/tools/lcp-phone.mjs "$u" 5 || true; done
