@@ -161,6 +161,7 @@
         });
       }
       st.id = row.id; localStorage.setItem('sere:job', row.id);
+      if (window.SKTrack) window.SKTrack('first_action', { kind: 'sere' }, 'sk-first-action');
       var pi = 0, pa = cut ? 0 : 1, tick = function () { st.pct = Math.round((pi * 0.3 + pa * 0.7) * 100); paintProgress(); };
       await Promise.all([
         putWithProgress('sere-images', row.image_path, st.image.blob, function (p) { pi = p; tick(); }),
