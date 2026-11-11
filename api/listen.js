@@ -93,7 +93,7 @@ function gone(what){
 }
 
 async function readSere(env,id,fetcher){
-  const key=String(env.SOTA_SERVICE_KEY||'');if(key.length<20)throw Error('config');
+  const key=String(env.SOTA_SERVICE_KEY||'');if(!/^[A-Za-z0-9._-]{20,}$/.test(key))throw Error('config');
   const headers={apikey:key,Authorization:`Bearer ${key}`};
   const r=await fetcher(`${SOTA_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&status=eq.completed&select=id,user_id,caption,output_video_url,output_poster_url`,{headers,signal:AbortSignal.timeout(5000)});
   if(!r.ok)throw Error('db');

@@ -19,9 +19,12 @@ const REPLICATE='https://api.replicate.com/v1';
 function sign(secret,id){return createHmac('sha256',secret).update(String(id)).digest('hex');}
 function sameSig(a,b){const x=Buffer.from(String(a||'')),y=Buffer.from(String(b||''));return x.length===y.length&&x.length>0&&timingSafeEqual(x,y);}
 
+// A key must look like a key (letters, digits, . _ -). A value pasted wrong (code, a line break) used to reach
+// fetch and fail as 'invalid header value'; now it is reported as the plain 'config' fault.
+const KEY_SHAPE=/^[A-Za-z0-9._-]{20,}$/;
 function svcHeaders(env,extra){
   const key=String(env.SOTA_SERVICE_KEY||'');
-  if(key.length<20)throw Error('config');
+  if(!KEY_SHAPE.test(key))throw Error('config');
   return Object.assign({apikey:key,Authorization:`Bearer ${key}`},extra||{});
 }
 async function who(auth,fetcher){
@@ -78,7 +81,7 @@ function modelInput(env,imageUrl,audioUrl,engine){
 }
 async function startRender(env,job,imageUrl,audioUrl,fetcher){
   const token=String(env.REPLICATE_API_TOKEN||''),secret=String(env.SERE_SECRET||'');
-  if(token.length<10||secret.length<16)throw Error('config');
+  if(!/^[A-Za-z0-9._-]{10,}$/.test(token)||secret.length<16)throw Error('config');
   const base=String(env.SERE_PUBLIC_URL||'https://sotakece.com').replace(/\/$/,'');
   const engine=engineFor(job.engine);
   const body={input:modelInput(env,imageUrl,audioUrl,engine),webhook:`${base}/api/sere-callback?id=${job.id}&sig=${sign(secret,job.id)}`,webhook_events_filter:['completed']};
@@ -141,7 +144,7 @@ function wavDurationMs(buf){
 }
 // Speak the text with Kokoro and return the WAV bytes. Waits on the request (Replicate 'Prefer: wait').
 async function speak(env,text,voice,fetcher){
-  const token=String(env.REPLICATE_API_TOKEN||'');if(token.length<10)throw Error('config');
+  const token=String(env.REPLICATE_API_TOKEN||'');if(!/^[A-Za-z0-9._-]{10,}$/.test(token))throw Error('config');
   const r=await fetcher(`${REPLICATE}/predictions`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json',Prefer:'wait=60'},
     body:JSON.stringify({version:TTS.version(env),input:{text,voice:TTS.voices[voice]||TTS.voices.bella,speed:1}}),signal:AbortSignal.timeout(70000)});
   if(!r.ok)throw Error('provider');

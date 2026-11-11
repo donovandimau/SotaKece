@@ -1,3 +1,12 @@
+## 11 November 2026 — Funnel events and server key check
+
+Release `sota-kece-shell-20261111-v182-funnel`. Numbers on the day (Dimau analytics, 30 days, bots excluded): 999 visitors (823 United States, 69 United Kingdom, 17 Australia, none from Fiji), one visitor seen on two or more days, 1 room, 1 wall post, 1 sere. The spine held only `view` for Sota Kece.
+
+- **`window.SKTrack(name, props, once)`** (index.html, beside `window.sb=sb`): one event posted to the `track` function as text/plain with no Authorization header. Fields match the shared beacon's; the visitor id is the beacon's (`dimau.visitor`); nothing is sent if the beacon never ran. `once` is a localStorage key that makes the event fire one time per device.
+- **Where it fires**: `signup` after the room row is created (sign-up form and the finish-your-room form); `first_action` (`sk-first-action`) after a wall post, reply or voice post lands and after a sere row is created. The standalone Sere page has no `SKTrack`, so the call there does nothing.
+- **Why not the shared beacon's `dimau.track`**: on this page it holds the member's token (it reads `window.sb`), and the `track` function forwards that token to a different Supabase project, which refuses it; the batch is dropped and the function still answers 200. That is why no Dimau site has an event with a member id. The fix belongs in the platform repo.
+- **Server keys**: `KEY_SHAPE` in `api/sere.js` and `api/account-delete.js`, the same test inline in `api/listen.js`, and the Replicate token in `startRender` and `speak`.
+
 ## 11 November 2026 — Largest paint, fourth pass: critical CSS, stylesheets and scripts after the photo (Ops task 1048)
 
 Release `sota-kece-shell-20261111-v181-critical-css`. Live slow-phone lab before (v180): largest paint 4.93s, first paint 4.2s. Nothing could paint until both combined stylesheets had arrived, and about 45 scripts (330 KB) downloaded alongside the 127 KB veranda photo and ran before it was drawn.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261111-v181-critical-css">
+<meta name="sota-release" content="sota-kece-shell-20261111-v182-funnel">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -36,7 +36,7 @@
    links to other pages, sign-in returns) gets the same render-blocking stylesheets and parser-blocking scripts as
    before: SK.css and SK.js write them in place, and the list below is preloaded at once. scripts/build-css.cjs keeps
    the critical CSS and this list in step with the page. */
-window.SK=(function(d,w){var fp=false,css=[],later=[],started=false;var pre="/sota-styles.css?v=2c1eb2c72125 /dimau-header-standard.js?v=20261029-header-v4 /dimau-install.js?v=20261103-glass-option-1 /dimau-premium-shell.js?v=20261109-shell-1 /sota-premium-shell.js?v=20261109-nav-1 /vendor/supabase-2.45.0.min.js /room-media.js?v=20261109-signed-links-1 /skin-identities.js?v=20261025-identity /pacific-themes.js?v=photo-themes-20261029 /skin-visuals.js?v=photo-themes-20261029 /skins.js?v=20261109-motion-room-1 /communications-core.js?v=20261109-fast-paint-1 /music-visualiser.js?v=20261105-live-lights-1 /hero-visualiser.js?v=20261027-spectrum-tidy-2 /playback.js?v=20261024-quality /music-badge.js?v=20261110-mini-1 /local-music.js?v=20261105-live-lights-1 /sota-share.js?v=20261105-completion-1 /music-playlist.js?v=20261110-music-tidy-1 /skin-discovery.js?v=20261104-authentic-displays-1 /room-atmosphere.js?v=20261025-1 /room-social-layout.js?v=20261026-live-panels /music-home.js?v=20261104-premium-worlds-1 /front-pages.js?v=20261109-fast-paint-1 /space-design.js?v=photo-themes-20261029 /sota-worlds.js?v=20261110-studio-1 /sota-experience.js?v=20261110-mini-1 /motion-engine.js?v=20261109-motion-room-1 /motion-room.js?v=20261109-motion-room-1 /skin-studio.js?v=20261111-media-hold-2 /offline.js?v=20261105-completion-1 /kava.js /circle-types.js?v=photo-themes-20261029 /circle-groups.js?v=photo-themes-20261029 /kava-ui.js?v=20261028-preview-1 /dimau-charts-core.js?v=20261109-fast-paint-1 /dimau-visuals.js?v=20261024 /friend-feed.js?v=20261025-personal-graph /room-social.js?v=20261026-spatial-life-1 /profile-photos.js?v=20261027-ui-clarity-3 /life-graph3d.js?v=20261110-lazy-start-1 /life-connections.js?v=20261027-spectrum-tidy-2 /connections.js?v=20261026-spatial-life-1 /icon-controls.js?v=20261109-fast-paint-1 /gifts.js?v=20261030-gifts-1 /sota-plus.js?v=20261110-coins-2 /sere-maker.js?v=20261110-share-1 /sota-hubs.js?v=20261110-hubs-1 /sota-pulse.js?v=20261110-coins-2 /sota-coins.js?v=20261110-coins-1 /sota-live.js?v=20261110-live-1 /sota-studio.js?v=20261110-studio-2 /sota-wellbeing.js?v=20261102-1 /bula-welcome.js?v=20261030 /bula-top-20261030.js?v=20261110-fold-1 /hover-lights.js?v=20261110-hover-2 /dimau-pwa.js";
+window.SK=(function(d,w){var fp=false,css=[],later=[],started=false;var pre="/sota-styles.css?v=2c1eb2c72125 /dimau-header-standard.js?v=20261029-header-v4 /dimau-install.js?v=20261103-glass-option-1 /dimau-premium-shell.js?v=20261109-shell-1 /sota-premium-shell.js?v=20261109-nav-1 /vendor/supabase-2.45.0.min.js /room-media.js?v=20261109-signed-links-1 /skin-identities.js?v=20261025-identity /pacific-themes.js?v=photo-themes-20261029 /skin-visuals.js?v=photo-themes-20261029 /skins.js?v=20261109-motion-room-1 /communications-core.js?v=20261109-fast-paint-1 /music-visualiser.js?v=20261105-live-lights-1 /hero-visualiser.js?v=20261027-spectrum-tidy-2 /playback.js?v=20261024-quality /music-badge.js?v=20261110-mini-1 /local-music.js?v=20261105-live-lights-1 /sota-share.js?v=20261105-completion-1 /music-playlist.js?v=20261110-music-tidy-1 /skin-discovery.js?v=20261104-authentic-displays-1 /room-atmosphere.js?v=20261025-1 /room-social-layout.js?v=20261026-live-panels /music-home.js?v=20261104-premium-worlds-1 /front-pages.js?v=20261109-fast-paint-1 /space-design.js?v=photo-themes-20261029 /sota-worlds.js?v=20261110-studio-1 /sota-experience.js?v=20261110-mini-1 /motion-engine.js?v=20261109-motion-room-1 /motion-room.js?v=20261109-motion-room-1 /skin-studio.js?v=20261111-media-hold-2 /offline.js?v=20261105-completion-1 /kava.js /circle-types.js?v=photo-themes-20261029 /circle-groups.js?v=photo-themes-20261029 /kava-ui.js?v=20261028-preview-1 /dimau-charts-core.js?v=20261109-fast-paint-1 /dimau-visuals.js?v=20261024 /friend-feed.js?v=20261025-personal-graph /room-social.js?v=20261026-spatial-life-1 /profile-photos.js?v=20261027-ui-clarity-3 /life-graph3d.js?v=20261110-lazy-start-1 /life-connections.js?v=20261027-spectrum-tidy-2 /connections.js?v=20261026-spatial-life-1 /icon-controls.js?v=20261109-fast-paint-1 /gifts.js?v=20261030-gifts-1 /sota-plus.js?v=20261110-coins-2 /sere-maker.js?v=20261111-funnel-1 /sota-hubs.js?v=20261110-hubs-1 /sota-pulse.js?v=20261111-funnel-1 /sota-coins.js?v=20261110-coins-1 /sota-live.js?v=20261110-live-1 /sota-studio.js?v=20261110-studio-2 /sota-wellbeing.js?v=20261102-1 /bula-welcome.js?v=20261030 /bula-top-20261030.js?v=20261110-fold-1 /hover-lights.js?v=20261110-hover-2 /dimau-pwa.js";
 try{var h=location.hash;fp=!!(w.matchMedia&&matchMedia('(max-width:760px)').matches)&&(!h||h==='#home')&&!/[?&](code|sid|error)=/.test(location.search)&&!localStorage.getItem('sb-aqfzpaczyodhugsgqvxi-auth-token')&&'content' in d.createElement('template')&&!!(w.Blob&&w.URL&&URL.createObjectURL);}catch(e){fp=false;}
 if(!fp&&pre)pre.split(' ').forEach(function(u){d.write('<link rel="preload" as="'+(/\.css\?/.test(u)?'style':'script')+'" href="'+u+'">');});
 function cur(){return d.currentScript;}
@@ -436,6 +436,7 @@ async function signUp(){
   }
   const {error:pe} = await sb.from("bv_profiles").insert({id:data.user.id,handle,display_name:name,age_band:band,...initialSkin()});
   if(pe){ err.textContent=pe.message; b.disabled=false; return; }
+  window.SKTrack("signup",{kind:"email"});
   await claimReferral();
   boot();
 }
@@ -1218,11 +1219,26 @@ function finishRoom(){
       age_band:bandFor(year),...initialSkin()});
     if(error){ err.textContent=error.message; b.disabled=false; return; }
     try{ localStorage.removeItem("bv_pending"); }catch(_){}
+    window.SKTrack("signup",{kind:"room"});
     await claimReferral();
     boot();
   };
   app.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#f-go").click()}));
 }
+/* Funnel events for the Dimau event spine (view -> signup -> first_action). Sent without the member's
+   token on purpose: the spine is another Supabase project, and the shared beacon's batches are dropped
+   when they carry this project's token, so nothing a signed-in member did was being counted. No words,
+   names or ids are sent: only the event name, a kind, and the anonymous visitor id the beacon already uses. */
+window.SKTrack=function(name,props,once){try{
+  if(once){if(localStorage.getItem(once))return;localStorage.setItem(once,"1");}
+  var v=(window.dimau&&window.dimau.visitor)||localStorage.getItem("dimau.visitor");if(!v)return;
+  var w=window.innerWidth,url="https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track";
+  var body=JSON.stringify([{name:name,surface:"sota-kece",props:props||{},visitor:v,session:sessionStorage.getItem("dimau.session"),
+    path:location.pathname,referrer_host:null,device:w<640?"phone":w<1024?"tablet":"desktop",code:(window.dimau&&window.dimau.code)||null,
+    host:location.hostname,at:new Date().toISOString()}]);
+  if(!(navigator.sendBeacon&&navigator.sendBeacon(url,new Blob([body],{type:"text/plain;charset=UTF-8"}))))
+    fetch(url,{method:"POST",body:body,headers:{"content-type":"text/plain;charset=UTF-8"},keepalive:true,credentials:"omit"}).catch(function(){});
+}catch(_){}};
 window.go=go; window.openRoom=openRoom; window.renderAuth=renderAuth; window.sb=sb;
 window.SotaView={invalidate:()=>viewRun()};
 </script><script>SK.run()</script>
@@ -1256,7 +1272,7 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/connections.js?v=20261026-spatial-life-1"></script>
 <script src="/icon-controls.js?v=20261109-fast-paint-1"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261110-coins-2"></script><script src="/sere-maker.js?v=20261110-share-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261110-coins-2"></script><script src="/sota-coins.js?v=20261110-coins-1"></script><script src="/sota-live.js?v=20261110-live-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-plus.js?v=20261110-coins-2"></script><script src="/sere-maker.js?v=20261111-funnel-1"></script><script src="/sota-hubs.js?v=20261110-hubs-1"></script><script src="/sota-pulse.js?v=20261111-funnel-1"></script><script src="/sota-coins.js?v=20261110-coins-1"></script><script src="/sota-live.js?v=20261110-live-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script>
 --><script>SK.js()</script>
 <script type="text/x-sk-later">window.SotaLive?.init({client:sb,state:S,app,go:t=>go(t),openKoro:id=>{S.tab='crews';S.crew=id;history.pushState({sotaView:'crews'},'','#view=crews');render();}});window.SotaStudio?.init({getPage:()=>S.user?S.tab:null,go:t=>go(t),rerender:()=>render(),isOwnRoom:()=>!!S.user&&!!S.me&&S.tab==='room'&&(!S.roomHandle||S.roomHandle===S.me.handle)});window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaSere?.init({client:sb,state:S,toast,esc,go});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script><script>SK.run()</script>
 <!-- js-later

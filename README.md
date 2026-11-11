@@ -1,2 +1,4 @@
-# bulavata
-Bula Vata - a small private social network for actual friends. No algorithm, no ads, no AI content.
+# Sota Kece
+A small social network for Fijians at home and overseas: sotakece.com. Read `TRACKER.md` first; the working notes are in `PROJECT_STATE.md`.
+
+The repository was first called bulavata. The database schema (`bulavata`) and function names (`bv_`) keep that name.
