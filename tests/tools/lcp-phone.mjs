@@ -2,6 +2,7 @@
 // Largest paint and layout shift for a signed-out visitor on a slow phone, as the lab measures it:
 // 390x844 at 3x, 4x slower CPU, 1.6 Mbps down / 150 ms round trip. Prints the median of the runs.
 //   node tests/tools/lcp-phone.mjs <url> [runs=3]
+// LCP_DETAIL=1 also prints, per run, when the stylesheets finished and which pictures were fetched in the first 6 seconds.
 // Report only: it exits 0 whatever the numbers, so a slow network day never blocks a deploy.
 import { chromium } from 'playwright';
 const url = process.argv[2], runs = +(process.argv[3] || 3);
@@ -21,8 +22,14 @@ for (let i = 0; i < runs; i++) {
   const [base, hash = ''] = url.split('#');
   await page.goto(base + (base.includes('?') ? '&' : '?') + 'lcp-check=' + Date.now() + (hash ? '#' + hash : ''), { waitUntil: 'load', timeout: 120000 });
   await page.waitForTimeout(4000);
-  const r = await page.evaluate(() => ({ lcp: Math.round(window.__lcp), cls: +window.__cls.toFixed(4), el: window.__el, fcp: Math.round(performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0) }));
+  const r = await page.evaluate(() => ({ lcp: Math.round(window.__lcp), cls: +window.__cls.toFixed(4), el: window.__el, fcp: Math.round(performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0),
+    res: performance.getEntriesByType('resource').filter(e => e.startTime < 6000).map(e => [e.name.split('?')[0].split('/').pop(), Math.round(e.startTime), Math.round(e.responseEnd), e.transferSize, e.nextHopProtocol]) }));
   console.log(`run ${i + 1}: largest paint ${r.lcp} ms (${r.el}), first paint ${r.fcp} ms, layout shift ${r.cls}`);
+  if (process.env.LCP_DETAIL) {
+    const css = r.res.filter(x => x[0].endsWith('.css')), img = r.res.filter(x => /\.(webp|png|jpe?g|svg|gif)$/.test(x[0]));
+    console.log(`  ${css.length} stylesheets done at ${Math.max(0, ...css.map(x => x[2]))} ms (${css.reduce((a, x) => a + x[3], 0)} bytes, ${css[0]?.[4] || '?'}); pictures in the first 6 s: ${img.reduce((a, x) => a + x[3], 0)} bytes`);
+    for (const x of img) console.log(`    ${x[0]} ${x[1]}-${x[2]} ms ${x[3]} bytes`);
+  }
   out.push(r); await ctx.close();
 }
 await browser.close();
