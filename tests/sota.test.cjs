@@ -32,7 +32,7 @@ const studioScript=/<script\b[^>]*\bsrc="\/skin-studio\.js(?:\?[^\"]*)?"[^>]*>/.
 assert(studioScript&&studioScript.index<html.lastIndexOf('boot();'),'Skin studio must load before app boot');
 for(const marker of ['async function viewPulse','async function sparkCard','async function exportArchive','async function viewCrewRoom','async function viewFriends'])assert(html.includes(marker));
 assert(html.includes('<title>Sota Kece'));
-assert(/<link rel="manifest" href="\/manifest\.webmanifest">\s*<script src="\/dimau-install\.js(?:\?v=[\w-]+)?" data-app="bulavata" data-label="Sota Kece" data-prompt="manual" data-notify="off" data-buttons="glass" defer><\/script>/.test(html)); // Dimau install kit, no data-sw: sw.js stays the only worker.
+assert(/<link rel="manifest" href="\/manifest\.webmanifest">/.test(html)&&/<!-- js-later\n[^]*?<script src="\/dimau-install\.js(?:\?v=[\w-]+)?" data-app="bulavata" data-label="Sota Kece" data-prompt="manual" data-notify="off" data-buttons="glass" defer><\/script>/.test(html)); // Dimau install kit, no data-sw: sw.js stays the only worker.
 assert(!html.includes('Bula Vata'));assert(!html.includes('Tanoa 8'));
 assert(!html.includes('fonts.googleapis.com'));assert(!html.includes('cdn.jsdelivr.net'));
 for(const bad of ['javascript:alert(1)','http://example.com/song.mp3','https://name:secret@example.com/song.mp3','https://example.com/page'])assert.equal(skins.safeUrl(bad,true),'');
