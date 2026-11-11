@@ -9,9 +9,12 @@ const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice'];
 
+// A key must look like a key (letters, digits, . _ -). A value pasted wrong (code, a line break) used to reach
+// fetch and fail as 'invalid header value'; now it is reported as the plain 'config' fault.
+const KEY_SHAPE=/^[A-Za-z0-9._-]{20,}$/;
 function svcHeaders(env,extra){
   const key=String(env.SOTA_SERVICE_KEY||'');
-  if(key.length<20)throw Error('config');
+  if(!KEY_SHAPE.test(key))throw Error('config');
   return Object.assign({apikey:key,Authorization:`Bearer ${key}`},extra||{});
 }
 async function who(auth,fetcher){

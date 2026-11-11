@@ -241,6 +241,7 @@
       if (rec === mine) dropRec();
       ta.value = '';
       landed(post, replyTo, form);
+      if (window.SKTrack) window.SKTrack('first_action', { kind: replyTo ? 'wall_reply' : 'wall_post' }, 'sk-first-action');
       toast(replyTo ? 'Replied.' : 'Posted.');
     } catch (e) {
       if (uploaded) { try { await client.storage.from(VOICE_BUCKET).remove([path]); } catch (_) {} }
@@ -696,6 +697,7 @@
       var post = await rpc('bv_talanoa_post', { p_body: body, p_quote: replyTo ? null : (st.quote ? Number(st.quote.id) : null), p_reply_to: replyTo });
       ta.value = ''; ta.disabled = false; st.quote = null;
       landed(post, replyTo, form);
+      if (window.SKTrack) window.SKTrack('first_action', { kind: replyTo ? 'wall_reply' : 'wall_post' }, 'sk-first-action');
       toast(replyTo ? 'Replied.' : 'Posted.');
     } catch (e) {
       ta.disabled = false; btn.disabled = false; toast(say(e));
