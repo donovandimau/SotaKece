@@ -18,6 +18,11 @@
     body.sx-enabled #app.sx-app .sx-hero {min-height:0!important;padding:32px 24px 36px!important;align-items:flex-start!important}
     body.sx-enabled #app.sx-app .sx-hero-copy {width:100%!important;max-width:420px!important}
     body.sx-enabled #app.sx-app .sx-hero h1 {font-size:clamp(36px,10.6vw,54px)!important;line-height:1.04!important;margin:22px 0!important}
+    /* dimau-consistency.js (shared, loaded from fijian-assistant-api) caps page titles with inline styles: 32px under
+       700px wide, 44px from 700px, line-height 1.15. The same cap is set here so the phone welcome is painted at its
+       final size from the start; when that script arrives nothing moves (task 1048). */
+    body.sx-enabled #app.sx-app .sx-hero h1 {font-size:32px!important;line-height:1.15!important}
+    @media(min-width:700px) {body.sx-enabled #app.sx-app .sx-hero h1 {font-size:44px!important}}
     body.sx-enabled #app.sx-app .sx-hero p {font-size:16px!important;line-height:1.6!important;margin-bottom:24px!important}
     body.sx-enabled #app.sx-app .sx-actions {gap:10px!important}
     body.sx-enabled #app.sx-app .sx-actions>.sx-button {width:100%!important}
