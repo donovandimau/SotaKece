@@ -15,20 +15,22 @@ for (let i = 0; i < runs; i++) {
   await cdp.send('Network.enable');
   await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1.6e6 / 8, uploadThroughput: 750e3 / 8 });
   await page.addInitScript(() => {
-    window.__lcp = 0; window.__cls = 0; window.__el = '';
-    new PerformanceObserver(l => { for (const e of l.getEntries()) { window.__lcp = e.startTime; window.__el = e.element ? e.element.tagName + (e.url ? ' ' + e.url.split('/').pop() : '') : ''; } }).observe({ type: 'largest-contentful-paint', buffered: true });
-    new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });
+    window.__lcp = 0; window.__cls = 0; window.__el = ''; window.__lcps = []; window.__shifts = [];
+    new PerformanceObserver(l => { for (const e of l.getEntries()) { window.__lcp = e.startTime; window.__el = e.element ? e.element.tagName + (e.url ? ' ' + e.url.split('/').pop() : '') : ''; const r = e.element && e.element.getBoundingClientRect(); window.__lcps.push([Math.round(e.startTime), Math.round(e.renderTime || 0), Math.round(e.loadTime || 0), e.size, window.__el, r ? [r.x, r.y, r.width, r.height].map(Math.round).join(',') : '', document.querySelectorAll('[data-css-bundle]').length]); } }).observe({ type: 'largest-contentful-paint', buffered: true });
+    new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) { window.__cls += e.value; window.__shifts.push([Math.round(e.startTime), +e.value.toFixed(4), (e.sources || []).map(s => (s.node ? (s.node.className || s.node.nodeName) : '') + ' ' + [s.previousRect.y, s.previousRect.height, s.currentRect.y, s.currentRect.height].map(Math.round).join(',')).join(' | ')]); } }).observe({ type: 'layout-shift', buffered: true });
   });
   const [base, hash = ''] = url.split('#');
   await page.goto(base + (base.includes('?') ? '&' : '?') + 'lcp-check=' + Date.now() + (hash ? '#' + hash : ''), { waitUntil: 'load', timeout: 120000 });
   await page.waitForTimeout(4000);
-  const r = await page.evaluate(() => ({ lcp: Math.round(window.__lcp), cls: +window.__cls.toFixed(4), el: window.__el, fcp: Math.round(performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0),
+  const r = await page.evaluate(() => ({ lcps: window.__lcps, shifts: window.__shifts, scripts: performance.getEntriesByType('resource').filter(e => /\.js(\?|$)/.test(e.name)).map(e => Math.round(e.startTime)).sort((a, b) => a - b)[0], lcp: Math.round(window.__lcp), cls: +window.__cls.toFixed(4), el: window.__el, fcp: Math.round(performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0),
     res: performance.getEntriesByType('resource').filter(e => e.startTime < 6000).map(e => [e.name.split('?')[0].split('/').pop(), Math.round(e.startTime), Math.round(e.responseEnd), e.transferSize, e.nextHopProtocol]) }));
   console.log(`run ${i + 1}: largest paint ${r.lcp} ms (${r.el}), first paint ${r.fcp} ms, layout shift ${r.cls}`);
   if (process.env.LCP_DETAIL) {
     const css = r.res.filter(x => x[0].endsWith('.css')), img = r.res.filter(x => /\.(webp|png|jpe?g|svg|gif)$/.test(x[0]));
     console.log(`  ${css.length} stylesheets done at ${Math.max(0, ...css.map(x => x[2]))} ms (${css.reduce((a, x) => a + x[3], 0)} bytes, ${css[0]?.[4] || '?'}); pictures in the first 6 s: ${img.reduce((a, x) => a + x[3], 0)} bytes`);
     for (const x of img) console.log(`    ${x[0]} ${x[1]}-${x[2]} ms ${x[3]} bytes`);
+    console.log(`  first script requested at ${r.scripts} ms; largest-paint candidates [start, render, load, size, element, rect, bundles linked]: ${JSON.stringify(r.lcps)}`);
+    console.log(`  layout shifts: ${JSON.stringify(r.shifts)}`);
   }
   out.push(r); await ctx.close();
 }
