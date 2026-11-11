@@ -50,7 +50,12 @@ test('critical CSS keeps every rule the first screen could use, and only those',
     '@layer l{.a{color:red}}@layer m;@media (max-width:760px){[data-x] svg{x:3}}@font-face{font-family:f}@keyframes k{to{x:5}}*{box-sizing:border-box}.a,.q{x:6}');
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8'),v=vocabulary(html);
   for(const w of ['.sx-hero-copy','.sx-top','@data-dps-nav','.sx-enabled','.bv-welcome','picture','.dps-fab'])assert(v.has(w),w+' is part of the first screen');
-  assert(!v.has('.sx-member'),'scripts and comments are not part of the first screen');
+  assert(!v.has('.tw-wrap'),'scripts and comments are not part of the first screen');
+  // A signed-in member's kept Home copy may only use the words in mw, so every one of them is part of the first screen.
+  const mw=/,mw="([^"]*)"/.exec(html)[1].split(' ');
+  assert(mw.length>50&&mw.includes('.sx-member')&&mw.includes('.sx-member-world-heading'));
+  for(const w of mw)assert(v.has(w),w+' (member copy) is part of the first screen');
+  assert(!mw.some(w=>/^(script|style|iframe|object|embed|form|input|textarea|template|link|meta|base)$/.test(w)||/^@on/.test(w)),'no script-capable elements or event handlers can be kept');
   const {bundles}=build();
   for(const b of bundles){assert(b.critical.length>2000&&b.critical.length<b.body.length/3,b.name+' critical CSS is a small part of the bundle');assert(html.includes('<style data-sk-critical="'+b.name+'" media="not all">'+b.critical+'</style>'));}
 });

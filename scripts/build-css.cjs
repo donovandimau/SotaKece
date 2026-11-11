@@ -16,7 +16,8 @@
 // is removed, so the finished page has exactly the old cascade). The <style> holds every rule of the bundle
 // that could match the first screen: a rule is kept when the classes, ids, attribute names and element names
 // its selector needs (outside :not(), :is(), :has() and the like) all appear in the markup of <body> (the
-// first-paint template included), plus the classes the first-paint script adds. Media blocks no phone can
+// first-paint template included), plus the classes the first-paint script adds, plus the words in `mw` in the SK
+// script: what a signed-in member's kept copy of their Home may be made of (SK.member, same first-paint path). Media blocks no phone can
 // match (min-width above 760px, print) are dropped; @font-face, @keyframes and @layer order are kept.
 //
 // Scripts are listed the same way, in <!-- js-later ... --><script>SK.js()</script> blocks (and inline ones as
@@ -40,6 +41,7 @@ const htmlPath = path.join(root, 'index.html');
 const BLOCK = /<!-- css-bundle ([a-z0-9-]+)\n([\s\S]*?)\n-->(<style data-sk-critical="([a-z0-9-]+)" media="not all">[\s\S]*?<\/style><script>SK\.css\("([a-z0-9-]+)","\/([a-z0-9-]+)\.css\?v=([a-z0-9]*)"\)<\/script><noscript><link rel="stylesheet" href="\/[a-z0-9-]+\.css\?v=[a-z0-9]*" data-css-bundle="[a-z0-9-]+"><\/noscript>)/g;
 const LATER = /<!-- js-later\n([\s\S]*?)\n--><script>SK\.js\(\)<\/script>/g;
 const PRE = /var pre="([^"]*)";/;
+const MEMBER_WORDS = /,mw="([^"]*)"/;
 // Classes the first-paint script in <body> puts on <body> and #app before it copies the welcome in.
 const FIRST_PAINT_CLASSES = ['sx-enabled', 'sx-guest', 'bv-welcome', 'sx-app'];
 const SOURCE = /^<link rel="stylesheet" href="\/([a-z0-9][a-z0-9.-]*\.css)\?v=[a-z0-9._-]+">$/i;
@@ -192,6 +194,10 @@ function startTags(html) {
 // <body> (scripts and comments left out, the first-paint template included) and the classes its script adds.
 function vocabulary(html) {
   const words = new Set(['html', 'head', 'body', '@lang', '@style', ...FIRST_PAINT_CLASSES.map(c => '.' + c)]);
+  // A signed-in member's kept Home copy may only hold the words listed in `mw` in the SK script (SK.keep checks).
+  const mw = MEMBER_WORDS.exec(html);
+  if (!mw) throw new Error('index.html: the SK script has no var mw="..." list');
+  for (const w of mw[1].split(' ')) if (w) words.add(w);
   for (const tag of startTags(html.slice(html.toLowerCase().indexOf('<body')))) {
     words.add(tag.name);
     for (const [name, value] of tag.attrs) {

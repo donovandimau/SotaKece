@@ -10,3 +10,5 @@ Before any work in this repo, read `TRACKER.md` (what is done, in progress and n
 
 ## Scripts and the phone guest first paint
 Phone guests on Home are painted from critical CSS (generated beside each bundle) before any stylesheet or script loads; see PROJECT_STATE.md, task 1048. Every script after the `window.SK` decision in `<head>` lives in a `<!-- js-later ... --><script>SK.js()</script>` block (inline ones as `type="text/x-sk-later"` + `SK.run()`). Add or move a script inside those blocks, never as a bare `<script>`, then run `node scripts/build-css.cjs` (it also refreshes the critical CSS and preload list); `tests/first-paint.test.cjs` and `tests/css-bundle.test.cjs` enforce this.
+
+Signed-in members on phones get a kept copy of their Home top (`SK.keep`/`SK.paint` in the SK script). It may only contain the words in `var mw="..."` there, and the build adds those words to the critical CSS. If you change the member header, tabs or greeting markup, add any new class or attribute to `mw` and rebuild. Until you do, those members just take the old path.
