@@ -17,14 +17,15 @@ test('page: layer declared first, shell stylesheet after the header standard, ad
  assert.match(html,/<body class="dps-shell dps-has-nav">/);
 });
 test('page: floating search button and overlay follow the shell contract and are static markup (no layout shift on mount)',()=>{
- assert.equal((html.replace(/<template id="sx-first-paint">[\s\S]*?<\/template>/,'').match(/data-dps-search-open/g)||[]).length,1,'one opener: the floating button (the inert first-paint copy of the header is replaced on first render)');
+ assert.equal((html.replace(/<template id="sx-first-paint">[\s\S]*?<\/template>/,'').replace(/,mw="[^"]*"/,'').match(/data-dps-search-open/g)||[]).length,1,'one opener: the floating button (the inert first-paint copy of the header is replaced on first render)');
  assert.match(html,/<button type="button" class="dps-fab" data-dps-search-open aria-expanded="false" aria-label="Search Sota Kece"/);
  assert.match(html,/<div class="dps-search" data-dps-search hidden/);
  assert.match(html,/role="dialog" aria-modal="true" aria-labelledby="dps-search-title"/);
  assert.match(html,/<label id="dps-search-title" class="dps-visually-hidden" for="dps-search-input">/);
  assert.match(html,/<form class="dps-search-form" role="search" data-dps-search-form action="#people">/);
  assert.match(html,/<ul class="dps-search-results" role="listbox" data-dps-search-results><\/ul>/);
- assert.ok(html.indexOf('data-dps-search-open')>html.indexOf('<div id="app"></div>'),'search markup sits after the app root, outside the re-rendered tree');
+ const page=html.replace(/,mw="[^"]*"/,''); // the member-copy word list in the SK script is not markup
+ assert.ok(page.indexOf('data-dps-search-open')>page.indexOf('<div id="app"></div>'),'search markup sits after the app root, outside the re-rendered tree');
 });
 test('navigation carries the shell roles without changing labels or handlers',()=>{
  assert.match(experience,/<nav class="sx-nav" data-dps-nav aria-label="Main navigation">/);
