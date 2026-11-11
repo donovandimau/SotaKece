@@ -59,6 +59,7 @@ ORDER BY kind,name;
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109000000_sota_talanoa_wall.sql'),'utf8'));
   const before=(await db.query(snapshot)).rows;
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261110160000_sota_share_engine.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261112120000_sota_share_stats.sql'),'utf8'));
   assert.deepEqual((await db.query(snapshot)).rows,before,'Existing tables, RLS and schema grants must remain unchanged');
   const results=await db.exec(fs.readFileSync(path.join(root,'tests/share-engine-db.sql'),'utf8'));
   const checks=results.flatMap(result=>result.rows||[]).flatMap(row=>Object.values(row)).filter(value=>typeof value==='string'&&value.startsWith('PASS '));

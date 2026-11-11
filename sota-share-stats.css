@@ -1,0 +1,37 @@
+/* Sota Kece share stats (sota-share-stats.js), at the top of Activity. */
+.ss-card[hidden]{display:none!important}
+.ss-card{display:flex;flex-direction:column;gap:10px}
+.ss-head h3{margin:0}
+.ss-head .sub{margin:2px 0 0}
+.ss-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ss-chip{min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid #c4d3dc;background:#fff;color:#123247;font:inherit;font-size:13px;cursor:pointer}
+.ss-chip.on{border-color:var(--accent,#086779);background:#e6f1f3;color:var(--accent,#086779);font-weight:700}
+.ss-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ss-tile{display:flex;flex-direction:column;padding:10px 12px;border-radius:12px;background:#f5f3ee;border:1px solid #e1e8ec}
+.ss-tile b{font-size:24px;line-height:1.1;color:#123247;font-variant-numeric:tabular-nums}
+.ss-tile span{font-size:12px;color:#4a6272}
+.ss-chart{width:100%;max-height:170px;display:block;overflow:visible}
+.ss-axis{stroke:#c4d3dc;stroke-width:1}
+.ss-hit{fill:transparent}
+.ss-open{fill:#9fc9d3}
+.ss-join{fill:#f2b84b}
+.ss-bar{cursor:pointer;outline:none}
+.ss-bar text{font-size:11px;fill:#4a6272;font-family:Arial,Helvetica,sans-serif}
+.ss-bar.on .ss-open,.ss-bar:hover .ss-open{fill:var(--accent,#086779)}
+.ss-bar.on text{fill:#123247;font-weight:700}
+.ss-bar:focus-visible .ss-hit{stroke:#f2b84b;stroke-width:2}
+.ss-key{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0;font-size:12px;color:#4a6272}
+.ss-sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-left:6px}
+.ss-sw.ss-open{background:#9fc9d3}.ss-sw.ss-join{background:#f2b84b}
+.ss-read{margin:0;font-size:13px;color:#4a6272}
+.ss-read.on{display:flex;flex-direction:column;gap:4px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid #d3dfe7}
+.ss-read.on p{margin:0;color:#123247;font-size:14px}
+.ss-read.on small{color:#4a6272}
+.ss-note{margin:0;font-size:12px;color:#6b8291}
+.ss-empty{margin:0;padding:12px;border-radius:12px;background:#f5f3ee;color:#2c4656;font-size:14px}
+.ss-card h4{margin:6px 0 0;font-size:14px;color:#123247}
+.ss-people{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ss-people li{display:flex;align-items:center;gap:10px}
+.ss-who{display:flex;flex-direction:column;flex:1;min-width:0}
+.ss-who small{color:#4a6272}
+@media (max-width:420px){.ss-tile b{font-size:20px}}

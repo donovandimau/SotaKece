@@ -343,7 +343,7 @@
   async function viewActivity() {
     shell('<div class="glass card"><h3>Activity</h3><div class="sub">Loading…</div></div>');
     var list; try { list = await rpc('bv_activity', { lim: 60 }); } catch (e) { return shell('<div class="glass card">' + back() + '<p>' + esc(say(e)) + '</p></div>'); }
-    shell('<div class="stack">' + back() + '<div class="glass card"><div class="row"><h3 style="margin:0">🔔 Activity</h3><div class="spacer"></div>' +
+    shell('<div class="stack">' + back() + (window.SotaShareStats ? window.SotaShareStats.html() : '') + '<div class="glass card"><div class="row"><h3 style="margin:0">🔔 Activity</h3><div class="spacer"></div>' +
       (list.some(function (n) { return !n.read; }) ? '<button type="button" class="sp-link" data-sp="act-read-all">mark all read</button>' : '') + '</div>' +
       '<div class="sub" style="margin:4px 0 10px">Reactions, replies, mentions, friend requests, wall scrawls and RSVPs. Friends only, newest first.</div>' +
       (list.length ? list.map(function (n) {
@@ -352,6 +352,7 @@
           '<span class="sp-act-icon" aria-hidden="true">' + (ACT_ICON[n.kind] || '') + '</span>' +
           '<button type="button" class="btn sm ghost" data-sp="room" data-handle="' + esc(n.handle || '') + '">Room</button></div>';
       }).join('') : '<div class="empty"><em>🔔</em>Nothing yet. When friends react, reply or mention you, it shows up here.</div>') + '</div></div>');
+    if (window.SotaShareStats) window.SotaShareStats.fill(document.querySelector('[data-share-stats]'), rpc);
     try { var unread = list.filter(function (n) { return !n.read; }).map(function (n) { return n.id; }); if (unread.length) { await rpc('bv_activity_read', { p_ids: unread }); } pollUnread(); } catch (_) {}
   }
 
