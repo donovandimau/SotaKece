@@ -33,11 +33,15 @@ test('every script after the decision is held the same way, so the page order is
  // Outside comments, the only executable scripts left are SK itself, its SK.* calls, the copy guard and two
  // independent beacons; everything else sits in js-later blocks or as text/x-sk-later run by SK.run().
  let live='',at=0;for(let o=html.indexOf('<!--',at);o>=0;o=html.indexOf('<!--',at)){live+=html.slice(at,o);at=html.indexOf('-->',o)+3;}live+=html.slice(at);
- const plain=[...live.matchAll(/<script(\s[^>]*)?>([\s\S]*?)<\/script>/g)].filter(m=>!/type="text\/x-sk-later"/.test(m[1]||'')&&!/^SK\.(css|js|run)\(/.test(m[2]));
- const kinds=plain.map(m=>/src="([^"]+)"/.exec(m[1]||'')?.[1]||m[2].trim().slice(0,24));
+ // Each <script ...>...</script> in the live markup, found by position (no regular expression over markup).
+ const all=[],low=live.toLowerCase();
+ for(let o=low.indexOf('<script');o>=0;){const gt=low.indexOf('>',o),end=low.indexOf('</script',gt);all.push([live.slice(o+7,gt),live.slice(gt+1,end)]);o=low.indexOf('<script',end);}
+ const plain=all.filter(m=>!m[0].includes('type="text/x-sk-later"')&&!/^SK\.(css|js|run)\(/.test(m[1]));
+ const kinds=plain.map(m=>/src="([^"]+)"/.exec(m[0])?.[1]||m[1].trim().slice(0,24));
  assert.deepEqual(kinds,['/* First paint for a gue','https://dimau-ops.vercel.app/api/visit?s=sota-kece','https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js','/* Phones, guests on Hom']);
  assert.equal((live.match(/type="text\/x-sk-later"/g)||[]).length,2,'the app script and its start-up line');
- assert.equal((live.match(/type="text\/x-sk-later">[\s\S]*?<\/script><script>SK\.run\(\)<\/script>/g)||[]).length,2,'each held inline script is followed by SK.run()');
+ const held=all.filter(m=>m[0].includes('type="text/x-sk-later"'));
+ for(const m of held)assert.ok(live.includes(m[1]+'</script><script>SK.run()</script>'),'each held inline script is followed by SK.run()');
  assert.ok(live.indexOf('/* ---------- config ---------- */')<live.lastIndexOf('boot();'));
 });
 test('scripts the app needs still load, in order, before the app script',()=>{

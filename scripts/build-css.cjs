@@ -152,15 +152,49 @@ function needs(sel) {
   return out;
 }
 
+// Start tags in a piece of HTML, read with a small tokenizer (no regular expressions over markup): comments are
+// skipped, and so is the content of raw-text elements (script, style, noscript, textarea, title), so neither
+// scripts nor <noscript> fallbacks count as page content. Element and attribute names come back lower case.
+const RAW_TEXT = new Set(['script', 'style', 'noscript', 'textarea', 'title', 'xmp', 'iframe', 'noembed', 'noframes']);
+function startTags(html) {
+  const out = []; const n = html.length; const lower = html.toLowerCase(); let i = 0;
+  const isSpace = c => c === ' ' || c === '\n' || c === '\t' || c === '\r' || c === '\f';
+  while (i < n) {
+    const lt = html.indexOf('<', i);
+    if (lt < 0) break;
+    if (html.startsWith('<!--', lt)) { const end = html.indexOf('-->', lt + 4); i = end < 0 ? n : end + 3; continue; }
+    if (html[lt + 1] === '!' || html[lt + 1] === '?' || html[lt + 1] === '/') { const end = html.indexOf('>', lt + 1); i = end < 0 ? n : end + 1; continue; }
+    if (!/[a-z]/i.test(html[lt + 1] || '')) { i = lt + 1; continue; }
+    let j = lt + 1;
+    while (j < n && !isSpace(html[j]) && html[j] !== '>' && html[j] !== '/') j++;
+    const name = lower.slice(lt + 1, j), attrs = [];
+    while (j < n && html[j] !== '>') {
+      if (isSpace(html[j]) || html[j] === '/') { j++; continue; }
+      let k = j; while (k < n && !isSpace(html[k]) && html[k] !== '=' && html[k] !== '>' && html[k] !== '/') k++;
+      const attr = lower.slice(j, k); let value = ''; j = k;
+      while (j < n && isSpace(html[j])) j++;
+      if (html[j] === '=') {
+        j++; while (j < n && isSpace(html[j])) j++;
+        const q = html[j];
+        if (q === '"' || q === "'") { const end = html.indexOf(q, j + 1); value = html.slice(j + 1, end < 0 ? n : end); j = end < 0 ? n : end + 1; }
+        else { let k2 = j; while (k2 < n && !isSpace(html[k2]) && html[k2] !== '>') k2++; value = html.slice(j, k2); j = k2; }
+      }
+      if (attr) attrs.push([attr, value]);
+    }
+    out.push({ name, attrs });
+    i = j + 1;
+    if (RAW_TEXT.has(name)) { const close = lower.indexOf('</' + name, i); i = close < 0 ? n : close; }
+  }
+  return out;
+}
+
 // Everything the first screen of a phone guest can be made of: the elements, attributes, classes and ids in
 // <body> (scripts and comments left out, the first-paint template included) and the classes its script adds.
 function vocabulary(html) {
   const words = new Set(['html', 'head', 'body', '@lang', '@style', ...FIRST_PAINT_CLASSES.map(c => '.' + c)]);
-  const body = html.slice(html.indexOf('<body')).replace(/<!--[\s\S]*?-->/g, '').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '').replace(/<noscript>[\s\S]*?<\/noscript>/g, '');
-  for (const m of body.matchAll(/<([a-zA-Z][\w-]*)((?:\s+[^\s=>/]+(?:=(?:"[^"]*"|'[^']*'|[^\s>]+))?)*)\s*\/?>/g)) {
-    words.add(m[1].toLowerCase());
-    for (const a of m[2].matchAll(/([^\s=/]+)(?:=(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g)) {
-      const name = a[1].toLowerCase(), value = a[2] ?? a[3] ?? a[4] ?? '';
+  for (const tag of startTags(html.slice(html.toLowerCase().indexOf('<body')))) {
+    words.add(tag.name);
+    for (const [name, value] of tag.attrs) {
       words.add('@' + name);
       if (name === 'class') for (const c of value.split(/\s+/)) if (c) words.add('.' + c);
       if (name === 'id' && value) words.add('#' + value);
@@ -227,7 +261,10 @@ function build() {
   // Same-origin scripts held in js-later blocks, in page order, and every bundle after the first: preloaded at
   // once by visitors who load the page the ordinary way, so nothing waits on the SK.css/SK.js writes.
   const scripts = [];
-  for (const m of next.matchAll(LATER)) for (const s of m[1].matchAll(/<script\b[^>]*\bsrc="(\/[^"]+)"/g)) scripts.push(s[1]);
+  for (const m of next.matchAll(LATER)) for (const tag of startTags(m[1])) {
+    const src = tag.name === 'script' && (tag.attrs.find(a => a[0] === 'src') || [])[1];
+    if (src && src[0] === '/' && src[1] !== '/') scripts.push(src);
+  }
   const pre = [...bundles.slice(1).map(b => b.href), ...scripts].join(' ');
   if (!PRE.test(next)) throw new Error('index.html: the SK script has no var pre="..." list');
   next = next.replace(PRE, 'var pre="' + pre + '";');
@@ -254,4 +291,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { build, minify, critical, needs, vocabulary };
+module.exports = { build, minify, critical, needs, vocabulary, startTags };
