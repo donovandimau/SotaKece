@@ -287,13 +287,13 @@
   // fetching its own pictures (about 700 KB), so on a slow phone they do not share the line with it.
   // Until then they show what an unloaded picture shows, nothing; once fetched the room looks the same.
   function holdRoomMedia(markup) {
-    return markup.replace('<div class="bv-preview bv-art-room"','<div class="bv-preview bv-art-room sk-media-hold"').replace(/<image href=/g,'<image data-sk-hold-href=');
+    return markup.replace('<div class="bv-preview bv-art-room"','<div class="bv-preview bv-art-room sk-media-hold"').split(`<image href="${ORIGINAL_SHEET}"`).join('<image data-sk-hold');
   }
   function releaseRoomMedia(root) {
     let done=false;
     const release=()=>{
       if(done)return;done=true;
-      root.querySelectorAll('image[data-sk-hold-href]').forEach(image=>{image.setAttribute('href',image.getAttribute('data-sk-hold-href'));image.removeAttribute('data-sk-hold-href');});
+      root.querySelectorAll('image[data-sk-hold]').forEach(image=>{image.removeAttribute('data-sk-hold');image.setAttribute('href',ORIGINAL_SHEET);});
       root.querySelectorAll('.sk-media-hold').forEach(node=>node.classList.remove('sk-media-hold'));
     };
     const photo=root.querySelector('img[fetchpriority="high"]');
@@ -301,8 +301,9 @@
     photo.addEventListener('load',release,{once:true});photo.addEventListener('error',release,{once:true});
     addEventListener('load',release,{once:true});
   }
+  const ORIGINAL_SHEET='/assets/mobile-front-reference-20261110.webp';
   function originalCrop(x,y,w,h,label) {
-    return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="/assets/mobile-front-reference-20261110.webp" width="1008" height="1792"/></svg>`;
+    return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="${ORIGINAL_SHEET}" width="1008" height="1792"/></svg>`;
   }
   function originalMate(index,label) {
     // Native portraits from Donovan's original mobile artwork, without re-encoding.

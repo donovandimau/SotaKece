@@ -15,7 +15,11 @@ test('the combined stylesheets and their ?v= hashes match the source files',()=>
 });
 
 test('each bundled file is loaded once, through its bundle, in the old cascade order',()=>{
-  const html=fs.readFileSync(path.join(root,'index.html'),'utf8'),live=html.replace(/<!--[\s\S]*?-->/g,'');
+  const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+  // The page as the browser uses it: index.html with every <!-- ... --> comment cut out.
+  let live='',at=0;
+  for(let open=html.indexOf('<!--',at);open>=0;open=html.indexOf('<!--',at)){const close=html.indexOf('-->',open+4);assert(close>0,'unclosed comment');live+=html.slice(at,open);at=close+3;}
+  live+=html.slice(at);
   const {bundles}=build(),all=bundles.flatMap(b=>b.sources);
   assert.equal(new Set(all).size,all.length,'a file is listed in two bundles');
   for(const src of all)assert(!live.includes('href="/'+src),src+' is also linked directly');
