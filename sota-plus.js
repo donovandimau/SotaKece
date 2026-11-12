@@ -312,14 +312,15 @@
         '<button type="button" class="btn sm ghost" data-sp="view" data-view="events">📅 Events</button>' +
         '<button type="button" class="btn sm ghost" data-sp="view" data-view="saved">🔖 Saved</button>' +
         '<button type="button" class="btn sm ghost" data-sp="view" data-view="close">🟢 Close friends</button>' +
+        '<button type="button" class="btn sm ghost sk-low-toggle" data-sk-lowdata aria-label="Low data mode"><span>📶 Low data</span><span class="sk-low-state">' + (window.SotaLowData && window.SotaLowData.isOn() ? 'On' : 'Off') + '</span></button>' +
       '</div></div>';
   }
   function back() { return '<button type="button" class="sp-link" data-sp="view" data-view="moments">‹ Back to Moments</button>'; }
 
   /* ---------------------------------------------------------------- activity (notifications) */
   var ACT_WORDS = { joined: 'joined Sota Kece through your link', tip: 'tipped your', reaction: 'reacted to your', reply: 'replied to your', mention: 'mentioned you in a', friend_request: 'wants to be friends',
-    friend_accepted: 'accepted your friend request', wall: 'scrawled on your wall', rsvp: 'answered your event' };
-  var ACT_ICON = { reaction: '👋', reply: '💬', mention: '＠', friend_request: '🤝', friend_accepted: '✅', wall: '🖊️', rsvp: '📅' };
+    friend_accepted: 'accepted your friend request', wall: 'scrawled on your wall', rsvp: 'answered your event', top_mate: 'put you in their Top Mates' };
+  var ACT_ICON = { top_mate: '⭐', reaction: '👋', reply: '💬', mention: '＠', friend_request: '🤝', friend_accepted: '✅', wall: '🖊️', rsvp: '📅' };
   var ACT_TARGET = { profile: '', post: 'post', moment: 'moment', pulse: 'pulse', wall: 'wall scrawl', comment: 'reply', story: 'story', event: 'event', friendship: '' };
   function actLine(n) {
     var sn = n.snippet || '', pre = '', text = sn, i = sn.indexOf('|');
@@ -328,6 +329,7 @@
     if (n.kind === 'reaction') verb = (RX[pre] ? RX[pre].icon + ' ' : '') + verb;
     if (n.kind === 'rsvp') verb = ({ going: '✅ is going to', maybe: '🤔 might come to', no: '❌ can\'t make' })[pre] || verb;
     if (n.kind === 'tip') verb = '🪙 ' + (Number(pre) || 0) + ' coins, ' + verb;
+    if (n.kind === 'top_mate') { var slot = parseInt(String(sn).replace('#', ''), 10); verb = slot ? 'put you at number ' + slot + ' in their Top Mates' : verb; text = ''; }
     return '<span class="name">@' + esc(n.handle || '') + '</span> ' + esc(verb) + (what ? ' ' + esc(what) : '') +
       (text ? ' <span class="sub">“' + esc(text.length > 70 ? text.slice(0, 70) + '…' : text) + '”</span>' : '');
   }
