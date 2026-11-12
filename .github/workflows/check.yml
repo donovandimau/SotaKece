@@ -8,9 +8,22 @@ permissions:
 jobs:
   social-and-skins:
     runs-on: ubuntu-latest
+    env:
+      NODE_PATH: ${{ github.workspace }}/tests/talanoa-tools/node_modules
+      JSDOM_MODULE: ${{ github.workspace }}/tests/talanoa-tools/node_modules/jsdom
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/*.test.cjs
+      # Most tests need jsdom. Without it they skip and the run still goes green, so install the pinned
+      # copy and fail loudly if it cannot be loaded.
+      - run: npm ci --ignore-scripts
+        working-directory: tests/talanoa-tools
+      - run: node -e "require('jsdom')"
+      # Fail if any test skipped: a skip here has always meant a missing tool, not a choice.
+      - run: |
+          node --test tests/*.test.cjs | tee test-output.tap
+          skipped=$(grep -E '^# skipped ' test-output.tap | awk '{print $3}')
+          test "${skipped:-0}" = "0" || { echo "::error::$skipped tests were skipped"; exit 1; }
+        shell: bash -eo pipefail {0}
