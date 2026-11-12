@@ -81,12 +81,36 @@ SELECT pg_temp.ok((SELECT count(*) FROM bulavata.referrals)=1,'the sharer sees t
 RESET ROLE;
 SELECT pg_temp.ok((SELECT count(*) FROM bulavata.referrals)=1,'exactly one referral exists');
 
+-- share stats (20261112120000_sota_share_stats.sql): the sharer's own links and sign-ups, nobody else's
+SET ROLE authenticated; SELECT pg_temp.as_member('ana');
+RESET ROLE;
+INSERT INTO pg_temp.keep SELECT 'ana_opens', (SELECT sum(opens)::text FROM bulavata.talanoa_shares WHERE sharer='11111111-1111-1111-1111-111111111111');
+SET ROLE authenticated; SELECT pg_temp.as_member('ana');
+SELECT pg_temp.ok((public.bv_share_stats()->'totals'->>'links')='1','stats: Ana has one link');
+SELECT pg_temp.ok((public.bv_share_stats()->'totals'->>'opens')=(SELECT value FROM pg_temp.keep WHERE name='ana_opens'),'stats: opens match her link rows');
+SELECT pg_temp.ok((public.bv_share_stats()->'totals'->>'joins')='1','stats: one person joined through her');
+SELECT pg_temp.ok((public.bv_share_stats()->'links'->0->>'path')='/p/1/'||(SELECT value FROM pg_temp.keep WHERE name='ana_token'),'stats: the link path is the shared one');
+SELECT pg_temp.ok((public.bv_share_stats()->'links'->0->>'body') LIKE 'bula from Suva%','stats: the link carries the start of the post');
+SELECT pg_temp.ok((public.bv_share_stats()->'joined'->0->>'handle')='cy' AND (public.bv_share_stats()->'joined'->0->>'post_id')='1','stats: Cy joined through the post 1 link');
+SELECT pg_temp.as_member('bo');
+SELECT pg_temp.ok((public.bv_share_stats()->'totals'->>'joins')='0' AND jsonb_array_length(public.bv_share_stats()->'joined')=0,'stats: Bo never sees Ana''s sign-ups');
+SELECT pg_temp.ok((public.bv_share_stats()->'links')::text NOT LIKE '%'||(SELECT value FROM pg_temp.keep WHERE name='ana_token')||'%','stats: Bo never sees Ana''s token');
+SELECT pg_temp.as_member('');
+SELECT pg_temp.fails($$SELECT public.bv_share_stats()$$,'P0001','stats: signed out is NOT_SIGNED_IN');
+RESET ROLE;
+SET ROLE anon;
+SELECT pg_temp.fails($$SELECT public.bv_share_stats()$$,'42501','stats: anon cannot call it at all');
+RESET ROLE;
+
 -- removing the post removes its links; the referral stays, without the link
 SET ROLE authenticated; SELECT pg_temp.as_member('ana');
 SELECT public.bv_talanoa_delete(1);
 RESET ROLE;
 SELECT pg_temp.ok((SELECT count(*) FROM bulavata.talanoa_shares WHERE post_id=1)=0,'deleting a post deletes its share links');
 SELECT pg_temp.ok((SELECT token IS NULL FROM bulavata.referrals LIMIT 1),'the referral keeps its credit after the link is gone');
+SET ROLE authenticated; SELECT pg_temp.as_member('ana');
+SELECT pg_temp.ok((public.bv_share_stats()->'totals'->>'links')='0' AND jsonb_array_length(public.bv_share_stats()->'joined')=1 AND (public.bv_share_stats()->'joined'->0->>'post_id') IS NULL,'stats: the sign-up stays credited after the post is gone');
+RESET ROLE;
 SET ROLE anon;
 SELECT pg_temp.ok((public.bv_talanoa_shared(1,(SELECT value FROM pg_temp.keep WHERE name='ana_token'))) IS NULL,'the public page goes with the post');
 RESET ROLE;
