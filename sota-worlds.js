@@ -88,7 +88,7 @@
     const alt=w.photo===photos.social?'Illustrative scene of four friends chatting while one plays guitar on a veranda at sunset':w.photo===photos.music?'Illustrative scene of happy young adult friends singing with a guitar on a beach at sunset':'Illustrative scene of happy young adult friends chatting in a Fijian garden at sunset';
     return `<img src="${w.photo}" class="${w.photo===photos.social?'sx-world-social':''}" srcset="${w.photo} 768w, ${w.photo.replace('-768.webp','-1536.webp')} 1536w" sizes="(max-width:760px) calc(100vw - 48px), 500px" alt="${alt}" width="768" height="512" decoding="async"><span aria-hidden="true">${esc(w.label)}<i>Make it yours.</i></span>`;
   }
-  const lightsToggle='<button type="button" class="sx-lights-toggle" data-sota-lights-toggle aria-pressed="true">Page lights: On</button>';
+  const lightsToggle='<button type="button" class="sx-lights-toggle" data-sota-lights-toggle aria-pressed="true">Page lights: On</button><div class="sx-lights-styles" role="group" aria-label="Choose your lights"><button type="button" data-sota-lights-style="disco" aria-pressed="false">🪩 Disco</button><button type="button" data-sota-lights-style="laser" aria-pressed="false">⚡ Laser</button><button type="button" data-sota-lights-style="aurora" aria-pressed="false">🌌 Aurora</button><button type="button" data-sota-lights-style="glow" aria-pressed="false">✨ Glow</button></div>';
   function homeListening(){
     return `<section class="sx-home-listen" aria-labelledby="sx-home-listen-title">
       <header><h2 id="sx-home-listen-title">Music visuals</h2><button type="button" class="sx-world-primary" data-world-member="music">Open Music ↗</button></header>
