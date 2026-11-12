@@ -1,3 +1,7 @@
+## 12 November 2026 — Hub map zoom and drag fixed (Ops task 1050)
+
+Release `sota-kece-shell-20261112-v190-hubmap-fix`. Live phones reported `Uncaught TypeError: moved is not a function` from `sota-hub-map.js:150`. The pointer handlers declared `var moved = 0` (a drag distance nobody read) in the same scope as `function moved()`, which records that the camera is moving. The `var` assignment replaced the function, so every zoom and pan threw after changing the camera but before `schedule()`, and the map did not redraw. Present since the map shipped (#454); unrelated to the script-deferral work (#448, #453). The counter is removed. `tests/hub-map.test.cjs` now drives +/−, wheel, arrows, a pointer drag and a double tap with jsdom errors captured, and checks the name `moved` is not reused. Only the release name and the map script's `?v=` change in `index.html`; the guest and signed-in phone first paint paths are untouched.
+
 ## 11 November 2026 — Signed-in members on phones get the fast first paint (Ops task 1049)
 
 Release `sota-kece-shell-20261111-v184-member-paint`. Before: a signed-in member on a phone still took the old path. Nothing painted until both combined stylesheets and about 56 parser-blocking scripts had arrived (lab first paint 3.4s), and Home then waited for the profile and the meta calls before drawing (lab largest paint 5.7s; the earlier 4.3s lab figure came from an expired stand-in session that never reached Home). A start-up `SIGNED_IN` auth event also wiped `#app` and booted a second time. Nobody could see that while the page was blank.

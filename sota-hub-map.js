@@ -174,17 +174,18 @@
   }
   function fitAll() { fly(HOME.lat, HOME.lon, fitZoom()); }
 
-  var ptrs = {}, pinch = 0, moved = 0;
+  // `moved` is the function above that marks the camera as moving; never reuse the name here.
+  var ptrs = {}, pinch = 0;
   function wire() {
     view.addEventListener('wheel', function (e) { e.preventDefault(); var r = view.getBoundingClientRect(); zoomAt(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0022), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
     view.addEventListener('pointerdown', function (e) {
       if (e.target.closest('button')) return;
-      view.setPointerCapture(e.pointerId); ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; moved = 0; pinch = 0;
+      view.setPointerCapture(e.pointerId); ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; pinch = 0;
     });
     view.addEventListener('pointermove', function (e) {
       var p = ptrs[e.pointerId]; if (!p) return;
       var ids = Object.keys(ptrs);
-      if (ids.length === 1) { pan(e.clientX - p.x, e.clientY - p.y); moved += Math.abs(e.clientX - p.x) + Math.abs(e.clientY - p.y); }
+      if (ids.length === 1) pan(e.clientX - p.x, e.clientY - p.y);
       ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
       if (ids.length === 2) {
         var a = ptrs[ids[0]], b = ptrs[ids[1]], dist = Math.hypot(a.x - b.x, a.y - b.y), r = view.getBoundingClientRect();

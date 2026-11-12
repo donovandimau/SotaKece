@@ -80,6 +80,44 @@ test('keys move and zoom the map, Esc closes it and focus goes back',dom,async()
   assert.equal(h.w.document.activeElement,opener);
 });
 
+// 12 Nov 2026 (Ops task 1050): live phones reported "moved is not a function" at sota-hub-map.js:150.
+// A pointer counter `var moved` replaced the moved() function, so every zoom and drag threw before the map redrew.
+test('zooming and dragging redraw the pins without a script error',dom,async()=>{
+  const {VirtualConsole}=require(process.env.JSDOM_MODULE||'jsdom');
+  const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(String(e&&(e.detail||e.message)||e)));
+  const d=new JSDOM('<!doctype html><body></body>',{runScripts:'outside-only',pretendToBeVisual:true,url:'https://sotakece.com/',virtualConsole:vc});
+  const w=d.window;windows.push(w);
+  w.matchMedia=()=>({matches:true});
+  w.fetch=async()=>({ok:true,json:async()=>({index:{}})});
+  w.SotaHubs={load:async()=>HUBS};
+  w.HTMLElement.prototype.setPointerCapture=function(){};
+  w.eval(read('sota-hub-map.js'));
+  const M=w.SotaHubMap;await M.open();
+  const view=w.document.querySelector('.hm-view');
+  const suva=()=>w.document.querySelector('.hm-dot[data-slug="suva"]').style.left;
+  const frame=()=>new Promise(r=>w.requestAnimationFrame(()=>r()));
+  const ptr=(type,x,y)=>{const e=new w.MouseEvent(type,{clientX:x,clientY:y,bubbles:true});Object.defineProperty(e,'pointerId',{value:1});view.dispatchEvent(e);};
+  const steps=[
+    ['+ key',()=>view.dispatchEvent(new w.KeyboardEvent('keydown',{key:'+',bubbles:true}))],
+    ['zoom out button',()=>w.document.querySelector('[data-hm="out"]').click()],
+    ['wheel',()=>view.dispatchEvent(new w.WheelEvent('wheel',{deltaY:-200,clientX:100,clientY:100,bubbles:true,cancelable:true}))],
+    ['arrow key',()=>view.dispatchEvent(new w.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}))],
+    ['drag',()=>{ptr('pointerdown',100,100);ptr('pointermove',160,130);ptr('pointerup',160,130);}],
+    ['double tap',()=>view.dispatchEvent(new w.MouseEvent('dblclick',{clientX:120,clientY:140,bubbles:true}))]];
+  for(const [name,act] of steps){
+    const before=suva();act();await frame();await frame();
+    assert.deepEqual(errors,[],name+' threw');
+    assert.notEqual(suva(),before,name+' moved the Suva pin on screen');
+  }
+});
+
+test('the map script never reuses the moved() name for something else',()=>{
+  const src=read('sota-hub-map.js');
+  assert.equal((src.match(/\bfunction moved\(/g)||[]).length,1);
+  assert.doesNotMatch(src,/\b(?:var|let|const)\s+(?:[\w$]+\s*=\s*[^,;]+,\s*)*moved\b|[,]\s*moved\s*=/);
+  assert.doesNotMatch(src,/\bmoved\s*(?:\+?=)(?!=)/);
+});
+
 test('no hubs, no map',dom,async()=>{
   const h=boot({hubs:[]});
   assert.equal(await h.w.SotaHubMap.open(),false);
