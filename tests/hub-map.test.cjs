@@ -114,8 +114,8 @@ test('zooming and dragging redraw the pins without a script error',dom,async()=>
 test('the map script never reuses the moved() name for something else',()=>{
   const src=read('sota-hub-map.js');
   assert.equal((src.match(/\bfunction moved\(/g)||[]).length,1);
-  assert.doesNotMatch(src,/\b(?:var|let|const)\s+(?:[\w$]+\s*=\s*[^,;]+,\s*)*moved\b|[,]\s*moved\s*=/);
-  assert.doesNotMatch(src,/\bmoved\s*(?:\+?=)(?!=)/);
+  // Outside the comment that names it, `moved` only ever appears as a call or the declaration.
+  assert.doesNotMatch(src,/(?<!`)\bmoved\b(?![`(])/);
 });
 
 test('no hubs, no map',dom,async()=>{
