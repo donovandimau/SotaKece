@@ -16,7 +16,7 @@ test('first-paint copy carries the welcome exactly as sota-experience.js renders
  assert.ok(!/bw-pill/.test(tpl),'Bula pill is added by its own script, not copied');
  assert.ok(!/ id="sk-sign-(in|up)"/.test(tpl),'no duplicate account button ids');
 });
-test('first-paint copy only shows for signed-out phone visitors on Home',()=>{
+test('first-paint copy shows for signed-out visitors on Home, any screen',()=>{
  const sk=html.slice(html.indexOf('window.SK='),html.indexOf('</script>',html.indexOf('window.SK=')));
  assert.match(sk,/matchMedia\('\(max-width:760px\)'\)/);
  assert.match(sk,/\(!h\|\|h==='#home'\)/);
@@ -39,7 +39,7 @@ test('every script after the decision is held the same way, so the page order is
  for(let o=low.indexOf('<script');o>=0;){const gt=low.indexOf('>',o),end=low.indexOf('</script',gt);all.push([live.slice(o+7,gt),live.slice(gt+1,end)]);o=low.indexOf('<script',end);}
  const plain=all.filter(m=>!m[0].includes('type="text/x-sk-later"')&&!/^SK\.(css|js|run)\(/.test(m[1]));
  const kinds=plain.map(m=>/src="([^"]+)"/.exec(m[0])?.[1]||m[1].trim().slice(0,24));
- assert.deepEqual(kinds,['/* First paint for a gue','https://dimau-ops.vercel.app/api/visit?s=sota-kece','https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js','/* Phones, guests on Hom']);
+ assert.deepEqual(kinds,['/* First paint for a gue','https://dimau-ops.vercel.app/api/visit?s=sota-kece','https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js','/* Guests on Home, any s']);
  assert.equal((live.match(/type="text\/x-sk-later"/g)||[]).length,2,'the app script and its start-up line');
  const held=all.filter(m=>m[0].includes('type="text/x-sk-later"'));
  for(const m of held)assert.ok(live.includes(m[1]+'</script><script>SK.run()</script>'),'each held inline script is followed by SK.run()');
@@ -70,7 +70,8 @@ const session={user:{id:uid}},rel=/<meta name="sota-release" content="([^"]+)">/
 const copy=(o={})=>JSON.stringify(Object.assign({v:rel,u:uid,a:'#4FA8D8',t:[['header',['class','top glass sx-top'],'Sota Kece']]},o));
 test('signed-in members on a phone take the first-paint path only with their own copy from this release',()=>{
  assert.equal(runSK().SK.fp,true,'guest on a phone');assert.equal(runSK().SK.member,false);
- assert.equal(runSK({width:1440}).SK.fp,false,'wide screens load as before');
+ assert.equal(runSK({width:1440}).SK.fp,true,'guests on wide screens take it too (12 Nov 2026)');
+ assert.equal(runSK({width:1440,store:{[TOKEN]:JSON.stringify(session),'sk-member-paint':copy()}}).SK.fp,false,'members on wide screens load as before');
  const member=store=>runSK({store:Object.assign({[TOKEN]:JSON.stringify(session)},store)});
  assert.equal(member({}).SK.fp,false,'member without a kept copy loads as before');
  assert.ok(member({}).written.some(s=>s.includes('rel="preload"')),'and preloads at once');
