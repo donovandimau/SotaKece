@@ -351,7 +351,7 @@
   /* ---------------------------------------------------------------- entry points */
   async function open(opts) {
     opts = opts || {};
-    if (!S || !S.user) { toast(SAY.NOT_SIGNED_IN); return; }
+    if (!S || !S.user) { var signIn = document.querySelector('#sk-sign-in, [data-dimau-account-trigger], [data-sx-auth="in"]'); toast(SAY.NOT_SIGNED_IN); if (signIn) signIn.click(); return; }
     wire();
     var scenes = st.scenes;
     if (st.step !== 'working') { st = fresh(); st.scenes = scenes; }
