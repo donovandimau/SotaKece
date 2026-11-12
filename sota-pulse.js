@@ -251,6 +251,7 @@
   }
   function card(p, opts) {
     opts = opts || {};
+    if (window.SotaSafety && window.SotaSafety.isBlocked(p.author)) return '';
     var likes = num(p.like_count), reposts = num(p.repost_count), replies = num(p.reply_count), sr = p.sere || null;
     return '<article class="tw-post' + (opts.expanded ? ' tw-expanded' : '') + (opts.reply ? ' tw-reply' : '') + '" data-id="' + p.id + '" data-author="' + esc(p.author) + '">' +
       avatar(p) +
@@ -270,7 +271,8 @@
           (sr && !p.mine ? '<button type="button" class="tw-btn" data-tw="tip" data-id="' + esc(sr.id) + '" aria-label="Tip the maker, ' + num(sr.tips) + '">🎁<b>' + (num(sr.tips) || '') + '</b></button>' : '') +
           (sr ? '<button type="button" class="tw-btn" data-tw="remix" data-id="' + esc(sr.id) + '" aria-label="Remix this sound with your photo">🎤</button>' : '') +
           coinButton(p) +
-          (p.mine ? '<button type="button" class="tw-btn tw-del" data-tw="del" data-id="' + p.id + '" aria-label="Remove your post">✕</button>' : '') +
+          (p.mine ? '<button type="button" class="tw-btn tw-del" data-tw="del" data-id="' + p.id + '" aria-label="Remove your post">✕</button>'
+                  : '<button type="button" class="tw-btn tw-more" data-tw="more" data-id="' + p.id + '" data-author="' + esc(p.author) + '" data-handle="' + esc(p.handle) + '" aria-label="Report or block">⋯</button>') +
         '</div>' +
       '</div></article>';
   }
@@ -724,6 +726,7 @@
       if (act === 'quote') return startQuote(id);
       if (act === 'share') return share(id);
       if (act === 'del') return remove(id);
+      if (act === 'more') return window.SotaSafety && window.SotaSafety.open({ kind: 'post', id: id, author: t.dataset.author, handle: t.dataset.handle });
       if (act === 'sere') return window.SotaSere && window.SotaSere.open();
       if (act === 'say') return window.SotaSere && window.SotaSere.open({ mode: 'say' });
       if (act === 'voice') return startVoice(t.closest('.tw-compose'));
