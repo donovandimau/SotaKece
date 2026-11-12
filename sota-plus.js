@@ -342,10 +342,24 @@
     if (!S || !S.user) return;
     try { setBadge(await rpc('bv_activity_unread')); } catch (_) { /* function not deployed yet: stay quiet */ }
   }
+  // "New for you": this visit's unread notifications as a card stack (sota-card-stack.js), newest in front.
+  function actStack(list) {
+    if (!window.SotaCardStack) return '';
+    var fresh = list.filter(function (n) { return !n.read; }).slice(0, 8);
+    return window.SotaCardStack.html(fresh.map(function (n) {
+      var line = actLine(n), plain = document.createElement('div'); plain.innerHTML = line;
+      return { key: n.id, label: plain.textContent, html:
+        '<div class="cs-act"><span class="av sm" style="--accent:' + esc(n.accent || '') + '">' + esc(n.avatar_emoji || '🌺') + '</span>' +
+        '<span class="cs-act-icon" aria-hidden="true">' + (ACT_ICON[n.kind] || '🔔') + '</span></div>' +
+        '<p class="cs-act-line">' + line + '</p>' +
+        '<div class="cs-act-foot"><span class="handle">' + esc(ago(n.created_at)) + '</span>' +
+        '<button type="button" class="btn sm ghost" data-sp="room" data-handle="' + esc(n.handle || '') + '">Room</button></div>' };
+    }), 'New for you');
+  }
   async function viewActivity() {
     shell('<div class="glass card"><h3>Activity</h3><div class="sub">Loading…</div></div>');
     var list; try { list = await rpc('bv_activity', { lim: 60 }); } catch (e) { return shell('<div class="glass card">' + back() + '<p>' + esc(say(e)) + '</p></div>'); }
-    shell('<div class="stack">' + back() + (window.SotaShareStats ? window.SotaShareStats.html() : '') + '<div class="glass card"><div class="row"><h3 style="margin:0">🔔 Activity</h3><div class="spacer"></div>' +
+    shell('<div class="stack">' + back() + (window.SotaShareStats ? window.SotaShareStats.html() : '') + actStack(list) + '<div class="glass card"><div class="row"><h3 style="margin:0">🔔 Activity</h3><div class="spacer"></div>' +
       (list.some(function (n) { return !n.read; }) ? '<button type="button" class="sp-link" data-sp="act-read-all">mark all read</button>' : '') + '</div>' +
       '<div class="sub" style="margin:4px 0 10px">Reactions, replies, mentions, friend requests, wall scrawls and RSVPs. Friends only, newest first.</div>' +
       (list.length ? list.map(function (n) {
@@ -355,6 +369,7 @@
           '<button type="button" class="btn sm ghost" data-sp="room" data-handle="' + esc(n.handle || '') + '">Room</button></div>';
       }).join('') : '<div class="empty"><em>🔔</em>Nothing yet. When friends react, reply or mention you, it shows up here.</div>') + '</div></div>');
     if (window.SotaShareStats) window.SotaShareStats.fill(document.querySelector('[data-share-stats]'), rpc);
+    if (window.SotaCardStack) window.SotaCardStack.mount(document.querySelector('[data-card-stack]'));
     try { var unread = list.filter(function (n) { return !n.read; }).map(function (n) { return n.id; }); if (unread.length) { await rpc('bv_activity_read', { p_ids: unread }); } pollUnread(); } catch (_) {}
   }
 

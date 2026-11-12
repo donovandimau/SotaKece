@@ -1,0 +1,32 @@
+/* Sota Kece card stack (sota-card-stack.js): "New for you" at the top of Activity. */
+.cs-wrap{display:flex;flex-direction:column;gap:10px}
+.cs-head{display:flex;align-items:baseline;gap:10px}
+.cs-head h3{margin:0}
+.cs-count{margin-left:auto;font-size:13px;color:#4a6272;font-variant-numeric:tabular-nums}
+.cs-body{display:grid;grid-template-columns:1fr;gap:14px}
+.cs-pile{position:relative;height:178px;margin:0 6px 26px;outline:none;touch-action:pan-y;border-radius:16px}
+.cs-pile:focus-visible{box-shadow:0 0 0 3px #f2b84b}
+.cs-card{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:#fff;border:1px solid #d3dfe7;box-shadow:0 10px 24px rgba(18,50,71,.12);transform-origin:50% 100%;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .25s;user-select:none;overflow:hidden}
+.cs-card:not(.front){background:#f5f3ee}
+.cs-card:not(.front)>*{visibility:hidden}
+.cs-card.dragging{transition:none;cursor:grabbing}
+.cs-card.front{cursor:grab}
+.cs-list{display:none;list-style:none;margin:0;padding:0;flex-direction:column;gap:4px;max-height:204px;overflow:auto}
+.cs-list button{width:100%;text-align:left;min-height:36px;padding:6px 10px;border-radius:10px;border:1px solid transparent;background:none;color:#2c4656;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-list button:hover{background:#f5f3ee}
+.cs-list button[aria-current="true"]{border-color:#c4d3dc;background:#e6f1f3;color:#123247;font-weight:700}
+.cs-nav{display:flex;align-items:center;justify-content:center;gap:12px}
+.cs-nav .btn{min-width:44px;min-height:44px;font-size:20px;line-height:1}
+.cs-dots{display:flex;gap:6px}
+.cs-dots i{width:7px;height:7px;border-radius:50%;background:#c4d3dc}
+.cs-dots i.on{background:var(--accent,#086779);width:18px;border-radius:4px}
+/* One notification card (built by sota-plus.js) */
+.cs-act{display:flex;align-items:center;gap:10px}
+.cs-act .av{flex:none}
+.cs-act-icon{margin-left:auto;font-size:22px}
+.cs-act-line{margin:0;font-size:15px;line-height:1.4;color:#123247;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cs-act-foot{margin-top:auto;display:flex;align-items:center;gap:8px}
+.cs-act-foot .handle{color:#4a6272;font-size:12px}
+.cs-act-foot .btn{margin-left:auto}
+@media (min-width:760px){.cs-body{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:start}.cs-list{display:flex}}
+@media (prefers-reduced-motion:reduce){.cs-card{transition:none}}
