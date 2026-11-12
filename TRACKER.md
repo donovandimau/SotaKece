@@ -23,6 +23,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 12 Nov 2026 | Claude | Fix hub map error "moved is not a function" when zooming or dragging (Ops task 1050) | agent/claude/sota-kece-fix-hub-map-moved-is-not-a-function/1 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
