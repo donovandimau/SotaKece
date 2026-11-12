@@ -7,7 +7,8 @@ Why: the live database had one member and no shared links, and the Dimau analyti
 - **Data** (`20261112180000_sota_invites.sql`): `bulavata.invites(token, sharer, label ≤60, opens, joins, created_at)` with own-row RLS; `referrals.invite`. `bv_referral_claim` looks the token up in post links first, then invites; once per member, never to oneself, only for an account under a day old; the inviter gets the existing "joined" Activity line.
 - **Verified**: 38 SQL checks (labels private to the owner and never on the public page, opens and joins per invite, claim rules, 50-invite cap, account deletion) with the share engine's 49 run again on top of the new claim; 9 page/card/wiring tests; full suite 737 pass. Headless Chromium at 390px: public page in light and dark, no sideways scroll; the card's make → share sheet → list flow with a stand-in database.
 - **Not verified**: the card inside the signed-in app (needs the migration on the live database), a WhatsApp preview fetch of a live `/i/` page, a real sign-up through an invite.
-- **Next (Donovan)**: approve applying the migration to the live database, then make one invite per group and send it.
+- **Live database**: migration applied 12 Nov 2026 (Donovan: "Yes, apply it"). Checked live: RLS on, anon cannot read the table or make/list invites (401), `bv_invite_open` answers null for an unknown invite, `bv_referral_claim` handles both link kinds.
+- **Next (Donovan)**: merge this PR so the card and `/i/` page deploy, then make one invite per group and send it.
 
 ## 12 November 2026 — Hub map zoom and drag fixed (Ops task 1050)
 
