@@ -1,0 +1,24 @@
+/* Sota Kece invite links (sota-invites.js), at the top of Activity. Same look as the share stats card. */
+.iv-card[hidden]{display:none!important}
+.iv-card{display:flex;flex-direction:column;gap:10px}
+.iv-head h3{margin:0}
+.iv-head .sub{margin:2px 0 0}
+.iv-form{display:flex;flex-direction:column;gap:6px;margin:0}
+.iv-form label{margin:0;font-size:13px;font-weight:700;color:#123247}
+.iv-row{display:flex;gap:8px;align-items:stretch}
+.iv-row input{flex:1;min-width:0;min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid #c4d3dc;background:#fff;color:#123247;font:inherit}
+.iv-row input:focus-visible{outline:3px solid var(--accent,#086779);outline-offset:1px}
+.iv-row .btn{min-height:44px;white-space:nowrap}
+.iv-msg{margin:0;min-height:1.2em;font-size:13px;color:#4a6272}
+.iv-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.iv-tile{display:flex;flex-direction:column;padding:10px 12px;border-radius:12px;background:#f5f3ee;border:1px solid #e1e8ec}
+.iv-tile b{font-size:24px;line-height:1.1;color:#123247;font-variant-numeric:tabular-nums}
+.iv-tile span{font-size:12px;color:#4a6272}
+.iv-list,.iv-people{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.iv-list li,.iv-people li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:#fff;border:1px solid #d3dfe7}
+.iv-what{flex:1;min-width:0;display:flex;flex-direction:column}
+.iv-what b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#123247}
+.iv-what small{font-size:12px;color:#4a6272}
+.iv-card h4{margin:6px 0 0;font-size:14px}
+@media(max-width:420px){.iv-row{flex-direction:column}.iv-row .btn{width:100%}}
+@media(forced-colors:active){.iv-tile,.iv-list li,.iv-people li,.iv-row input{border:1px solid CanvasText}}
