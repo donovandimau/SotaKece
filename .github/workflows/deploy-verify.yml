@@ -2,6 +2,8 @@ name: Verify production deployment
 # Runs when Vercel reports the production deployment ready. The live page must answer with the security
 # headers, carry the release the commit shipped, and pass the Premium Shell check (bottom dock at 390, left rail at 1440,
 # 44px targets, no horizontal overflow, header search behaviour, cumulative layout shift under 0.05).
+# Vercel has named the environment 'Production' and, from 11 Nov 2026 21:09 UTC, 'Production – sotakece'
+# (it adds the project name). Both mean the project that serves sotakece.com.
 on:
   deployment_status:
   workflow_dispatch:
@@ -14,7 +16,7 @@ permissions:
   contents: read
 jobs:
   live:
-    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && (github.event.deployment.environment == 'Production' || github.event.deployment.environment == 'Production – sotakece'))
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
