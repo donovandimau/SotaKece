@@ -9,7 +9,7 @@
   const eligible=audio=>audio?.tagName==='AUDIO'&&['sota-playlist-audio','sota-local-audio'].includes(audio.id);
   const healthy=audio=>eligible(audio)&&!audio.paused&&!audio.ended&&!audio.error;
   let document=null,current=null,installed=false,phases=new WeakMap(),cleanup=[],unbind=()=>{};
-  let lights=true,theme="rainbow",motion=null,overlay=null,frame=0,last=0,low=0,high=0,peakLow=.05,peakHigh=.05,avgLow=0,prevLow=0,beatAt=0,flash=0,hue=0;
+  let lights=true,theme="rainbow",motion=null,overlay=null,style='disco',frame=0,last=0,low=0,high=0,peakLow=.05,peakHigh=.05,avgLow=0,prevLow=0,beatAt=0,flash=0,hue=0;
   const show=playing=>document?.documentElement?.classList.toggle('sota-music-playing',!!playing);
   const playing=()=>!document.hidden&&healthy(current)&&phases.get(current)==='playing';
 
@@ -22,6 +22,7 @@
       if(button.dataset.sotaLightsToggle==='icon'){button.setAttribute('aria-label',words);button.title=words;}
       else button.textContent=words;
     });
+    document?.querySelectorAll('[data-sota-lights-style]').forEach(button=>button.setAttribute('aria-pressed',String(lights&&button.dataset.sotaLightsStyle===style)));
   }
   function paintColours(){
     if(!overlay)return;
@@ -64,6 +65,7 @@
           overlay=document.createElement('div');
           overlay.className='sota-page-lights';
           overlay.setAttribute('aria-hidden','true');
+          overlay.dataset.style=style;
           // Disco: a mirror ball with sweeping coloured beams and beat sparkles.
           overlay.innerHTML='<i class="sota-disco-beams"></i><i class="sota-disco-beams sota-disco-b"></i><i class="sota-disco-dots"></i><i class="sota-disco-ball"></i>';
           document.body.append(overlay);
@@ -98,6 +100,15 @@
     }else clearLights();
   }
   function changeLights(event){
+    // Choosing a light style switches the lights on in that style.
+    const pick=event.target.closest?.('[data-sota-lights-style]');
+    if(pick){
+      style=pick.dataset.sotaLightsStyle||'disco';lights=true;
+      try{root.localStorage.setItem('sota.page-lights-style',style);root.localStorage.setItem('sota.page-lights','on');}catch{}
+      if(overlay)overlay.dataset.style=style;
+      if(playing())prepare(current);
+      updateControls();sync();return;
+    }
     const button=event.target.closest?.('[data-sota-lights-toggle]');
     if(!button)return;
     lights=!lights;
@@ -151,6 +162,7 @@
     installed=true;
     try{
       lights=root.localStorage?.getItem('sota.page-lights')!=='off';
+      style=root.localStorage?.getItem('sota.page-lights-style')||'disco';
       theme=JSON.parse(root.localStorage?.getItem('dimau.music.visuals.v1')||'null')?.theme||'rainbow';
     }catch{lights=true;theme='rainbow';}
     motion=root.matchMedia?.('(prefers-reduced-motion: reduce)');
