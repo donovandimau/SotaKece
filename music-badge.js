@@ -9,7 +9,7 @@
   const eligible=audio=>audio?.tagName==='AUDIO'&&['sota-playlist-audio','sota-local-audio'].includes(audio.id);
   const healthy=audio=>eligible(audio)&&!audio.paused&&!audio.ended&&!audio.error;
   let document=null,current=null,installed=false,phases=new WeakMap(),cleanup=[],unbind=()=>{};
-  let lights=true,theme="rainbow",motion=null,overlay=null,frame=0,last=0,low=0,high=0;
+  let lights=true,theme="rainbow",motion=null,overlay=null,frame=0,last=0,low=0,high=0,peakLow=.05,peakHigh=.05,avgLow=0,prevLow=0,beatAt=0,flash=0,hue=0;
   const show=playing=>document?.documentElement?.classList.toggle('sota-music-playing',!!playing);
   const playing=()=>!document.hidden&&healthy(current)&&phases.get(current)==='playing';
 
@@ -56,7 +56,7 @@
     if(!installed||!lights||!playing()||!document.body?.classList.contains('sx-enabled')){
       clearLights();return;
     }
-    if(!last||time-last>=42){
+    if(!last||time-last>=30){
       last=time;
       const sample=root.DimauMusicVisuals?.sample?.(current);
       if(sample?.context?.state==='running'&&sample.frequency?.length){
@@ -64,14 +64,26 @@
           overlay=document.createElement('div');
           overlay.className='sota-page-lights';
           overlay.setAttribute('aria-hidden','true');
+          // Disco: a mirror ball with sweeping coloured beams and beat sparkles.
+          overlay.innerHTML='<i class="sota-disco-beams"></i><i class="sota-disco-beams sota-disco-b"></i><i class="sota-disco-dots"></i><i class="sota-disco-ball"></i>';
           document.body.append(overlay);
           paintColours();
         }
         const rate=sample.context.sampleRate||48000;
-        low+=(band(sample.frequency,rate,45,180)-low)*.26;
-        high+=(band(sample.frequency,rate,450,3500)-high)*.22;
-        overlay.style.setProperty('--sota-bass-light',(low*.82).toFixed(3));
-        overlay.style.setProperty('--sota-mid-light',(high*.72).toFixed(3));
+        const rawLow=band(sample.frequency,rate,50,2500),rawHigh=band(sample.frequency,rate,2500,9000);
+        // Auto-gain: quiet and loud songs both swing the lights fully.
+        peakLow=Math.max(rawLow,peakLow*.996,.05);peakHigh=Math.max(rawHigh,peakHigh*.996,.05);
+        const nLow=Math.min(1,rawLow/peakLow),nHigh=Math.min(1,rawHigh/peakHigh);
+        low+=(Math.pow(nLow,2.2)-low)*.5;high+=(Math.pow(nHigh,1.8)-high)*.4;
+        avgLow+=(rawLow-avgLow)*.06;
+        // A kick drum flashes the whole screen and moves the colour round.
+        if(rawLow>avgLow*1.15&&rawLow-prevLow>.04&&rawLow>.06&&time-beatAt>200){beatAt=time;flash=1;hue=(hue+47)%360;}
+        else flash*=.8;
+        prevLow=rawLow;
+        overlay.style.setProperty('--sota-bass-light',low.toFixed(3));
+        overlay.style.setProperty('--sota-mid-light',high.toFixed(3));
+        overlay.style.setProperty('--sota-flash',flash.toFixed(3));
+        overlay.style.setProperty('--sota-hue',hue.toFixed(0));
       }else if(overlay){
         overlay.remove();overlay=null;low=0;high=0;
       }
