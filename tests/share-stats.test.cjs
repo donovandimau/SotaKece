@@ -78,7 +78,8 @@ test('nothing shared shows the how-to; a missing function keeps the panel hidden
 
 test('Activity carries the panel and the page loads it the house way',()=>{
   const plus=read('sota-plus.js'),html=read('index.html'),sw=read('sw.js'),sql=read('supabase/migrations/20261112120000_sota_share_stats.sql');
-  assert.match(plus,/back\(\) \+ \(window\.SotaShareStats \? window\.SotaShareStats\.html\(\) : ''\)/);
+  // The invite card (sota-invites.js, 12 Nov) sits just above it.
+  assert.match(plus,/back\(\) \+ (\(window\.SotaInvites \? window\.SotaInvites\.html\(\) : ''\) \+ )?\(window\.SotaShareStats \? window\.SotaShareStats\.html\(\) : ''\)/);
   assert.match(plus,/SotaShareStats\.fill\(document\.querySelector\('\[data-share-stats\]'\), rpc\)/);
   assert.match(html,/<script src="\/sota-people-bubbles\.js\?v=[^"]+"><\/script><script src="\/sota-share-stats\.js\?v=[^"]+"><\/script>/);
   assert.match(html,/<link rel="stylesheet" href="\/sota-share-stats\.css\?v=/);

@@ -72,6 +72,10 @@
       "dest": "/api/share?post=$1&t=$2"
     },
     {
+      "src": "/i/([a-fA-F0-9]{32})/?",
+      "dest": "/api/invite?t=$1"
+    },
+    {
       "handle": "filesystem"
     }
   ]
