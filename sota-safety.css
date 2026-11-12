@@ -1,0 +1,27 @@
+/* Sota Kece — report / block sheet, and low-data mode (12 Nov 2026). */
+.sk-safe-wrap{position:fixed;inset:0;z-index:9500;display:flex;align-items:flex-end;justify-content:center}
+.sk-safe-back{position:absolute;inset:0;background:rgba(10,30,45,.38);backdrop-filter:blur(2px)}
+.sk-safe-sheet{position:relative;width:min(440px,100%);margin:0 0 env(safe-area-inset-bottom);padding:18px 18px 20px;border-radius:22px 22px 0 0;
+  background:rgba(255,255,255,.94);box-shadow:0 -8px 40px rgba(8,60,90,.18);color:var(--ink,#123)}
+@media (min-width:700px){.sk-safe-wrap{align-items:center}.sk-safe-sheet{border-radius:22px}}
+.sk-safe-sheet h3{margin:0 0 10px;font-size:17px}
+.sk-safe-row{display:flex;width:100%;align-items:center;gap:10px;min-height:48px;padding:10px 12px;border:0;border-radius:14px;background:rgba(135,206,235,.18);
+  color:inherit;font:inherit;font-size:15px;text-align:left;cursor:pointer;margin-bottom:8px}
+.sk-safe-row:hover,.sk-safe-row:focus-visible{background:rgba(135,206,235,.36)}
+.sk-safe-quiet{background:transparent;justify-content:center}
+.sk-safe-reasons{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.sk-safe-chip{min-height:40px;padding:8px 12px;border-radius:999px;border:1px solid rgba(8,103,121,.25);background:#fff;color:inherit;font:inherit;font-size:14px;cursor:pointer}
+.sk-safe-chip.on{background:#0b6e99;border-color:#0b6e99;color:#fff}
+.sk-safe-sheet textarea{width:100%;box-sizing:border-box;border-radius:12px;border:1px solid rgba(8,103,121,.25);padding:8px 10px;font:inherit;margin-top:4px}
+.sk-safe-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.sk-safe-danger{background:#c62828!important;border-color:#c62828!important;color:#fff!important}
+.sk-safe-toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9600;background:#0d3b4f;color:#fff;
+  padding:10px 16px;border-radius:999px;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+.tw-btn.tw-more{margin-left:auto}
+
+/* Low data: no moving pictures, no background artwork, no animation. Words and photos people post stay. */
+html.sk-low-data *,html.sk-low-data *::before,html.sk-low-data *::after{animation:none!important;transition:none!important}
+html.sk-low-data body,html.sk-low-data #app,html.sk-low-data .sx-hero,html.sk-low-data [class*="hero"],html.sk-low-data [class*="backdrop"]{background-image:none!important}
+html.sk-low-data canvas[class*="visual"],html.sk-low-data .hero-visualiser,html.sk-low-data [data-hero-visualiser],html.sk-low-data .sota-hover-frame{display:none!important}
+.sk-low-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%}
+.sk-low-toggle .sk-low-state{font-weight:700}
