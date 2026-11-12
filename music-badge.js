@@ -64,6 +64,8 @@
           overlay=document.createElement('div');
           overlay.className='sota-page-lights';
           overlay.setAttribute('aria-hidden','true');
+          // Disco: a mirror ball with sweeping coloured beams and beat sparkles.
+          overlay.innerHTML='<i class="sota-disco-beams"></i><i class="sota-disco-beams sota-disco-b"></i><i class="sota-disco-dots"></i><i class="sota-disco-ball"></i>';
           document.body.append(overlay);
           paintColours();
         }
