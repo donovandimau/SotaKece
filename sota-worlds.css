@@ -354,7 +354,7 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-deck{background:#fffafc!
     radial-gradient(ellipse at 2% 100%, var(--sota-light-mid-b,#8055e9), transparent 36%);
   opacity: var(--sota-mid-light,0);
 }
-@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+@media (forced-colors: active) {
   .sota-page-lights { display: none; }
 }
 .sx-home-listen {
@@ -511,8 +511,8 @@ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playl
  html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline[open]{grid-template-columns:minmax(0,1fr);grid-template-rows:none}
  #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-now{grid-row:auto}
  #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-player-library{grid-column:1!important;grid-row:auto;order:2}
- #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-music-visuals{grid-row:auto;order:3}
- html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playlist-songs{flex:none;min-height:0;max-height:420px!important}
+ #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-music-visuals{grid-row:auto;order:-1} #app.sx-app #sk-music-playlist.sk-playlist-inline .sx-music-visuals dimau-music-visualiser{--music-visual-stage-height:150px}
+ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playlist-songs{flex:none;min-height:0;max-height:260px!important}
 }
 @media(max-width:760px){
  #app.sx-app .sx-world-hero.sx-world-hero-compact{grid-template-columns:minmax(0,1fr)}

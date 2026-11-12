@@ -196,8 +196,8 @@
     let region=player.querySelector('.sx-music-visuals');
     if(region?.tagName==='DETAILS'){const old=region;region=doc.createElement('section');region.className=old.className;for(const n of [...old.children])if(n.tagName!=='SUMMARY')region.append(n);old.replaceWith(region);}
     if(!region){region=doc.createElement('section');region.className='sx-music-visuals';now.after(region);}
-    region.setAttribute('aria-label','Music visuals');
-    if(!region.querySelector('[data-world-inline-visual]')){const header=doc.createElement('header');header.innerHTML='<span class="sx-eyebrow">MAKE YOUR MUSIC MOVE</span><h3>Music visuals</h3><p>Choose a visual style and colour. Page lights respond to the playing track.</p>'+lightsToggle;const host=doc.createElement('div');host.setAttribute('data-world-inline-visual','');region.prepend(header);region.append(host);}
+    region.setAttribute('aria-label','Make your phone jive with your music');
+    if(!region.querySelector('[data-world-inline-visual]')){const header=doc.createElement('header');header.innerHTML='<span class="sx-eyebrow">PAGE LIGHTS</span><h3>Make your phone jive with your music</h3><p>Play a song and your screen lights up in time with the beat.</p>'+lightsToggle;const host=doc.createElement('div');host.setAttribute('data-world-inline-visual','');region.prepend(header);region.append(host);}
     // One view: player, visuals and library share the card, so the old two-tab bar is retired.
     const section=doc.querySelector('#sota-music-home'),tabs=section?.querySelector('.sota-music-view-tabs'),panel=section?.querySelector('[data-music-panel="playlist"]');
     if(tabs)tabs.hidden=true;

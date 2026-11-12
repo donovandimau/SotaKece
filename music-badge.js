@@ -15,9 +15,9 @@
 
   function updateControls(){
     document?.querySelectorAll('[data-sota-lights-toggle]').forEach(button=>{
-      button.disabled=!!motion?.matches;
-      button.setAttribute('aria-pressed',String(lights&&!motion?.matches));
-      const words=motion?.matches?'Page lights · reduced motion':'Page lights: '+(lights?'On':'Off');
+      button.disabled=false;
+      button.setAttribute('aria-pressed',String(lights));
+      const words='Page lights: '+(lights?'On':'Off');
       // An icon-only switch (the mini-player) keeps its symbol; the words become its name.
       if(button.dataset.sotaLightsToggle==='icon'){button.setAttribute('aria-label',words);button.title=words;}
       else button.textContent=words;
@@ -36,7 +36,7 @@
     theme=next;paintColours();
   }
   function prepare(audio){
-    if(!lights||motion?.matches||!eligible(audio))return;
+    if(!lights||!eligible(audio)||!(audio.currentSrc||audio.getAttribute('src')))return;
     root.DimauMusicVisuals?.prepare?.(audio)?.catch(()=>{});
   }
   function clearLights(){
@@ -53,7 +53,7 @@
   }
   function animate(time){
     frame=0;
-    if(!installed||!lights||motion?.matches||!playing()||!document.body?.classList.contains('sx-enabled')){
+    if(!installed||!lights||!playing()||!document.body?.classList.contains('sx-enabled')){
       clearLights();return;
     }
     if(!last||time-last>=42){
@@ -81,17 +81,23 @@
   function sync(){
     const active=playing();
     show(active);
-    if(active&&lights&&!motion?.matches&&document.body?.classList.contains('sx-enabled')&&root.requestAnimationFrame){
+    if(active&&lights&&document.body?.classList.contains('sx-enabled')&&root.requestAnimationFrame){
       if(!frame)frame=root.requestAnimationFrame(animate);
     }else clearLights();
   }
   function changeLights(event){
     const button=event.target.closest?.('[data-sota-lights-toggle]');
-    if(!button||motion?.matches)return;
+    if(!button)return;
     lights=!lights;
     try{root.localStorage.setItem('sota.page-lights',lights?'on':'off');}catch{}
     if(lights&&playing())prepare(current);
     updateControls();sync();
+  }
+  // Phones only let sound analysis start from a tap, so each tap wakes it.
+  function gesture(){
+    if(!installed||!lights)return;
+    const audio=[current,...document.querySelectorAll('#sota-playlist-audio,#sota-local-audio')].find(a=>eligible(a)&&(a.currentSrc||a.getAttribute('src')));
+    if(audio)prepare(audio);
   }
   function bind(audio){
     if(current===audio)return;
@@ -104,6 +110,7 @@
   }
   function media(event){
     const audio=event.target;if(!installed||!eligible(audio))return;
+    if((event.type==='play'||event.type==='playing')&&lights)prepare(audio);
     if(event.type==='playing'&&healthy(audio)){
       bind(audio);phases.set(audio,'playing');sync();
     }else if(event.type==='stalled'&&audio===current&&healthy(audio)&&audio.readyState>=3&&phases.get(audio)==='playing'){
@@ -135,12 +142,18 @@
       theme=JSON.parse(root.localStorage?.getItem('dimau.music.visuals.v1')||'null')?.theme||'rainbow';
     }catch{lights=true;theme='rainbow';}
     motion=root.matchMedia?.('(prefers-reduced-motion: reduce)');
+    // Reduced motion only sets the starting choice; the switch always works.
+    try{if(!root.localStorage?.getItem('sota.page-lights')&&motion?.matches)lights=false;}catch{}
     const motionChanged=()=>{updateControls();sync();};
     motion?.addEventListener?.('change',motionChanged);
     cleanup.push(()=>motion?.removeEventListener?.('change',motionChanged));
     document.addEventListener('visualchange',paletteChanged);
     cleanup.push(()=>document.removeEventListener('visualchange',paletteChanged));
     document.addEventListener('click',changeLights);
+    for(const [type,capture] of [['pointerup',true],['touchend',true],['click',false],['keydown',true]]){
+      document.addEventListener(type,gesture,capture);
+      cleanup.push(()=>document.removeEventListener(type,gesture,capture));
+    }
     cleanup.push(()=>document.removeEventListener('click',changeLights));
     for(const event of events){
       document.addEventListener(event,media,true);
