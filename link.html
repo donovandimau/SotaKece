@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connect an app — Sota Kece</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-32.png">
+<link rel="stylesheet" href="/legal/legal.css">
+<script src="/vendor/supabase-2.45.0.min.js"></script>
+</head>
+<body>
+<header><img src="/icons/icon-192.png" alt=""><a href="/">Sota Kece</a></header>
+<main>
+<div class="card" id="box">
+<h1>Show Sota Kece in Mataka</h1>
+<p class="muted" id="lead">Checking your sign-in…</p>
+<div id="act"></div>
+</div>
+</main>
+<script>
+(function () {
+  // Apps that may ask, and the ONLY addresses we will send the key back to (exact origins, never a pattern
+  // anyone could register). Previews are limited to Donovan's own Vercel team.
+  var APPS = { mataka: { name: 'Mataka', origins: ['https://mataka.vercel.app', 'https://mataka-sigma.vercel.app'],
+    preview: /^https:\/\/mataka-git-[a-z0-9-]+-donovandimau-3468s-projects\.vercel\.app$/ } };
+  function safeBack(app, raw) {
+    var u; try { u = new URL(raw); } catch (e) { return null; }
+    var o = u.origin; return (app.origins.indexOf(o) >= 0 || app.preview.test(o)) ? o + '/' : null;
+  }
+  var q = new URLSearchParams(location.search), appKey = q.get('app') || '', ret = q.get('return') || '';
+  var app = APPS[appKey], lead = document.getElementById('lead'), act = document.getElementById('act');
+  function btn(t, cls, fn) { var b = document.createElement('button'); b.className = 'btn' + (cls ? ' ' + cls : ''); b.textContent = t; b.onclick = fn; b.style.marginRight = '8px'; act.appendChild(b); return b; }
+  var back = app && safeBack(app, ret);
+  if (!back) { lead.textContent = 'This link is not from an app Sota Kece knows. Nothing has been shared.'; return; }
+  document.querySelector('h1').textContent = 'Show Sota Kece in ' + app.name;
+  var sb = window.supabase.createClient('https://aqfzpaczyodhugsgqvxi.supabase.co', 'sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF');
+  sb.auth.getSession().then(function (r) {
+    var s = r.data && r.data.session;
+    if (!s) {
+      lead.textContent = 'Sign in to Sota Kece first, then you will come straight back here.';
+      btn('Continue with Google', '', function () { sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href } }); });
+      var a = document.createElement('a'); a.href = '/'; a.textContent = 'Other ways to sign in'; act.appendChild(a);
+      return;
+    }
+    lead.textContent = app.name + ' will show your mates’ latest activity and the newest message in each of your Koro. It can only read — it can never post, react or message as you. You can disconnect at any time from either app.';
+    btn('Allow', '', function (e) {
+      e.target.disabled = true;
+      sb.rpc('bv_link_app', { p_app: appKey }).then(function (res) {
+        if (res.error || !res.data) { e.target.disabled = false; lead.textContent = (res.error && res.error.message) || 'Could not connect. Try again.'; return; }
+        if (!/^[0-9a-f]{48}$/.test(res.data)) { e.target.disabled = false; lead.textContent = 'Could not connect. Try again.'; return; }
+        location.replace(back + '#sota=' + res.data);
+      });
+    });
+    btn('Not now', 'ghost', function () { location.replace(back); });
+  });
+})();
+</script>
+</body>
+</html>
