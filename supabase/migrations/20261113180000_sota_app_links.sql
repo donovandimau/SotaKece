@@ -96,5 +96,6 @@ begin
 end $$;
 
 revoke execute on function public.bv_link_app(text), public.bv_unlink_app(text), public.bv_app_unlink(text), public.bv_app_feed(text) from public;
+revoke execute on function public.bv_link_app(text), public.bv_unlink_app(text) from anon;   -- Supabase grants anon directly by default
 grant execute on function public.bv_link_app(text), public.bv_unlink_app(text) to authenticated;
 grant execute on function public.bv_app_unlink(text), public.bv_app_feed(text) to anon, authenticated;
