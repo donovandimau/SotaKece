@@ -178,3 +178,5 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - 2026-10-30 — claude — Dimau Pay: load the widget from a host every app security policy already allows  The Supabase function address was blocked by script-src on the live sites.  Co-Authored-By: Claude Fable 5.1 <noreply@a
 
 _Seeded 2026-11-02 from the Ops Room. From here on, this file is the record for this project._
+
+- 2026-11-13 — Claude — Switched links to sister apps from *.vercel.app to their dimau-fintech.com addresses (security rules keep both).

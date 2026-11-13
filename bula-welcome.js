@@ -448,7 +448,7 @@
           (app.langs ? '<p class="bw-p"><b>Languages:</b> ' + esc(app.langs) + '</p>' : '') +
           (app.note && !app.items.some(function(it){return it[1].indexOf(app.note)!==-1;}) ? '<p class="bw-note">' + esc(app.note) + '</p>' : '') +
           '<button type="button" class="bw-go">Start exploring</button>' +
-          '<p class="bw-foot">By Dimau Fintech · <a href="https://myfiji.vercel.app/" target="_blank" rel="noopener">See all our apps</a></p>' +
+          '<p class="bw-foot">By Dimau Fintech · <a href="https://myfiji.dimau-fintech.com/" target="_blank" rel="noopener">See all our apps</a></p>' +
         '</div>' +
       '</div>';
     document.body.appendChild(backEl);
