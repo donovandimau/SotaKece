@@ -579,3 +579,4 @@ html body .sota-page-lights[data-style="aurora"]>.sota-disco-ball,html body .sot
 html body .sota-page-lights[data-style="aurora"]>.sota-disco-dots{background:linear-gradient(115deg,#16e879,#00dce8,#6248ff,#ff38ca,#ffe62e,#16e879);background-size:400% 400%;filter:blur(28px);-webkit-mask-image:linear-gradient(#000,transparent 55%,#000 100%);mask-image:linear-gradient(#000,transparent 55%,#000 100%);opacity:calc(.3 + var(--sota-bass-light,0)*.35 + var(--sota-flash,0)*.2);animation:sota-aurora 9s linear infinite}
 @keyframes sota-laser-sweep{from{transform:translate(-50%,-50%) rotate(-28deg)}to{transform:translate(-50%,-50%) rotate(28deg)}}
 @keyframes sota-aurora{from{background-position:0% 50%}to{background-position:400% 50%}}
+#app.sx-app .sx-world-hero[hidden]{display:none!important}

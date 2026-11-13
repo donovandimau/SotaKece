@@ -9,7 +9,7 @@
   status();window.addEventListener('offline',status);window.addEventListener('online',status);
   if(!('serviceWorker' in navigator))return;
   const sw=navigator.serviceWorker,pageRelease=document.querySelector('meta[name="sota-release"]')?.content;
-  const drafts=new Set(),originals=new WeakMap();let registration,lastCheck=Date.now(),dismissed='',notice;
+  const drafts=new Set(),originals=new WeakMap();let registration,lastCheck=Date.now();
   const draftField=el=>el?.matches?.('textarea,input:not([type]),input[type="text"],input[type="url"],input[type="email"],input[type="password"],input[type="tel"]')&&!el.readOnly&&!el.disabled&&!/search|filter|find|^s-q$/i.test(el.id||'');
   const remember=event=>{if(draftField(event.target)&&!originals.has(event.target))originals.set(event.target,event.target.value);};
   document.addEventListener('focusin',remember);document.addEventListener('beforeinput',remember);
@@ -18,19 +18,15 @@
     for(const el of drafts){if(!el.isConnected)drafts.delete(el);else if(el.value!==originals.get(el))return true;}
     return !!document.querySelector('dialog[open]:not(.sk-playlist-inline):not(.sota-share-sheet)');
   }
+  // A new release updates quietly: the page reloads only while it is out of sight (tab switched,
+  // phone locked, app in the background) and never while a draft or editor is open. No pop-up.
+  let pending='';
+  function quietReload(){if(pending&&document.visibilityState==='hidden'&&!hasDraft()){pending='';window.location.reload();}}
   function offer(release){
-    if(!/^sota-kece-shell-[a-z0-9._-]+$/i.test(release||'')||release===pageRelease||release===dismissed)return;
-    if(!notice){
-      notice=document.createElement('aside');notice.id='sota-update';notice.setAttribute('aria-label','Sota Kece update');
-      const text=document.createElement('p');text.setAttribute('role','status');text.setAttribute('aria-live','polite');
-      const update=document.createElement('button');update.type='button';update.textContent='Reload to update';
-      const later=document.createElement('button');later.type='button';later.textContent='Later';later.className='sota-update-later';
-      update.addEventListener('click',()=>{if(hasDraft()){text.textContent='Save your draft and close any open editor before updating.';return;}window.location.reload();});
-      later.addEventListener('click',()=>{dismissed=notice.dataset.release;notice.hidden=true;document.querySelector('[data-dimau-menu-toggle]')?.focus({preventScroll:true});});
-      notice.append(text,update,later);document.body.append(notice);
-    }
-    notice.dataset.release=release;notice.querySelector('p').textContent='A new version of Sota Kece is ready.';notice.hidden=false;
+    if(!/^sota-kece-shell-[a-z0-9._-]+$/i.test(release||'')||release===pageRelease)return;
+    pending=release;quietReload();
   }
+  document.addEventListener('visibilitychange',quietReload);
   function readRelease(){
     if(!sw.controller||typeof MessageChannel!=='function')return;
     const channel=new MessageChannel();const done=()=>{channel.port1.close();channel.port2.close();};
