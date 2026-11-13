@@ -30,6 +30,9 @@ test('a Home invite button makes a personal link and shares it, not the plain si
   assert.equal(w.shared.length,1);
   assert.equal(w.shared[0].url,'https://sotakece.com/i/'+TOKEN);
   assert.match(w.shared[0].text,/^Dimau here\./);
+  w.document.querySelector('button').click();await tick();
+  assert.equal(calls.length,1,'a second tap reuses the link');
+  assert.equal(w.shared[1].url,'https://sotakece.com/i/'+TOKEN);
   w.close();
 });
 

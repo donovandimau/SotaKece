@@ -124,11 +124,18 @@
     var sp = window.SotaPlus, callFn = quickCall || (sp && sp.inviteRpc), meFn = quickMe || (sp && sp.me);
     if (!callFn) return;
     e.preventDefault(); e.stopImmediatePropagation();
+    var label = String(t.getAttribute('data-iv-quick') || '').slice(0, 60);
+    var mine = typeof meFn === 'function' ? meFn() : null, key = 'sk-iv-quick:' + ((mine && (mine.id || mine.handle)) || '') + ':' + label;
+    /* Reuse this device's link for this button: the share sheet then opens inside the tap itself, which
+       iPhones require, and repeat taps do not use up the member's 50 invites. */
+    var kept = ''; try { kept = safePath(localStorage.getItem(key)); } catch (_) {}
+    if (kept) { if (!me) me = mine; send(kept); return; }
     if (quickBusy) return;
     quickBusy = true;
-    callFn('bv_invite_create', { p_label: String(t.getAttribute('data-iv-quick') || '').slice(0, 60) }).then(function (made) {
+    callFn('bv_invite_create', { p_label: label }).then(function (made) {
       var path = made && safePath(made.path);
       if (!path) throw new Error('no link');
+      try { localStorage.setItem(key, path); } catch (_) {}
       if (!me) me = typeof meFn === 'function' ? meFn() : null;
       send(path);
     }).catch(function () {
