@@ -1,3 +1,7 @@
+## 13 November 2026 — Join prompt for guests (Ops 1098)
+
+Release `sota-kece-shell-20261113-v193-join`. There were no enquiries or sign-ups all week across the Dimau sites. The guest welcome already leads with "Create your space", so it stays as it is. Added `sota-join-nudge.js`/`.css`: once a guest scrolls about a screen or taps twice, a small bottom bar offers **Join free**, which opens the existing sign-up. On phones it sits above the tab bar. Not now hides it for 7 days. Members never see it, and it never shows over the sign-up or sign-in dialog. Events `cta_click {cta:'join'}` (every sign-up button click) and `lead {kind:'signup'}` (both completion points) go through `window.SKEvent`, which uses the shared beacon when it has run and SKTrack otherwise. No change to the guest or member first-paint paths; lab numbers are in TRACKER.md.
+
 ## 12 November 2026 — Invite links for a first group of members
 
 Why: the live database had one member and no shared links, and the Dimau analytics' ~275 weekly "visitors" turned out to be robots (bursts seconds apart, one view, no referrer, never back; the shared beacon now skips them, dimau-platform PR #8). The share engine credits a join only through a shared wall post, and there are no posts to share, so nothing let Donovan send a first group a link and see who came.

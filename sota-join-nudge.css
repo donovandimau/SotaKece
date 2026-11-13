@@ -1,0 +1,8 @@
+/* Guest join prompt (13 Nov 2026). Fixed to the bottom, so it never moves the page. */
+.sk-join-nudge{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9000;display:flex;align-items:center;gap:10px;width:min(520px,calc(100vw - 32px));padding:8px 8px 8px 16px;border-radius:999px;background:rgba(255,255,255,.96);color:#0b3440;box-shadow:0 10px 30px -10px rgba(8,52,64,.45),0 0 0 1px rgba(8,103,121,.18);transform:translate(-50%,140%);opacity:0;transition:transform .35s ease,opacity .35s ease}
+.sk-join-nudge.sk-in{transform:translate(-50%,0);opacity:1}
+.sk-join-nudge p{flex:1 1 auto;margin:0;font-size:14px;font-weight:600;line-height:1.3}
+.sk-join-nudge .sk-join-go{flex:none;min-height:44px;padding:0 20px;border:0;border-radius:999px;background:var(--accent,#086779);color:#fff;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.sk-join-nudge .sk-join-x{flex:none;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:#0b3440;font:700 22px/1 inherit;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.sk-join-nudge{transition:none}}
+@media (prefers-color-scheme:dark){.sk-join-nudge{background:rgba(10,32,40,.96);color:#e6f6f6}.sk-join-nudge .sk-join-x{color:#e6f6f6}}
