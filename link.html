@@ -22,7 +22,7 @@
 (function () {
   // Apps that may ask, and the ONLY addresses we will send the key back to (exact origins, never a pattern
   // anyone could register). Previews are limited to Donovan's own Vercel team.
-  var APPS = { mataka: { name: 'Mataka', origins: ['https://mataka.vercel.app', 'https://mataka-sigma.vercel.app'],
+  var APPS = { mataka: { name: 'Mataka', origins: ['https://mataka.dimau-fintech.com', 'https://mataka-sigma.vercel.app'],
     preview: /^https:\/\/mataka-git-[a-z0-9-]+-donovandimau-3468s-projects\.vercel\.app$/ } };
   function safeBack(app, raw) {
     var u; try { u = new URL(raw); } catch (e) { return null; }
