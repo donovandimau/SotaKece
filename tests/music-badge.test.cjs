@@ -6,7 +6,7 @@ function target(){return {listeners:new Map(),addEventListener(name,fn){if(!this
 function fixture(options={}){
   const classes=new Set(),audios=[];
   const document=Object.assign(target(),{hidden:!!options.hidden,documentElement:{classList:{toggle(name,on){if(on)classes.add(name);else classes.delete(name);},remove(name){classes.delete(name);}}},querySelectorAll(selector){return selector.includes('audio')?audios.filter(audio=>audio.isConnected):[];}});
-  function audio(id,extra={}){const node=Object.assign(target(),{tagName:'AUDIO',id,paused:true,ended:false,error:null,readyState:0,isConnected:true},extra);node.play=node.pause=()=>{throw Error('Badge must never control playback');};audios.push(node);return node;}
+  function audio(id,extra={}){const node=Object.assign(target(),{tagName:'AUDIO',id,paused:true,ended:false,error:null,readyState:0,isConnected:true,currentSrc:'track.mp3',getAttribute(name){return name==='src'?this.currentSrc||null:null;}},extra);node.play=node.pause=()=>{throw Error('Badge must never control playback');};audios.push(node);return node;}
   const playlist=audio('sota-playlist-audio',options.playlist),local=audio('sota-local-audio',options.local);
   const root={document};vm.runInNewContext(source,root,{timeout:1000});
   return {root,document,playlist,local,audio,api:root.SotaMusicBadge,spins:()=>classes.has('sota-music-playing'),event(node,type,changes={}){Object.assign(node,changes);const event={target:node,type};if(node.isConnected)document.emit(event);node.emit(event);},visibility(hidden){document.hidden=hidden;document.emit({type:'visibilitychange',target:document});},count(node){return [...node.listeners.values()].reduce((total,set)=>total+set.size,0);}};
