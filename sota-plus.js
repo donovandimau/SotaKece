@@ -672,7 +672,7 @@
     document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { var v = document.getElementById('sp-viewer'); if (v) v.remove(); } });
   }
 
-  window.SotaPlus = { init: init, feed: feed, momentCard: momentCard, bar: bar, composerExtras: composerExtras, wireComposer: wireComposer, post: post,
+  window.SotaPlus = { init: init, inviteRpc: function (n, a) { if (!client) return Promise.reject(new Error('not ready')); return rpc(n, a); }, me: function () { return S && S.me; }, feed: feed, momentCard: momentCard, bar: bar, composerExtras: composerExtras, wireComposer: wireComposer, post: post,
     strip: strip, mountStrip: mountStrip, sidePanel: sidePanel, open: open, pollUnread: pollUnread, actLine: actLine, roomExtras: roomExtras, highlights: highlights, REACTIONS: REACTIONS,
     koroRead: koroRead, koroHeader: koroHeader, koroMessages: koroMessages, koroReplyBar: koroReplyBar, koroReplyId: koroReplyId, koroReplyClear: koroReplyClear, feedCompat: feedCompat, koroReadCompat: koroReadCompat, koroComposerNote: koroComposerNote };
 })();

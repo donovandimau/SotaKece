@@ -258,7 +258,7 @@
       '<div class="tw-main">' +
         '<div class="tw-head"><span class="name">' + esc(p.display_name || p.handle) + '</span><span class="tw-handle">@' + esc(p.handle) + '</span><span class="spacer"></span>' +
           '<time class="ago" datetime="' + esc(p.created_at) + '">' + ago(p.created_at) + '</time></div>' +
-        '<div class="tw-body"' + (opts.expanded ? '' : ' data-tw="open" data-id="' + p.id + '"') + '>' + rich(p.body) + '</div>' +
+        (p.sere && String(p.body || '').trim() === '🎤 Sere' ? '' : '<div class="tw-body"' + (opts.expanded ? '' : ' data-tw="open" data-id="' + p.id + '"') + '>' + rich(p.body) + '</div>') +
         quoteBox(p.quote) +
         sereBox(sr) +
         voiceBox(p.voice) +
@@ -404,7 +404,7 @@
         (window.SotaSere ? '<button type="button" class="tw-viti-act" data-tw="sere"><span aria-hidden="true">🎤</span> Make a photo sing</button>' : '') +
         (st.sparkHtml ? '<button type="button" class="tw-viti-act" data-tw="spark"><span aria-hidden="true">✨</span> Answer today\'s Spark</button>' : '') +
         '<button type="button" class="tw-viti-act" data-tw="people"><span aria-hidden="true">🤝</span> Find your people</button>' +
-        '<button type="button" class="tw-viti-act" data-sota-share data-share-text="Come and join me on Sota Kece. Make your space, share music and catch up over Talanoa."><span aria-hidden="true">↗</span> Invite someone</button>' +
+        '<button type="button" class="tw-viti-act" data-iv-quick="Home: Start something" data-sota-share data-share-text="Come and join me on Sota Kece. Make your space, share music and catch up over Talanoa."><span aria-hidden="true">↗</span> Invite someone</button>' +
       '</div></div></section>';
   }
   async function loadTracks() {

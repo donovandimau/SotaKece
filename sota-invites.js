@@ -112,5 +112,29 @@
     else if (a === 'all') { state.all = true; paint(); }
   });
 
-  window.SotaInvites = { html: html, fill: fill, message: message, name: name, _state: state };
+  /* Home's "Invite someone" buttons (data-iv-quick, 13 Nov 2026). They used to share a plain sotakece.com
+     link, so nobody who joined through them was counted. Now one tap makes a personal /i/ link (the label is
+     the button's data-iv-quick, private to the sender) and opens the share sheet with it. If the database
+     helper is not ready, or making the link fails, the click falls through to the old plain share. */
+  var quickCall = null, quickMe = null, quickBusy = false;
+  function use(rpc, getMe) { quickCall = rpc; quickMe = getMe; }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-iv-quick]');
+    if (!t) return;
+    var sp = window.SotaPlus, callFn = quickCall || (sp && sp.inviteRpc), meFn = quickMe || (sp && sp.me);
+    if (!callFn) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if (quickBusy) return;
+    quickBusy = true;
+    callFn('bv_invite_create', { p_label: String(t.getAttribute('data-iv-quick') || '').slice(0, 60) }).then(function (made) {
+      var path = made && safePath(made.path);
+      if (!path) throw new Error('no link');
+      if (!me) me = typeof meFn === 'function' ? meFn() : null;
+      send(path);
+    }).catch(function () {
+      if (window.SotaShare && typeof window.SotaShare.share === 'function') window.SotaShare.share({ url: SITE + '/', title: 'Join me on Sota Kece', text: t.getAttribute('data-share-text') || message(null) });
+    }).then(function () { quickBusy = false; });
+  }, true);
+
+  window.SotaInvites = { html: html, fill: fill, use: use, message: message, name: name, _state: state };
 })();

@@ -65,7 +65,7 @@
   function peopleBlock(list) {
     if (!list) return '';
     if (!list.length) return '<div class="hub-people"><p class="hub-first">You are among the first here. Bring one person with you and the wall wakes up.</p>' +
-      '<button type="button" class="btn sm ghost" data-sota-share data-share-text="Come and join me on Sota Kece. Make your space, share music and catch up over Talanoa.">Invite someone ↗</button></div>';
+      '<button type="button" class="btn sm ghost" data-iv-quick="Home: Top Mates" data-sota-share data-share-text="Come and join me on Sota Kece. Make your space, share music and catch up over Talanoa.">Invite someone ↗</button></div>';
     return '<div class="hub-people"><h3>Say bula to</h3>' + list.map(person).join('') + '</div>';
   }
   function body(context, hubs, list) {
