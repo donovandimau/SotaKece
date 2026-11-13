@@ -23,6 +23,7 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-13 | Claude | Join free as the obvious next step for guests (Ops 1098) | agent/claude/sota-kece-make-join-free-the-obvious-next-step-for-guests/1 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
