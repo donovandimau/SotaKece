@@ -4,7 +4,7 @@
 .hub-card .hub-head h2{font-size:20px!important;line-height:1.2!important;margin:6px 0 4px;letter-spacing:-.01em;text-wrap:balance}
 .hub-head p{margin:0;font-size:14px;line-height:1.45;color:var(--ink-soft)}
 .hub-kicker{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
-.hub-pills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.hub-pills{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:8px}
 .hub-pill{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border:1px solid var(--line-hard,var(--line));border-radius:16px;background:var(--shell);color:inherit;font:inherit;text-align:left;cursor:pointer;min-width:0}
 .hub-pill:hover{border-color:var(--accent)}
 .hub-pill.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--shell))}

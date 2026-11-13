@@ -122,7 +122,8 @@
     if(!title||!state?.user?.id)return;
     const name=firstName(state),returning=visits[state.user.id]??(visits[state.user.id]=seenBefore(state.user.id));
     tools.querySelector('.sx-world-hero').dataset.worldVisit=returning?'returning':'first';
-    if(returning){title.textContent=name?`Welcome back, ${name}.`:'Welcome back.';return;}
+    // A returning member goes straight to the wall: the slim greeting banner steps aside.
+    if(returning){title.textContent=name?`Welcome back, ${name}.`:'Welcome back.';const hero=tools.querySelector('.sx-world-hero');if(hero.classList.contains('sx-world-hero-slim'))hero.hidden=true;return;}
     if(eyebrow)eyebrow.textContent=name?`BULA, ${name.toUpperCase()}. YOU’RE IN.`:'BULA. YOU’RE IN.';
     title.textContent='Start with one small moment.';
     if(line)line.textContent='Share a photo, a thought or a song. Your friends will see it in their feed.';
