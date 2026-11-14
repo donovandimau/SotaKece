@@ -1,3 +1,7 @@
+## 14 November 2026 — Older browsers (Ops 1159)
+
+Release `sota-kece-shell-20261114-v196-oldbrowsers`. Live analytics logged `button.replaceChildren is not a function` (Safari before 14, Chrome before 86). All `replaceChildren` calls in shipped first-party JS now use `textContent=''` + `append`; `.at(-1)`, `replaceAll` and unguarded `crypto.randomUUID()` are replaced too (`uuid4()` falls back to `getRandomValues`). The site's floor stays at optional chaining (Safari 13.1 / Chrome 80). `tests/older-browsers.test.cjs` guards this. Rule for the next AI: do not call those APIs in shipped JS; the test names the replacement.
+
 ## 14 November 2026 — TRACKER merge prevention
 
 Added TRACKER.md merge=union with other attributes preserved. Git resolves the rule and keeps both concurrent tracker log entries in a real merge fixture. Application source and behavior are unchanged; source publication evidence is recorded in the scoped PR and Ops.

@@ -1,5 +1,6 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SotaRoomMedia=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
+  function uuid4(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g,function(c){return (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16);});}
   const bucket='bv-room-media',limit=6*1024*1024;
   const formats={mp3:'audio/mpeg',m4a:'audio/mp4',ogg:'audio/ogg',opus:'audio/ogg',wav:'audio/wav',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'};
   function path(value,kind){const text=String(value||'');return new RegExp('^[a-f0-9-]{36}/'+(kind==='music'?'music':'covers')+'/[a-f0-9-]{36}\\.(?:'+(kind==='music'?'mp3|m4a|ogg|opus|wav':'jpg|jpeg|png|webp')+')$','i').test(text)?text:'';}
@@ -19,7 +20,7 @@
     return {
       async upload(file,kind){
         const checked=await inspect(file,kind);
-        const objectPath=userId+'/'+(kind==='music'?'music':'covers')+'/'+crypto.randomUUID()+'.'+checked.extension;
+        const objectPath=userId+'/'+(kind==='music'?'music':'covers')+'/'+uuid4()+'.'+checked.extension;
         const {data,error}=await client.storage.from(bucket).upload(objectPath,file,{contentType:checked.contentType,cacheControl:'3600',upsert:false});
         if(error)throw new Error(error.message||'Upload interrupted. Try again when your connection returns.');
         if(!data||data.path!==objectPath)throw new Error('The upload could not be confirmed. Please try again.');

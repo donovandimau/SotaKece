@@ -77,7 +77,7 @@
       const people=nav.querySelector('[data-dps-tab="people"]');
       if(people&&people.parentNode===nav)people.after(box);else nav.after(box);
     }
-    box.dataset.key=key;box.replaceChildren();
+    box.dataset.key=key;box.textContent='';
     const summary=doc.createElement('summary');summary.textContent='Your Koro';
     const count=doc.createElement('b');count.textContent=String(list.length);summary.append(count);box.append(summary);
     const items=doc.createElement('div');items.className='sl-koro-list';items.setAttribute('role','group');items.setAttribute('aria-label','Your Koro');

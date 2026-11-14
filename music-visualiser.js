@@ -248,7 +248,7 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
     // Keep the actual button and all its event listeners during state changes.
     let svg=node.querySelector('svg[data-control-symbol]'),text=node.querySelector('.control-label');
     if(!svg){svg=root.document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('data-control-symbol','');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','2.6');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');}
-    if(!text){text=root.document.createElement('span');text.className='control-label';node.replaceChildren(svg,text);}
+    if(!text){text=root.document.createElement('span');text.className='control-label';node.textContent='';node.append(svg,text);}
     if(svg.getAttribute('data-symbol-kind')!==kind){svg.innerHTML=controlSymbols[kind]||controlSymbols.play;svg.setAttribute('data-symbol-kind',kind);}
     text.textContent=label;node.classList.add('symbol-control');node.setAttribute('data-control-kind',kind);node.setAttribute('aria-label',label);node.title=label;
   }

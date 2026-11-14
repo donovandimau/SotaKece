@@ -150,7 +150,7 @@
     else{q('[data-slc-graph3d]').innerHTML='<p class="slc-graph-unavailable" role="status">3D view could not load. Your connections are available below.</p>';}
     if(motionPreference?.addEventListener)on(motionPreference,'change',event=>{if(event.matches)motion=false;draw();});
     draw();
-    return {updateFriends(next){if(disposed)return;remote=acceptedFriends(next);draw();},dispose(){disposed=true;renderer?.dispose();renderer=null;listeners.forEach(fn=>fn());records=[];remote=[];host.replaceChildren();host.classList.remove('slc','slc-paused');}};
+    return {updateFriends(next){if(disposed)return;remote=acceptedFriends(next);draw();},dispose(){disposed=true;renderer?.dispose();renderer=null;listeners.forEach(fn=>fn());records=[];remote=[];host.textContent='';host.classList.remove('slc','slc-paused');}};
   }
   return {mount,CATEGORIES,keyFor,sanitize,readRecords,saveRecords,acceptedFriends,graphModel,sceneModel};
 });

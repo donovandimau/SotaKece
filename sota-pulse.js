@@ -7,6 +7,8 @@
    supabase/migrations/20261109000000_sota_talanoa_wall.sql; the rules live in the database. */
 (function () {
   'use strict';
+  /* v4 id; crypto.randomUUID is missing before Safari 15.4 / Chrome 92 */
+  function uuid4() { var c = window.crypto; if (c && typeof c.randomUUID === 'function') return c.randomUUID(); if (!c || !c.getRandomValues) return ''; return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, function (d) { return (d ^ c.getRandomValues(new Uint8Array(1))[0] & 15 >> d / 4).toString(16); }); }
 
   var MAX = 280, PAGE = 20, PREFETCH_PX = 900, DEFAULT_MODE = 'latest', CHANNEL = 'talanoa-wall', SITE = 'https://sotakece.com';
   var SAY = {
@@ -229,7 +231,7 @@
     var form = mine.form, ta = form.querySelector('textarea'), words = (ta.value || '').trim();
     if (words.length > MAX) return toast(SAY.TOO_LONG);
     var replyTo = form.dataset.replyTo ? Number(form.dataset.replyTo) : null;
-    var path = S.user.id + '/' + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '') + '.' + mine.kind[2];
+    var path = S.user.id + '/' + uuid4() + '.' + mine.kind[2];
     if (!VOICE_PATH.test(path)) return toast('This browser cannot send a voice note.');
     mine.sending = true; paintRec();
     var uploaded = false;

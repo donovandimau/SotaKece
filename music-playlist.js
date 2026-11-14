@@ -73,7 +73,7 @@ title.textContent=selected?selected.title:'Your island soundtrack';status.textCo
 dialog.classList.toggle('is-playing',playing);
 mood.textContent=selected?(playing?'Now playing':'On pause'):'Turn up the island vibes';
 subtitle.textContent=selected?(selected.artist||'Track '+(current+1)+' of '+tracks.length+' · Sota Kece'):'Pick a song. Find your rhythm.';
-play.replaceChildren(el('span',playing?'Ⅱ':'▶','sk-playlist-play-icon'),el('span',playing?'Pause':'Play'));
+play.textContent='';play.append(el('span',playing?'Ⅱ':'▶','sk-playlist-play-icon'),el('span',playing?'Pause':'Play'));
 play.firstChild.setAttribute('aria-hidden','true');play.disabled=previous.disabled=next.disabled=!tracks.length;
 list.querySelectorAll('[data-track-index]').forEach(b=>{
 const active=!!selected&&b.dataset.trackKey===selected.key;
@@ -97,7 +97,7 @@ catch(_){if(request===attempt){message='Could not play this song. Tap Play to re
 function move(delta,auto){if(!tracks.length)return;const t=ext?.next?ext.next(delta,!!auto):current<0?0:(current+delta+tracks.length)%tracks.length;if(t>=0)playTrack(t);}
 function playKey(key){const items=view();tracks=items.slice();const i=tracks.findIndex(t=>t.key===key);if(i>=0)playTrack(i);}
 function render(){
-list.replaceChildren();const query=filter.value.trim().toLocaleLowerCase();let shown=0;
+list.textContent='';const query=filter.value.trim().toLocaleLowerCase();let shown=0;
 const items=view();
 items.forEach((track,index)=>{
 if(query&&!(track.rawTitle||track.title).toLocaleLowerCase().includes(query)&&!(track.title+' '+(track.artist||'')).toLocaleLowerCase().includes(query))return;
@@ -161,7 +161,7 @@ const extras=el('div','','sk-lib-host');
 dialog.append(head,hero,audio,transport,visuals,status,retry,extras,search,queue,list);root.document.body.append(dialog);
 const docHead=root.document.head;
 if(root.SotaMusicLibrary)extend(root.SotaMusicLibrary);
-else if(docHead){const s=el('script');s.src='/music-library.js?v=20261110-music-tidy-1';s.async=true;docHead.append(s);}
+else if(docHead){const s=el('script');s.src='/music-library.js?v=20261114-oldbrowsers-1';s.async=true;docHead.append(s);}
 audio.addEventListener('play',()=>{
 root.SotaPlayback?.activate('playlist',audio);
 beforePlay();root.document.querySelectorAll('audio').forEach(other=>{if(other!==audio)other.pause();});

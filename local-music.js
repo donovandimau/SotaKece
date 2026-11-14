@@ -87,7 +87,7 @@
   }
   function renderList(){
     if(!dialog)return;
-    const list=dialog.querySelector('#bv-local-music-list');list.replaceChildren();
+    const list=dialog.querySelector('#bv-local-music-list');list.textContent='';
     if(!tracks.length){list.append(el('p','Add songs from your device. They will be here when you return.','sub'));return;}
     for(const track of tracks){
       const row=el('div','','bv-local-music-row'),words=el('div');words.append(el('strong',track.title),el('small',`${(track.size/1024/1024).toFixed(1)} MB · saved on this device`));
