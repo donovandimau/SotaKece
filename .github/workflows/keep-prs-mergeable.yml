@@ -1,0 +1,89 @@
+# Keeps every open pull request mergeable after something lands on main.
+#
+# Why: GitHub's own merge check ignores .gitattributes, so two AIs adding TRACKER.md entries
+# always shows "conflicts" even though `TRACKER.md merge=union` says keep both. And when a PR
+# that another PR was built on top of is squash-merged, the later PR collides with its own
+# earlier work. This job does the merge with real git (which honours union), takes the PR's
+# newer copy for files the stacked PR already contains, and pushes the result. Anything it
+# cannot settle safely is left alone and flagged with a comment.
+name: Keep PRs mergeable
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: keep-prs-mergeable
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge main into open PR branches
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ONLY_PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -u
+          git config user.name  "keep-prs-mergeable[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Make sure the union rule for tracker/log files is on even if a repo forgot it.
+          for f in TRACKER.md CHANGELOG.md; do
+            grep -qs "^$f merge=union" .gitattributes || echo "$f merge=union" >> .git/info/attributes
+          done
+
+          # Heads of PRs that were squash-merged into main recently. If a branch already
+          # contains one of these, it was stacked on that PR and its copy of those files is newer.
+          gh api "repos/$REPO/pulls?state=closed&base=main&sort=updated&direction=desc&per_page=30" \
+            --jq '.[] | select(.merged_at != null) | "\(.number) \(.head.sha)"' > /tmp/merged.txt || true
+
+          if [ -n "$ONLY_PR" ]; then PRS="$ONLY_PR"; else
+            PRS=$(gh api "repos/$REPO/pulls?state=open&base=main&per_page=100" \
+              --jq '.[] | select(.head.repo.full_name == env.REPO) | .number'); fi
+
+          for n in $PRS; do
+            br=$(gh api "repos/$REPO/pulls/$n" --jq .head.ref)
+            echo "::group::PR #$n ($br)"
+            git fetch -q origin "$br" main
+            git checkout -q -B "$br" "origin/$br"
+            if git merge-base --is-ancestor origin/main HEAD; then echo "up to date"; echo "::endgroup::"; continue; fi
+
+            if ! git merge --no-edit -m "Merge main into $br (automatic)" origin/main; then
+              # Files from squash-merged PRs this branch was built on: keep the branch's copy.
+              git fetch -q origin $(cut -d' ' -f2 /tmp/merged.txt) 2>/dev/null || true
+              while read -r mn msha; do
+                git merge-base --is-ancestor "$msha" HEAD 2>/dev/null || continue
+                for f in $(gh api "repos/$REPO/pulls/$mn/files?per_page=100" --jq '.[].filename'); do
+                  # Only when main's copy is exactly what that PR left, so nothing newer on main is lost.
+                  if git diff --name-only --diff-filter=U | grep -qxF "$f" && git diff --quiet "$msha" origin/main -- "$f"; then
+                    git checkout --ours -- "$f" && git add -- "$f" && echo "kept branch copy of $f (stacked on #$mn)"
+                  fi
+                done
+              done < /tmp/merged.txt
+              left=$(git diff --name-only --diff-filter=U)
+              if [ -n "$left" ]; then
+                git merge --abort
+                body="Automatic merge of main could not settle these files, so a person or AI needs to resolve them:"$'\n'"$(echo "$left" | sed 's/^/- `/; s/$/`/')"
+                gh pr comment "$n" --repo "$REPO" --body "$body" || true
+                echo "::endgroup::"; continue
+              fi
+              git commit --no-edit -q
+            fi
+            git push -q origin "HEAD:$br" && echo "pushed"
+            echo "::endgroup::"
+          done
