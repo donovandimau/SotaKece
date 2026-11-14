@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://sotakece.com/</loc></url>
+  <url><loc>https://sotakece.com/</loc><lastmod>2026-11-14</lastmod></url>
+  <url><loc>https://sotakece.com/privacy.html</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://sotakece.com/terms.html</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://sotakece.com/data-deletion.html</loc><lastmod>2026-11-10</lastmod></url>
 </urlset>
