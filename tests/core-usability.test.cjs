@@ -128,7 +128,7 @@ check('auth owner changes immediately clear member state and defer boot beyond t
   const tasks=[];
   const ctx=harness({sb:{auth:{onAuthStateChange:fn=>{callback=fn;return {data:{subscription:{unsubscribe(){}}}};}}},
     window:{SotaCircles:{stop(){circleStops++;}},SotaConnections:{stop(){stops++;}},SotaKavaUI:{stop(){stops++;}},BulaSkinStudio:{closeForOwnerChange(){studioCloses++;}}},
-    app:{replaceChildren(){clears++;}},setTimeout:fn=>tasks.push(fn),
+    app:{set textContent(v){if(v==='')clears++;}},setTimeout:fn=>tasks.push(fn),
     boot:()=>{assert(!insideCallback);boots++;},renderAuth:()=>{assert(!insideCallback);authScreens++;}});
   ctx.S.friends=[{handle:'private-friend'}];ctx.S.pending=[{id:1}];ctx.S.crew=42;ctx.S.wallet={balance_minor:1234};
   ctx.viewRun();const oldView=ctx.viewRun(false);ctx.installAuthLifecycle();
@@ -146,7 +146,7 @@ check('auth owner changes immediately clear member state and defer boot beyond t
 
 check('a sign-out supersedes a queued account-switch boot',async()=>{
   let callback,boots=0,authScreens=0;const tasks=[];
-  const ctx=harness({sb:{auth:{onAuthStateChange:fn=>{callback=fn;return {};}}},window:{},app:{replaceChildren(){}},setTimeout:fn=>tasks.push(fn),boot:()=>boots++,renderAuth:()=>authScreens++});
+  const ctx=harness({sb:{auth:{onAuthStateChange:fn=>{callback=fn;return {};}}},window:{},app:{set textContent(v){}},setTimeout:fn=>tasks.push(fn),boot:()=>boots++,renderAuth:()=>authScreens++});
   ctx.installAuthLifecycle();callback('SIGNED_IN',{user:{id:'other'}});callback('SIGNED_OUT',null);
   tasks.forEach(fn=>fn());assert.equal(boots,0);assert.equal(authScreens,1);
 });

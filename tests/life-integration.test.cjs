@@ -8,9 +8,9 @@ const vm = require('node:vm');
 // A small event/element adapter exercises the real Connections lifecycle without
 // depending on a browser or replacing its data-loading implementation.
 class Element {
-  constructor() { this.listeners = new Map(); this.children = new Map(); this.isConnected = true; this.textContent = ''; this.hidden = false; this.attrs = new Map(); this.markup = ''; }
+  constructor() { this.listeners = new Map(); this.children = new Map(); this.isConnected = true; this.text = ''; this.hidden = false; this.attrs = new Map(); this.markup = ''; }
   set innerHTML(value) {
-    this.markup = value; this.children.clear(); this.textContent = '';
+    this.markup = value; this.children.clear(); this.text = '';
     for (const match of value.matchAll(/<\w+\b([^>]*)>/g)) {
       for (const attr of match[1].matchAll(/\b(data-[\w-]+)(?:="[^"]*")?/g)) {
         const child = new Element(); child.hidden = /\bhidden\b/.test(match[1]); this.children.set('[' + attr[1] + ']', child);
@@ -22,7 +22,9 @@ class Element {
   addEventListener(type, fn) { if (!this.listeners.has(type)) this.listeners.set(type, new Set()); this.listeners.get(type).add(fn); }
   removeEventListener(type, fn) { this.listeners.get(type)?.delete(fn); }
   setAttribute(name, value) { this.attrs.set(name, value); }
-  replaceChildren() { this.markup = ''; this.textContent = ''; this.children.clear(); }
+  // Like the DOM: setting textContent removes every child.
+  get textContent() { return this.text; }
+  set textContent(value) { this.text = String(value); this.markup = ''; this.children.clear(); }
   get listenerCount() { return [...this.listeners.values()].reduce((total, set) => total + set.size, 0); }
 }
 
@@ -48,7 +50,7 @@ function fixture({ signedIn = true } = {}) {
     mount(target, options) {
       const map = { target, options, updates: [], disposals: 0,
         updateFriends(friends) { this.updates.push(friends); target.textContent = friends.map(p => p.label).join(', '); },
-        dispose() { this.disposals++; target.replaceChildren(); }
+        dispose() { this.disposals++; target.textContent = ''; }
       };
       target.textContent = options.owner ? 'Private device record' : 'Guest category map'; maps.push(map); return map;
     }

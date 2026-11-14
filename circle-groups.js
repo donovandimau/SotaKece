@@ -26,7 +26,7 @@
     for(const existing of Array.from(records))if(!existing.host.isConnected){if(existing===dialog)closeDialog(existing,{clearHash:false,restore:false,preserveDraft:true});else existing.dispose();}
     hosts.get(host)?.dispose();
     const r={host,owner:owner(),revision,scope:'tc-scope-'+(++sequence),active:true,pending:false,polling:false,timer:null,listeners:[],clear,
-      dispose(){if(!r.active)return;r.active=false;root.clearTimeout(r.timer);r.listeners.forEach(off=>off());r.listeners=[];records.delete(r);if(hosts.get(host)===r)hosts.delete(host);if(r.clear)host.replaceChildren();}};
+      dispose(){if(!r.active)return;r.active=false;root.clearTimeout(r.timer);r.listeners.forEach(off=>off());r.listeners=[];records.delete(r);if(hosts.get(host)===r)hosts.delete(host);if(r.clear)host.textContent='';}};
     hosts.set(host,r);records.add(r);return r;
   }
   function listen(r,node,event,fn){if(!node)return;node.addEventListener(event,fn);r.listeners.push(()=>node.removeEventListener(event,fn));}
@@ -257,7 +257,7 @@
     let group=supplied,dirty=false;
     host.innerHTML=`<div class="tc-actions"><button type="button" class="tc-button" data-tc-refresh>Refresh graph</button><div class="tc-actions" data-tc-public-actions hidden><button type="button" class="tc-button" data-tc-view>View public graph</button><button type="button" class="tc-button" data-tc-copy>Copy public graph link</button></div></div><div data-tc-graph></div><form class="tc-settings" data-tc-choice-form><label class="tc-check"><input type="checkbox" data-tc-own-choice disabled> I choose to appear on this circle’s public graph</label><button type="submit" class="tc-button" data-tc-save disabled>Save my appearance choice</button></form>${sharedStatusHTML(r)}`;
     const target=q(host,'graph');graphLinks(r,target);
-    const clear=()=>{target.replaceChildren();q(host,'public-actions').hidden=true;q(host,'own-choice').disabled=true;q(host,'save').disabled=true;r.slots?.clear();};
+    const clear=()=>{target.textContent='';q(host,'public-actions').hidden=true;q(host,'own-choice').disabled=true;q(host,'save').disabled=true;r.slots?.clear();};
     const refresh=polling(r,async()=>{const all=await list(),found=all.find(item=>String(item.id)===String(supplied.id));if(!current(r)||!found||found.legacy)throw Error('Membership unavailable.');const graph=graphData(await rpc('bv_circle_graph',{p_crew:found.id}),'circle');return {group:found,graph};},data=>{
       group=data.group;Object.assign(supplied,group);drawGraph(r,target,data.graph);q(host,'public-actions').hidden=group.graph_visibility!=='public';if(!dirty)q(host,'own-choice').checked=group.show_on_graph;q(host,'own-choice').disabled=false;q(host,'save').disabled=false;setStatus(r,'Member graph updated. Public views include only people who opt in.');
     },clear);
@@ -292,7 +292,7 @@
     q(r.host,'body').innerHTML=`<div class="tc-actions"><button type="button" class="tc-button" data-tc-refresh>Refresh graph</button><button type="button" class="tc-button" data-tc-copy>Copy public graph link</button></div><div data-tc-graph></div>${sharedStatusHTML(r)}`;
     const target=q(r.host,'graph'),kind=route.kind==='circle-graph'?'circle':'personal';let available=false;
     q(r.host,'copy').disabled=true;r.shareAllowed=false;graphLinks(r,target);
-    polling(r,async()=>graphData(await rpc(kind==='circle'?'bv_public_circle_graph':'bv_public_personal_graph',kind==='circle'?{p_crew:groupId(route.value)}:{p_handle:route.value}),kind,true),graph=>{drawGraph(r,target,graph);available=true;r.shareAllowed=true;q(r.host,'copy').disabled=false;setStatus(r,'Public graph updated. Only opted-in people appear.');},()=>{available=false;r.shareAllowed=false;target.replaceChildren();q(r.host,'copy').disabled=true;r.slots?.clear();});
+    polling(r,async()=>graphData(await rpc(kind==='circle'?'bv_public_circle_graph':'bv_public_personal_graph',kind==='circle'?{p_crew:groupId(route.value)}:{p_handle:route.value}),kind,true),graph=>{drawGraph(r,target,graph);available=true;r.shareAllowed=true;q(r.host,'copy').disabled=false;setStatus(r,'Public graph updated. Only opted-in people appear.');},()=>{available=false;r.shareAllowed=false;target.textContent='';q(r.host,'copy').disabled=true;r.slots?.clear();});
     listen(r,q(r.host,'copy'),'click',()=>{if(current(r)&&available)share(r,{title:'Sota Kece public graph',text:'A public graph on Sota Kece.',url:publicURL(route.kind,route.value)},true);});
     return true;
   }

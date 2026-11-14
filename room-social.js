@@ -69,7 +69,7 @@
         host.dataset.socialState=kind;host.removeAttribute('aria-busy');
         for(const panel of host.querySelectorAll('[data-social-panel]')){
           const wall=panel.dataset.socialPanel==='wall',body=panel.querySelector('.sota-social-body'),action=panel.querySelector('.sota-social-action');
-          body.replaceChildren(span(host,'sota-social-empty',kind==='guest'?(wall?'Your conversations, together.':'Your closest connections.'):kind==='setup'?'Finish setting up your room to see this panel.':kind==='auth-required'?'Sign in again to see your room.':'Your live panel is paused.'));
+          body.textContent='';body.append(span(host,'sota-social-empty',kind==='guest'?(wall?'Your conversations, together.':'Your closest connections.'):kind==='setup'?'Finish setting up your room to see this panel.':kind==='auth-required'?'Sign in again to see your room.':'Your live panel is paused.'));
           action.hidden=kind==='guest';
           action.textContent=kind==='guest'?'':kind==='auth-required'?'Sign in →':kind==='setup'?'Room setup required':wall?'Open your room →':'See your friends →';
           panel.disabled=kind==='setup'||kind==='stopped';
@@ -92,7 +92,7 @@
       if(!valid())return;lastUpdated=result.updated;
       for(const host of hosts){
         const wall=host.querySelector('[data-social-body="wall"]'),mates=host.querySelector('[data-social-body="mates"]');
-        wall.replaceChildren();mates.replaceChildren();
+        wall.textContent='';mates.textContent='';
         if(!result.notes.length)wall.append(span(host,'sota-social-empty','Your wall is ready for real notes from your friends.'));
         for(const note of result.notes){const row=span(host,'sota-social-note');row.append(span(host,'sota-social-note-author','@'+note.handle),span(host,'sota-social-note-text',note.body));wall.append(row);}
         if(!result.mates.length)mates.append(span(host,'sota-social-empty','Your accepted friends will appear here as you connect.'));
@@ -111,7 +111,7 @@
         host.dataset.socialState=value;host.setAttribute('aria-busy',String(value==='loading'));
         const node=host.querySelector('.sota-social-status');
         if(node){node.setAttribute('aria-live',value==='current'?'off':'polite');node.textContent=value==='loading'?'Checking your room…':value==='current'?`Live · Updated ${lastUpdated.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`:value==='paused'?'Updates paused':value==='stale'?'Could not refresh · Showing your last update':'Could not load your room · Try Refresh';}
-        if(value==='error')for(const body of host.querySelectorAll('.sota-social-body'))body.replaceChildren(span(host,'sota-social-empty','Your room could not load. Try Refresh.'));
+        if(value==='error')for(const body of host.querySelectorAll('.sota-social-body')){body.textContent='';body.append(span(host,'sota-social-empty','Your room could not load. Try Refresh.'));}
       }
     }
     for(const host of hosts){

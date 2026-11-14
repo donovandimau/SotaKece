@@ -122,7 +122,7 @@ uploadRun++;saveRun++;draft=null;staged.clear();revoke();saved=after;apply();edi
 function undoQuick(){
 const previous=undoState;if(!previous)return false;
 if(ownerKey(getOwner())!==previous.owner){ensureOwner();apply();clearFeedback();return false;}
-const store=localStore();try{if(!store)throw Error();if(JSON.stringify(read(store,getOwner()))!==JSON.stringify(previous.after)){clearFeedback();return false;}if(ownerKey(getOwner())!==previous.owner){ensureOwner();apply();clearFeedback();return false;}store.setItem('sota-page-design:v1:'+previous.owner,JSON.stringify(previous.before));}catch(_){feedback?.querySelector('span')?.replaceChildren(root.document.createTextNode('Could not undo. Try again.'));return false;}
+const store=localStore();try{if(!store)throw Error();if(JSON.stringify(read(store,getOwner()))!==JSON.stringify(previous.after)){clearFeedback();return false;}if(ownerKey(getOwner())!==previous.owner){ensureOwner();apply();clearFeedback();return false;}store.setItem('sota-page-design:v1:'+previous.owner,JSON.stringify(previous.before));}catch(_){const note=feedback?.querySelector('span');if(note)note.textContent='Could not undo. Try again.';return false;}
 uploadRun++;saveRun++;draft=null;staged.clear();revoke();saved=clone(previous.before);clearFeedback();apply();return true;
 }
 function init(options={}){if(typeof options.getOwner==='function')getOwner=options.getOwner;if(typeof options.getPage==='function')getPage=options.getPage;ensureUI();if(options.app)mount(options.app);return api;}

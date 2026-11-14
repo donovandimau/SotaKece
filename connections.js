@@ -139,7 +139,7 @@
     const listeners=[];let feed,lastUpdated=null,disposed=false;
     function on(el,event,fn){el.addEventListener(event,fn);listeners.push(()=>el.removeEventListener(event,fn));}
     const privacyCleanup=owner?window.SotaCircles?.mountPersonalSettings(q('[data-friend-privacy]')):null;
-    mounted={dispose(){disposed=true;feed?.stop();life?.dispose();privacyCleanup?.();listeners.forEach(fn=>fn());host.replaceChildren();}};
+    mounted={dispose(){disposed=true;feed?.stop();life?.dispose();privacyCleanup?.();listeners.forEach(fn=>fn());host.textContent='';}};
     on(q('[data-friend-sign-in]'),'click',signIn);
     if(!owner||!ctx.state.me)return;
     const snapshot={user:{id:owner},me:{...ctx.state.me}};
@@ -157,7 +157,7 @@
       q('[data-friend-status]').textContent=value==='current'?`Accepted friends updated ${time} · Checks every 15 seconds`:value==='loading'?'Checking your accepted friends…':value==='paused'?(offline?'Offline · Friend updates paused':'Friend updates paused'):value==='stale'?`Friends could not refresh · Last updated ${time}`:value==='auth-required'?'Sign in again to refresh your accepted friends.':'Friends could not load · Your device map is still available.';
       if(value==='auth-required'){
         // Clear this owner immediately, including personal device records in the visible UI.
-        life?.dispose();q('[data-life-map]').replaceChildren();
+        life?.dispose();q('[data-life-map]').textContent='';
         q('[data-friend-refresh]').hidden=true;q('[data-friend-sign-in]').hidden=false;
         q('[data-friend-warning]').hidden=true;privacyCleanup?.();
       }
@@ -271,7 +271,7 @@
     on(svg,'pointerdown',event=>{if(event.button!==0||event.target.closest('[data-select]'))return;drag={x:event.clientX,y:event.clientY,px:pan.x,py:pan.y};svg.setPointerCapture?.(event.pointerId);});
     on(svg,'pointermove',event=>{if(!drag)return;const rect=svg.getBoundingClientRect();if(!rect.width)return;pan={x:drag.px+(event.clientX-drag.x)*900/rect.width,y:drag.py+(event.clientY-drag.y)*620/rect.height};setCamera();});
     on(svg,'pointerup',()=>{drag=null;});on(svg,'pointercancel',()=>{drag=null;});
-    draw();return {dispose(){disposed=true;listeners.forEach(fn=>fn());host.replaceChildren();}};
+    draw();return {dispose(){disposed=true;listeners.forEach(fn=>fn());host.textContent='';}};
   }
   return {init,view,preview,openPersonal,entryHtml,mountEntry,stopEntry,signIn,stop,model,load,path,layout,friendPositions,example,mount,summaryRows};
 });

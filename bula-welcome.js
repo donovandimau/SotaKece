@@ -707,7 +707,7 @@
     var wasPicking=picking;stopPicking(false);
     if(!dialog.open){opener=wasPicking?launcher:document.activeElement;dialog.showModal();}
     dialog.style.setProperty('--dg-sky',sky||shade(title));
-    dialog.replaceChildren();
+    dialog.textContent='';
     var head=el('div',null,'dg-head'), h=el('h2',title);h.id='dg-title';head.appendChild(h);
     var x=el('button','×','dg-close');x.type='button';x.setAttribute('aria-label','Close help');x.onclick=close;head.appendChild(x);dialog.appendChild(head);
     var body=el('div',null,'dg-body');dialog.appendChild(body);dialog.scrollTop=0;x.focus();return body;
@@ -734,7 +734,7 @@
     var label=el('label','Find help on this page');label.htmlFor='dg-search';body.appendChild(label);
     search=el('input');search.id='dg-search';search.type='search';search.placeholder='Search a word, feature or field';body.appendChild(search);
     list=el('div',null,'dg-list');body.appendChild(list);
-    function render(){list.replaceChildren();var q=search.value.toLowerCase();var matches=items.filter(function(e){return (text(e)+' '+section(e)).toLowerCase().includes(q);});var page=0;
+    function render(){list.textContent='';var q=search.value.toLowerCase();var matches=items.filter(function(e){return (text(e)+' '+section(e)).toLowerCase().includes(q);});var page=0;
       function more(){var end=Math.min(page+40,matches.length);for(;page<end;page++){var e=matches[page],b=el('button',text(e),'dg-item');b.type='button';b.style.setProperty('--dg-sky',shades[page%shades.length]);b.appendChild(el('span',kind(e)+(section(e)?' · '+section(e):''),'dg-kind'));b.onclick=(function(target){return function(){showItem(target);};})(e);list.appendChild(b);}if(page<matches.length){var next=el('button','More topics ('+(matches.length-page)+')');next.type='button';next.onclick=function(){next.remove();more();};list.appendChild(next);}}
       if(!matches.length)list.appendChild(el('p','No matching items on this screen. Try a different word or use Explain anything.'));else more();
     }search.addEventListener('input',render);render();

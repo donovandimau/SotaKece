@@ -99,8 +99,8 @@ test('the member copy is rebuilt node by node from the allowed words, never pars
  assert.match(keep,/bw-pill/,'the Bula pill is added by its own script, not kept');
  // The app keeps the copy after Home renders and drops it on sign-out; the start-up auth event leaves the copy up.
  assert.match(html,/if\(S\.tab==='pulse'\)window\.SK\?\.keep\?\.\(S\.user\.id,me\.room_accent\|\|''\);/);
- assert.match(html,/if\(!window\.SK\?\.showing\?\.\(\)\)app\.replaceChildren\(\);if\(!next\)window\.SK\?\.forget\?\.\(\);/);
+ assert.match(html,/if\(!window\.SK\?\.showing\?\.\(\)\)app\.textContent='';if\(!next\)window\.SK\?\.forget\?\.\(\);/);
  assert.match(html,/function renderAuth\(mode="in"\)\{\n  viewRun\(\);window\.SK\?\.forget\?\.\(\);/);
  const s=html.slice(html.indexOf('</template>'));const guard=s.slice(0,s.indexOf('</script>'));
- assert.match(guard,/if\(SK\.member\)\{if\(!SK\.paint\(a\)\)a\.replaceChildren\(\);requestAnimationFrame/,'members: copy drawn, then everything loads at once');
+ assert.match(guard,/if\(SK\.member\)\{if\(!SK\.paint\(a\)\)a\.textContent='';requestAnimationFrame/,'members: copy drawn, then everything loads at once');
 });

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261113-v195-quiet">
+<meta name="sota-release" content="sota-kece-shell-20261114-v196-oldbrowsers">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -41,7 +41,7 @@
    copy straight away and the stylesheets and scripts load at once behind it; the app then draws the same thing over
    it. The copy is kept by SK.keep after Home has rendered, only when every element, attribute and class in it is in
    `mw` below (the build adds those words to the critical CSS), and SK.forget drops it when the member signs out. */
-window.SK=(function(d,w){var fp=false,css=[],later=[],started=false;var pre="/sota-styles.css?v=4717118a7bee /dimau-header-standard.js?v=20261029-header-v4 /dimau-install.js?v=20261103-glass-option-1 /dimau-premium-shell.js?v=20261109-shell-1 /sota-premium-shell.js?v=20261112-hubmap-1 /vendor/supabase-2.45.0.min.js /room-media.js?v=20261109-signed-links-1 /skin-identities.js?v=20261025-identity /pacific-themes.js?v=photo-themes-20261029 /skin-visuals.js?v=photo-themes-20261029 /skins.js?v=20261109-motion-room-1 /communications-core.js?v=20261109-fast-paint-1 /music-visualiser.js?v=20261105-live-lights-1 /hero-visualiser.js?v=20261027-spectrum-tidy-2 /playback.js?v=20261024-quality /music-badge.js?v=20261112-styles-1 /local-music.js?v=20261105-live-lights-1 /sota-share.js?v=20261105-completion-1 /music-playlist.js?v=20261110-music-tidy-1 /skin-discovery.js?v=20261104-authentic-displays-1 /room-atmosphere.js?v=20261025-1 /room-social-layout.js?v=20261026-live-panels /music-home.js?v=20261104-premium-worlds-1 /front-pages.js?v=20261109-fast-paint-1 /space-design.js?v=photo-themes-20261029 /sota-worlds.js?v=20261113-worlds-quiet /sota-experience.js?v=20261112-signout-1 /motion-engine.js?v=20261109-motion-room-1 /motion-room.js?v=20261109-motion-room-1 /skin-studio.js?v=20261111-media-hold-2 /offline.js?v=20261113-quiet-1 /kava.js /circle-types.js?v=photo-themes-20261029 /circle-groups.js?v=photo-themes-20261029 /kava-ui.js?v=20261028-preview-1 /dimau-charts-core.js?v=20261109-fast-paint-1 /dimau-visuals.js?v=20261024 /friend-feed.js?v=20261025-personal-graph /room-social.js?v=20261026-spatial-life-1 /profile-photos.js?v=20261027-ui-clarity-3 /life-graph3d.js?v=20261110-lazy-start-1 /life-connections.js?v=20261027-spectrum-tidy-2 /connections.js?v=20261026-spatial-life-1 /icon-controls.js?v=20261109-fast-paint-1 /gifts.js?v=20261030-gifts-1 /sota-lowdata.js?v=20261112-safety-1 /sota-safety.js?v=20261112-safety-1 /sota-plus.js?v=20261113-quickinvite-1 /sere-maker.js?v=20261112-signin-1 /sota-hubs.js?v=20261113-quickinvite-1 /sota-pulse.js?v=20261113-quickinvite-1 /sota-coins.js?v=20261110-coins-1 /sota-live.js?v=20261110-live-1 /sota-studio.js?v=20261110-studio-2 /sota-wellbeing.js?v=20261102-1 /sota-tour.js?v=20261111-tour-1 /sota-hub-map.js?v=20261112-hubmap-2 /sota-people-bubbles.js?v=20261112-bubbles-1 /sota-share-stats.js?v=20261112-sharestats-1 /sota-card-stack.js?v=20261112-cardstack-1 /sota-invites.js?v=20261113-quickinvite-2 /bula-welcome.js?v=20261030 /bula-top-20261030.js?v=20261110-fold-1 /hover-lights.js?v=20261110-hover-2 /sota-join-nudge.js?v=20261113-join-3 /dimau-pwa.js";
+window.SK=(function(d,w){var fp=false,css=[],later=[],started=false;var pre="/sota-styles.css?v=4717118a7bee /dimau-header-standard.js?v=20261029-header-v4 /dimau-install.js?v=20261103-glass-option-1 /dimau-premium-shell.js?v=20261109-shell-1 /sota-premium-shell.js?v=20261112-hubmap-1 /vendor/supabase-2.45.0.min.js /room-media.js?v=20261114-oldbrowsers-1 /skin-identities.js?v=20261025-identity /pacific-themes.js?v=photo-themes-20261029 /skin-visuals.js?v=photo-themes-20261029 /skins.js?v=20261109-motion-room-1 /communications-core.js?v=20261109-fast-paint-1 /music-visualiser.js?v=20261114-oldbrowsers-1 /hero-visualiser.js?v=20261027-spectrum-tidy-2 /playback.js?v=20261024-quality /music-badge.js?v=20261112-styles-1 /local-music.js?v=20261114-oldbrowsers-1 /sota-share.js?v=20261105-completion-1 /music-playlist.js?v=20261114-oldbrowsers-1 /skin-discovery.js?v=20261104-authentic-displays-1 /room-atmosphere.js?v=20261025-1 /room-social-layout.js?v=20261026-live-panels /music-home.js?v=20261104-premium-worlds-1 /front-pages.js?v=20261109-fast-paint-1 /space-design.js?v=20261114-oldbrowsers-1 /sota-worlds.js?v=20261113-worlds-quiet /sota-experience.js?v=20261112-signout-1 /motion-engine.js?v=20261109-motion-room-1 /motion-room.js?v=20261109-motion-room-1 /skin-studio.js?v=20261111-media-hold-2 /offline.js?v=20261113-quiet-1 /kava.js /circle-types.js?v=photo-themes-20261029 /circle-groups.js?v=20261114-oldbrowsers-1 /kava-ui.js?v=20261028-preview-1 /dimau-charts-core.js?v=20261114-oldbrowsers-1 /dimau-visuals.js?v=20261114-oldbrowsers-1 /friend-feed.js?v=20261025-personal-graph /room-social.js?v=20261114-oldbrowsers-1 /profile-photos.js?v=20261027-ui-clarity-3 /life-graph3d.js?v=20261114-oldbrowsers-1 /life-connections.js?v=20261114-oldbrowsers-1 /connections.js?v=20261114-oldbrowsers-1 /icon-controls.js?v=20261109-fast-paint-1 /gifts.js?v=20261030-gifts-1 /sota-lowdata.js?v=20261112-safety-1 /sota-safety.js?v=20261112-safety-1 /sota-plus.js?v=20261113-quickinvite-1 /sere-maker.js?v=20261112-signin-1 /sota-hubs.js?v=20261113-quickinvite-1 /sota-pulse.js?v=20261114-oldbrowsers-1 /sota-coins.js?v=20261110-coins-1 /sota-live.js?v=20261114-oldbrowsers-1 /sota-studio.js?v=20261110-studio-2 /sota-wellbeing.js?v=20261102-1 /sota-tour.js?v=20261111-tour-1 /sota-hub-map.js?v=20261112-hubmap-2 /sota-people-bubbles.js?v=20261112-bubbles-1 /sota-share-stats.js?v=20261112-sharestats-1 /sota-card-stack.js?v=20261112-cardstack-1 /sota-invites.js?v=20261113-quickinvite-2 /bula-welcome.js?v=20261114-oldbrowsers-1 /bula-top-20261030.js?v=20261110-fold-1 /hover-lights.js?v=20261110-hover-2 /sota-join-nudge.js?v=20261113-join-3 /dimau-pwa.js";
 var KEY='sk-member-paint',mw="a aside b button circle div h1 header i img main nav p path section small span svg #sota-header-menu #view .dimau-header-sr-only .glass .luvchip .sota-skip-link .ssd-hosted-launcher .ssd-launcher .sx-app .sx-brand .sx-button .sx-count .sx-design-entry .sx-design-label .sx-design-short .sx-eyebrow .sx-header-search .sx-member .sx-member-content .sx-member-world-heading .sx-menu-dimau .sx-mobile-brand .sx-music-badge .sx-music-note .sx-music-ring .sx-nav .sx-rail .sx-rail-bottom .sx-rail-caption .sx-top .sx-top-note .sx-utilities .sx-world-actions .sx-world-crumb .sx-world-hero .sx-world-hero-copy .sx-world-hero-slim .sx-world-member-tabs .sx-world-rail-links .sx-world-toolbar .top @alt @aria-controls @aria-current @aria-expanded @aria-haspopup @aria-hidden @aria-label @class @cx @cy @d @data-dimau-brand @data-dimau-endorsement @data-dimau-header @data-dimau-header-actions @data-dimau-header-bar @data-dimau-logo @data-dimau-logo-frame @data-dimau-menu-host @data-dimau-menu-panel @data-dimau-menu-toggle @data-dimau-music-slot @data-dimau-title @data-dps-nav @data-dps-search-open @data-dps-tab @data-front-page @data-sota-share @data-sx-design @data-sx-member @data-world-actions @data-world-description @data-world-label @data-world-member @data-world-page @data-world-tone @data-world-tool @data-world-visit @decoding @fill @height @hidden @href @id @loading @r @rel @src @stroke @stroke-linecap @stroke-linejoin @stroke-width @style @tabindex @target @title @type @viewbox @width",allow={},member=null,kept=0,copy=null,rel=(d.querySelector('meta[name="sota-release"]')||{}).content||'';
 mw.split(' ').forEach(function(x){allow[x]=1;});
 function phone(){return !!(w.matchMedia&&matchMedia('(max-width:760px)').matches);}
@@ -351,7 +351,7 @@ nav.bottom button.on{background:#fff;color:var(--accent);box-shadow:0 2px 10px r
 (function(){var d=document,go=function(){SK.go();};if(!window.SK||!SK.fp)return;try{var a=d.getElementById('app'),t=d.getElementById('sx-first-paint');
 if(!a||!t||a.firstElementChild)return setTimeout(go);
 /* A member with a kept copy of their Home: draw it, then load everything at once behind it. */
-if(SK.member){if(!SK.paint(a))a.replaceChildren();requestAnimationFrame(function(){setTimeout(go);});return;}
+if(SK.member){if(!SK.paint(a))a.textContent='';requestAnimationFrame(function(){setTimeout(go);});return;}
 d.documentElement.style.setProperty('--accent','#086779');d.body.classList.add('sx-enabled','sx-guest');a.className='bv-welcome sx-app';
 a.appendChild(t.content.cloneNode(true));
 var img=a.querySelector('.sx-hero-copy picture img')||a.querySelector('img[srcset]');
@@ -373,7 +373,7 @@ setTimeout(go,8000);}catch(e){setTimeout(go);}})();</script>
 </div>
 <!-- js-later
 <script src="/vendor/supabase-2.45.0.min.js"></script>
-<script src="/room-media.js?v=20261109-signed-links-1"></script>
+<script src="/room-media.js?v=20261114-oldbrowsers-1"></script>
 <script src="/skin-identities.js?v=20261025-identity"></script>
 <script src="/pacific-themes.js?v=photo-themes-20261029"></script>
 <script src="/skin-visuals.js?v=photo-themes-20261029"></script>
@@ -874,7 +874,7 @@ function installAuthLifecycle(){
     S.searchRevision=(S.searchRevision||0)+1;
     window.SotaCircles?.stop();window.SotaConnections?.stop();window.SotaKavaUI?.stop();window.SotaRoomSocial?.stop();window.SotaRoomSocialLayout?.stop();window.BulaSkinStudio?.closeForOwnerChange?.();
     // While the member's kept Home copy is still showing (the session read back at start-up), leave it up: boot draws over it.
-    if(!window.SK?.showing?.())app.replaceChildren();if(!next)window.SK?.forget?.();
+    if(!window.SK?.showing?.())app.textContent='';if(!next)window.SK?.forget?.();
     // Supabase work runs after its synchronous auth callback has returned.
     setTimeout(()=>{if(revision!==change)return;if(next)boot();else renderAuth();},0);
   });
@@ -1298,19 +1298,19 @@ window.go=go; window.openRoom=openRoom; window.renderAuth=renderAuth; window.sb=
 window.SotaView={invalidate:()=>viewRun()};
 </script><script>SK.run()</script>
 <!-- js-later
-<script src="/music-visualiser.js?v=20261105-live-lights-1"></script>
+<script src="/music-visualiser.js?v=20261114-oldbrowsers-1"></script>
 <script src="/hero-visualiser.js?v=20261027-spectrum-tidy-2"></script>
 <script src="/playback.js?v=20261024-quality"></script>
 <script src="/music-badge.js?v=20261112-styles-1"></script>
-<script src="/local-music.js?v=20261105-live-lights-1"></script>
+<script src="/local-music.js?v=20261114-oldbrowsers-1"></script>
 <script src="/sota-share.js?v=20261105-completion-1"></script>
-<script src="/music-playlist.js?v=20261110-music-tidy-1"></script>
+<script src="/music-playlist.js?v=20261114-oldbrowsers-1"></script>
 <script src="/skin-discovery.js?v=20261104-authentic-displays-1"></script>
 <script src="/room-atmosphere.js?v=20261025-1"></script>
 <script src="/room-social-layout.js?v=20261026-live-panels"></script>
 <script src="/music-home.js?v=20261104-premium-worlds-1"></script>
 <script src="/front-pages.js?v=20261109-fast-paint-1"></script>
-<script src="/space-design.js?v=photo-themes-20261029"></script>
+<script src="/space-design.js?v=20261114-oldbrowsers-1"></script>
 <script src="/sota-worlds.js?v=20261113-worlds-quiet"></script>
 <script src="/sota-experience.js?v=20261112-signout-1"></script>
 <script src="/motion-engine.js?v=20261109-motion-room-1"></script>
@@ -1318,20 +1318,20 @@ window.SotaView={invalidate:()=>viewRun()};
 <script src="/skin-studio.js?v=20261111-media-hold-2"></script>
 <script src="/offline.js?v=20261113-quiet-1"></script>
 <script src="/kava.js"></script>
-<script src="/circle-types.js?v=photo-themes-20261029"></script><script src="/circle-groups.js?v=photo-themes-20261029"></script><script src="/kava-ui.js?v=20261028-preview-1"></script>
-<script src="/dimau-charts-core.js?v=20261109-fast-paint-1"></script><script src="/dimau-visuals.js?v=20261024"></script>
+<script src="/circle-types.js?v=photo-themes-20261029"></script><script src="/circle-groups.js?v=20261114-oldbrowsers-1"></script><script src="/kava-ui.js?v=20261028-preview-1"></script>
+<script src="/dimau-charts-core.js?v=20261114-oldbrowsers-1"></script><script src="/dimau-visuals.js?v=20261114-oldbrowsers-1"></script>
 <script src="/friend-feed.js?v=20261025-personal-graph"></script>
-<script src="/room-social.js?v=20261026-spatial-life-1"></script>
+<script src="/room-social.js?v=20261114-oldbrowsers-1"></script>
 <script src="/profile-photos.js?v=20261027-ui-clarity-3"></script>
-<script src="/life-graph3d.js?v=20261110-lazy-start-1"></script>
-<script src="/life-connections.js?v=20261027-spectrum-tidy-2"></script>
-<script src="/connections.js?v=20261026-spatial-life-1"></script>
+<script src="/life-graph3d.js?v=20261114-oldbrowsers-1"></script>
+<script src="/life-connections.js?v=20261114-oldbrowsers-1"></script>
+<script src="/connections.js?v=20261114-oldbrowsers-1"></script>
 <script src="/icon-controls.js?v=20261109-fast-paint-1"></script>
-<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-lowdata.js?v=20261112-safety-1"></script><script src="/sota-safety.js?v=20261112-safety-1"></script><script src="/sota-plus.js?v=20261113-quickinvite-1"></script><script src="/sere-maker.js?v=20261112-signin-1"></script><script src="/sota-hubs.js?v=20261113-quickinvite-1"></script><script src="/sota-pulse.js?v=20261113-quickinvite-1"></script><script src="/sota-coins.js?v=20261110-coins-1"></script><script src="/sota-live.js?v=20261110-live-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script><script src="/sota-tour.js?v=20261111-tour-1"></script><script src="/sota-hub-map.js?v=20261112-hubmap-2"></script><script src="/sota-people-bubbles.js?v=20261112-bubbles-1"></script><script src="/sota-share-stats.js?v=20261112-sharestats-1"></script><script src="/sota-card-stack.js?v=20261112-cardstack-1"></script><script src="/sota-invites.js?v=20261113-quickinvite-2"></script>
+<script src="/gifts.js?v=20261030-gifts-1"></script><script src="/sota-lowdata.js?v=20261112-safety-1"></script><script src="/sota-safety.js?v=20261112-safety-1"></script><script src="/sota-plus.js?v=20261113-quickinvite-1"></script><script src="/sere-maker.js?v=20261112-signin-1"></script><script src="/sota-hubs.js?v=20261113-quickinvite-1"></script><script src="/sota-pulse.js?v=20261114-oldbrowsers-1"></script><script src="/sota-coins.js?v=20261110-coins-1"></script><script src="/sota-live.js?v=20261114-oldbrowsers-1"></script><script src="/sota-studio.js?v=20261110-studio-2"></script><script src="/sota-wellbeing.js?v=20261102-1"></script><script src="/sota-tour.js?v=20261111-tour-1"></script><script src="/sota-hub-map.js?v=20261112-hubmap-2"></script><script src="/sota-people-bubbles.js?v=20261112-bubbles-1"></script><script src="/sota-share-stats.js?v=20261112-sharestats-1"></script><script src="/sota-card-stack.js?v=20261112-cardstack-1"></script><script src="/sota-invites.js?v=20261113-quickinvite-2"></script>
 --><script>SK.js()</script>
 <script type="text/x-sk-later">window.SotaTour?.init({state:S,go:t=>go(t)});window.SotaLive?.init({client:sb,state:S,app,go:t=>go(t),openKoro:id=>{S.tab='crews';S.crew=id;history.pushState({sotaView:'crews'},'','#view=crews');render();}});window.SotaStudio?.init({getPage:()=>S.user?S.tab:null,go:t=>go(t),rerender:()=>render(),isOwnRoom:()=>!!S.user&&!!S.me&&S.tab==='room'&&(!S.roomHandle||S.roomHandle===S.me.handle)});window.SotaIconControls?.init();window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null,getPage:()=>S.user?S.tab:'profile'});window.SotaSpaceDesign?.mount(app);window.SotaProfilePhotos?.init({client:sb,state:S,app,auth:renderAuth,onSaved:()=>{if(S.tab==='room')viewRoom();}});window.SotaRoomSocial?.init({client:sb,state:S,app,auth:renderAuth,go});window.SotaCircles.init({client:sb,state:S,toast,auth:renderAuth,go,render,openRoom:openCircleMember,groupChanged:circleGroupChanged});window.SotaKavaUI.init({client:sb,state:S,shell,escape:esc,toast});window.SotaConnections.init({client:sb,state:S,shell,app,auth:renderAuth,home:boot,render,openRoom,go});window.addEventListener('hashchange',()=>window.SotaCircles.route());window.SotaExperience?.init({go,welcome:()=>{window.SotaKavaUI?.stop();renderAuth('in');}});window.SotaGifts?.init({client:sb,state:S,toast,app});window.SotaSere?.init({client:sb,state:S,toast,esc,go});window.SotaPlus?.init({client:sb,state:S,toast,render,openRoom,esc,ago,mediaMarkup,shell:b=>shell(b)});window.addEventListener('popstate',restoreMemberPage);window.addEventListener('hashchange',restoreMemberPage);boot();installAuthLifecycle();</script><script>SK.run()</script>
 <!-- js-later
-<script src="/bula-welcome.js?v=20261030" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
+<script src="/bula-welcome.js?v=20261114-oldbrowsers-1" data-app="sota-kece" data-mount="after:[data-dimau-header-bar]" defer></script>
 <script src="/bula-top-20261030.js?v=20261110-fold-1" defer></script>
 <script src="https://fijian-assistant-api.vercel.app/dimau-pay.js" data-product="sotakece-plus-30d" data-pill="Sota Kece Plus · FJ$9.90 / 30 days" data-blurb="Back the build of Fiji’s own social network. Plus perks land first for members; gifts and everything you use today stay free." defer></script>
 <script src="https://fijian-assistant-api.vercel.app/dimau-consistency.js" defer></script>

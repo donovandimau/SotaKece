@@ -144,9 +144,9 @@ catch(e){api.say(e.message||'Songs could not be saved. Check available device st
 });
 function chip(text,key,n){const c=btn('','sk-lib-chip',()=>setView(key));c.append(el('span',text),el('small',String(n)));c.setAttribute('aria-pressed',String(view===key));return c;}
 function draw(){
-bar.replaceChildren(chip('Island Mix','mix',api.catalogue().length),chip('My music','device',device.length),...lists.map(l=>chip(l.name,'pl:'+l.id,l.items.filter(byKey).length)));
+bar.textContent='';bar.append(chip('Island Mix','mix',api.catalogue().length),chip('My music','device',device.length),...lists.map(l=>chip(l.name,'pl:'+l.id,l.items.filter(byKey).length)));
 const add=btn('','sk-lib-chip sk-lib-new',()=>{form=form==='new'?'':'new';pendingAdd='';draw();});add.innerHTML=plus;add.append(el('span','New playlist'));add.setAttribute('aria-expanded',String(form==='new'));bar.append(add);
-tools.replaceChildren();const list=current();
+tools.textContent='';const list=current();
 if(form){
 const editing=form==='rename'?list:null,f=el('form','','sk-lib-form'),input=el('input');
 Object.assign(input,{type:'text',maxLength:60,required:true,placeholder:'Playlist name, e.g. Kava night',value:editing?.name||''});input.setAttribute('aria-label','Playlist name');
