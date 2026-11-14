@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261114-v196-oldbrowsers">
+<meta name="sota-release" content="sota-kece-shell-20261114-v197-signupfunnel">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -456,13 +456,21 @@ function renderAuth(mode="in"){
    finishRoom() to pick a handle; their name from Google/Facebook is pre-filled there. */
 async function oauthSignIn(provider){
   const err=$("#a-err"); if(err)err.textContent="";
-  const {error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+"/"}});
-  if(error&&err)err.textContent=/not enabled|unsupported/i.test(error.message)?"That sign-in is not switched on yet. Use email for now.":error.message;
+  /* One tap is enough: the trip to Google/Facebook takes a moment, so say so and stop repeat taps. */
+  const buttons=[...document.querySelectorAll(".social-btn")];buttons.forEach(b=>{b.disabled=true;b.setAttribute("aria-busy","true");});
+  if(err)err.textContent="Opening "+(provider==="google"?"Google":"Facebook")+"…";
+  window.SKFunnel("signup_provider",{provider});window.SKAuthPending(provider);
+  let error;try{({error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+"/"}}));}catch(e){error=e||Error("failed");}
+  if(error){buttons.forEach(b=>{b.disabled=false;b.removeAttribute("aria-busy");});window.SKAuthPending(null);
+    const off=/not enabled|unsupported/i.test(String(error.message||""));window.SKFunnel("signup_error",{provider,step:off?"provider_off":"provider"});
+    if(err)err.textContent=off?"That sign-in is not switched on yet. Use email for now.":String(error.message||"Could not open sign-in. Try again.");}
 }
 async function signIn(){
   const b=$("#a-go"); b.disabled=true; $("#a-err").textContent="";
+  window.SKFunnel("signup_provider",{provider:"email",mode:"in"});
   const {error} = await sb.auth.signInWithPassword({email:$("#a-email").value.trim(),password:$("#a-pass").value});
-  if(error){ $("#a-err").textContent=error.message; b.disabled=false; } else boot();
+  if(error){ $("#a-err").textContent=error.message; b.disabled=false; window.SKFunnel("signup_error",{provider:"email",step:"signin"}); }
+  else { window.SKFunnel("signup_signed_in",{provider:"email",new_account:0}); boot(); }
 }
 /* Age is worked out against TODAY. It used to be measured against a 2026
    written into the code, so from 1 January the sum was a year out and the
@@ -478,8 +486,10 @@ async function signUp(){
   if(!oldEnough(year)){ err.textContent="Sota Kece is for 16 and over."; b.disabled=false; return; }
   const {data:free, error:he} = await sb.rpc("bv_handle_free",{p_handle:handle});
   if(!he && free===false){ err.textContent="That handle is taken."; b.disabled=false; return; }
+  window.SKFunnel("signup_provider",{provider:"email",mode:"up"});
   const {data,error} = await sb.auth.signUp({email:$("#a-email").value.trim(),password:$("#a-pass").value});
-  if(error){ err.textContent=error.message; b.disabled=false; return; }
+  if(error){ err.textContent=error.message; b.disabled=false; window.SKFunnel("signup_error",{provider:"email",step:"signup"}); return; }
+  window.SKFunnel("signup_account_created",{provider:"email",confirm_email:data.session?0:1});
   const band = bandFor(year);
   if(!data.session){
     try{ localStorage.setItem("bv_pending", JSON.stringify({handle,name,band})); }catch(_){}
@@ -488,7 +498,7 @@ async function signUp(){
   }
   const {error:pe} = await sb.from("bv_profiles").insert({id:data.user.id,handle,display_name:name,age_band:band,...initialSkin()});
   if(pe){ err.textContent=pe.message; b.disabled=false; return; }
-  window.SKTrack("signup",{kind:"email"});window.SKEvent("lead",{kind:"signup"});
+  window.SKTrack("signup",{kind:"email"});window.SKEvent("lead",{kind:"signup"});window.SKFunnel("signup_space_setup",{via:"email"},true);
   await claimReferral();
   boot();
 }
@@ -1182,6 +1192,7 @@ async function boot(){
   if(!stillHere())return;
   if(!session){renderAuth('in',personal);if(circleRoute)window.SotaCircles?.route();return;}
   S.user = session.user;
+  window.SKAuthReturned?.(S.user);
   window.SotaSpaceDesign?.apply();
   if(run)run.user=S.user.id;
   if(publicGraphRoute){
@@ -1272,7 +1283,7 @@ function finishRoom(){
       age_band:bandFor(year),...initialSkin()});
     if(error){ err.textContent=error.message; b.disabled=false; return; }
     try{ localStorage.removeItem("bv_pending"); localStorage.setItem("sk-tour-pending","1"); }catch(_){}
-    window.SKTrack("signup",{kind:"room"});window.SKEvent("lead",{kind:"signup"});
+    window.SKTrack("signup",{kind:"room"});window.SKEvent("lead",{kind:"signup"});window.SKFunnel("signup_space_setup",{via:"room"},true);
     await claimReferral();
     boot();
   };
@@ -1294,6 +1305,25 @@ window.SKTrack=function(name,props,once){try{
 }catch(_){}};
 /* Conversion events (13 Nov 2026): through the shared beacon when it has run, otherwise straight to the spine. */
 window.SKEvent=function(name,props){try{if(window.dimau&&typeof window.dimau.track==="function")window.dimau.track(name,props);else window.SKTrack(name,props);}catch(_){}};
+/* Sign-up funnel (14 Nov 2026): signup_open -> signup_provider -> signup_signed_in / signup_account_created -> signup_space_setup,
+   plus signup_error. Each step goes to the event spine (SKEvent) and to the site analytics (dimauTrack) so the funnel
+   can be read beside the clicks. Only fixed words travel: the step, provider, mode and 0/1 flags. Never an email,
+   name, handle, user id or error text. A finished space also counts as the shared signup_complete goal. */
+window.SKFunnel=function(name,props,goal){try{props=props||{};window.SKEvent(name,props);
+  if(typeof window.dimauTrack==="function")window.dimauTrack(name,props);
+  if(goal&&typeof window.dimauGoal==="function")window.dimauGoal("signup_complete");}catch(_){}};
+/* Google/Facebook leave the page, so the provider is noted on this device for up to 30 minutes and read back
+   when the person returns signed in. */
+window.SKAuthPending=function(provider){try{if(provider)localStorage.setItem("sk-auth-pending",provider+"|"+Date.now());else localStorage.removeItem("sk-auth-pending");}catch(_){}};
+window.SKAuthReturned=function(user){try{const raw=localStorage.getItem("sk-auth-pending");if(!raw)return;localStorage.removeItem("sk-auth-pending");
+  const parts=raw.split("|"),provider=parts[0],at=+parts[1];if(!/^(google|facebook)$/.test(provider)||!(Date.now()-at<18e5))return;
+  const made=Date.parse(user&&user.created_at||""),fresh=made>0&&Date.now()-made<18e5?1:0;
+  window.SKFunnel("signup_signed_in",{provider,new_account:fresh});if(fresh)window.SKFunnel("signup_account_created",{provider});}catch(_){}};
+/* Back from the Google/Facebook page (browser back restores this page as it was): make the buttons usable again. */
+window.addEventListener("pageshow",e=>{if(!e.persisted)return;document.querySelectorAll(".social-btn[aria-busy]").forEach(b=>{b.disabled=false;b.removeAttribute("aria-busy");});
+  const m=document.getElementById("a-err");if(m&&/^Opening /.test(m.textContent))m.textContent="";});
+document.addEventListener("click",e=>{const t=e.target&&e.target.closest&&e.target.closest("#sk-sign-in,#sk-sign-up");
+  if(t)window.SKFunnel("signup_open",{mode:t.id==="sk-sign-up"?"up":"in"});},true);
 window.go=go; window.openRoom=openRoom; window.renderAuth=renderAuth; window.sb=sb;
 window.SotaView={invalidate:()=>viewRun()};
 </script><script>SK.run()</script>
