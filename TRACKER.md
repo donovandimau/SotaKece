@@ -1,3 +1,7 @@
+## 2026-11-14 — TRACKER merge prevention
+
+Added TRACKER.md merge=union while preserving other Git attributes. Git attribute resolution and a real concurrent-log merge pass. Application behavior is unchanged. Publication is tracked in this PR and Ops.
+
 # TRACKER — Sota Kece
 
 > **Every AI: read this whole file before you start any work on this project, and update it before you finish — in the same commit as your work.**
@@ -23,7 +27,6 @@
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-14 | Codex | TRACKER merge conflict prevention | agent/codex/tracker-merge-prevention-sotakece/1 |
 
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
