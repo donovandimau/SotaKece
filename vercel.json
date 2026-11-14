@@ -19,6 +19,7 @@
       "src": "/(.*)",
       "headers": {
         "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "frame-ancestors 'self' https://*.dimau-fintech.com https://dimau-ops.vercel.app https://sotakece.com https://*.sotakece.com",
         "Referrer-Policy": "strict-origin-when-cross-origin"
       },
       "continue": true
