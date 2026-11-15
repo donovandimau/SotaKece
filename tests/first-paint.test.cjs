@@ -16,6 +16,13 @@ test('first-paint copy carries the welcome exactly as sota-experience.js renders
  assert.ok(!/bw-pill/.test(tpl),'Bula pill is added by its own script, not copied');
  assert.ok(!/ id="sk-sign-(in|up)"/.test(tpl),'no duplicate account button ids');
 });
+test('first-paint side rail carries the "Make it yours" links exactly as sota-worlds.js draws them',()=>{
+ // A stale copy (two old Studio/Skins buttons where the app draws one) made the rail bottom jump on computers.
+ const drawn=(read('sota-worlds.js').match(/links\.className='sx-world-rail-links';[^`]*`([^`]*)`/)||[])[1];
+ const copied=(tpl.match(/<nav class="sx-world-rail-links" aria-label="Create and explore">([\s\S]*?)<\/nav>/)||[])[1];
+ assert.ok(drawn&&copied,'rail links found in both');
+ assert.equal(copied.replace(/&amp;/g,'&'),drawn);
+});
 test('first-paint copy shows for signed-out visitors on Home, any screen',()=>{
  const sk=html.slice(html.indexOf('window.SK='),html.indexOf('</script>',html.indexOf('window.SK=')));
  assert.match(sk,/matchMedia\('\(max-width:760px\)'\)/);

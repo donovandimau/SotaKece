@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds the combined stylesheets index.html loads, so the page waits for two style files instead of 43,
-// the critical CSS a phone guest's first screen needs, and the preload list for the scripts the page holds back.
+// the critical CSS a guest's first screen needs (phones and computers), and the preload list for the scripts the page holds back.
 //
 // The source of truth stays in the separate .css files and in index.html. Each bundle is declared there as
 //
@@ -17,8 +17,9 @@
 // that could match the first screen: a rule is kept when the classes, ids, attribute names and element names
 // its selector needs (outside :not(), :is(), :has() and the like) all appear in the markup of <body> (the
 // first-paint template included), plus the classes the first-paint script adds, plus the words in `mw` in the SK
-// script: what a signed-in member's kept copy of their Home may be made of (SK.member, same first-paint path). Media blocks no phone can
-// match (min-width above 760px, print) are dropped; @font-face, @keyframes and @layer order are kept.
+// script: what a signed-in member's kept copy of their Home may be made of (SK.member, same first-paint path). Print media blocks
+// are dropped; every screen media block is kept, phone and computer alike, since guests on computers take the
+// same first-paint path (12 Nov 2026) and a missing desktop rule moves the page when the bundle arrives; @font-face, @keyframes and @layer order are kept.
 //
 // Scripts are listed the same way, in <!-- js-later ... --><script>SK.js()</script> blocks (and inline ones as
 // <script type="text/x-sk-later">...</script><script>SK.run()</script>): SK writes them in place for everyone
@@ -209,23 +210,20 @@ function vocabulary(html) {
   return words;
 }
 
-// True unless every query in the @media list needs a screen wider than 760px, or print.
-function phoneMedia(prelude) {
-  return prelude.replace(/^@media\s*/i, '').split(',').some(q => {
-    if (/^\s*(print|not\s+all)\b/i.test(q)) return false;
-    const m = /min-width\s*:\s*([\d.]+)px/i.exec(q);
-    return !(m && +m[1] > 760);
-  });
+// True unless every query in the @media list is print-only. Wide-screen queries are kept: computers paint the
+// guest welcome from the critical CSS too, and dropping them shifted the desktop layout when the bundle arrived.
+function screenMedia(prelude) {
+  return prelude.replace(/^@media\s*/i, '').split(',').some(q => !/^\s*(print|not\s+all)\b/i.test(q));
 }
 
-// The rules of a bundle that could style a phone guest's first screen, in their original order.
+// The rules of a bundle that could style a guest's first screen, in their original order.
 function critical(css, words) {
   let out = '';
   for (const it of items(css)) {
     if (it.body === null) { if (/^@layer\b/i.test(it.prelude)) out += it.prelude + ';'; continue; }
     if (it.prelude[0] === '@') {
       const name = /^@([\w-]+)/.exec(it.prelude)[1].toLowerCase();
-      if (name === 'media' && !phoneMedia(it.prelude)) continue;
+      if (name === 'media' && !screenMedia(it.prelude)) continue;
       if (name === 'media' || name === 'supports' || name === 'layer' || name === 'container') {
         const inner = critical(it.body, words);
         if (inner) out += it.prelude + '{' + inner + '}';
