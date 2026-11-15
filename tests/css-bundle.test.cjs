@@ -46,9 +46,12 @@ test('critical CSS keeps every rule the first screen could use, and only those',
   assert.deepEqual(needs(':is(.a,.b) .c svg'),['.c','svg']);
   assert.deepEqual(needs('.md\\:flex'),['.md:flex']);
   const words=new Set(['body','.a','@data-x','svg']);
-  assert.equal(critical('@layer l{.a{color:red}.b{color:blue}}@layer m{.b{x:1}}@media (min-width:900px){.a{x:2}}@media (max-width:760px){[data-x] svg{x:3}.zz{x:4}}@font-face{font-family:f}@keyframes k{to{x:5}}*{box-sizing:border-box}.a,.q{x:6}',words),
-    '@layer l{.a{color:red}}@layer m;@media (max-width:760px){[data-x] svg{x:3}}@font-face{font-family:f}@keyframes k{to{x:5}}*{box-sizing:border-box}.a,.q{x:6}');
+  assert.equal(critical('@layer l{.a{color:red}.b{color:blue}}@layer m{.b{x:1}}@media (min-width:900px){.a{x:2}}@media (max-width:760px){[data-x] svg{x:3}.zz{x:4}}@media print{.a{x:7}}@font-face{font-family:f}@keyframes k{to{x:5}}*{box-sizing:border-box}.a,.q{x:6}',words),
+    '@layer l{.a{color:red}}@layer m;@media (min-width:900px){.a{x:2}}@media (max-width:760px){[data-x] svg{x:3}}@font-face{font-family:f}@keyframes k{to{x:5}}*{box-sizing:border-box}.a,.q{x:6}');
+  // Computers take the first-paint path too (12 Nov 2026), so wide-screen rules stay in: without them the desktop
+  // welcome was drawn with phone spacing and jumped when the bundle arrived (layout shift, 15 Nov 2026).
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8'),v=vocabulary(html);
+  assert(html.includes('@media(min-width:761px){body.sx-enabled #app.sx-app .sx-hero h1{font-size:44px;line-height:1.15}'),'the desktop welcome title rule is in the critical CSS');
   for(const w of ['.sx-hero-copy','.sx-top','@data-dps-nav','.sx-enabled','.bv-welcome','picture','.dps-fab'])assert(v.has(w),w+' is part of the first screen');
   assert(!v.has('.tw-wrap'),'scripts and comments are not part of the first screen');
   // A signed-in member's kept Home copy may only use the words in mw, so every one of them is part of the first screen.
