@@ -182,9 +182,13 @@
   .tw-bar .tw-btn.tw-phone-only[data-tw]{display:inline-grid!important}
   /* Composer: avatar, words, 🎤 and ＋ on one line; the five make buttons live in the ＋ sheet. */
   .tw-compose[data-tw-form="post"]>.tw-make,.tw-compose[data-tw-form="post"]>.tw-quick{display:none}
-  .tw-compose[data-tw-form="post"]{padding:8px 10px;gap:6px}
-  .tw-compose[data-tw-form="post"] .tw-compose-row{align-items:center}
-  .tw-compose[data-tw-form="post"] textarea{min-height:40px;padding:8px 0}
+  /* The member page gives every .card 20px padding; the one-line post box needs that room for words. */
+  .tw-compose[data-tw-form="post"],.sx-enabled .sx-member-content:not(.bv-room) .tw-compose.card[data-tw-form="post"]{padding:8px 10px;gap:6px}
+  .tw-compose[data-tw-form="post"] .tw-compose-row{align-items:center;gap:8px}
+  /* On a phone the words need the avatar's space more than the box needs your own face. */
+  .tw-compose[data-tw-form="post"] .tw-compose-row>.av{display:none}
+  .tw-compose[data-tw-form="post"] textarea{min-width:0;min-height:40px;padding:8px 4px}
+  .tw-compose[data-tw-form="post"] textarea::placeholder{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tw-create-sere,.tw-create-open{flex:none;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;font:inherit;font-size:19px;line-height:1;cursor:pointer}
   .tw-create-sere{border:0;background:var(--accent);color:#fff}
   .tw-create-open{border:1px solid var(--line-hard,var(--line));background:transparent;color:inherit;font-size:22px}
