@@ -10,7 +10,7 @@
     profile:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio',sere:true},
     skins:{label:'Skins & Room Studio',title:'Your space. Your choice.',line:'Browse colours, artwork and layouts, or create your own.',tone:'sun',photo:null,action:'Browse every skin',tool:'skins'},
     world:{label:'3D world',title:'Every connection has a story.',line:'Explore your people and places from a different perspective.',tone:'lime',photo:null,action:'Explore the map',focus:'#sota-connections'},
-    pulse:{label:'Your feed',title:'A little closer, every day.',line:'Catch up with your people. Share a thought. Start a conversation.',tone:'rose',photo:null,slim:true},
+    pulse:{label:'Your feed',title:'A little closer, every day.',line:'Catch up with your people. Share a thought. Start a conversation.',tone:'rose',photo:photos.social,action:'Share a moment',member:'moments',sere:true},
     moments:{label:'Moments',title:'Little moments. Yours to keep.',line:'The good days, everyday stories and memories worth sharing.',tone:'sun',photo:null,action:'Share a moment',focus:'#m-body'},
     friends:{label:'Friends',title:'Good people. Great connections.',line:'Keep your circle close. Find a mate, visit a room and catch up.',tone:'rose',photo:photos.social,action:'Find a friend',focus:'#s-q'},
     room:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',photo:photos.space,action:'Open Room Studio',tool:'studio',sere:true},

@@ -7,8 +7,8 @@ const worlds=read('sota-worlds.js'),css=read('sota-worlds.css'),studio=read('ski
 
 test('heroes carry at most one primary action; Home has none because its composer is the starting point',()=>{
   assert.match(worlds,/class="sx-world-secondary sx-world-sere" data-world-sere="1"/);
-  // 10 Nov 2026: the Home banner is a slim greeting. Voice and music still lead on Home, in the composer below it.
-  assert.match(worlds,/pulse:\{[^}]*slim:true\}/);
+  // 15 Nov 2026: Donovan brought back the Home picture banner; Share a moment leads, the singing photo is the quiet button.
+  assert.match(worlds,/pulse:\{[^}]*photo:photos\.social,action:'Share a moment',member:'moments',sere:true\}/);
   assert.doesNotMatch(worlds,/sereFirst/);
   assert.match(worlds,/function action\(w\)\{return w\.compact\|\|w\.slim\?'':/);
   assert.match(fs.readFileSync(path.join(__dirname,'..','sota-pulse.js'),'utf8'),/class="tw-make-main tw-sere-open" data-tw="sere"/);
