@@ -27,7 +27,8 @@
         '<header class="sk-group-head"><h2 id="sk-group-' + g.key + '">' + g.title + '</h2><p>' + g.line + '</p></header>' +
         '<div class="sk-group-body"></div>' + (g.key === 'yours' ? YOURS : '') + '</section>';
     }).join('');
-    view.appendChild(box);
+    var w = view.querySelector(':scope > .tw-wrap');
+    if (w) view.insertBefore(box, w); else view.appendChild(box);
     return box;
   }
   function put(box, key, node) {
@@ -39,7 +40,10 @@
     var view = app.querySelector('#view');
     if (!view || !view.querySelector('.tw-wrap')) return;
     var box = side(view);
-    if (box !== view.lastElementChild) view.appendChild(box);
+    // Talanoa sits at the foot of Home (owner, 15 Nov 2026): the groups go just above the wall.
+    var wall = view.querySelector(':scope > .tw-wrap');
+    if (wall && box.nextElementSibling !== wall) view.insertBefore(box, wall);
+    if (wall && wall !== view.lastElementChild) view.appendChild(wall);
     // Music: the music visuals card, then today's island songs from the wall's foot.
     put(box, 'music', view.querySelector(':scope > .sx-home-listen'));
     var viti = view.querySelector('.tw-wrap .tw-viti');

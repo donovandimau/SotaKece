@@ -543,9 +543,9 @@ body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-hero-slim .sx-worl
 }
 @media(min-width:1360px){
  body.sx-member #app.sx-app[data-world-page="pulse"] #view.sx-member-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,400px);column-gap:28px;align-items:start;align-content:start}
- body.sx-member #app.sx-app[data-world-page="pulse"] #view>*{grid-column:2;min-width:0}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>*{grid-column:auto;min-width:0}
  body.sx-member #app.sx-app[data-world-page="pulse"] #view>:is(.sx-world-member-tabs,.sx-member-world-heading,.view-error,.empty){grid-column:1/-1}
- body.sx-member #app.sx-app[data-world-page="pulse"] #view>.tw-wrap{grid-column:1;grid-row:3/span 12;width:100%;max-width:880px;margin:0}
+ body.sx-member #app.sx-app[data-world-page="pulse"] #view>.tw-wrap{grid-column:1/-1;grid-row:auto;width:100%;max-width:none;margin:18px 0 0}
  body.sx-member #app.sx-app[data-world-page="pulse"] #view>:is(.sx-home-listen,.sota-social-host,.sota-hubs,[class*="hubs"]){margin:0 0 18px}
  body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sota-social-host{display:grid;grid-template-columns:minmax(0,1fr)!important;gap:14px}
 }
@@ -598,6 +598,6 @@ body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-toolbar [data-worl
 #app.sx-app .sk-group-actions button{min-height:48px;padding:8px 12px;border-radius:14px;border:1px solid rgba(23,62,73,.16);background:#fff;color:var(--world-dark,#173e4b);font:inherit;font-size:14px;font-weight:700;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px}
 #app.sx-app .sk-group-actions button:hover{border-color:var(--world-accent,#086779)}
 #app.sx-app .sk-group-actions button:focus-visible{outline:3px solid var(--world-accent,#086779);outline-offset:2px}
-@media(min-width:1360px){body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side{grid-column:2;grid-row:3/span 12;margin-top:0}}
+@media(min-width:1101px){body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side{grid-column:1/-1;grid-row:auto;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}}
 @media(max-width:400px){#app.sx-app .sk-group-actions{grid-template-columns:1fr}}
 @media(forced-colors:active){#app.sx-app .sk-group,#app.sx-app .sk-group-actions button{background:Canvas;color:CanvasText;border-color:CanvasText}}

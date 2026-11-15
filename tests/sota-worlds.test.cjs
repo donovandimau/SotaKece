@@ -132,11 +132,13 @@ browserTest('Koro choices use native group type and naming controls',t=>{
    assert.equal(h.get('[data-tc-name]').value,'');
  }
 });
-test('wide desktops use the room beside the rail, and Home docks its side blocks next to the wall',()=>{
+test('wide desktops use the room beside the rail, and Home puts Talanoa full width at the foot',()=>{
  const css=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','sota-worlds.css'),'utf8');
  assert.match(css,/@media\(min-width:1101px\)\{\s*body\.sx-member #app\.sx-app \.sx-member-content\{max-width:1560px;/);
  assert.match(css,/@media\(min-width:1360px\)\{\s*body\.sx-member #app\.sx-app\[data-world-page="pulse"\] #view\.sx-member-content\{display:grid;grid-template-columns:minmax\(0,1fr\) minmax\(320px,400px\)/);
- assert.match(css,/#view>\.tw-wrap\{grid-column:1;grid-row:3\/span 12;/);
+ assert.match(css,/#view>\.tw-wrap\{grid-column:1\/-1;grid-row:auto;/);
+ const html=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','index.html'),'utf8');
+ assert.match(html,/const wall=view\.querySelector\(':scope > \.tw-wrap'\);if\(wall\)view\.appendChild\(wall\);/,'Talanoa is moved under every other Home panel');
 });
 test('the welcome button greets for three seconds, then folds to its short form and never stays floating over the page',()=>{
  const src=require('node:fs').readFileSync(require('node:path').join(__dirname,'..','bula-top-20261030.js'),'utf8');
