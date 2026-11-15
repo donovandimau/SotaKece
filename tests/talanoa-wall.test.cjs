@@ -293,5 +293,5 @@ test('phone wall CSS: secondary actions and the five make buttons hide only on n
   const css=fs.readFileSync(path.join(root,'sota-pulse.css'),'utf8');
   const phone=css.slice(css.lastIndexOf('@media(max-width:760px)'));
   assert.ok(css.includes('.tw-phone-only,.tw-bar .tw-btn.tw-phone-only[data-tw]{display:none!important}'),'hidden by default on wide screens, even against the labelled-bar rule');
-  for(const rule of ['.tw-bar .tw-btn.tw-phone-only[data-tw]{display:inline-grid!important}','.tw-bar .tw-btn.tw-sec[data-tw]{display:none!important}','>.tw-make,','>.tw-quick{display:none}','.sx-world-toolbar{display:none}'])assert.ok(phone.includes(rule),rule);
+  for(const rule of ['.tw-bar .tw-btn.tw-phone-only[data-tw]{display:inline-grid!important}','.tw-bar .tw-btn.tw-sec[data-tw]{display:none!important}','>.tw-make,','>.tw-quick{display:none}','.sx-world-toolbar{display:none}','.sx-enabled .sx-member-content:not(.bv-room) .tw-compose.card[data-tw-form="post"]{padding:8px 10px','.tw-compose-row>.av{display:none}','textarea::placeholder{white-space:nowrap'])assert.ok(phone.includes(rule),rule);
 });
