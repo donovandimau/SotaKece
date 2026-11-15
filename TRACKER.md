@@ -28,6 +28,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
 
+| 2026-11-15 | Claude | IndexNow: shared public key file at the site root, then send every sitemap page to Bing/Yandex/Seznam (Ops task 1184) | agent/claude/indexnow-add-the-shared-key-file-and-submit-the-sitemap/1 |
 ## Ideas from the old sota-kece skins demo (not started — need Donovan's design approval)
 The separate `sota-kece` demo repo was reviewed on 7 Nov 2026 and archived. Its 8 skins (generic neon/pop colours, one in Comic Sans) were not brought over: the Skin Studio here already has about 70 Fiji-first skins and they would clash with the premium look. Two features it had that the studio here does not:
 - **Surprise me**: one tap picks a random skin that still passes the contrast check
