@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Talanoa wall on a phone (preview)</title>
+<!-- Local preview only: the real wall code and stylesheets with sample posts and no network. -->
+<link rel="stylesheet" href="/sota-styles-head.css">
+<link rel="stylesheet" href="/sota-styles.css">
+</head>
+<body>
+<div id="app"><main id="view"></main></div>
+<script>window.SotaSere = { open: function (o) { alert('Sere maker: ' + JSON.stringify(o || {})); }, tip: function () {} };</script>
+<script src="/sota-pulse.js"></script>
+<script>
+(function () {
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var t = Date.now();
+  var rows = [
+    { id: 3, author: 'u-dimau', handle: 'dimau', display_name: 'Dimau', avatar_emoji: '🌺', accent: '#E8456B', body: '🎤 Sere', created_at: new Date(t - 5 * 864e5).toISOString(), like_count: 4, reply_count: 1, repost_count: 0, sere: { id: 's1', tips: 2 } },
+    { id: 2, author: 'u-ana', handle: 'ana', display_name: 'Ana', avatar_emoji: '🥥', accent: '#2A9D8F', body: 'Bula from Brisbane! Who is around for the lovo on Saturday?', created_at: new Date(t - 36e5).toISOString(), like_count: 2, reply_count: 3, repost_count: 1 },
+    { id: 1, author: 'u-me', handle: 'me', display_name: 'You', avatar_emoji: '🌴', accent: '#4FA8D8', body: 'First post on the wall 🙌', created_at: new Date(t - 6e5).toISOString(), like_count: 0, reply_count: 0, repost_count: 0, mine: true }
+  ];
+  var channel = { on: function () { return channel; }, subscribe: function () { return channel; } };
+  var client = { channel: function () { return channel; }, removeChannel: function () {}, rpc: async function (name, a) {
+    if (name === 'bv_talanoa_feed') return { data: a && (a.p_post_id || a.p_reply_to || a.p_since || a.p_cursor_id) ? [] : rows, error: null };
+    if (name === 'bv_talanoa_repost') return { data: { reposted: true, repost_count: 2 }, error: null };
+    if (name === 'bv_talanoa_like') return { data: { liked: true, like_count: 5 }, error: null };
+    return { data: [], error: null };
+  } };
+  window.SotaPulse.init({ client: client, state: { user: { id: 'u-me' }, me: { display_name: 'You', avatar_emoji: '🌴' }, tab: 'pulse' }, toast: function (m) { console.log('toast', m); }, esc: esc, ago: function () { return '5d'; }, openRoom: function () {}, shell: function (h) { document.getElementById('view').innerHTML = h; } });
+  window.SotaPulse.view();
+})();
+</script>
+</body>
+</html>

@@ -240,3 +240,58 @@ test('index.html hands the Pulse tab to the wall, keeps the Spark, stops the wal
   assert.match(sw,/ON_DEMAND=\['\/sota-pulse\.js','\/sota-pulse\.css'/);
   const release=/<meta name="sota-release" content="([^"]+)">/.exec(html)[1];assert.match(sw,new RegExp("const CACHE='"+release+"';"),'page and worker name the same release');
 });
+
+test('phone wall: posts keep four actions in view and put the rest in a sheet that presses the real buttons',{skip:!JSDOM},async()=>{
+  const rows=[post(1,{repost_count:2}),post(2,{mine:true,author:'u-ana',handle:'ana'})];
+  const {w,calls}=boot(feed(rows));
+  await w.SotaPulse.view();await flush();
+  const d=w.document,card=d.querySelector('.tw-post[data-id="1"]');
+  // Secondary actions are marked for the phone sheet; the visible four are reply, like, share and the menu.
+  const sec=[...card.querySelectorAll('.tw-bar .tw-sec')].map(b=>b.dataset.tw);
+  assert.deepEqual(sec,['repost','quote','more']);
+  assert.ok(card.querySelector('.tw-phone-more[data-tw="post-menu"][aria-haspopup="dialog"]'));
+  const menuBtn=card.querySelector('[data-tw="post-menu"]');menuBtn.focus();menuBtn.click();
+  let sheet=d.querySelector('.tw-sheet[role="dialog"][aria-modal="true"]');
+  assert.ok(sheet,'sheet opens');
+  assert.deepEqual([...sheet.querySelectorAll('.tw-sheet-item b')].map(b=>b.textContent),['Repost','Quote in your own post','Report or block']);
+  assert.equal(d.activeElement,sheet.querySelector('.tw-sheet-item'),'focus moves into the sheet');
+  sheet.querySelector('.tw-sheet-item').click();await flush();
+  assert.ok(!d.querySelector('.tw-sheet-layer'),'sheet closes after a choice');
+  assert.ok(calls.some(c=>c.name==='bv_talanoa_repost'&&c.args.p_id===1),'the real repost ran');
+  assert.ok(card.querySelector('[data-tw="repost"]').classList.contains('on'));
+  // Own post: remove sits in the sheet, marked as the dangerous one. Escape closes and returns focus.
+  const mine=d.querySelector('.tw-post[data-id="2"] [data-tw="post-menu"]');mine.focus();mine.click();
+  sheet=d.querySelector('.tw-sheet');
+  assert.ok(sheet.querySelector('.tw-sheet-item.danger'),'remove is flagged');
+  assert.match(sheet.textContent,/Remove your post/);
+  sheet.querySelector('.tw-sheet-item').dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  assert.ok(!d.querySelector('.tw-sheet-layer'));assert.equal(d.activeElement,mine,'focus returns to the opener');
+  // Sere posts show "Sing it" in the visible row.
+  const P=w.SotaPulse;
+  assert.match(P.card(post(3,{sere:{id:'s1',tips:0}})),/class="tw-btn tw-remix" data-tw="remix"[^>]*aria-label="Sing it: remix this sound with your photo">🎤</);
+});
+
+test('phone composer: one line with ＋ opening every way to share; the sheet uses the composer\'s own buttons',{skip:!JSDOM},async()=>{
+  const {w}=boot(feed([post(1)]));
+  await w.SotaPulse.view();await flush();
+  const d=w.document,form=d.querySelector('[data-tw-form="post"]');
+  assert.ok(form.querySelector('.tw-compose-row .tw-create-open.tw-phone-only[data-tw="create"]'));
+  form.querySelector('[data-tw="create"]').click();
+  const items=[...d.querySelectorAll('.tw-sheet-item b')].map(b=>b.textContent);
+  assert.ok(items.includes('Drop a moment')&&items.includes('Share a track'),items.join(','));
+  const track=[...d.querySelectorAll('.tw-sheet-item')].find(b=>/Share a track/.test(b.textContent));
+  track.click();await flush();
+  assert.equal(d.querySelector('#tw-track-pick').hidden,false,'the track picker opens, as from the original button');
+  assert.ok(!d.querySelector('.tw-sheet-layer'));
+  // Replies never get the create buttons; leaving the wall closes any open sheet.
+  assert.doesNotMatch(w.SotaPulse.composer?w.SotaPulse.composer({replyTo:1}):'' ,/tw-create-open/);
+  form.querySelector('[data-tw="create"]').click();assert.ok(d.querySelector('.tw-sheet-layer'));
+  w.SotaPulse.stop();assert.ok(!d.querySelector('.tw-sheet-layer'));
+});
+
+test('phone wall CSS: secondary actions and the five make buttons hide only on narrow screens',()=>{
+  const css=fs.readFileSync(path.join(root,'sota-pulse.css'),'utf8');
+  const phone=css.slice(css.lastIndexOf('@media(max-width:760px)'));
+  assert.ok(css.includes('.tw-phone-only,.tw-bar .tw-btn.tw-phone-only[data-tw]{display:none!important}'),'hidden by default on wide screens, even against the labelled-bar rule');
+  for(const rule of ['.tw-bar .tw-btn.tw-phone-only[data-tw]{display:inline-grid!important}','.tw-bar .tw-btn.tw-sec[data-tw]{display:none!important}','>.tw-make,','>.tw-quick{display:none}','.sx-world-toolbar{display:none}'])assert.ok(phone.includes(rule),rule);
+});

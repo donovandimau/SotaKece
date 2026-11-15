@@ -266,15 +266,17 @@
         voiceBox(p.voice) +
         '<div class="tw-bar">' +
           '<button type="button" class="tw-btn" data-tw="reply" data-id="' + p.id + '" aria-label="Reply, ' + replies + '">💬<b data-count="reply">' + (replies || '') + '</b></button>' +
-          '<button type="button" class="tw-btn tw-repost' + (p.i_reposted ? ' on' : '') + '" data-tw="repost" data-id="' + p.id + '" aria-pressed="' + (p.i_reposted ? 'true' : 'false') + '" aria-label="Repost, ' + reposts + '">🔁<b data-count="repost">' + (reposts || '') + '</b></button>' +
+          '<button type="button" class="tw-btn tw-repost tw-sec' + (p.i_reposted ? ' on' : '') + '" data-tw="repost" data-id="' + p.id + '" aria-pressed="' + (p.i_reposted ? 'true' : 'false') + '" aria-label="Repost, ' + reposts + '">🔁<b data-count="repost">' + (reposts || '') + '</b></button>' +
           '<button type="button" class="tw-btn tw-like' + (p.i_liked ? ' on' : '') + '" data-tw="like" data-id="' + p.id + '" aria-pressed="' + (p.i_liked ? 'true' : 'false') + '" aria-label="Like, ' + likes + '">' + (p.i_liked ? '♥' : '♡') + '<b data-count="like">' + (likes || '') + '</b></button>' +
-          '<button type="button" class="tw-btn" data-tw="quote" data-id="' + p.id + '" aria-label="Quote">❝</button>' +
+          '<button type="button" class="tw-btn tw-sec" data-tw="quote" data-id="' + p.id + '" aria-label="Quote">❝</button>' +
+          (sr ? '<button type="button" class="tw-btn tw-remix" data-tw="remix" data-id="' + esc(sr.id) + '" aria-label="Sing it: remix this sound with your photo">🎤</button>' : '') +
           '<button type="button" class="tw-btn" data-tw="share" data-id="' + p.id + '" aria-label="Share">↗</button>' +
-          (sr && !p.mine ? '<button type="button" class="tw-btn" data-tw="tip" data-id="' + esc(sr.id) + '" aria-label="Tip the maker, ' + num(sr.tips) + '">🎁<b>' + (num(sr.tips) || '') + '</b></button>' : '') +
-          (sr ? '<button type="button" class="tw-btn" data-tw="remix" data-id="' + esc(sr.id) + '" aria-label="Remix this sound with your photo">🎤</button>' : '') +
+          (sr && !p.mine ? '<button type="button" class="tw-btn tw-sec" data-tw="tip" data-id="' + esc(sr.id) + '" aria-label="Tip the maker, ' + num(sr.tips) + '">🎁<b>' + (num(sr.tips) || '') + '</b></button>' : '') +
           coinButton(p) +
-          (p.mine ? '<button type="button" class="tw-btn tw-del" data-tw="del" data-id="' + p.id + '" aria-label="Remove your post">✕</button>'
-                  : '<button type="button" class="tw-btn tw-more" data-tw="more" data-id="' + p.id + '" data-author="' + esc(p.author) + '" data-handle="' + esc(p.handle) + '" aria-label="Report or block">⋯</button>') +
+          (p.mine ? '<button type="button" class="tw-btn tw-del tw-sec" data-tw="del" data-id="' + p.id + '" aria-label="Remove your post">✕</button>'
+                  : '<button type="button" class="tw-btn tw-more tw-sec" data-tw="more" data-id="' + p.id + '" data-author="' + esc(p.author) + '" data-handle="' + esc(p.handle) + '" aria-label="Report or block">⋯</button>') +
+          // Phones show four actions; this opens a sheet holding the rest (repost, quote, tips, remove or report).
+          '<button type="button" class="tw-btn tw-phone-more tw-phone-only" data-tw="post-menu" data-id="' + p.id + '" aria-haspopup="dialog" aria-label="More for this post">⋯</button>' +
         '</div>' +
       '</div></article>';
   }
@@ -284,7 +286,7 @@
     if (typeof window === 'undefined' || !window.SOTA_WALLET_ON) return '';
     var coins = num(p.tip_coins);
     if (p.mine) return coins ? '<span class="tw-btn tw-coin on" aria-label="Tipped ' + coins + ' coins">🪙<b data-count="coin">' + coins + '</b></span>' : '';
-    return '<button type="button" class="tw-btn tw-coin' + (coins ? ' on' : '') + '" data-tw="coin" data-id="' + p.id + '" aria-label="Tip coins, ' + coins + '">🪙<b data-count="coin">' + (coins || '') + '</b></button>';
+    return '<button type="button" class="tw-btn tw-coin tw-sec' + (coins ? ' on' : '') + '" data-tw="coin" data-id="' + p.id + '" aria-label="Tip coins, ' + coins + '">🪙<b data-count="coin">' + (coins || '') + '</b></button>';
   }
   function composer(opts) {
     opts = opts || {};
@@ -293,7 +295,8 @@
       (opts.replyTo ? '' : makeRow() + quickRow()) +
       '<div class="tw-compose-row">' +
         '<div class="av" style="background:' + esc(me.room_accent || '#4FA8D8') + '18" aria-hidden="true">' + esc(me.avatar_emoji || '🌺') + '</div>' +
-        '<textarea name="body" maxlength="' + MAX + '" rows="' + (opts.replyTo || !window.SotaSere ? 2 : 1) + '" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : !window.SotaSere ? 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?' : 'Or write a few words…') + '"></textarea>' +
+        '<textarea name="body" maxlength="' + MAX + '" rows="' + (opts.replyTo || !window.SotaSere ? 2 : 1) + '" aria-label="' + (opts.replyTo ? 'Your reply' : 'Say it to everyone') + '" placeholder="' + (opts.replyTo ? 'Reply…' : !window.SotaSere ? 'What\'s happening, ' + esc(me.display_name || me.handle || 'you') + '?' : 'Write a few words…') + '"></textarea>' +
+        (opts.replyTo ? '' : createButtons()) +
       '</div>' +
       (st.quote && !opts.replyTo ? '<div class="tw-quoting">' + quoteBox(st.quote) + '<button type="button" class="tw-btn tw-unquote" data-tw="unquote" aria-label="Remove the quote">✕</button></div>' : '') +
       '<div class="tw-voice" hidden></div>' +
@@ -302,6 +305,66 @@
         (opts.replyTo ? voiceButton(true) : '') +
         '<button type="submit" class="btn sm" disabled>' + (opts.replyTo ? 'Reply' : 'Post') + '</button></div>' +
     '</form>';
+  }
+  /* ---------------------------------------------------------------- phone sheets
+     On a phone the composer is one line and each post shows four actions. Everything else waits in a
+     bottom sheet within thumb reach. Sheet buttons press the original (hidden) buttons, so every action
+     keeps its own behaviour, checks and counts. Wider screens never see these controls. */
+  function createButtons() {
+    return (window.SotaSere ? '<button type="button" class="tw-create-sere tw-phone-only" data-tw="sere" aria-label="Make a photo sing">🎤</button>' : '') +
+      '<button type="button" class="tw-create-open tw-phone-only" data-tw="create" aria-haspopup="dialog" aria-label="More ways to share">＋</button>';
+  }
+  var MENU = { repost: ['🔁', 'Repost'], quote: ['❝', 'Quote in your own post'], tip: ['🎁', 'Tip the maker'], coin: ['🪙', 'Tip coins'], del: ['✕', 'Remove your post'], more: ['⚑', 'Report or block'] };
+  function postMenuItems(post) {
+    var out = [];
+    if (!post) return out;
+    Array.prototype.forEach.call(post.querySelectorAll('.tw-bar .tw-sec'), function (b) {
+      var m = MENU[b.dataset.tw]; if (!m) return;
+      var label = b.dataset.tw === 'repost' && b.classList.contains('on') ? 'Undo repost' : m[1];
+      out.push({ icon: m[0], label: label, el: b, danger: b.dataset.tw === 'del' });
+    });
+    return out;
+  }
+  function createItems(form) {
+    var out = [], pick = function (sel, root, icon, label, sub, hero) { var el = (root || document).querySelector(sel); if (el) out.push({ icon: icon, label: label, sub: sub, el: el, hero: !!hero }); };
+    if (form) {
+      pick('.tw-make-main', form, '🎤', 'Make a photo sing', 'Pick a photo, add a song or your voice', true);
+      pick('.tw-make-say', form, '💬', 'Say my words', 'A photo that speaks what you write');
+      pick('.tw-quick .tw-voice-open', form, '🎙️', 'Voice note', 'Record up to a minute');
+      pick('.tw-quick [data-tw="moment"]', form, '📷', 'Drop a moment', 'A photo for your friends');
+      pick('.tw-quick [data-tw="track"]', form, '🎵', 'Share a track', 'A song from the Island Mix');
+    }
+    pick('.sx-world-toolbar [data-world-tool="explore"]', null, '✦', 'Explore Sota Kece', '');
+    pick('.sx-world-toolbar [data-world-tool="design"]', null, '✎', 'Studio', 'Design this page');
+    return out;
+  }
+  var sheet = null;
+  function openSheet(title, items, opener) {
+    closeSheet(true);
+    if (!items.length || typeof document === 'undefined') return;
+    var host = document.getElementById('app') || document.body, layer = document.createElement('div');
+    layer.className = 'tw-sheet-layer';
+    layer.innerHTML = '<button type="button" class="tw-sheet-scrim" data-tw="sheet-close" tabindex="-1" aria-label="Close"></button>' +
+      '<div class="tw-sheet" role="dialog" aria-modal="true" aria-labelledby="tw-sheet-title"><span class="tw-sheet-grip" aria-hidden="true"></span>' +
+        '<div class="tw-sheet-head"><h2 id="tw-sheet-title">' + esc(title) + '</h2><button type="button" class="tw-btn" data-tw="sheet-close">Done</button></div>' +
+        '<div class="tw-sheet-list">' + items.map(function (it, i) {
+          return '<button type="button" class="tw-sheet-item' + (it.hero ? ' hero' : '') + (it.danger ? ' danger' : '') + '" data-tw="sheet-go" data-i="' + i + '">' +
+            '<span class="tw-sheet-icon" aria-hidden="true">' + esc(it.icon) + '</span><span class="tw-sheet-words"><b>' + esc(it.label) + '</b>' + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') + '</span></button>';
+        }).join('') + '</div></div>';
+    host.appendChild(layer);
+    sheet = { layer: layer, items: items, opener: opener || null };
+    var first = layer.querySelector('.tw-sheet-item'); if (first) first.focus({ preventScroll: true });
+  }
+  function closeSheet(quiet) {
+    if (!sheet) return;
+    var s = sheet; sheet = null;
+    if (s.layer.parentNode) s.layer.parentNode.removeChild(s.layer);
+    if (!quiet && s.opener && s.opener.isConnected) s.opener.focus({ preventScroll: true });
+  }
+  function sheetGo(i) {
+    var it = sheet && sheet.items[Number(i)];
+    closeSheet(true);
+    if (it && it.el && it.el.isConnected) it.el.click();
   }
   /** Voice and music come first: one big button to make a photo sing, one to make it speak. */
   function makeRow() {
@@ -721,6 +784,10 @@
     app.addEventListener('click', function (ev) {
       var t = ev.target.closest('[data-tw]'); if (!t || !app.contains(t)) return;
       var act = t.dataset.tw, id = t.dataset.id;
+      if (act === 'sheet-close') return closeSheet();
+      if (act === 'sheet-go') return sheetGo(t.dataset.i);
+      if (act === 'post-menu') return openSheet('This post', postMenuItems(t.closest('.tw-post')), t);
+      if (act === 'create') return openSheet('Share something', createItems(t.closest('.tw-compose')), t);
       if (act === 'room') { ev.preventDefault(); ev.stopPropagation(); return openRoom(t.dataset.handle); }
       if (act === 'open') { if (ev.target.closest('a,button')) return; return openThread(id); }
       if (act === 'like' || act === 'repost') return toggle(act, id, t);
@@ -751,7 +818,15 @@
       if (act === 'retry') return view();
     });
     app.addEventListener('keydown', function (ev) {
-      var t = ev.target.closest('.tw-quote[data-tw="open"]');
+      if (sheet && sheet.layer.contains(ev.target)) {
+        if (ev.key === 'Escape') { ev.preventDefault(); return closeSheet(); }
+        if (ev.key === 'Tab') { // keep focus inside the open sheet
+          var f = sheet.layer.querySelectorAll('.tw-sheet button'), a = f[0], z = f[f.length - 1];
+          if (ev.shiftKey && ev.target === a) { ev.preventDefault(); z.focus(); } else if (!ev.shiftKey && ev.target === z) { ev.preventDefault(); a.focus(); }
+        }
+        return;
+      }
+      var t =ev.target.closest('.tw-quote[data-tw="open"]');
       if (t && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); openThread(t.dataset.id); }
       if (ev.target.matches('.tw-compose textarea') && (ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') { ev.preventDefault(); submit(ev.target.form); }
     });
@@ -776,6 +851,7 @@
   async function view() {
     var seq = ++st.seq;
     st.thread = null;
+    closeSheet(true);
     wire(); subscribe();
     shell(skeleton());
     if (spark && st.sparkHtml === null) {
@@ -794,6 +870,7 @@
   }
   function stop() {
     st.seq += 1;
+    closeSheet(true);
     if (st.io) { st.io.disconnect(); st.io = null; }
     if (st.channel && client && typeof client.removeChannel === 'function') { try { client.removeChannel(st.channel); } catch (_) {} }
     stopTrack(); dropRec();
@@ -811,7 +888,7 @@
   window.SotaPulse = {
     init: init, view: view, stop: stop, openThread: openThread,
     // exposed for tests
-    cleanShare: cleanShare, shareText: shareText, coinButton: coinButton, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, voiceBox: voiceBox, clock: clock, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
+    cleanShare: cleanShare, shareText: shareText, coinButton: coinButton, featured: featured, dayNumber: dayNumber, vitiPulse: vitiPulse, makeRow: makeRow, quickRow: quickRow, createButtons: createButtons, postMenuItems: postMenuItems, createItems: createItems, trackWords: trackWords, momentsStrip: momentsStrip, rich: rich, voiceBox: voiceBox, clock: clock, trackUrl: trackUrl, CAUGHT_UP: CAUGHT_UP, card: card, sereBox: sereBox, composer: composer, merge: merge, pillText: pillText, rich: rich, newest: newest, shareUrl: shareUrl,
     onInsert: onInsert, state: function () { return st; }, MAX: MAX, PAGE: PAGE, DEFAULT_MODE: DEFAULT_MODE
   };
 })();
