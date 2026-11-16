@@ -2,7 +2,7 @@ name: Sota Kece checks
 on:
   pull_request:
   push:
-    branches: [main, 'agent/**']
+    branches: [main]
 permissions:
   contents: read
 jobs:
