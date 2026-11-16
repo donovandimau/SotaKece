@@ -54,8 +54,9 @@
     pause();const player=getAudio();player.removeAttribute('src');player.load();
     if(objectUrl){root.URL.revokeObjectURL(objectUrl);objectUrl='';}
     const hadSelection=!!selected;selected=tracks.find(track=>track.id===id)||null;
-    if(selected){objectUrl=root.URL.createObjectURL(selected.blob);player.src=objectUrl;}
+    if(selected){objectUrl=root.URL.createObjectURL(selected.blob);player.src=objectUrl;player.setAttribute('data-now-title',selected.title);player.setAttribute('data-now-kind','room');player.setAttribute('data-now-id','room:'+selected.id);}
     else if(hadSelection)beforePlay();
+    if(!selected)player.removeAttribute('data-now-title');
     remember();sync();changed();
   }
   async function ensure(){

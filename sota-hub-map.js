@@ -58,7 +58,7 @@
   function has(z, x, y) { var col = index && index[z] && index[z][x]; return !!(col && col.indexOf(y) !== -1); }
   function num(v) { var n = Number(v); return Number.isSafeInteger(n) && n >= 0 ? n : 0; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function members(h) { var n = num(h.members); return n ? n + (n === 1 ? ' member' : ' members') : 'Be the first'; }
+  function members(h) { var n = num(h.members); return n ? n + (n === 1 ? ' member' : ' members') : 'Open Koro'; }
 
   /* ----------------------------------------------------------- drawing */
   function size() { return { w: view.clientWidth || 360, h: view.clientHeight || 480 }; }

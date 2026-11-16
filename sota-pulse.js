@@ -138,11 +138,13 @@
   }
   function clock(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
   /** A voice note on a post. Nothing downloads until the member presses play. */
-  function voiceBox(v) {
+  function voiceBox(v, who) {
     var url = v && voiceUrl(v.path);
     if (!url) return '';
+    /* data-now-* let the note carry on in the mini-player if the page changes mid-play (sota-now-playing.js). */
+    var now = ' data-now-kind="voice" data-now-title="' + esc(who ? 'Voice note from ' + who : 'Voice note') + '" data-now-id="voice:' + esc(v.path) + '"';
     return '<div class="tw-voice-note"><span class="tw-voice-meta"><span aria-hidden="true">🎙️</span> Voice note' + (num(v.seconds) ? ' · ' + clock(num(v.seconds)) : '') + '</span>' +
-      '<audio controls preload="none" src="' + esc(url) + '" aria-label="Voice note"></audio></div>';
+      '<audio controls preload="none" src="' + esc(url) + '" aria-label="Voice note"' + now + '></audio></div>';
   }
   function canRecord() {
     return !voiceOff && typeof window.MediaRecorder === 'function' && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && !!(client && client.storage);
@@ -263,7 +265,7 @@
         (p.sere && String(p.body || '').trim() === '🎤 Sere' ? '' : '<div class="tw-body"' + (opts.expanded ? '' : ' data-tw="open" data-id="' + p.id + '"') + '>' + rich(p.body) + '</div>') +
         quoteBox(p.quote) +
         sereBox(sr) +
-        voiceBox(p.voice) +
+        voiceBox(p.voice, p.display_name || p.handle) +
         '<div class="tw-bar">' +
           '<button type="button" class="tw-btn" data-tw="reply" data-id="' + p.id + '" aria-label="Reply, ' + replies + '">💬<b data-count="reply">' + (replies || '') + '</b></button>' +
           '<button type="button" class="tw-btn tw-repost tw-sec' + (p.i_reposted ? ' on' : '') + '" data-tw="repost" data-id="' + p.id + '" aria-pressed="' + (p.i_reposted ? 'true' : 'false') + '" aria-label="Repost, ' + reposts + '">🔁<b data-count="repost">' + (reposts || '') + '</b></button>' +
@@ -429,7 +431,7 @@
     return '<button type="button" class="tw-pill" data-tw="new" hidden aria-live="polite">' + pillText(st.pending) + '</button>';
   }
   function list(posts) {
-    if (!posts.length) return '<div class="tw-empty"><img src="/assets/feature-scenes/pulse-cafe-20261105-880.webp" alt="" loading="lazy" decoding="async"><p>Quiet in here. Say the first thing.</p></div>';
+    if (!posts.length) return '<div class="tw-empty"><img src="/assets/feature-scenes/pulse-cafe-20261105-880.webp" alt="" loading="lazy" decoding="async"><p>Start the Talanoa: say bula, share a song or answer today\'s Spark. Today\'s island songs are just below.</p></div>';
     return posts.map(function (p) { return card(p); }).join('');
   }
   function endMark() {
@@ -452,7 +454,7 @@
   function trackUrl(id) { return 'https://sotakece.com/t/' + encodeURIComponent(id); }
   function trackRow(t) {
     return '<div class="tw-track" data-track="' + esc(t.id) + '">' +
-      '<button type="button" class="tw-track-play" data-tw="play" data-id="' + esc(t.id) + '" data-src="' + esc(AUDIO_BASE + t.path) + '" aria-pressed="false" aria-label="Play ' + esc(clean(t.title).title) + '">▶</button>' +
+      '<button type="button" class="tw-track-play" data-tw="play" data-id="' + esc(t.id) + '" data-src="' + esc(AUDIO_BASE + t.path) + '" data-title="' + esc(clean(t.title).title) + '" data-credit="' + esc(clean(t.title).artist || '') + '" aria-pressed="' + nowOn(t.id) + '" aria-label="Play ' + esc(clean(t.title).title) + '">' + (nowOn(t.id) ? '❚❚' : '▶') + '</button>' +
       '<span class="tw-track-title"><b>' + esc(clean(t.title).title) + '</b>' + (clean(t.title).artist ? '<small>' + esc(clean(t.title).artist) + '</small>' : '') + '</span>' +
       '<button type="button" class="tw-btn" data-sota-share data-share-url="' + esc(trackUrl(t.id)) + '" data-share-title="' + esc(t.title + ' · Sota Kece') + '" data-share-text="' + esc('Listen to ' + t.title + ' on Sota Kece 🎶') + '" aria-label="Share ' + esc(t.title) + '">↗</button></div>';
   }
@@ -485,8 +487,21 @@
       var el = $('#tw-viti-tracks'); if (el) el.innerHTML = tracksBlock();
     } catch (_) { st.tracks = []; st.catalogue = []; var failed = $('#tw-track-pick'); if (failed) failed.innerHTML = trackPicker(); }
   }
+  /* With SotaNowPlaying the song plays on the page-wide player, so it keeps going on other pages
+     and shows in the mini-player; the buttons follow its state. Without it, the small player below. */
+  function nowOn(id) { return !!(window.SotaNowPlaying && window.SotaNowPlaying.isPlaying('track:' + id)); }
+  function syncTracks() {
+    $$('.tw-track-play').forEach(function (b) { var on = nowOn(b.dataset.id); b.textContent = on ? '❚❚' : '▶'; b.setAttribute('aria-pressed', String(on)); });
+  }
+  if (typeof window.addEventListener === 'function') window.addEventListener('sota-now-playing', function () { if (window.SotaNowPlaying) syncTracks(); });
   /** One small player for the three songs: tap to play, tap again to stop, one at a time. */
   function playTrack(btn) {
+    if (window.SotaNowPlaying) {
+      window.SotaNowPlaying.play(btn.dataset.src, { id: 'track:' + btn.dataset.id, title: btn.dataset.title, credit: btn.dataset.credit, kind: 'track' })
+        .then(function (r) { if (r === false) toast('That song could not start. Check your signal.'); syncTracks(); });
+      syncTracks();
+      return;
+    }
     var same = player && player.dataset.id === btn.dataset.id && !player.paused;
     if (player) { player.pause(); }
     $$('.tw-track-play').forEach(function (b) { b.textContent = '▶'; b.setAttribute('aria-pressed', 'false'); });
