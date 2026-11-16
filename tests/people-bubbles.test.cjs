@@ -76,7 +76,7 @@ test('tapping a hub offers Join or Open Koro, and joining redraws the card with 
   const suva=h.all('.pb-hub').find(b=>/Suva/.test(b.getAttribute('aria-label')));
   suva.click();h.q('[data-pb="open"]').click();assert.deepEqual(h.koro,[1]);
   const west=h.all('.pb-hub').find(b=>/Nadi/.test(b.getAttribute('aria-label')));
-  west.click();assert.match(h.q('.pb-detail').textContent,/Be the first/);
+  west.click();assert.match(h.q('.pb-detail').textContent,/Open Koro/);
   h.q('[data-pb="join"]').click();await flush();
   assert.ok(h.calls.some(c=>c[0]==='bv_hub_join'&&c[1].p_slug==='west'));
   assert.equal(h.all('.pb-wrap').length,1,'one cluster after the card repaints');
@@ -87,7 +87,7 @@ test('with nobody to meet the card keeps its own invite message and no bubbles',
   const h=boot({people:[]});await h.w.SotaHubs.fill(h.w.document);await flush();
   assert.equal(h.q('.pb-wrap'),null);
   assert.equal(h.q('.hub-people').hidden,false);
-  assert.match(h.q('.hub-first').textContent,/among the first/);
+  assert.match(h.q('.hub-first').textContent,/Bring one of your people/);
 });
 
 test('the page loads the bubbles the house way',()=>{

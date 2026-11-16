@@ -153,7 +153,7 @@
           '<button type="button" class="btn sm' + (asked ? ' ghost' : '') + '" data-pb="ask"' + (asked ? ' disabled' : '') + '>' + (asked ? 'Asked' : 'Ask to be friends') + '</button></span></div>';
       } else {
         html = '<div class="pb-card"><span class="pb-face" aria-hidden="true">' + esc(d.emoji || '🪸') + '</span>' +
-          '<span class="pb-who"><b>' + esc(d.name) + '</b><small>' + (num(d.members) ? num(d.members) + (num(d.members) === 1 ? ' member' : ' members') : 'Be the first') + (d.joined ? ' · you are in' : '') + '</small></span>' +
+          '<span class="pb-who"><b>' + esc(d.name) + '</b><small>' + (num(d.members) ? num(d.members) + (num(d.members) === 1 ? ' member' : ' members') : 'Open Koro') + (d.joined ? ' · you are in' : '') + '</small></span>' +
           '<span class="pb-acts"><button type="button" class="btn sm" data-pb="' + (d.joined ? 'open' : 'join') + '">' + (d.joined ? 'Open Koro' : 'Join') + '</button></span></div>';
       }
       detail.innerHTML = html;

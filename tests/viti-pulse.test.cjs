@@ -55,7 +55,7 @@ test('an empty wall still gets Viti Pulse, and no fake member posts are drawn',d
   await h.w.SotaPulse.view();await flush();
   assert.equal(h.all('.tw-post').length,0);
   assert.equal(h.q('.tw-end'),null);
-  assert.ok(h.q('.tw-viti'));assert.match(h.q('.tw-empty').textContent,/Say the first thing/);
+  assert.ok(h.q('.tw-viti'));assert.match(h.q('.tw-empty').textContent,/Start the Talanoa/);
   assert.equal(h.q('.tw-viti [data-tw="spark"]'),null,'no Spark button when there is no Spark today');
 });
 test('the composer leads with the singing photo; the text box is the quiet second step',dom,async()=>{
@@ -109,7 +109,7 @@ test('the starter Koro card shows three one-tap pills and up to three people to 
   assert.equal(h.q('[data-hubs]').hidden,true,'nothing shows until the hubs are known');
   assert.equal(await h.w.SotaHubs.fill(h.app),true);
   assert.deepEqual(h.all('.hub-pill').map(b=>b.querySelector('b').textContent),['Suva','Nadi & Lautoka','UK & overseas']);
-  assert.match(h.q('[data-slug="suva"]').textContent,/Be the first/);assert.match(h.q('[data-slug="west"]').textContent,/4 members/);assert.match(h.q('[data-slug="diaspora"]').textContent,/1 member ·/);
+  assert.match(h.q('[data-slug="suva"]').textContent,/Open Koro · join/);assert.match(h.q('[data-slug="west"]').textContent,/4 members/);assert.match(h.q('[data-slug="diaspora"]').textContent,/1 member ·/);
   assert.equal(h.q('.hub-who b').textContent,'Bo <b>','names are text, never markup');
   assert.equal(JSON.stringify(h.calls.find(c=>c.name==='bv_people_to_meet').args),'{"p_limit":3}');
 });
@@ -121,7 +121,7 @@ test('joining is one tap: the pill flips to open, people refresh, and the Koro o
     return joined?[{id:'u-cy',handle:'cy',display_name:'Cy',hub:'Suva',posts:0}]:[];
   });
   h.app.innerHTML=h.w.SotaHubs.html('wall');await h.w.SotaHubs.fill(h.app);
-  assert.match(h.q('.hub-first').textContent,/among the first/,'with nobody to suggest the card offers an invite instead');
+  assert.match(h.q('.hub-first').textContent,/Bring one of your people/,'with nobody to suggest the card offers an invite instead');
   h.q('[data-slug="suva"]').click();await flush();
   assert.equal(JSON.stringify(h.calls.filter(c=>c.name==='bv_hub_join').map(c=>c.args)),'[{"p_slug":"suva"}]');
   assert.equal(h.q('[data-slug="suva"]').dataset.hub,'open');assert.match(h.q('[data-slug="suva"]').textContent,/You are in/);

@@ -85,7 +85,7 @@
       (shelf ? '<div class="skg-shelf">' + shelf + '</div>' : '') +
       picker +
       (recent ? '<div class="skg-list">' + recent + '</div>'
-              : '<div class="empty"><em>🎁</em>' + (d.is_me ? 'No gifts yet.' : 'No gifts yet. Be the first.') + '</div>');
+              : '<div class="empty"><em>🎁</em>' + (d.is_me ? 'No gifts yet.' : 'No gifts yet. Pick one above to leave them something.') + '</div>');
 
     var chosen = null;
     var goBtn = card.querySelector('.skg-go');

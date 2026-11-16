@@ -43,26 +43,32 @@
     s.app.append(bar);
     const doc=root.document,current=()=>doc.querySelector('#sota-playlist-audio'),player=()=>doc.querySelector('#sk-music-playlist');
     const fill=bar.querySelector('.sx-mini-progress i'),toggle=bar.querySelector('.sx-mini-toggle'),state=bar.querySelector('small'),credit=bar.querySelector('em');
-    function progress(){const audio=current(),d=audio?.duration;fill.style.width=(Number.isFinite(d)&&d>0?Math.min(100,audio.currentTime/d*100):0)+'%';}
+    const now=()=>root.SotaNowPlaying?.active?.()||null,skips=[...bar.querySelectorAll('.sx-mini-skip')];
+    function progress(){const audio=now()?.audio||current(),d=audio?.duration;fill.style.width=(Number.isFinite(d)&&d>0?Math.min(100,audio.currentTime/d*100):0)+'%';}
+    // A wall song, a voice note or room music (SotaNowPlaying) shows here on every page; the
+    // playlist shows everywhere but Music, where its own full player is on screen.
     function update(){
-      const audio=current();bar.hidden=!audio?.getAttribute('src')||s.page==='music';s.app.classList.toggle('sx-has-mini',!bar.hidden);if(bar.hidden)return;
+      const np=now(),audio=np?np.audio:current();
+      bar.hidden=!audio?.getAttribute('src')||(!np&&s.page==='music');s.app.classList.toggle('sx-has-mini',!bar.hidden);if(bar.hidden)return;
       const paused=audio.paused||audio.ended;
-      bar.querySelector('b').textContent=doc.querySelector('.sk-playlist-title')?.textContent||'Your soundtrack';
-      const line=doc.querySelector('.sk-playlist-subtitle')?.textContent||'';credit.textContent=line;credit.hidden=!line;
+      bar.dataset.kind=np?np.kind:'playlist';skips.forEach(b=>{b.hidden=!!np;});
+      bar.querySelector('.sx-mini-open').title=np&&np.kind==='voice'?'Open Talanoa':'Open Music';
+      bar.querySelector('b').textContent=np?np.title:doc.querySelector('.sk-playlist-title')?.textContent||'Your soundtrack';
+      const line=np?(np.credit||(np.kind==='voice'?'Talanoa':np.kind==='room'?'Room music':'')):doc.querySelector('.sk-playlist-subtitle')?.textContent||'';credit.textContent=line;credit.hidden=!line;
       state.textContent=paused?'PAUSED':'NOW PLAYING';bar.classList.toggle('is-playing',!paused);
       toggle.innerHTML=draw(paused?'play':'pause');toggle.setAttribute('aria-label',paused?'Resume music':'Pause music');
       progress();root.SotaMusicBadge?.updateControls?.();
     }
     for(const event of ['play','pause','ended','loadedmetadata','emptied']){doc.addEventListener(event,update,true);s.listeners.push(()=>doc.removeEventListener(event,update,true));}
     doc.addEventListener('timeupdate',progress,true);s.listeners.push(()=>doc.removeEventListener('timeupdate',progress,true));
-    listen(s,root,'sota-front-page-change',update);
-    listen(s,toggle,'click',()=>{player()?.querySelector('.sk-deck-play,.sk-playlist-play')?.click();});
+    listen(s,root,'sota-front-page-change',update);listen(s,root,'sota-now-playing',update);
+    listen(s,toggle,'click',()=>{if(now())return root.SotaNowPlaying.toggle();player()?.querySelector('.sk-deck-play,.sk-playlist-play')?.click();});
     listen(s,bar.querySelector('.sx-mini-controls'),'click',event=>{
       const skip=event.target.closest('[data-mini]');if(!skip)return;
       const next=skip.dataset.mini==='next',deck=[...(player()?.querySelectorAll('.sk-deck-skip')||[])],basic=[...(player()?.querySelectorAll('.sk-playlist-transport button')||[])];
       (deck.length>1?deck[next?deck.length-1:0]:basic.length>2?basic[next?basic.length-1:0]:null)?.click();root.setTimeout(update,0);
     });
-    listen(s,bar.querySelector('.sx-mini-open'),'click',()=>{if(s.member){config.go?.('music');}else{root.history.pushState(null,'','#music');s.show?.('music');}});update();
+    listen(s,bar.querySelector('.sx-mini-open'),'click',()=>{if(now()?.kind==='voice'&&s.member){config.go?.('pulse');return;}if(s.member){config.go?.('music');}else{root.history.pushState(null,'','#music');s.show?.('music');}});update();
   }
   function welcome(){return `<section class="sx-hero" aria-labelledby="sx-welcome-title"><div class="sx-hero-copy"><span class="sx-eyebrow">FIJI ROOTS. EVERYWHERE ENERGY.</span><h1 id="sx-welcome-title" tabindex="-1">Your people.<br>Your music.<br><em>Your space.</em></h1><p>Choose your look. Bring your soundtrack. Make a place for your people.</p><div class="sx-actions"><button class="sx-button sx-primary" data-sx-auth="up">Create your space <span aria-hidden="true">↗</span></button></div><small>Already part of the circle? <button class="sx-inline" data-sx-auth="in">Sign in</button><br><a class="sx-inline" href="#profile">Take a look around</a></small><picture class="sx-hero-social"><img src="/assets/social-sunset-20261104/friends-guitar-clean-768.webp" srcset="/assets/social-sunset-20261104/friends-guitar-clean-768.webp 768w, /assets/social-sunset-20261104/friends-guitar-clean-1024.webp 1024w, /assets/social-sunset-20261104/friends-guitar-clean-1536.webp 1536w" sizes="(max-width:760px) calc(100vw - 72px), 440px" width="1536" height="1024" alt="Illustrative scene of four friends chatting while one plays guitar on a veranda at sunset" fetchpriority="high" decoding="async"></picture></div><section class="sx-hero-room" aria-label="Sema’s example room"><header><span>SEMA’S SPACE</span><small>EXAMPLE ROOM</small></header><div data-sx-room-home></div><footer><button type="button" data-sx-customise>Try Room Studio ↗</button><a href="#profile">Open this space ↗</a></footer></section><div class="sx-hero-caption">SOTA KECE <span>Come as you are.</span></div></section><nav class="sx-home-paths" aria-label="Explore Sota Kece"><a href="#people">${icon('people')} Find your people</a><a href="#talanoa">${icon('talanoa')} Pull up a seat</a><a href="#music">${icon('music')} Build your soundtrack</a><a href="#skins">${icon('profile')} Find your look</a><a href="#world">${icon('home')} Your 3D world</a></nav><section class="sx-intro"><div><span class="sx-eyebrow">MORE CONNECTION. MORE YOU.</span><h2>All the things that<br>bring us together.</h2></div><p>Catch up with your people, share a favourite song and build a space that tells your story.</p></section><div class="sx-discover sx-scene-grid">
     <a class="sx-discover-card sx-photo-card sx-discover-people" href="#people">

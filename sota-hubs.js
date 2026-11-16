@@ -54,7 +54,7 @@
     return '<button type="button" class="hub-pill' + (h.joined ? ' on' : '') + '" data-hub="' + (h.joined ? 'open' : 'join') + '" data-slug="' + esc(h.slug) + '"' +
       (h.crew_id ? ' data-crew="' + num(h.crew_id) + '"' : '') + ' aria-label="' + esc((h.joined ? 'Open ' : 'Join ') + h.name + ' Koro') + '">' +
       '<span class="hub-emoji" aria-hidden="true">' + esc(h.emoji || '🪸') + '</span>' +
-      '<span class="hub-name"><b>' + esc(h.name) + '</b><small>' + (h.joined ? 'You are in · open' : n ? n + (n === 1 ? ' member' : ' members') + ' · join' : 'Be the first · join') + '</small></span></button>';
+      '<span class="hub-name"><b>' + esc(h.name) + '</b><small>' + (h.joined ? 'You are in · open' : n ? n + (n === 1 ? ' member' : ' members') + ' · join' : 'Open Koro · join') + '</small></span></button>';
   }
   function person(p) {
     var done = asked[p.id];
@@ -64,7 +64,7 @@
   }
   function peopleBlock(list) {
     if (!list) return '';
-    if (!list.length) return '<div class="hub-people"><p class="hub-first">You are among the first here. Bring one person with you and the wall wakes up.</p>' +
+    if (!list.length) return '<div class="hub-people"><p class="hub-first">Nobody new to suggest right now. Bring one of your people in and say bula together.</p>' +
       '<button type="button" class="btn sm ghost" data-iv-quick="Home: Top Mates" data-sota-share data-share-text="Come and join me on Sota Kece. Make your space, share music and catch up over Talanoa.">Invite someone ↗</button></div>';
     return '<div class="hub-people"><h3>Say bula to</h3>' + list.map(person).join('') + '</div>';
   }
