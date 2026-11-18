@@ -43,6 +43,7 @@ function copyPublic(src, dest, rel = '') {
     if (name.startsWith('.')) continue; // .env*, .git, .github, .vercel ...
     if (SKIP_NAMES.has(name) || SKIP_NAMES.has(relPath)) continue;
     const from = join(src, name);
+    if (from === out) continue; // never copy the output folder into itself
     const st = statSync(from);
     if (st.isDirectory()) {
       copyPublic(from, join(dest, name), relPath);
@@ -63,18 +64,23 @@ if (!existsSync(out)) {
   process.exit(1);
 }
 
-// Cloudflare Workers static assets are capped at 25 MiB per file; a bigger file
-// fails the whole deploy. Such files are left out and listed in the build log.
+// Cloudflare Workers static assets are capped at 25 MiB per file. A bigger file would make
+// `wrangler deploy` fail anyway; stop here with a clear list so the live version stays as it is
+// until the file is made smaller or moved to storage. Nothing is ever dropped silently.
 const MAX_BYTES = 25 * 1024 * 1024;
-const dropped = [];
-(function dropOversize(dir) {
+const oversize = [];
+(function findOversize(dir) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     const st = statSync(p);
-    if (st.isDirectory()) dropOversize(p);
-    else if (st.size > MAX_BYTES) { dropped.push(`${p.slice(out.length)} (${(st.size / 1048576).toFixed(1)} MiB)`); rmSync(p); }
+    if (st.isDirectory()) findOversize(p);
+    else if (st.size > MAX_BYTES) oversize.push(`${p.slice(out.length)} (${(st.size / 1048576).toFixed(1)} MiB)`);
   }
 })(out);
+if (oversize.length) {
+  console.error(`cf-static-assets: these files are over Cloudflare's 25 MiB asset limit; make them smaller or host them elsewhere:\n  ${oversize.join('\n  ')}`);
+  process.exit(1);
+}
 
 const vercelPath = join(root, 'vercel.json');
 const vercel = existsSync(vercelPath) ? JSON.parse(readFileSync(vercelPath, 'utf8')) : {};
@@ -92,7 +98,7 @@ function toPatterns(source) {
     return a && b ? [...a, ...b] : null;
   }
   // Alternation groups such as (a|b) are expanded into separate patterns.
-  const alt = s.match(/\(([^()*?+]+\|[^()*?+]+)\)/);
+  const alt = s.match(/\(([^()*?+]*\|[^()*?+]*)\)/);
   if (alt) {
     const parts = alt[1].split('|').map((part) => toPatterns(s.replace(alt[0], part)));
     return parts.every(Boolean) ? parts.flat() : null;
@@ -171,15 +177,16 @@ for (const r of vercel.rewrites || []) {
   if (r.destination === `${r.source.replace(/\/$/, '')}.html`) continue;
   const pats = toPatterns(r.source);
   if (!pats) { warnings.push(`rewrite ${r.source}: pattern not supported, skipped`); continue; }
+  // Rewrite to the clean address: html_handling would answer /page.html with a redirect to /page.
+  const dest = r.destination.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
   for (const p of pats) {
-    if (p === r.destination) continue;
-    redirectLines.push(`${p} ${toDest(r.destination)} 200`);
+    if (p === dest) continue;
+    redirectLines.push(`${p} ${toDest(dest)} 200`);
   }
 }
 if (redirectLines.length) {
   writeFileSync(join(out, '_redirects'), `# Generated from vercel.json by scripts/cf-static-assets.mjs. Do not edit.\n${redirectLines.join('\n')}\n`);
 }
 
-for (const d of dropped) warnings.push(`left out ${d}: over the 25 MiB Cloudflare asset limit, host it elsewhere`);
 for (const w of warnings) console.warn(`cf-static-assets: ${w}`);
 console.log(`cf-static-assets: ${out} ready (${rules.length} header rules, ${redirectLines.length} redirects)`);
