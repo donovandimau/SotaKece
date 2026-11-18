@@ -11,6 +11,7 @@
 //
 // On a pull request a gap is a warning (the migration is normally applied when the PR merges).
 // On main a gap fails the run: something is merged and live without its database change.
+// If the database cannot be asked at all (three tries), that is also a warning on a PR and a failure on main.
 // migrations-check.json: "dirs" (folders of .sql files), "databases" (name, url, public key),
 // "ignoreFiles" (files deliberately not applied yet) and "ignore" (single names; a trailing * matches a prefix).
 // Give the reason for every ignore in TRACKER.md.
@@ -54,6 +55,14 @@ function collect(files) {
 const ignored = key => (config.ignore || []).some(rule => rule.endsWith('*') ? key.startsWith(rule.slice(0, -1)) : key === rule);
 
 async function missingIn(database, names) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try { return await askOnce(database, names); }
+    catch (error) { lastError = error; if (attempt < 3) await new Promise(resolve => setTimeout(resolve, attempt * 4000)); }
+  }
+  throw lastError;
+}
+async function askOnce(database, names) {
   const response = await fetch(database.url.replace(/\/$/, '') + '/rest/v1/rpc/ops_objects_missing', {
     method: 'POST', headers: { apikey: database.key, 'Content-Type': 'application/json' },
     body: JSON.stringify({ p_names: names }), signal: AbortSignal.timeout(30000)
@@ -76,8 +85,10 @@ async function main() {
     // A name counts as present if any listed database has it (an app may be moving between two).
     for (const database of config.databases) { if (!missing.length) break; missing = await missingIn(database, missing); }
   } catch (error) {
-    console.log('::warning::Migration check could not reach the database (' + error.message + '). Nothing was checked.');
-    return 0;
+    // On main, "could not check" is a failure too: a changed key or a removed helper function would
+    // otherwise pass quietly for ever. On a pull request it stays a warning.
+    console.log('::' + (strict ? 'error' : 'warning') + '::Migration check could not ask the database (' + error.message + '). Nothing was checked.');
+    return strict ? 1 : 0;
   }
   if (!missing.length) { console.log('Everything the migration files create exists on ' + config.databases.map(d => d.name).join(' or ') + '.'); return 0; }
   const level = strict ? 'error' : 'warning';
