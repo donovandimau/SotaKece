@@ -50,13 +50,14 @@ test('a server key that is not shaped like a key is a config fault, not a header
   const sere=require('../api/sere.js'),listen=require('../api/listen.js');
   const pasted='export const WALLPAPER_PRESETS = [\n  { id: "parallax" },';
   const never=async()=>{throw Error('fetch must not be reached');};
-  await assert.rejects(sere.getJob({SOTA_SERVICE_KEY:pasted},'x',never),/^Error: config$/);
-  await assert.rejects(listen.readSere({SOTA_SERVICE_KEY:pasted},'x',never),/^Error: config$/);
+  await assert.rejects(sere.getJob({SOTA_SERVER_SECRET:pasted},'x',never),/^Error: config$/);
+  await assert.rejects(listen.readSere({SOTA_SERVER_SECRET:pasted},'x',never),/^Error: config$/);
   await assert.rejects(sere.speak({REPLICATE_API_TOKEN:pasted},'hi','bella',never),/^Error: config$/);
   let reached=false;
-  await sere.getJob({SOTA_SERVICE_KEY:'sb_secret_abcdefghijklmnop-1234'},'x',async()=>{reached=true;return {ok:true,json:async()=>[]};});
+  await sere.getJob({SOTA_SERVER_SECRET:'0123456789abcdef0123456789abcdef0123'},'x',async()=>{reached=true;return {ok:true,json:async()=>[]};});
   assert(reached,'a well-formed key is used');
-  assert.match(read('api/account-delete.js'),/if\(!KEY_SHAPE\.test\(key\)\)throw Error\('config'\)/);
+  assert.match(read('api/_sota-server.js'),/if\(!KEY_SHAPE\.test\(key\)\)throw Error\('config'\)/);
+  assert.match(read('api/account-delete.js'),/require\('\.\/_sota-server\.js'\)/);
 });
 
 // Sign-up funnel steps (14 Nov 2026): every step exists, carries only fixed words, and Google/Facebook

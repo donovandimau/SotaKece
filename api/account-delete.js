@@ -2,21 +2,14 @@
 // Order matters: files first through the storage API (so the bytes go, not
 // just the rows), then bv_account_delete() as the member (profile and its
 // cascades — the shared Dimau login is kept), then a second file sweep to catch an upload that raced the
-// delete. Needs SOTA_SERVICE_KEY (same as /api/sere).
+// delete. Needs SOTA_SERVER_SECRET (the files are listed and deleted through the sota-server edge
+// function, which holds the service key; see api/_sota-server.js).
 'use strict';
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
+const {SOTA_URL,SERVICE_URL,svcHeaders}=require('./_sota-server.js');
 const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice'];
 
-// A key must look like a key (letters, digits, . _ -). A value pasted wrong (code, a line break) used to reach
-// fetch and fail as 'invalid header value'; now it is reported as the plain 'config' fault.
-const KEY_SHAPE=/^[A-Za-z0-9._-]{20,}$/;
-function svcHeaders(env,extra){
-  const key=String(env.SOTA_SERVICE_KEY||'');
-  if(!KEY_SHAPE.test(key))throw Error('config');
-  return Object.assign({apikey:key,Authorization:`Bearer ${key}`},extra||{});
-}
 async function who(auth,fetcher){
   if(typeof auth!=='string'||!/^Bearer [A-Za-z0-9_.-]{20,8192}$/.test(auth))return null;
   const r=await fetcher(`${SOTA_URL}/auth/v1/user`,{headers:{apikey:SOTA_KEY,Authorization:auth},signal:AbortSignal.timeout(5000)});
@@ -27,7 +20,7 @@ async function who(auth,fetcher){
 async function wipeBucket(env,bucket,uid,fetcher){
   let removed=0;
   for(let page=0;page<50;page++){
-    const r=await fetcher(`${SOTA_URL}/storage/v1/object/list/${bucket}`,{
+    const r=await fetcher(`${SERVICE_URL}/storage/v1/object/list/${bucket}`,{
       method:'POST',headers:svcHeaders(env,{'Content-Type':'application/json'}),
       body:JSON.stringify({prefix:`${uid}/`,limit:1000,offset:0}),signal:AbortSignal.timeout(10000)});
     if(r.status===404||r.status===400)return removed; // bucket absent
@@ -39,7 +32,7 @@ async function wipeBucket(env,bucket,uid,fetcher){
     for(const o of items){
       if(o.id)paths.push(`${uid}/${o.name}`);
       else{
-        const s=await fetcher(`${SOTA_URL}/storage/v1/object/list/${bucket}`,{
+        const s=await fetcher(`${SERVICE_URL}/storage/v1/object/list/${bucket}`,{
           method:'POST',headers:svcHeaders(env,{'Content-Type':'application/json'}),
           body:JSON.stringify({prefix:`${uid}/${o.name}/`,limit:1000,offset:0}),signal:AbortSignal.timeout(10000)});
         if(!s.ok)throw Error('storage list '+s.status);
@@ -47,7 +40,7 @@ async function wipeBucket(env,bucket,uid,fetcher){
       }
     }
     if(!paths.length)return removed;
-    const d=await fetcher(`${SOTA_URL}/storage/v1/object/${bucket}`,{
+    const d=await fetcher(`${SERVICE_URL}/storage/v1/object/${bucket}`,{
       method:'DELETE',headers:svcHeaders(env,{'Content-Type':'application/json'}),
       body:JSON.stringify({prefixes:paths}),signal:AbortSignal.timeout(15000)});
     if(!d.ok)throw Error('storage delete '+d.status);

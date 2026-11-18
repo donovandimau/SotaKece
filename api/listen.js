@@ -6,9 +6,9 @@
 //                            handed to the member who made it (see /api/sere action "share"), so
 //                            nobody else can turn a member's sere into a public page.
 //   GET /t/<track id>        one Island Mix song from music-playlist.json.
-// Env: SOTA_SERVICE_KEY (service role, read only here), SERE_SECRET (link signing).
+// Env: SOTA_SERVER_SECRET (key for the sota-server edge function, read only here), SERE_SECRET (link signing).
 const {createHmac,timingSafeEqual}=require('node:crypto');
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
+const {SOTA_URL,SERVICE_URL,svcHeaders}=require('./_sota-server.js');
 const AUDIO_BASE='https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/fiji-audio/';
 const SITE='https://sotakece.com';
 const OG_IMAGE=SITE+'/assets/og-sota-kece-premium-20261111.jpg';
@@ -93,15 +93,14 @@ function gone(what){
 }
 
 async function readSere(env,id,fetcher){
-  const key=String(env.SOTA_SERVICE_KEY||'');if(!/^[A-Za-z0-9._-]{20,}$/.test(key))throw Error('config');
-  const headers={apikey:key,Authorization:`Bearer ${key}`};
-  const r=await fetcher(`${SOTA_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&status=eq.completed&select=id,user_id,caption,output_video_url,output_poster_url`,{headers,signal:AbortSignal.timeout(5000)});
+  const headers=svcHeaders(env);
+  const r=await fetcher(`${SERVICE_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&status=eq.completed&select=id,user_id,caption,output_video_url,output_poster_url`,{headers,signal:AbortSignal.timeout(5000)});
   if(!r.ok)throw Error('db');
   const job=(await r.json())[0];
   if(!job||!ourVideo(job.output_video_url))return null;
   let name='';
   try{
-    const p=await fetcher(`${SOTA_URL}/rest/v1/bv_profiles?id=eq.${job.user_id}&select=display_name,handle`,{headers,signal:AbortSignal.timeout(4000)});
+    const p=await fetcher(`${SERVICE_URL}/rest/v1/bv_profiles?id=eq.${job.user_id}&select=display_name,handle`,{headers,signal:AbortSignal.timeout(4000)});
     if(p.ok){const row=(await p.json())[0];name=String(row?.display_name||row?.handle||'').trim().split(/\s+/)[0].slice(0,24);}
   }catch(_){}
   return {job,name};

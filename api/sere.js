@@ -5,13 +5,13 @@
 //   POST /api/sere  { action:'start', id }  — member only; signs the two inputs, starts the render
 //   POST /api/sere  { action:'check', id }  — member only; re-reads a job that looks stuck
 //   POST /api/sere  { action:'share', id }  — the maker only; the public page link for a finished sere
-// Env: SOTA_SERVICE_KEY (service role), REPLICATE_API_TOKEN, SERE_SECRET (webhook signing),
+// Env: SOTA_SERVER_SECRET (key for the sota-server edge function, api/_sota-server.js), REPLICATE_API_TOKEN, SERE_SECRET (webhook signing),
 //      SERE_REPLICATE_MODEL ("owner/name", used when SERE_REPLICATE_VERSION is empty),
 //      SERE_REPLICATE_VERSION (version hash), SERE_INPUT_IMAGE (default source_image),
 //      SERE_INPUT_AUDIO (default driven_audio), SERE_INPUT_EXTRA (JSON merged into the input),
 //      SERE_PUBLIC_URL (default https://sotakece.com)
 const {createHmac,timingSafeEqual}=require('node:crypto');
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
+const {SOTA_URL,SERVICE_URL,svcHeaders}=require('./_sota-server.js');
 const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REPLICATE='https://api.replicate.com/v1';
@@ -19,14 +19,6 @@ const REPLICATE='https://api.replicate.com/v1';
 function sign(secret,id){return createHmac('sha256',secret).update(String(id)).digest('hex');}
 function sameSig(a,b){const x=Buffer.from(String(a||'')),y=Buffer.from(String(b||''));return x.length===y.length&&x.length>0&&timingSafeEqual(x,y);}
 
-// A key must look like a key (letters, digits, . _ -). A value pasted wrong (code, a line break) used to reach
-// fetch and fail as 'invalid header value'; now it is reported as the plain 'config' fault.
-const KEY_SHAPE=/^[A-Za-z0-9._-]{20,}$/;
-function svcHeaders(env,extra){
-  const key=String(env.SOTA_SERVICE_KEY||'');
-  if(!KEY_SHAPE.test(key))throw Error('config');
-  return Object.assign({apikey:key,Authorization:`Bearer ${key}`},extra||{});
-}
 async function who(auth,fetcher){
   if(typeof auth!=='string'||!/^Bearer [A-Za-z0-9_.-]{20,8192}$/.test(auth))return null;
   const r=await fetcher(`${SOTA_URL}/auth/v1/user`,{headers:{apikey:SOTA_KEY,Authorization:auth},signal:AbortSignal.timeout(5000)});
@@ -34,25 +26,25 @@ async function who(auth,fetcher){
   const u=await r.json();return UUID.test(u?.id||'')?u.id:null;
 }
 async function getJob(env,id,fetcher){
-  const r=await fetcher(`${SOTA_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&select=*`,{headers:svcHeaders(env),signal:AbortSignal.timeout(5000)});
+  const r=await fetcher(`${SERVICE_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&select=*`,{headers:svcHeaders(env),signal:AbortSignal.timeout(5000)});
   if(!r.ok){console.error('sere db read',r.status);throw Error('db');}
   const rows=await r.json();return rows[0]||null;
 }
 async function patchJob(env,id,patch,fetcher,where){
-  const r=await fetcher(`${SOTA_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}${where||''}`,{
+  const r=await fetcher(`${SERVICE_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}${where||''}`,{
     method:'PATCH',headers:svcHeaders(env,{'Content-Type':'application/json',Prefer:'return=representation'}),
     body:JSON.stringify(patch),signal:AbortSignal.timeout(5000)});
   if(!r.ok){console.error('sere db write',r.status);throw Error('db');}
   return (await r.json())[0]||null;
 }
 async function signedUrl(env,bucket,path,fetcher){
-  const r=await fetcher(`${SOTA_URL}/storage/v1/object/sign/${bucket}/${path}`,{
+  const r=await fetcher(`${SERVICE_URL}/storage/v1/object/sign/${bucket}/${path}`,{
     method:'POST',headers:svcHeaders(env,{'Content-Type':'application/json'}),body:JSON.stringify({expiresIn:3600}),signal:AbortSignal.timeout(5000)});
   if(!r.ok)return null;
   const d=await r.json();return d?.signedURL?`${SOTA_URL}/storage/v1${d.signedURL}`:null;
 }
 async function copyObject(env,bucket,from,to,fetcher){
-  const r=await fetcher(`${SOTA_URL}/storage/v1/object/copy`,{
+  const r=await fetcher(`${SERVICE_URL}/storage/v1/object/copy`,{
     method:'POST',headers:svcHeaders(env,{'Content-Type':'application/json'}),
     body:JSON.stringify({bucketId:bucket,sourceKey:from,destinationKey:to}),signal:AbortSignal.timeout(10000)});
   return r.ok;
@@ -71,6 +63,11 @@ const ENGINES={
 const TTS={version:env=>env.SERE_TTS_VERSION||'f559560eb822dc509045f3921a1921234918b91739db4bf3daab2169b71c7a13',
   voices:{bella:'af_bella',sarah:'af_sarah',nicole:'af_nicole',adam:'am_adam',michael:'am_michael',emma:'bf_emma',isabella:'bf_isabella',george:'bm_george',lewis:'bm_lewis'}};
 function engineFor(name){return ENGINES[name]?name:'quick';}
+// The render service key (REPLICATE_API_TOKEN) belongs to Donovan's Replicate account and cannot be
+// made again from here. Without it Sere says so plainly and early: before a voice is made, and a
+// started job is marked failed so it does not use up one of the member's five a day.
+const RENDER_OFF='Making photos sing is paused for now. Your photo and sound were not used. Please try again later.';
+function renderOn(env){return /^[A-Za-z0-9._-]{10,}$/.test(String(env.REPLICATE_API_TOKEN||''));}
 function modelInput(env,imageUrl,audioUrl,engine){
   const e=ENGINES[engineFor(engine)],input=e.input(imageUrl,audioUrl);
   // An env override renames the field (for a model with other input names); the built-in one goes.
@@ -120,16 +117,16 @@ async function finish(env,job,prediction,fetcher){
   const video=await fetcher(src,{signal:AbortSignal.timeout(45000)});
   if(!video.ok)throw Error('provider');
   const put=async(path,type,body)=>{
-    const r=await fetcher(`${SOTA_URL}/storage/v1/object/sere-video/${path}`,{method:'POST',headers:svcHeaders(env,{'Content-Type':type,'x-upsert':'true','Cache-Control':'public, max-age=31536000, immutable'}),body,signal:AbortSignal.timeout(45000)});
+    const r=await fetcher(`${SERVICE_URL}/storage/v1/object/sere-video/${path}`,{method:'POST',headers:svcHeaders(env,{'Content-Type':type,'x-upsert':'true','Cache-Control':'public, max-age=31536000, immutable'}),body,signal:AbortSignal.timeout(45000)});
     if(!r.ok)throw Error('storage');
   };
   await put(`${base}/v.mp4`,'video/mp4',Buffer.from(await video.arrayBuffer()));
-  const poster=await fetcher(`${SOTA_URL}/storage/v1/object/sere-images/${job.source_image_url}`,{headers:svcHeaders(env),signal:AbortSignal.timeout(15000)});
+  const poster=await fetcher(`${SERVICE_URL}/storage/v1/object/sere-images/${job.source_image_url}`,{headers:svcHeaders(env),signal:AbortSignal.timeout(15000)});
   if(poster.ok)await put(`${base}/p.jpg`,poster.headers.get('content-type')||'image/jpeg',Buffer.from(await poster.arrayBuffer()));
   const pub=p=>`${SOTA_URL}/storage/v1/object/public/sere-video/${p}`;
   await patchJob(env,job.id,{status:'completed',progress:100,output_video_url:pub(`${base}/v.mp4`),output_poster_url:poster.ok?pub(`${base}/p.jpg`):null},fetcher,'&status=eq.processing');
   // Inputs are no longer needed (the poster is the copy that stays).
-  fetcher(`${SOTA_URL}/storage/v1/object/sere-audio`,{method:'DELETE',headers:svcHeaders(env,{'Content-Type':'application/json'}),body:JSON.stringify({prefixes:[job.audio_url]}),signal:AbortSignal.timeout(5000)}).catch(()=>{});
+  fetcher(`${SERVICE_URL}/storage/v1/object/sere-audio`,{method:'DELETE',headers:svcHeaders(env,{'Content-Type':'application/json'}),body:JSON.stringify({prefixes:[job.audio_url]}),signal:AbortSignal.timeout(5000)}).catch(()=>{});
   return 'completed';
 }
 
@@ -167,6 +164,15 @@ async function handler(req,res){
     if(!me)return res.status(401).json({error:'Sign in again.'});
     const env=process.env;
 
+    if(!renderOn(env)&&(body.action==='speak'||body.action==='start'||body.action==='check')){
+      if(body.action==='start'&&UUID.test(id)){
+        // Mark the member's own pending job failed (so it does not count against the day), then say why.
+        try{const job=await getJob(env,id,fetch);if(job&&job.user_id===me&&job.status==='pending')await patchJob(env,id,{status:'failed',error:RENDER_OFF},fetch,'&status=eq.pending');}
+        catch(e){console.error('sere render off',e?.message);}
+      }
+      return res.status(503).json({error:RENDER_OFF,code:'render_off'});
+    }
+
     if(body.action==='speak'){
       // "Say it": words → voice → a pending sere whose sound is already uploaded. The row is created
       // AS THE MEMBER (their token), so the daily allowance and ownership rules apply unchanged.
@@ -184,7 +190,7 @@ async function handler(req,res){
         body:JSON.stringify({p_image_ext:body.imageExt,p_duration_ms:Math.min(ms,600000),p_start_ms:0,p_scene:String(body.scene||'none'),p_caption:body.caption?String(body.caption).slice(0,140):null,p_remix_of:null,p_engine:engineFor(body.engine)}),signal:AbortSignal.timeout(8000)});
       const row=await rpc.json().catch(()=>null);
       if(!rpc.ok||!row?.id){const m=String(row?.message||'');return res.status(rpc.status===400?400:503).json({error:/OUT_OF_SERE/.test(m)?'Five a day — more tomorrow.':'Could not start the sere.',code:m.slice(0,40)});}
-      const up=await fetch(`${SOTA_URL}/storage/v1/object/sere-audio/${row.audio_path}`,{method:'POST',headers:svcHeaders(env,{'Content-Type':'audio/wav','x-upsert':'true'}),body:wav,signal:AbortSignal.timeout(20000)});
+      const up=await fetch(`${SERVICE_URL}/storage/v1/object/sere-audio/${row.audio_path}`,{method:'POST',headers:svcHeaders(env,{'Content-Type':'audio/wav','x-upsert':'true'}),body:wav,signal:AbortSignal.timeout(20000)});
       if(!up.ok){console.error('sere speak upload',up.status);throw Error('storage');}
       return res.status(200).json({ok:true,id:row.id,image_path:row.image_path,duration_ms:ms});
     }
@@ -225,7 +231,7 @@ async function handler(req,res){
   }catch(err){
     const m=err?.message;
     console.error('sere',body.action,id,m);   // which step failed (db / storage / provider / config), never a key
-    if(m==='config')return res.status(503).json({error:'The sere maker needs its keys set on the server.',code:m});
+    if(m==='config')return res.status(503).json({error:'The sere maker is not set up on the server yet. Please try again later.',code:m});
     if(m==='provider')return res.status(502).json({error:'The render service did not answer. Try again in a minute.',code:m});
     return res.status(503).json({error:'The sere maker is temporarily unavailable.',code:m});
   }
@@ -238,6 +244,8 @@ module.exports.modelInput=modelInput;
 module.exports.wavDurationMs=wavDurationMs;
 module.exports.speak=speak;
 module.exports.ENGINES=ENGINES;
+module.exports.renderOn=renderOn;
+module.exports.RENDER_OFF=RENDER_OFF;
 module.exports.startRender=startRender;
 module.exports.readRender=readRender;
 module.exports.finish=finish;
