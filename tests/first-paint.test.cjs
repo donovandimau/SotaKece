@@ -46,7 +46,7 @@ test('every script after the decision is held the same way, so the page order is
  for(let o=low.indexOf('<script');o>=0;){const gt=low.indexOf('>',o),end=low.indexOf('</script',gt);all.push([live.slice(o+7,gt),live.slice(gt+1,end)]);o=low.indexOf('<script',end);}
  const plain=all.filter(m=>!m[0].includes('type="text/x-sk-later"')&&!/^SK\.(css|js|run)\(/.test(m[1]));
  const kinds=plain.map(m=>/src="([^"]+)"/.exec(m[0])?.[1]||m[1].trim().slice(0,24));
- assert.deepEqual(kinds,['/* First paint for a gue','https://dimau-ops.vercel.app/api/visit?s=sota-kece','https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js','/* Guests on Home, any s']);
+ assert.deepEqual(kinds,['/* First paint for a gue','https://ops.dimau-fintech.com/api/visit?s=sota-kece','https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js','/* Guests on Home, any s']);
  assert.equal((live.match(/type="text\/x-sk-later"/g)||[]).length,2,'the app script and its start-up line');
  const held=all.filter(m=>m[0].includes('type="text/x-sk-later"'));
  for(const m of held)assert.ok(live.includes(m[1]+'</script><script>SK.run()</script>'),'each held inline script is followed by SK.run()');
