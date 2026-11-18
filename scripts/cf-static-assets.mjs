@@ -5,7 +5,7 @@
 //
 // --copy  copies the public site files from the repo root into --out first
 //         (for sites with no build step). Dotfiles, .env*, node_modules, *.md,
-//         tests, scripts, docs, api, cloudflare (Worker code) and config files are
+//         tests, scripts, docs, api, mobile (app-store shell), cloudflare (Worker code) and config files are
 //         never copied.
 //
 // Then it turns vercel.json "headers" (and "routes" entries that carry
@@ -31,7 +31,7 @@ const extraSkip = (opt('--skip', '') || '').split(',').filter(Boolean);
 // Never published, whatever the site.
 const SKIP_NAMES = new Set([
   'node_modules', 'api', 'scripts', 'tests', 'test', '__tests__', 'docs', 'supabase', 'backend',
-  'tools', 'verify', 'handovers', 'cloudflare', 'package.json', 'package-lock.json', 'pnpm-lock.yaml', 'yarn.lock',
+  'tools', 'verify', 'handovers', 'cloudflare', 'mobile', 'package.json', 'package-lock.json', 'pnpm-lock.yaml', 'yarn.lock',
   'vercel.json', 'netlify.toml', 'wrangler.jsonc', 'wrangler.toml', 'wrangler.json', 'tsconfig.json',
   'vite.config.js', 'vitest.config.ts', 'eslint.config.mjs', 'dist', 'Dockerfile', 'LICENSE',
   ...extraSkip,
