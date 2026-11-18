@@ -31,25 +31,30 @@ const clean = name => name.toLowerCase().replace(/"/g, '');
 const qualify = name => name.includes('.') ? name : 'public.' + name;
 
 function collect(files) {
-  const wanted = new Map(), dropped = new Set();
-  const want = (kind, name, file) => { const key = kind + ':' + name; if (!wanted.has(key)) wanted.set(key, file); dropped.delete(key); };
+  // Statements are applied in the order they appear, file by file, so "drop then create again" leaves the
+  // table wanted and "create then drop" leaves it out.
+  const wanted = new Map();
   for (const file of files) {
-    const sql = fs.readFileSync(path.join(root, file), 'utf8').replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-    for (const m of sql.matchAll(/\bdrop\s+table\s+(?:if\s+exists\s+)?([a-z_0-9."]+)/gi)) dropped.add('t:' + qualify(clean(m[1])));
-    for (const m of sql.matchAll(/\bdrop\s+function\s+(?:if\s+exists\s+)?([a-z_0-9."]+)/gi)) dropped.add('f:' + qualify(clean(m[1])));
+    const sql = fs.readFileSync(path.join(root, file), 'utf8').replace(/--[^\n]*/g, m => ' '.repeat(m.length)).replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '));
+    const steps = [];
+    const add = (at, drop, kind, name) => { if (!/^pg_temp\./.test(name)) steps.push({ at, drop, key: kind + ':' + name }); };
+    for (const m of sql.matchAll(/\bdrop\s+table\s+(?:if\s+exists\s+)?([a-z_0-9."]+)/gi)) add(m.index, true, 't', qualify(clean(m[1])));
+    for (const m of sql.matchAll(/\bdrop\s+function\s+(?:if\s+exists\s+)?([a-z_0-9."]+)/gi)) add(m.index, true, 'f', qualify(clean(m[1])));
+    for (const m of sql.matchAll(/\bcreate\s+(?:unlogged\s+)?table\s+(?:if\s+not\s+exists\s+)?([a-z_0-9."]+)/gi)) add(m.index, false, 't', qualify(clean(m[1])));
+    for (const m of sql.matchAll(/\bcreate\s+(?:or\s+replace\s+)?function\s+([a-z_0-9."]+)/gi)) add(m.index, false, 'f', qualify(clean(m[1])));
     for (const m of sql.matchAll(/\balter\s+table\s+(?:if\s+exists\s+)?(?:only\s+)?([a-z_0-9."]+)([^;]*)/gi)) {
-      const table = qualify(clean(m[1]));
-      for (const c of m[2].matchAll(/\bdrop\s+column\s+(?:if\s+exists\s+)?([a-z_0-9"]+)/gi)) dropped.add('c:' + table + '.' + clean(c[1]));
-      for (const c of m[2].matchAll(/\badd\s+column\s+(?:if\s+not\s+exists\s+)?([a-z_0-9"]+)/gi)) want('c', table + '.' + clean(c[1]), file);
+      const table = qualify(clean(m[1])), from = m.index + m[0].length - m[2].length;
+      for (const c of m[2].matchAll(/\bdrop\s+column\s+(?:if\s+exists\s+)?([a-z_0-9"]+)/gi)) add(from + c.index, true, 'c', table + '.' + clean(c[1]));
+      for (const c of m[2].matchAll(/\badd\s+column\s+(?:if\s+not\s+exists\s+)?([a-z_0-9"]+)/gi)) add(from + c.index, false, 'c', table + '.' + clean(c[1]));
     }
-    for (const m of sql.matchAll(/\bcreate\s+(?:unlogged\s+)?table\s+(?:if\s+not\s+exists\s+)?([a-z_0-9."]+)/gi)) {
-      const name = clean(m[1]); if (!/^pg_temp\./.test(name)) want('t', qualify(name), file);
-    }
-    for (const m of sql.matchAll(/\bcreate\s+(?:or\s+replace\s+)?function\s+([a-z_0-9."]+)/gi)) {
-      const name = clean(m[1]); if (!/^pg_temp\./.test(name)) want('f', qualify(name), file);
+    steps.sort((a, b) => a.at - b.at);
+    for (const step of steps) {
+      if (!step.drop) { wanted.set(step.key, file); continue; }
+      wanted.delete(step.key);
+      // Dropping a table takes its added columns with it.
+      if (step.key.startsWith('t:')) for (const key of [...wanted.keys()]) if (key.startsWith('c:' + step.key.slice(2) + '.')) wanted.delete(key);
     }
   }
-  for (const key of dropped) wanted.delete(key);
   return wanted;
 }
 const ignored = key => (config.ignore || []).some(rule => rule.endsWith('*') ? key.startsWith(rule.slice(0, -1)) : key === rule);
