@@ -110,7 +110,7 @@ function toPatterns(source) {
 // ---- _headers ----
 const rules = [];
 for (const rule of vercel.headers || []) {
-  if (rule.has || rule.missing) { warnings.push(`headers ${rule.source}: host/cookie condition dropped`); }
+  if (rule.has || rule.missing) { warnings.push(`headers ${rule.source}: host/cookie condition, skipped`); continue; }
   const pats = toPatterns(rule.source);
   if (!pats) { warnings.push(`headers ${rule.source}: pattern not supported, skipped`); continue; }
   for (const p of pats) rules.push({ path: p, headers: rule.headers.map((h) => [h.key, h.value]) });
