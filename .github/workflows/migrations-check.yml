@@ -1,0 +1,25 @@
+name: Migration check
+# Is every table, function and column our migration files create actually on the live database?
+# A gap is a warning on a pull request and a failure on main. See scripts/check-migrations.cjs.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 19 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Compare migration files with the live database
+        run: node scripts/check-migrations.cjs
+        env:
+          MIGRATIONS_CHECK_STRICT: ${{ github.event_name == 'pull_request' && '0' || '1' }}
