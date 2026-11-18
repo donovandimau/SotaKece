@@ -1,0 +1,15 @@
+{
+  "appId": "com.sotakece.app",
+  "appName": "Sota Kece",
+  "webDir": "www",
+  "server": {
+    "url": "https://sotakece.com",
+    "androidScheme": "https",
+    "errorPath": "offline.html",
+    "allowNavigation": ["sotakece.com", "www.sotakece.com"]
+  },
+  "appendUserAgent": "DimauApp/1 (com.sotakece.app)",
+  "backgroundColor": "#FCF3E2",
+  "android": { "allowMixedContent": false },
+  "ios": { "contentInset": "never" }
+}

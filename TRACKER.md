@@ -27,6 +27,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
 | 2026-11-18 | Claude | Share links /s/ /t/ /p/ /i/ and sere.sotakece.com/ back on Cloudflare (Worker code) — built, waiting for Donovan to merge | fix/worker-short-links |
 | 2026-11-16 | Claude | Sound across pages (SotaNowPlaying) + empty-state copy, release v206 — built, waiting for Donovan to merge | claude/alive-honest-20261116 |
 
