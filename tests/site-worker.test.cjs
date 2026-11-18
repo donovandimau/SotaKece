@@ -37,7 +37,7 @@ test('wrangler.jsonc sends exactly these paths to the Worker first',()=>{
   assert.equal(cfg.main,'cloudflare/site-worker.js');
   assert.deepEqual(cfg.compatibility_flags,['nodejs_compat']);
   assert.equal(cfg.assets.binding,'ASSETS');
-  assert.deepEqual(cfg.assets.run_worker_first,['/','/s/*','/t/*','/p/*','/i/*']);
+  assert.deepEqual(cfg.assets.run_worker_first,['/','/s/*','/t/*','/p/*','/i/*','/api/*']);
 });
 
 test('sere.sotakece.com/ opens the Sere app; sotakece.com/ and other sere paths stay as they are',async()=>{

@@ -12,8 +12,8 @@
 // /t/, /p/ and /i/ need nothing secret. /s/ needs SOTA_SERVICE_KEY and SERE_SECRET; while those are
 // not set on the Worker, /s/ links are passed to the Vercel deployment that still has them, so a
 // shared singing photo keeps working.
-// Everything else goes to the static files, and /api/* never reaches this Worker (the
-// dimau-api-forwarder Worker owns <host>/api/*).
+// Everything else goes to the static files. /api/* is handled before this file is reached, in
+// cloudflare/site-worker.js.
 const listen = require('../api/listen.js');
 const share = require('../api/share.js');
 const invite = require('../api/invite.js');
