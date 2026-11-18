@@ -1,0 +1,15 @@
+// Cloudflare Workers Builds: every merge to main runs
+//   node scripts/cf-static-assets.mjs --copy --out dist
+// (copies only the public site files into dist/ and writes dist/_headers from vercel.json)
+// and then `npx wrangler deploy`. Static files only: no main, no routes
+// (sotakece.com, www and sere.sotakece.com are attached in Cloudflare; /api/* is answered by
+// the separate dimau-api-forwarder Worker).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sotakece",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash"
+  }
+}
