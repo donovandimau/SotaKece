@@ -1,15 +1,21 @@
 // Cloudflare Workers Builds: every merge to main runs
 //   node scripts/cf-static-assets.mjs --copy --out dist
 // (copies only the public site files into dist/ and writes dist/_headers from vercel.json)
-// and then `npx wrangler deploy`. Static files only: no main, no routes
-// (sotakece.com, www and sere.sotakece.com are attached in Cloudflare; /api/* is answered by
-// the separate dimau-api-forwarder Worker).
+// and then `npx wrangler deploy`. No routes: sotakece.com, www and sere.sotakece.com are attached
+// in Cloudflare, and /api/* is answered by the separate dimau-api-forwarder Worker.
+// cloudflare/site-worker.js runs first only for the paths in run_worker_first: the share links
+// /s/, /t/, /p/, /i/ (the same api/listen.js, api/share.js and api/invite.js Vercel ran) and "/"
+// (sere.sotakece.com/ opens sere/index.html). Every other path is served straight from dist/.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sotakece",
+  "main": "cloudflare/site-worker.js",
   "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": "./dist",
-    "html_handling": "auto-trailing-slash"
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/", "/s/*", "/t/*", "/p/*", "/i/*"]
   }
 }
