@@ -1,0 +1,6 @@
+{
+  "dirs": ["supabase/migrations"],
+  "databases": [{ "name": "dimau-core-sydney", "url": "https://aqfzpaczyodhugsgqvxi.supabase.co", "key": "sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF" }],
+  "ignoreFiles": [],
+  "ignore": []
+}
