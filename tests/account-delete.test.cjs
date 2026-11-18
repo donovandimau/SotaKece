@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test');const assert=require('node:assert');
 const {wipeBucket,BUCKETS}=require('../api/account-delete.js');
-const env={SOTA_SERVICE_KEY:'x'.repeat(40)};
+const env={SOTA_SERVER_SECRET:'x'.repeat(40)};
 const UID='33333333-3333-3333-3333-333333333333';
 function fetcher(calls){
   return async(url,opts)=>{

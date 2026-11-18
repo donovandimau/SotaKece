@@ -9,9 +9,9 @@
 //   /i/<token>                  -> api/invite.js  (an invite)
 //
 // The same handler files Vercel ran are used here, unchanged, through a small (req, res) adapter.
-// /t/, /p/ and /i/ need nothing secret. /s/ needs SOTA_SERVICE_KEY and SERE_SECRET; while those are
-// not set on the Worker, /s/ links are passed to the Vercel deployment that still has them, so a
-// shared singing photo keeps working.
+// /t/, /p/ and /i/ need nothing secret. /s/ needs SOTA_SERVER_SECRET (the key for the sota-server edge
+// function, which reads the sere with the service key) and SERE_SECRET; while those are not set on the
+// Worker, /s/ links are passed to the Vercel deployment, so a shared singing photo keeps working.
 // Everything else goes to the static files. /api/* is handled before this file is reached, in
 // cloudflare/site-worker.js.
 const listen = require('../api/listen.js');
@@ -30,7 +30,7 @@ const ROUTES = [
   { re: /^\/p\/([0-9]{1,18})\/([a-fA-F0-9]{32})\/?$/, handler: share, query: (m) => ({ post: m[1], t: m[2] }) },
   { re: /^\/i\/([a-fA-F0-9]{32})\/?$/, handler: invite, query: (m) => ({ t: m[1] }) },
 ];
-const SERE_SECRETS = ['SOTA_SERVICE_KEY', 'SERE_SECRET'];
+const SERE_SECRETS = ['SOTA_SERVER_SECRET', 'SERE_SECRET'];
 
 // Vercel put these on every answer (first entry of vercel.json "routes"); the static files get them
 // from dist/_headers, the pages made here get them from this list.

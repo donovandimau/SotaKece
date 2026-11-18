@@ -99,11 +99,11 @@ test('/s/ without the sere secrets on the Worker is answered by the Vercel deplo
 
 test('/s/ with the sere secrets on the Worker runs api/listen.js itself and checks the signed key',async t=>{
   const secret='test-secret-0123456789abcdef',vid='https://aqfzpaczyodhugsgqvxi.supabase.co/storage/v1/object/public/sere-video/x.mp4';
-  const saved={k:process.env.SOTA_SERVICE_KEY,s:process.env.SERE_SECRET};
-  delete process.env.SOTA_SERVICE_KEY;delete process.env.SERE_SECRET;
-  t.after(()=>{for(const [k,v] of [['SOTA_SERVICE_KEY',saved.k],['SERE_SECRET',saved.s]]){if(v===undefined)delete process.env[k];else process.env[k]=v;}});
+  const saved={k:process.env.SOTA_SERVER_SECRET,s:process.env.SERE_SECRET};
+  delete process.env.SOTA_SERVER_SECRET;delete process.env.SERE_SECRET;
+  t.after(()=>{for(const [k,v] of [['SOTA_SERVER_SECRET',saved.k],['SERE_SECRET',saved.s]]){if(v===undefined)delete process.env[k];else process.env[k]=v;}});
   stubFetch(t,url=>url.includes('/bv_sere_media_generations')?Response.json([{id:SERE,user_id:'u1',caption:'Isa lei',output_video_url:vid}]):Response.json([{display_name:'Mere Tora'}]));
-  const e=env({SOTA_SERVICE_KEY:'fake_service_key_for_test_only',SERE_SECRET:secret});
+  const e=env({SOTA_SERVER_SECRET:'fake_bridge_key_for_test_only_000000',SERE_SECRET:secret});
   const never=async()=>{throw Error('must not call Vercel');};
   let r=await routes.handle(get(`https://sotakece.com/s/${SERE}/${listen.shareKey(secret,SERE)}`),e,never);
   assert.equal(r.status,200);assert.match(await r.text(),/<title>Mere made a photo sing/);

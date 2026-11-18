@@ -83,7 +83,7 @@ test('startRender posts to Replicate with a signed webhook and refuses without k
 });
 test('finish stores the video and poster, marks completed, and marks failures',async()=>{
   const log=[];
-  const env={SOTA_SERVICE_KEY:'service-key-xxxxxxxxxxxxxxxx'};
+  const env={SOTA_SERVER_SECRET:'bridge-key-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'};
   const job={id:'11111111-1111-4111-8111-111111111111',user_id:'22222222-2222-4222-8222-222222222222',audio_url:'u/a.wav',source_image_url:'u/i.jpg'};
   const fetcher=async(url,init={})=>{
     log.push({url,method:init.method||'GET',headers:init.headers||{},body:init.body});
@@ -170,4 +170,40 @@ test('speak waits on Replicate, polls, and returns the audio bytes',async()=>{
 });
 test('the maker exposes the voice and engine lists the sheet is built from',()=>{
   assert.ok(sere.VOICES.some(v=>v[0]==='george'));assert.deepEqual(sere.ENGINES.map(e=>e[0]),['quick','lifelike']);
+});
+
+// ---------------------------------------------------------------- no service key on the server (18 Nov 2026)
+test('privileged reads and writes go to the sota-server edge function with the bridge key, never a service key',async()=>{
+  const log=[];
+  const env={SOTA_SERVER_SECRET:'bridge-key-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'};
+  const fetcher=async(url,init={})=>{log.push({url,headers:init.headers||{}});return {ok:true,json:async()=>[{id:'x'}]};};
+  await api.getJob(env,'11111111-1111-4111-8111-111111111111',fetcher);
+  await api.patchJob(env,'11111111-1111-4111-8111-111111111111',{status:'failed'},fetcher,'&status=eq.pending');
+  for(const l of log){
+    assert.match(l.url,/^https:\/\/aqfzpaczyodhugsgqvxi\.supabase\.co\/functions\/v1\/sota-server\/rest\/v1\/bv_sere_media_generations\?id=eq\./);
+    assert.equal(l.headers['x-sota-bridge'],env.SOTA_SERVER_SECRET);
+    assert.ok(!('apikey' in l.headers)&&!('Authorization' in l.headers),'no Supabase key is sent');
+  }
+  await assert.rejects(api.getJob({SOTA_SERVICE_KEY:'old-service-key-xxxxxxxxxxxxxxxxxxxx'},'x',fetcher),/config/,'the old service key is no longer read');
+});
+test('without the render key, Sere says it is paused before any work and frees a started job',async()=>{
+  assert.equal(api.renderOn({}),false);assert.equal(api.renderOn({REPLICATE_API_TOKEN:'r8_token_xxxxxxx'}),true);
+  const saved={...process.env};delete process.env.REPLICATE_API_TOKEN;process.env.SOTA_SERVER_SECRET='bridge-key-xxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+  const realFetch=global.fetch;const log=[];
+  const ME='22222222-2222-4222-8222-222222222222',ID='11111111-1111-4111-8111-111111111111';
+  global.fetch=async(url,init={})=>{log.push({url,method:init.method||'GET',body:init.body});
+    if(url.endsWith('/auth/v1/user'))return {ok:true,json:async()=>({id:ME})};
+    if(url.includes('bv_sere_media_generations')&&(init.method||'GET')==='GET')return {ok:true,json:async()=>[{id:ID,user_id:ME,status:'pending'}]};
+    if(init.method==='PATCH')return {ok:true,json:async()=>[{id:ID}]};
+    throw new Error('unexpected '+url);};
+  try{
+    for(const action of ['speak','start']){
+      log.length=0;let status=null,out=null;
+      const res={setHeader(){},status(s){status=s;return this;},json(j){out=j;return this;}};
+      await api({method:'POST',headers:{authorization:'Bearer '+'a'.repeat(40)},body:{action,id:ID,text:'Bula vinaka',imageExt:'jpg'}},res);
+      assert.equal(status,503);assert.equal(out.code,'render_off');assert.equal(out.error,api.RENDER_OFF);
+      assert.ok(!log.some(l=>/replicate|bv_sere_mine|bv_sere_create/.test(l.url)),action+': no voice, allowance or render call');
+      if(action==='start'){const p=log.find(l=>l.method==='PATCH');assert.ok(p,'the pending job is marked failed');assert.match(p.url,/status=eq\.pending$/);assert.equal(JSON.parse(p.body).status,'failed');}
+    }
+  }finally{global.fetch=realFetch;for(const k of Object.keys(process.env))if(!(k in saved))delete process.env[k];Object.assign(process.env,saved);}
 });

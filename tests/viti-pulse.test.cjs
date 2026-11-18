@@ -194,7 +194,7 @@ test('a song page plays without an account and carries the preview tags chat app
 });
 test('a sere page needs the signed key, shows only our own files and escapes the maker\'s words',async()=>{
   const key=listen.shareKey(SECRET,ID),row={id:ID,user_id:'u',caption:'Isa <script>alert(1)</script>',output_video_url:VIDEO,output_poster_url:POSTER};
-  const ok=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVICE_KEY:'k'.repeat(30)},sereDb(row),()=>listen({method:'GET',query:{sere:ID.toUpperCase(),k:key}},ok));
+  const ok=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVER_SECRET:'k'.repeat(40)},sereDb(row),()=>listen({method:'GET',query:{sere:ID.toUpperCase(),k:key}},ok));
   assert.equal(ok.code,200);
   assert.ok(ok.body.includes(`<meta property="og:video" content="${VIDEO}">`));assert.ok(ok.body.includes(`<meta property="og:image" content="${POSTER}">`));
   assert.ok(ok.body.includes('<video controls playsinline preload="metadata"'));
@@ -204,21 +204,21 @@ test('a sere page needs the signed key, shows only our own files and escapes the
   assert.ok(ok.body.includes(`https://sotakece.com/s/${ID}/${key}`));
   let asked=0;const count=async(...a)=>{asked++;return sereDb(row)(...a);};
   for(const k of ['',key.slice(0,-1)+(key.endsWith('0')?'1':'0'),'x'.repeat(32),listen.shareKey('other-secret-other-secret',ID)]){
-    const r=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVICE_KEY:'k'.repeat(30)},count,()=>listen({method:'GET',query:{sere:ID,k}},r));
+    const r=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVER_SECRET:'k'.repeat(40)},count,()=>listen({method:'GET',query:{sere:ID,k}},r));
     assert.equal(r.code,404);assert.equal(r.headers['cache-control'],'no-store');
   }
   assert.equal(asked,0,'a wrong key never reaches the database');
-  const removed=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVICE_KEY:'k'.repeat(30)},sereDb(null),()=>listen({method:'GET',query:{sere:ID,k:key}},removed));
+  const removed=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVER_SECRET:'k'.repeat(40)},sereDb(null),()=>listen({method:'GET',query:{sere:ID,k:key}},removed));
   assert.equal(removed.code,404,'a removed sere takes its page with it');
-  const foreign=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVICE_KEY:'k'.repeat(30)},sereDb(Object.assign({},row,{output_video_url:'https://evil.example/v.mp4'})),()=>listen({method:'GET',query:{sere:ID,k:key}},foreign));
+  const foreign=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVER_SECRET:'k'.repeat(40)},sereDb(Object.assign({},row,{output_video_url:'https://evil.example/v.mp4'})),()=>listen({method:'GET',query:{sere:ID,k:key}},foreign));
   assert.equal(foreign.code,404,'a video that is not in our bucket is never embedded');
-  const nosecret=res();await withEnv({SERE_SECRET:'',SOTA_SERVICE_KEY:'k'.repeat(30)},sereDb(row),()=>listen({method:'GET',query:{sere:ID,k:listen.shareKey('',ID)}},nosecret));
+  const nosecret=res();await withEnv({SERE_SECRET:'',SOTA_SERVER_SECRET:'k'.repeat(40)},sereDb(row),()=>listen({method:'GET',query:{sere:ID,k:listen.shareKey('',ID)}},nosecret));
   assert.equal(nosecret.code,404,'no secret set means no public pages at all');
 });
 test('only the maker of a finished sere is given its public link',async()=>{
   const sere=require(path.join(root,'api/sere.js'));
   const job=over=>Object.assign({id:ID,user_id:'11111111-1111-4111-8111-111111111111',status:'completed',output_video_url:VIDEO},over||{});
-  const run=async(row,uid)=>{const r=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVICE_KEY:'k'.repeat(30)},
+  const run=async(row,uid)=>{const r=res();await withEnv({SERE_SECRET:SECRET,SOTA_SERVER_SECRET:'k'.repeat(40)},
     async url=>({ok:true,json:async()=>String(url).includes('/auth/v1/user')?{id:uid}:[row]}),
     ()=>sere({method:'POST',headers:{authorization:'Bearer '+'t'.repeat(40)},body:{action:'share',id:ID}},r));return r;};
   const mine=await run(job(),'11111111-1111-4111-8111-111111111111');

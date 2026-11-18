@@ -7,8 +7,11 @@
 //   - the share links /s/, /t/, /p/, /i/ and the home page "/" (so sere.sotakece.com/ can open the
 //     Sere app). That routing lives in cloudflare/site-routes.cjs, where the tests can reach it.
 //
-// Secrets the API reads (set on this Worker with `wrangler secret put`, same values as Vercel):
-//   SOTA_SERVICE_KEY, SERE_SECRET, REPLICATE_API_TOKEN   (sere, sere-callback, account-delete)
+// Secrets the API reads (set on this Worker as secrets; the Vercel values are not needed):
+//   SOTA_SERVER_SECRET  key for the Supabase edge function sota-server, which holds the service key
+//                       (sere, sere-callback, listen /s/, account-delete). No service key on the Worker.
+//   SERE_SECRET         signs /s/ share links and the render webhook address (fresh on 18 Nov 2026)
+//   REPLICATE_API_TOKEN the render service (Donovan's Replicate account); without it Sere says it is paused
 //   optional: CF_TURN_KEY_ID, CF_TURN_API_TOKEN, CALLS_TURN_URLS, CALLS_TURN_SECRET (call relay)
 // With nodejs_compat and this compatibility date, Worker secrets also appear in process.env, which is
 // where the handlers read them, as on Vercel.
