@@ -1,3 +1,5 @@
 tests/talanoa-tools/node_modules/
 work/
 node_modules/
+
+dist/
