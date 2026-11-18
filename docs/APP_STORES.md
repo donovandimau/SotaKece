@@ -34,6 +34,8 @@ npx cap sync
 
 ## Android (Google Play)
 
+Android Studio 2026.2 ships Java 25, which Gradle 8.14.3 (Capacitor 8) can't run ("Unsupported class file major version 69"). Use a Java 21 JDK: in Android Studio, Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JDK. On Donovan's PC it is `D:\Android\jdk-21`, and the SDK is `D:\Android\Sdk`.
+
 1. Install Android Studio from https://developer.android.com/studio and accept the SDK licence.
 2. In `mobile/`, run `npx cap open android` and wait for Gradle sync to finish. Run it on a phone to check calls, the camera and music.
 3. Build > Generate Signed App Bundle or APK > Android App Bundle. Create the key store the first time and keep the `.jks` file and its password forever, backed up offline. Choose `release`. The output is `mobile/android/app/release/app-release.aab`.
