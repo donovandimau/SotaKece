@@ -598,6 +598,14 @@ body.sx-member #app.sx-app[data-world-page="pulse"] .sx-world-toolbar [data-worl
 #app.sx-app .sk-group-actions button{min-height:48px;padding:8px 12px;border-radius:14px;border:1px solid rgba(23,62,73,.16);background:#fff;color:var(--world-dark,#173e4b);font:inherit;font-size:14px;font-weight:700;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:6px}
 #app.sx-app .sk-group-actions button:hover{border-color:var(--world-accent,#086779)}
 #app.sx-app .sk-group-actions button:focus-visible{outline:3px solid var(--world-accent,#086779);outline-offset:2px}
-@media(min-width:1101px){body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side{grid-column:1/-1;grid-row:auto;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}}
+/* Home groups, desktop (19 Nov 2026): Music runs full width with its visuals and island songs side by side; Your people and Make it yours share the row under it at equal height. The small Talanoa card is not shown here because the Talanoa wall sits at the foot of Home. */
+#app.sx-app .sk-home-side .sota-social-wall{display:none}
+#app.sx-app .sk-home-side .sota-social-host.sota-social-no-mates{display:none}
+@media(min-width:1101px){body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side{grid-column:1/-1;grid-row:auto;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:stretch}
+body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side>[data-sk-group="music"]{grid-column:1/-1}
+body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side>[data-sk-group="music"]>.sk-group-body{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start;gap:20px}
+body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side>.sk-group{align-content:start}
+body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side .sk-group-body>.hub-card{max-width:none;width:auto}
+body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side>[data-sk-group="yours"] .sk-group-actions{grid-template-columns:1fr}}
 @media(max-width:400px){#app.sx-app .sk-group-actions{grid-template-columns:1fr}}
 @media(forced-colors:active){#app.sx-app .sk-group,#app.sx-app .sk-group-actions button{background:Canvas;color:CanvasText;border-color:CanvasText}}

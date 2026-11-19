@@ -67,3 +67,5 @@ body.sere-open{overflow:hidden}
 .sere-engine[aria-checked="true"]{border-color:#1E90FF;background:rgba(135,206,235,.35);box-shadow:0 0 0 2px #1E90FF inset}
 .sx-world-sere{margin-left:8px}
 @media (max-width:520px){.sere-engines{grid-template-columns:1fr}.sere-say .sere-row{grid-template-columns:1fr}}
+.sere-song{display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:12.5px;font-weight:600;color:#3C6B86}
+.sere-song select{font:inherit;font-size:16px;padding:9px 11px;border-radius:12px;border:1px solid rgba(11,42,74,.16);background:#fff;color:#0b2a4a;min-height:48px;width:100%}
