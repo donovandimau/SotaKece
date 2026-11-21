@@ -27,10 +27,10 @@
   window.DimauCompanion = window.DimauCompanion || {
     mount: function () { return null; }, open: function () { if (window.Volau) window.Volau.open(); }, profiles: {}
   };
-  if (window.__nvvWidget || document.querySelector('script[src*="fijian-assistant-api.vercel.app/widget/widget.js"]')) return;
+  if (window.__nvvWidget || document.querySelector('script[src*="volau.dimau-fintech.com/widget/widget.js"]')) return;
   if (window.self !== window.top) return; // never inside embedded frames
   var s = document.createElement('script');
-  s.src = 'https://fijian-assistant-api.vercel.app/widget/widget.js';
+  s.src = 'https://volau.dimau-fintech.com/widget/widget.js';
   s.setAttribute('data-app', app);
   s.setAttribute('data-side', (me && me.getAttribute('data-side')) || 'left');
   s.async = true;
