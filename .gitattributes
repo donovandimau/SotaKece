@@ -1,2 +1,3 @@
 
 TRACKER.md merge=union
+supabase/baseline/*.sql -text
