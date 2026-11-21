@@ -5,7 +5,7 @@
 // The Worker holds only SOTA_SERVER_SECRET, a random value shared with that function; the function
 // holds the service key and repeats only the requests on its own short list.
 // The request shapes are the same as before; only the base address and the key header change.
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
+const SOTA_URL='https://xnxmumbvgtmlpenutlii.supabase.co';
 const SERVICE_URL=`${SOTA_URL}/functions/v1/sota-server`;
 // A key must look like a key (letters, digits, . _ -). A value pasted wrong (code, a line break) used to reach
 // fetch and fail as 'invalid header value'; now it is reported as the plain 'config' fault.

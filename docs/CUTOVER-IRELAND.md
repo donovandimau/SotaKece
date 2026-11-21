@@ -1,7 +1,19 @@
 # Cutover: Sota Kece onto the shared Dimau account (dimau-core-ireland)
 
-Prepared 21 Nov 2026 (Ops task 1255). Not done yet. Every step that changes a live database, a live
-setting or the live site needs Donovan's yes in chat first.
+Prepared 21 Nov 2026 (Ops task 1255). **Run 21 Nov 2026 (Ops task 1257, Donovan: "Done, run the cutover").**
+
+## What was done on 21 Nov
+
+| Step | Result |
+| --- | --- |
+| 1 Redirect URLs | Added by Donovan in the Ireland dashboard |
+| 5 Baseline | Applied to dimau-core-ireland, recorded as migration `20261121195543 sota_kece_baseline_from_sydney`. Ireland downloaded both files from GitHub (commit 87774ef) and checked them against the live export's md5 before running. Inventory equals Sydney exactly (56 tables, 171 functions, 162 indexes, 279 constraints, 64 policies, 470/285 grants, 5 buckets, 8 storage policies, 2 realtime tables, 1 cron job). |
+| 6 sota-server | Deployed to Ireland, verify_jwt off, same code and secret hash; refuses requests without the secret (401). |
+| 7 Rows | No id swap was needed: the one member has the same auth id in both projects. 26 rows copied (profile, wallet, app link, Talanoa post, Sere item, 7 sparks, 6 Sere scenes, 3 hubs, coin settings, 4 coin bundles) with triggers off, sequences moved on. Per-table md5 of every row equals Sydney (Sere item after the address change). The export method escaped `&` in two hub names; fixed and re-checked. |
+| 8 Files | 9 objects (3.1 MB) copied to the same bucket and path through two one-off helper functions (`sota-move-export` on Sydney, `sota-move-import` on Ireland) and a one-time secret. Names and sizes identical on both sides. Both helpers then redeployed as do-nothing stubs (410, JWT required); delete them from the dashboard when convenient. |
+| 9 Switch | `switch-backend.cjs --switch` (22 files), `EXPECTED = []`, release bumped to `sota-kece-shell-20261121-v207-ireland` so installed copies fetch the new page, CSS rebuilt. 780/780 tests and the database runners pass (LF copy). |
+
+The rest of this page is the plan as written beforehand.
 
 ## Why it is one switch
 

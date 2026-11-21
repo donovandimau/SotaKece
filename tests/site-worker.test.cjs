@@ -98,7 +98,7 @@ test('/s/ without the sere secrets on the Worker is answered by the Vercel deplo
 });
 
 test('/s/ with the sere secrets on the Worker runs api/listen.js itself and checks the signed key',async t=>{
-  const secret='test-secret-0123456789abcdef',vid='https://aqfzpaczyodhugsgqvxi.supabase.co/storage/v1/object/public/sere-video/x.mp4';
+  const secret='test-secret-0123456789abcdef',vid='https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/sere-video/x.mp4';
   const saved={k:process.env.SOTA_SERVER_SECRET,s:process.env.SERE_SECRET};
   delete process.env.SOTA_SERVER_SECRET;delete process.env.SERE_SECRET;
   t.after(()=>{for(const [k,v] of [['SOTA_SERVER_SECRET',saved.k],['SERE_SECRET',saved.s]]){if(v===undefined)delete process.env[k];else process.env[k]=v;}});

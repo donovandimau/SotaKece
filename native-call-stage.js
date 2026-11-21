@@ -98,7 +98,7 @@
     if (window.__sotaStageClient) return window.__sotaStageClient;
     const lib = window.supabase;
     if (!lib || typeof lib.createClient !== 'function') return null;
-    window.__sotaStageClient = lib.createClient('https://aqfzpaczyodhugsgqvxi.supabase.co', 'sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF');
+    window.__sotaStageClient = lib.createClient('https://xnxmumbvgtmlpenutlii.supabase.co', 'sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM');
     return window.__sotaStageClient;
   }
   function joinReactions() {

@@ -6,8 +6,8 @@
 // so the join is credited to the inviter once the room exists. Only the publishable key is used: the
 // token is the capability, and bv_invite_open returns nothing for a token that was never made.
 const listen=require('./listen.js');
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
-const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+const SOTA_URL='https://xnxmumbvgtmlpenutlii.supabase.co';
+const SOTA_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 const SITE='https://sotakece.com';
 const OG_IMAGE=SITE+'/assets/og-sota-kece-premium-20261111.jpg';
 const TOKEN=/^[a-f0-9]{32}$/;

@@ -1,7 +1,7 @@
 // New adapter to existing account and data services; no legacy UI modules.
 // Only the public client key is embedded. Access remains governed by existing RLS.
-const URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
-const PUBLIC_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+const URL='https://xnxmumbvgtmlpenutlii.supabase.co';
+const PUBLIC_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 let clientPromise;
 export async function client(){if(!clientPromise)clientPromise=import('https://esm.sh/@supabase/supabase-js@2.57.4').then(({createClient})=>createClient(URL,PUBLIC_KEY,{auth:{storageKey:'sota-revised-auth',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})).catch(error=>{clientPromise=null;throw error;});return clientPromise;}
 export async function result(query){const {data,error}=await query;if(error)throw new Error(error.message||'The connection was interrupted. Try again.');return data;}

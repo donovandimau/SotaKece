@@ -1,7 +1,7 @@
 'use strict';
 const {createHmac}=require('node:crypto');
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
-const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+const SOTA_URL='https://xnxmumbvgtmlpenutlii.supabase.co';
+const SOTA_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const STUN={urls:['stun:stun.cloudflare.com:3478']};
 const ICE_URL=/^(?:stun|turns?):[a-z0-9.-]+(?::(\d{1,5}))?(?:\?transport=(?:udp|tcp))?$/i;

@@ -2,7 +2,7 @@
  'use strict';
  function uuid4(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g,function(c){return (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16);});}
  const C=window.DimauCommsCore,$=id=>document.getElementById(id);
- const sb=window.supabase.createClient('https://aqfzpaczyodhugsgqvxi.supabase.co','sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF');
+ const sb=window.supabase.createClient('https://xnxmumbvgtmlpenutlii.supabase.co','sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM');
  const S={user:null,me:null,groups:[],group:null,rows:new Map(),profiles:new Map(),epoch:0,loading:false,sending:false,operation:null,dirty:true,tab:'chat',cursor:null,complete:false};
  window.SotaSpaceDesign?.init({getOwner:()=>S.user?.id||null});window.SotaSpaceDesign?.mount($('workspace'),{page:'communications'});
  const callUI=window.DimauNativeCalls.create({sb,root:$('nativeCalls'),inbox:$('callInbox'),getContext:()=>({user:S.user,group:S.group,groups:S.groups}),onStatus:tell,onSelectGroup:async crew=>{const g=S.groups.find(g=>String(g.id)===String(crew));if(g){setTab('calls');await selectGroup(g);}}});
