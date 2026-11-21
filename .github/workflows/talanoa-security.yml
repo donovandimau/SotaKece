@@ -31,3 +31,4 @@ jobs:
       - run: node tests/run-talanoa-voice-db.cjs
       - run: node tests/run-safety-db.cjs
       - run: node tests/run-sere-db.cjs
+      - run: node tests/run-baseline-db.cjs
