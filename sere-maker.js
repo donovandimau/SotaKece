@@ -109,6 +109,7 @@
   }
   /* Island songs (19 Nov 2026): the picture can sing one of the real songs already on Sota Kece,
      so nobody has to find an MP3 first. Same list and storage the Music page plays from. */
+  var audioPick = 0;
   var SONG_BASE = 'https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/fiji-audio/', songs = null;
   function loadSongs() {
     if (songs) return Promise.resolve(songs);
@@ -341,8 +342,9 @@
       var k = t.dataset.sere;
       try {
         if (k === 'image') { st.image = await prepImage(t.files[0]); st.error = null; paint(); }
-        if (k === 'audio') { toast('Reading the sound…'); st.audio = await decodeAudio(t.files[0]); st.startMs = 0; st.error = null; paint(); }
-        if (k === 'song' && t.value) { toast('Getting the song…'); t.disabled = true; st.audio = await songAudio(t.value); st.startMs = 0; st.error = null; paint(); }
+        // Only the latest sound choice wins: a slow song download must not replace a sound picked after it.
+        if (k === 'audio') { var na = ++audioPick; toast('Reading the sound…'); var fa = await decodeAudio(t.files[0]); if (na !== audioPick) return; st.audio = fa; st.startMs = 0; st.error = null; paint(); }
+        if (k === 'song' && t.value) { var ns = ++audioPick; toast('Getting the song…'); t.disabled = true; var fs = await songAudio(t.value); if (ns !== audioPick) return; st.audio = fs; st.startMs = 0; st.error = null; paint(); }
         if (k === 'scene') st.scene = t.value;
         if (k === 'voice') st.voice = t.value;
         if (k === 'caption') st.caption = t.value.slice(0, 140);
