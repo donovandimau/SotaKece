@@ -1,4 +1,5 @@
-// sota-server: the Sota Kece Worker's narrow door to the service role (dimau-core-sydney).
+// sota-server: the Sota Kece Worker's narrow door to the service role (dimau-core-ireland since 21 Nov 2026;
+// the same code also still runs on dimau-core-sydney, read-only fallback).
 //
 // The Cloudflare Worker (api/sere.js, api/sere-callback.js, api/listen.js, api/account-delete.js) no
 // longer holds the Supabase service key. It sends the same REST and storage requests it used to send

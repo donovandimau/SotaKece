@@ -6,7 +6,7 @@
 // function, which holds the service key; see api/_sota-server.js).
 'use strict';
 const {SOTA_URL,SERVICE_URL,svcHeaders}=require('./_sota-server.js');
-const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+const SOTA_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice'];
 

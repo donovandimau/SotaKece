@@ -40,7 +40,7 @@ test('the page reads the invite with the publishable key only and the token as t
   let call=null;
   const got=await invite.openInvite(TOKEN,async(url,opts)=>{call={url,opts};return {ok:true,json:async()=>card};});
   assert.equal(got.handle,'ana');
-  assert.equal(call.url,'https://aqfzpaczyodhugsgqvxi.supabase.co/rest/v1/rpc/bv_invite_open');
+  assert.equal(call.url,'https://xnxmumbvgtmlpenutlii.supabase.co/rest/v1/rpc/bv_invite_open');
   assert.equal(call.opts.headers.apikey.startsWith('sb_publishable_'),true);
   assert.equal(call.opts.headers.Authorization,undefined);
   assert.deepEqual(JSON.parse(call.opts.body),{p_token:TOKEN});

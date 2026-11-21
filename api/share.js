@@ -7,8 +7,8 @@
 // people land on sign-up with the link remembered). Only the publishable key is used: the token
 // is the capability, and nothing here can read a post that was never shared.
 const listen=require('./listen.js');
-const SOTA_URL='https://aqfzpaczyodhugsgqvxi.supabase.co';
-const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+const SOTA_URL='https://xnxmumbvgtmlpenutlii.supabase.co';
+const SOTA_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 const SITE='https://sotakece.com';
 const OG_IMAGE=SITE+'/assets/og-sota-kece-premium-20261111.jpg';
 const POST=/^[0-9]{1,18}$/,TOKEN=/^[a-f0-9]{32}$/;

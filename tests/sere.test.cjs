@@ -180,7 +180,7 @@ test('privileged reads and writes go to the sota-server edge function with the b
   await api.getJob(env,'11111111-1111-4111-8111-111111111111',fetcher);
   await api.patchJob(env,'11111111-1111-4111-8111-111111111111',{status:'failed'},fetcher,'&status=eq.pending');
   for(const l of log){
-    assert.match(l.url,/^https:\/\/aqfzpaczyodhugsgqvxi\.supabase\.co\/functions\/v1\/sota-server\/rest\/v1\/bv_sere_media_generations\?id=eq\./);
+    assert.match(l.url,/^https:\/\/xnxmumbvgtmlpenutlii\.supabase\.co\/functions\/v1\/sota-server\/rest\/v1\/bv_sere_media_generations\?id=eq\./);
     assert.equal(l.headers['x-sota-bridge'],env.SOTA_SERVER_SECRET);
     assert.ok(!('apikey' in l.headers)&&!('Authorization' in l.headers),'no Supabase key is sent');
   }
