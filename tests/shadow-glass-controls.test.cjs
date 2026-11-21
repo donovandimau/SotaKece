@@ -18,7 +18,7 @@ domTest('installer keeps install and defer behavior while assigning different se
 domTest('companion file is the Volau loader: old callers keep working and open goes to Volau',async t=>{
  const h=harness(t);h.run('dimau-companion.js');const c=h.w.DimauCompanion;assert.equal(typeof c.mount,'function');assert.equal(c.mount({appId:'bulavata'}),null,'nothing of the old companion is drawn');
  assert.doesNotThrow(()=>c.open(),'open is safe before Volau has loaded');let opened=0;h.w.Volau={open(){opened++;}};c.open();assert.equal(opened,1);
- assert.equal(h.d.querySelector('[data-dimau-companion]'),null);const text=source('dimau-companion.js');assert.match(text,/fijian-assistant-api\.vercel\.app\/widget\/widget\.js/);assert.match(text,/window\.self !== window\.top/,'never loads inside embedded frames');await flush();
+ assert.equal(h.d.querySelector('[data-dimau-companion]'),null);const text=source('dimau-companion.js');assert.match(text,/volau\.dimau-fintech\.com\/widget\/widget\.js/);assert.match(text,/window\.self !== window\.top/,'never loads inside embedded frames');await flush();
 });
 domTest('Connect glass launcher and symbol links keep exact destinations and keyboard dismissal',async t=>{
  const h=harness(t);h.run('dimau-connect.js');h.d.dispatchEvent(new h.w.Event('DOMContentLoaded'));const host=h.d.getElementById('dimau-connect-launcher'),r=host.shadowRoot,toggle=r.querySelector('.toggle');
