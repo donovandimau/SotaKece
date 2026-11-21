@@ -487,7 +487,7 @@ async function signUp(){
   const {data:free, error:he} = await sb.rpc("bv_handle_free",{p_handle:handle});
   if(!he && free===false){ err.textContent="That handle is taken."; b.disabled=false; return; }
   window.SKFunnel("signup_provider",{provider:"email",mode:"up"});
-  const {data,error} = await sb.auth.signUp({email:$("#a-email").value.trim(),password:$("#a-pass").value});
+  const {data,error} = await sb.auth.signUp({email:$("#a-email").value.trim(),password:$("#a-pass").value,options:{emailRedirectTo:location.origin+"/"}});
   if(error){ err.textContent=error.message; b.disabled=false; window.SKFunnel("signup_error",{provider:"email",step:"signup"}); return; }
   window.SKFunnel("signup_account_created",{provider:"email",confirm_email:data.session?0:1});
   const band = bandFor(year);
