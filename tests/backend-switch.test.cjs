@@ -11,15 +11,8 @@ const {FROM, TO, rewrite, namesSydney, sydneyFiles} = require('../scripts/switch
 const root = path.resolve(__dirname, '..');
 const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 
-// Every file that talks to Sota Kece's own project. A new file that names Sydney fails this test, so
-// whoever adds it also decides that it moves with the rest. At the cutover this list becomes [].
-const EXPECTED = [
-  'api/_sota-server.js', 'api/account-delete.js', 'api/call-config.js', 'api/invite.js', 'api/sere.js',
-  'api/share.js', 'call-room.js', 'communications.js', 'data-deletion.html', 'index.html', 'link.html',
-  'migrations-check.json', 'motion-editor.js', 'native-call-stage.js', 'revised/backend.mjs',
-  'sere/index.html', 'tests/first-paint.test.cjs', 'tests/invites.test.cjs', 'tests/sere.test.cjs',
-  'tests/share-engine.test.cjs', 'tests/site-worker.test.cjs', 'tests/viti-pulse.test.cjs',
-];
+// Files that still name Sota Kece's old Sydney project. Empty since the cutover: nothing may go back to it.
+const EXPECTED = []; // switched to dimau-core-ireland on 21 Nov 2026 (docs/CUTOVER-IRELAND.md)
 
 test('the files that name Sota Kece\'s own project are exactly the known list', () => {
   assert.deepEqual(sydneyFiles().sort(), [...EXPECTED].sort());

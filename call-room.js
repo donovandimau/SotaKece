@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   function uuid4(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g,function(c){return (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16);});}
-  const URL_ = 'https://aqfzpaczyodhugsgqvxi.supabase.co', KEY = 'sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+  const URL_ = 'https://xnxmumbvgtmlpenutlii.supabase.co', KEY = 'sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
   const MAX = 6, UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
   const $ = id => document.getElementById(id);
   const params = new URLSearchParams(location.search);

@@ -4,7 +4,7 @@
 (function () {
   'use strict';
   const E = window.SotaMotionEngine, G = window.SotaSubscriptionGuard;
-  const SB_URL = 'https://aqfzpaczyodhugsgqvxi.supabase.co', SB_KEY = 'sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+  const SB_URL = 'https://xnxmumbvgtmlpenutlii.supabase.co', SB_KEY = 'sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
   const MAX_BYTES = 25 * 1024 * 1024, MAX_EDGE = 2048, MIN_EDGE = 320;
   const TYPES = ['image/png', 'image/jpeg', 'image/webp'];
   const STYLES = [

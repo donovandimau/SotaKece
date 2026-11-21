@@ -176,7 +176,7 @@ async function withEnv(env,fetcher,run){
   global.fetch=fetcher;
   try{return await run();}finally{global.fetch=keep.fetch;for(const k of Object.keys(env)){if(keep.env[k]===undefined)delete process.env[k];else process.env[k]=keep.env[k];}}
 }
-const VIDEO='https://aqfzpaczyodhugsgqvxi.supabase.co/storage/v1/object/public/sere-video/u/j/v.mp4',POSTER=VIDEO.replace('v.mp4','p.jpg');
+const VIDEO='https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/sere-video/u/j/v.mp4',POSTER=VIDEO.replace('v.mp4','p.jpg');
 const sereDb=row=>async url=>({ok:true,json:async()=>String(url).includes('bv_profiles')?[{display_name:'Mere "M" <Vuki>',handle:'mere'}]:(row?[row]:[])});
 test('a song page plays without an account and carries the preview tags chat apps read',async()=>{
   const track=playlist[1],r=res();

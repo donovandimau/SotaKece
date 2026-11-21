@@ -46,8 +46,8 @@ test('the handler asks the database for exactly the shared card with the publish
     assert.equal(res.code,200);assert.match(res.headers['Cache-Control'],/public, max-age=60/);assert.match(res.body,/Lusi Vakatawa on Sota Kece/);
   });
   assert.equal(calls.length,1);
-  assert.equal(calls[0].url,'https://aqfzpaczyodhugsgqvxi.supabase.co/rest/v1/rpc/bv_talanoa_shared');
-  assert.equal(calls[0].init.headers.apikey,'sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF');
+  assert.equal(calls[0].url,'https://xnxmumbvgtmlpenutlii.supabase.co/rest/v1/rpc/bv_talanoa_shared');
+  assert.equal(calls[0].init.headers.apikey,'sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM');
   assert.equal(calls[0].init.headers.Authorization,undefined,'no bearer: anon is the whole point');
   assert.deepEqual(JSON.parse(calls[0].init.body),{p_post:7,p_token:TOKEN});
 });

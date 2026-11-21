@@ -27,7 +27,7 @@ test('first-paint copy shows for signed-out visitors on Home, any screen',()=>{
  const sk=html.slice(html.indexOf('window.SK='),html.indexOf('</script>',html.indexOf('window.SK=')));
  assert.match(sk,/matchMedia\('\(max-width:760px\)'\)/);
  assert.match(sk,/\(!h\|\|h==='#home'\)/);
- assert.match(sk,/tok=localStorage\.getItem\('sb-aqfzpaczyodhugsgqvxi-auth-token'\)/);
+ assert.match(sk,/tok=localStorage\.getItem\('sb-xnxmumbvgtmlpenutlii-auth-token'\)/);
  assert.match(sk,/fp=ok&&\(!h\|\|h==='#home'\)&&!tok;/,'guests: no stored session');
  assert.match(sk,/code\|sid\|error/);
  assert.ok(html.indexOf('window.SK=')<html.indexOf('<!-- css-bundle'),'decided before the first stylesheet');
@@ -35,7 +35,7 @@ test('first-paint copy shows for signed-out visitors on Home, any screen',()=>{
  assert.match(guard,/if\(!window\.SK\|\|!SK\.fp\)return;/,'the copy is only drawn on the first-paint path');
  assert.match(guard,/img\.addEventListener\('load',go\)/,'stylesheets and scripts follow the welcome photo');
  assert.match(guard,/setTimeout\(go,\d+\)/,'and never wait for ever');
- assert.ok(html.includes('const SB_URL = "https://aqfzpaczyodhugsgqvxi.supabase.co"'),'token key matches the Supabase project');
+ assert.ok(html.includes('const SB_URL = "https://xnxmumbvgtmlpenutlii.supabase.co"'),'token key matches the Supabase project');
 });
 test('every script after the decision is held the same way, so the page order is kept on both paths',()=>{
  // Outside comments, the only executable scripts left are SK itself, its SK.* calls, the copy guard and two
@@ -72,7 +72,7 @@ function runSK({width=390,hash='',search='',store={},release}={}){
   matchMedia:window.matchMedia,URL:window.URL,setTimeout,clearTimeout,Event:function(){}};
  vm.runInNewContext(src,ctx);return {SK:window.SK,written,store};
 }
-const TOKEN='sb-aqfzpaczyodhugsgqvxi-auth-token',uid='11111111-2222-4333-8444-555555555555';
+const TOKEN='sb-xnxmumbvgtmlpenutlii-auth-token',uid='11111111-2222-4333-8444-555555555555';
 const session={user:{id:uid}},rel=/<meta name="sota-release" content="([^"]+)">/.exec(html)[1];
 const copy=(o={})=>JSON.stringify(Object.assign({v:rel,u:uid,a:'#4FA8D8',t:[['header',['class','top glass sx-top'],'Sota Kece']]},o));
 test('signed-in members on a phone take the first-paint path only with their own copy from this release',()=>{

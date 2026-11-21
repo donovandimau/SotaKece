@@ -12,7 +12,7 @@
 //      SERE_PUBLIC_URL (default https://sotakece.com)
 const {createHmac,timingSafeEqual}=require('node:crypto');
 const {SOTA_URL,SERVICE_URL,svcHeaders}=require('./_sota-server.js');
-const SOTA_KEY='sb_publishable_DvpX2PSuPtxE3IqWUlRZfQ_YP2qLZtF';
+const SOTA_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const REPLICATE='https://api.replicate.com/v1';
 
