@@ -65,3 +65,24 @@
   function ready(){if(window.DimauShell){window.DimauShell.search.provider(provider);return true;}return false;}
   if(!ready())document.addEventListener('DOMContentLoaded',ready,{once:true});
 })();
+
+/* Dimau apps switcher (dimau-shell.js), 21 November 2026. On narrow phones it opens from the ☰ menu, and the
+   menu closes as the switcher opens, so the item that opened it is hidden when the switcher closes and focus
+   would fall to the page. Send it back to the ☰ button instead. */
+(function(){
+  'use strict';
+  document.addEventListener('click',function(e){
+    var item=e.target&&e.target.closest&&e.target.closest('.sx-menu-apps');
+    if(!item||typeof MutationObserver!=='function')return;
+    var watch=new MutationObserver(function(){
+      if(item.getAttribute('aria-expanded')!=='false')return;
+      watch.disconnect();
+      // The switcher hands focus back to its trigger just after this; check once that has happened.
+      setTimeout(function(){
+        var a=document.activeElement;
+        if(!a||a===document.body||a===item){var t=document.querySelector('[data-dimau-menu-toggle]');if(t&&t.offsetParent!==null)t.focus();}
+      },60);
+    });
+    watch.observe(item,{attributes:true,attributeFilter:['aria-expanded']});
+  },true);
+})();
