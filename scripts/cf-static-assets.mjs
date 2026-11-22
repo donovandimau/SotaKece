@@ -191,3 +191,7 @@ if (redirectLines.length) {
 
 for (const w of warnings) console.warn(`cf-static-assets: ${w}`);
 console.log(`cf-static-assets: ${out} ready (${rules.length} header rules, ${redirectLines.length} redirects)`);
+
+// Ops Room live check: write dist/ops-build.json (see scripts/ops-build-marker.mjs).
+import { execFileSync as opsMarkerRun } from 'node:child_process';
+opsMarkerRun(process.execPath, [new URL('./ops-build-marker.mjs', import.meta.url).pathname, 'dist', 'donovandimau/SotaKece'], { stdio: 'inherit' });
