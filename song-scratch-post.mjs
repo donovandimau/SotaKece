@@ -101,6 +101,48 @@ export async function postStory({ kind, audience, caption }, story, progress = (
   }
 }
 
+/* ---------- shareable scratch links: anyone can open them, no account needed ---------- */
+
+const LINK_BUCKET = 'sota-scratch-links';
+export const SITE = 'https://sotakece.com';
+
+export function linkError(e) {
+  const m = String(e?.message || e || '');
+  if (/LINK_LIMIT/.test(m)) return 'That is 30 links today. Try again tomorrow.';
+  if (/bv_scratch_link_create|PGRST202|Could not find the function|Bucket not found/i.test(m)) return 'Sharing as a link is not switched on yet.';
+  return postError(e);
+}
+
+/** Make a public scratch link for the current story. Returns {url, path}. */
+export async function makeScratchLink({ caption }, story, progress = () => {}) {
+  const user = await member();
+  if (!user) throw new Error('NOT_SIGNED_IN');
+  const S = story.state();
+  if (!S.song) throw new Error('SONG_BAD');
+  const stem = `${user.id}/${newId()}`, uploaded = [];
+  try {
+    progress('Getting the layers ready…');
+    const l = await story.scratchLayers({ coverType: 'image/jpeg' });   // the cover is the link preview: JPEG shows everywhere
+    progress('Making your link…');
+    for (const [suffix, blob] of [['-under', l.under], ['-cover', l.cover], ['-over', l.over]]) {
+      const ext = extFor(blob?.type);
+      if (!ext) throw new Error('mime type not supported');
+      const path = `${stem}${suffix}.${ext}`;
+      const { error } = await sb().storage.from(LINK_BUCKET).upload(path, blob, { contentType: blob.type, upsert: false, cacheControl: '31536000' });
+      if (error) throw error;
+      uploaded.push(path);
+    }
+    const { data, error } = await sb().rpc('bv_scratch_link_create', {
+      p_stem: stem, p_song_id: S.song.id, p_song_start: Math.round(S.start || 0), p_caption: (caption || '').trim() || null,
+    });
+    if (error) throw error;
+    return { url: SITE + data.path, path: data.path };
+  } catch (e) {
+    if (uploaded.length) sb().storage.from(LINK_BUCKET).remove(uploaded).catch(() => {});
+    throw e;
+  }
+}
+
 /* ---------- the "Post to Sota Stories" part of the Save tab ---------- */
 
 const $ = (id) => document.getElementById(id);
@@ -146,6 +188,32 @@ export async function mountPostPanel(story) {
     } finally {
       P.busy = false; $('ss-post-btn').disabled = false;
     }
+  });
+
+  // Share as a link
+  $('ss-link-btn').disabled = !user;
+  $('ss-link-btn').addEventListener('click', async () => {
+    if (P.busy) return;
+    P.busy = true; $('ss-link-btn').disabled = true;
+    const note = (t) => { $('ss-link-status').textContent = t; };
+    try {
+      const { url } = await makeScratchLink({ caption: $('ss-post-caption').value }, story, note);
+      note('');
+      $('ss-link-out').value = url; $('ss-link-box').hidden = false;
+      const name = story.songTitle();
+      const data = { title: 'A song to scratch · Sota Kece', text: name ? `Scratch this to hear a song I picked 🎵` : 'Scratch this 🎵', url };
+      if (navigator.share) { try { await navigator.share(data); story.say('Link shared. You will see in Activity when someone joins through it.'); return; } catch (e) { if (e?.name === 'AbortError') return; } }
+      try { await navigator.clipboard.writeText(url); story.say('Link copied. Paste it into WhatsApp, Messenger or anywhere.'); }
+      catch (_) { story.say('Your link is ready below. Copy it and send it to friends.'); }
+    } catch (e) {
+      note(linkError(e));
+    } finally {
+      P.busy = false; $('ss-link-btn').disabled = false;
+    }
+  });
+  $('ss-link-copy').addEventListener('click', async () => {
+    const v = $('ss-link-out').value; if (!v) return;
+    try { await navigator.clipboard.writeText(v); story.say('Link copied.'); } catch (_) { $('ss-link-out').select(); }
   });
 }
 

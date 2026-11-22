@@ -172,3 +172,32 @@ test('drafts: labels say how long ago', async () => {
   assert.equal(draftLabel({ name: 'Bula', savedAt: now - 5 * 60000 }, now), 'Bula · 5 min ago');
   assert.equal(draftLabel({ savedAt: now - 3 * 3600000 }, now), 'Story · 3 h ago');
 });
+
+test('scratch links: the public page plays the story, previews the cover and never trusts the card', () => {
+  const inv = require(path.join(root, 'api', 'invite.js'));
+  const stem = '11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222';
+  const card = { handle: 'don', display_name: 'Donovan', scratch: {
+    files: { under: stem + '-under.webp', cover: stem + '-cover.jpg', over: stem + '-over.webp' },
+    song_id: 'fiji-remix-2026-05', song_start: 30, caption: 'Bula </script><img src=x onerror=alert(1)>' } };
+  const sx = inv.scratchOf(card);
+  assert.ok(sx);
+  assert.equal(sx.song_start, 30);
+  const html = inv.scratchPage(card, 'a'.repeat(32), sx).html;
+  assert.match(html, /<meta property="og:image" content="https:\/\/xnxmumbvgtmlpenutlii\.supabase\.co\/storage\/v1\/object\/public\/sota-scratch-links\/[^"]+-cover\.jpg">/);
+  assert.match(html, /SotaStoryMedia\.mountUrls/);
+  assert.match(html, /href="https:\/\/sotakece\.com\/\?ref=a{32}"/, 'the join button credits the sender');
+  assert.doesNotMatch(html, /<img src=x/, 'the caption is escaped');
+  // a card without all three good file names, or with a strange song, is an ordinary invite
+  assert.equal(inv.scratchOf({ scratch: { files: { under: '../etc', cover: stem + '-cover.jpg', over: stem + '-over.webp' }, song_id: 'x' } }), null);
+  assert.equal(inv.scratchOf({ scratch: { ...card.scratch, song_id: 'BAD ID' } }), null);
+  assert.equal(inv.scratchOf({ handle: 'don' }), null);
+});
+
+test('scratch links: posting errors are put into plain words', async () => {
+  const post = await import(pathToFileURL(path.join(root, 'song-scratch-post.mjs')).href);
+  assert.match(post.linkError(new Error('LINK_LIMIT')), /30 links today/);
+  assert.match(post.linkError(new Error('Could not find the function public.bv_scratch_link_create')), /not switched on yet/);
+  assert.match(post.postError(new Error('NOT_SIGNED_IN')), /sign in/i);
+  assert.equal(post.extFor('image/jpeg'), 'jpg');
+  assert.equal(post.extFor('text/html'), null);
+});
