@@ -1,3 +1,7 @@
+## 2026-11-22 — Shared music: up to 999 songs
+
+The shared catalogue now has 461 songs; this app's music player refused the whole list above 500. `shared-music/`: core.mjs updated to the museum's shared music player (3c05e31): limit 999 songs and playlist names kept (this app uses its own player; only the catalogue reader changes). Tests: no music tests.
+
 ## 2026-11-22 — Music icon at vinyl LP speed
 
 - Codex, Ops task 1359. The Fiji flag turns once every 1.8 seconds (33⅓ RPM) during playback. The centred music note stays still, and reduced-motion settings disable the spin.
