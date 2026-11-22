@@ -1,3 +1,13 @@
+## 2026-11-22 — Security review: four table-rule holes closed (shared database)
+
+- Claude, Ops task 1491 (Donovan: "Yes, review it"). Reviewed all 171 Sota Kece database functions now in dimau-core-ireland: none uses the two guard bugs found in other Dimau apps (`current_user = postgres`, NULL `auth.uid()` passing an `if not (…)`), the money functions (wallet send, coins buy/tip/payout) check the caller properly, and none reads tables outside Sota Kece. The holes were in the table rules, each confirmed on live in a rolled-back transaction:
+  1. any signed-in member could add themselves to any private Koro without its code and read its messages;
+  2. a member could send a friend request already marked accepted (or accept their own), becoming anyone's friend and seeing friends-only posts, stories and rooms;
+  3. a member could tick their own "verified" badge;
+  4. sign-up was broken: every new profile insert failed with "cannot insert into column age_band of view bv_profiles" (the view hides age_band behind a CASE).
+- `supabase/migrations/20261122200000_sota_table_rule_holes.sql` closes 1–3 (Koros joined only through the code functions; requests start pending and only the person asked accepts; badge columns not writable) and fixes 4 with an insert trigger on the view that runs as the member. New test `tests/table-rules-security.test.cjs` (PGlite: reproduces holes, then checks the fix and every normal path). Dry-run on live (rolled back) matched. Applied live only on Donovan's yes.
+- Not changed: `bulavata.are_friends` and the trigger functions stay callable by anon (low risk, used inside row rules); coin tips can be sent to a post the tipper cannot see.
+
 ## 2026-11-22 — Sign-up: plain message when a password is on a leaked list
 
 - Claude, Ops task 1458 (Donovan: "Yes, Sota Kece"). On 21 Nov a visitor (iPhone, NZ) tried email sign-up 11 times in a minute; the Sydney project's logs show every `/auth/v1/signup` refused 422 "Password is known to be weak and easy to guess" (leaked-password protection, which Donovan keeps on, 19 Nov). Nobody explained what to do, so they gave up.
