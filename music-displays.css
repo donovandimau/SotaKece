@@ -287,3 +287,59 @@ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-display-enabled .sk-displ
 #sk-music-playlist .sk-display-stage .sk-display-song {font-size:14px;font-weight:650}
 #sk-music-playlist .sk-display-stage .sk-display-queue-credit {font-size:11px;font-weight:400}
 #sk-music-playlist [data-layout=glass] .sk-display-band {grid-template-columns:minmax(52px,auto) minmax(50px,1fr) 45px}
+
+#sk-music-playlist .sk-display-stage .arc-wave {stroke:#fbb867;stroke-width:1.65;fill:none;stroke-linecap:round}
+#sk-music-playlist .sk-display-arc svg text {fill:#f5d8af;font:5px Consolas,monospace;letter-spacing:.1px}
+#sk-music-playlist .sk-display-stage[data-layout=arc] {
+  background:radial-gradient(ellipse at 23% 78%,#65412c88,transparent 60%),linear-gradient(130deg,#13121af2,#201b23ed),var(--photo) center/cover
+}
+#sk-music-playlist [data-layout=arc] .sk-display-visual {background:radial-gradient(ellipse at 50% 105%,#74513a44,transparent 72%),#191720}
+#sk-music-playlist .sk-arc-info {display:flex;align-items:center;justify-content:center;gap:8px;color:#e3c9a2;font:500 12px/1.5 system-ui;text-align:center}
+#sk-music-playlist .sk-arc-info button {min-height:44px;width:auto;color:#ffe4ac;background:#382c2a;border:1px solid #98754f;border-radius:8px;padding:5px 12px}
+#sk-music-playlist .sk-arc-info button[hidden] {display:none}
+#sk-music-playlist .sk-display-stage .sk-display-queue-art {background:var(--photo) center/cover}
+#sk-music-playlist .sk-display-edition .sk-display-sleeve {background:var(--photo) center/cover}
+#sk-music-playlist .sk-wave-interaction {position:absolute;inset:0;overflow:hidden;touch-action:pan-y}
+#sk-music-playlist [data-layout=wave] .sk-wave-fan {inset:5% 0 auto;height:42%;pointer-events:auto;touch-action:pan-y;user-select:none}
+#sk-music-playlist .sk-display-stage .sk-wave-cover {
+  grid-area:1/1;height:100%;width:auto;max-width:56%;aspect-ratio:1;min-height:0;padding:0;
+  background:var(--photo) center/cover;border:1px solid #fff6;border-radius:4px;box-shadow:0 8px 20px #0c09194f;
+  transform:translateX(var(--shift)) rotate(var(--turn)) scale(var(--scale));transform-origin:center 95%;
+  transition:transform .19s ease-out;cursor:pointer;touch-action:pan-y
+}
+#sk-music-playlist .sk-wave-fan.is-dragging .sk-wave-cover {transition:none;cursor:grabbing}
+#sk-music-playlist .sk-wave-nav {position:absolute;top:51%;left:50%;transform:translateX(-50%);width:min(96%,390px);display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:4px;border-radius:8px;background:#180f23dd;padding:1px 3px;color:#fff7f5}
+#sk-music-playlist .sk-wave-nav span {min-width:0;text-align:center;line-height:1.2}
+#sk-music-playlist .sk-wave-nav b,#sk-music-playlist .sk-wave-nav small {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sk-music-playlist .sk-wave-nav b {font-size:14px}
+#sk-music-playlist .sk-wave-nav small {font-size:10px;color:#eccde3}
+#sk-music-playlist .sk-wave-nav button {width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:8px;background:transparent;color:#fff;font:400 25px/1 system-ui;box-shadow:none}
+#sk-music-playlist .sk-wave-nav button:disabled {opacity:.3}
+#sk-music-playlist [data-layout=wave] .sk-display-angle {z-index:2}
+@media(prefers-reduced-motion:reduce){#sk-music-playlist .sk-display-stage .sk-wave-cover {transition:none}}
+#sk-music-playlist .sk-display-stage[data-layout=arc] {background:radial-gradient(ellipse at 15% 85%,#392a30,transparent 65%),#17161e}
+#sk-music-playlist .sk-arc-info {display:grid;justify-content:stretch;text-align:left}
+#sk-music-playlist .sk-arc-overview {display:grid;gap:8px;min-width:0}
+#sk-music-playlist .sk-arc-overview[hidden] {display:none}
+#sk-music-playlist .sk-arc-overview span {font:650 10px/1.1 system-ui;letter-spacing:.08em;text-transform:uppercase;color:#cfb9a2}
+#sk-music-playlist .sk-arc-overview svg {display:block;width:100%;height:35px;background:#15141d;border-radius:4px;overflow:visible}
+#sk-music-playlist .sk-arc-overview path {stroke:#ad8c6d;stroke-width:1.25}
+#sk-music-playlist .sk-arc-overview rect {fill:#ffc97938;stroke:#ffd08b}
+#sk-music-playlist .sk-arc-overview line {stroke:#fff1cc;stroke-width:2}
+@media(max-width:799px){
+  #sk-music-playlist .sk-display-theatre .sk-display-stage:is([data-layout=arc],[data-layout=wave]) {
+    justify-content:flex-start;gap:clamp(12px,2.6svh,24px);padding:clamp(14px,4vw,24px)
+  }
+  #sk-music-playlist .sk-display-theatre .sk-display-stage:is([data-layout=arc],[data-layout=wave]) .sk-display-bar {order:0;margin:0;padding-bottom:12px;border-bottom:1px solid #ffffff26}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage:is([data-layout=arc],[data-layout=wave]) .sk-display-meta {order:1;margin:0;text-align:left}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc] .sk-display-meta {display:grid;grid-template-columns:66px minmax(0,1fr);column-gap:14px;align-content:center}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc] .sk-display-meta::before {content:'';grid-column:1;grid-row:1/3;width:66px;height:66px;align-self:center;background:var(--photo) center/cover;border-radius:3px}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc] .sk-display-title {align-self:end}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage:is([data-layout=arc],[data-layout=wave]) .sk-display-visual {order:2;margin:0}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc] .sk-display-visual {height:clamp(202px,31svh,320px);display:grid;place-items:center;background:radial-gradient(ellipse at 50% 80%,#45313c,transparent 64%),#17151f}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc] .sk-display-visual::before {display:none}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc] .sk-display-arc {margin:0;width:96%}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage:is([data-layout=arc],[data-layout=wave]) .sk-display-detail {order:3;margin:0}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage[data-layout=arc][data-arc-ready] .sk-deck-seek {display:none}
+  #sk-music-playlist .sk-display-theatre .sk-display-stage:is([data-layout=arc],[data-layout=wave]) .sk-deck-main {order:5;margin:auto 0 0;padding:12px 0 max(8px,env(safe-area-inset-bottom))}
+}

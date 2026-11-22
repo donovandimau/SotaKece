@@ -122,23 +122,23 @@ async function openDisplay(){
   if(!api.dialog.open || display || loadingDisplay)return;
   loadingDisplay=true;
   try{
-    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-instruments');
+    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-phone1');
     display=mountDisplays({api,deck,main,time,clock,queue});
     display.sync();
     watchDisplay.disconnect();
   }catch(_){/* The original deck stays usable offline. */}
   finally{loadingDisplay=false;}
 }
-function queue(){
+function queue(limit=3){
   const items=api.tracks(),index=api.index();
   if(index<0){
     const visible=view==='mix'?api.catalogue():view==='device'?device:(current()?.items||[]).map(byKey).filter(Boolean);
-    return visible.slice(0,3).map(track=>({track,pick:()=>api.playKey(track.key)}));
+    return visible.slice(0,limit).map(track=>({track,pick:()=>api.playKey(track.key)}));
   }
   if(prefs.repeat==='one')return [{track:items[index],pick:()=>api.playTrack(index)}];
   if(prefs.shuffle && order.length!==items.length)shuffled();
   const at=prefs.shuffle?order.indexOf(index):index,entries=[];
-  for(let step=1;step<=Math.min(3,items.length);step++){
+  for(let step=1;step<=Math.min(limit,items.length);step++){
     if(at+step>=items.length && (prefs.repeat!=='all'||prefs.shuffle))break;
     const pos=(at+step)%items.length,i=prefs.shuffle?order[pos]:pos;
     entries.push({track:items[i],pick:()=>api.playTrack(i)});
