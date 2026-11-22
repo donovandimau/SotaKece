@@ -1,0 +1,8 @@
+{
+  "_about": "Read by cloudflare/site-routes.cjs. siteHeaders: the headers put on every page the Worker makes (share links, invites, sere.sotakece.com/); the same values as the \"/*\" block of cloudflare/_headers, which tests/site-worker.test.cjs checks. Moved from vercel.json \"routes\" on 22 Nov 2026.",
+  "siteHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "Content-Security-Policy": "frame-ancestors 'self' https://*.dimau-fintech.com https://sotakece.com https://*.sotakece.com",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  }
+}

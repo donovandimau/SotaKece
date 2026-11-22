@@ -1,6 +1,6 @@
 // Cloudflare Workers Builds: every merge to main runs
 //   node scripts/cf-static-assets.mjs --copy --out dist
-// (copies only the public site files into dist/ and writes dist/_headers from vercel.json)
+// (copies only the public site files into dist/ and copies cloudflare/_headers to dist/_headers)
 // and then `npx wrangler deploy`. No routes: sotakece.com, www and sere.sotakece.com are attached
 // in Cloudflare. /api/* is answered by this Worker's own code (api/*.js, no Vercel) once the
 // dimau-api-forwarder routes for these hosts are removed; until then those routes answer /api/*.

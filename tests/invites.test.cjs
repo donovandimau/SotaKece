@@ -126,11 +126,10 @@ test('too many invites and other errors say what to do',dom,async()=>{
 });
 
 test('wiring: route, page tags, worker, release, Activity and CI',()=>{
-  const vercel=JSON.parse(read('vercel.json'));
-  const route=vercel.routes.find(r=>r.dest&&r.dest.startsWith('/api/invite'));
-  assert.ok(route,'the /i/ route exists');
-  assert.ok(new RegExp('^'+route.src+'$').test('/i/'+'a'.repeat(32)));
-  assert.ok(vercel.routes.indexOf(route)<vercel.routes.findIndex(r=>r.handle==='filesystem'),'the route comes before the filesystem');
+  const siteRoutes=require('../cloudflare/site-routes.cjs'),invite=require('../api/invite.js');
+  const hit=siteRoutes.match('/i/'+'a'.repeat(32));
+  assert.ok(hit&&hit.route.handler===invite,'the /i/ route exists and runs api/invite.js');
+  assert.ok(read('wrangler.jsonc').includes('"/i/*"'),'the Worker answers /i/ before the static files');
   const html=read('index.html'),sw=read('sw.js');
   assert.match(html,/<script src="\/sota-card-stack\.js\?v=[^"]+"><\/script><script src="\/sota-invites\.js\?v=[^"]+"><\/script>/);
   assert.match(html,/<link rel="stylesheet" href="\/sota-invites\.css\?v=/);

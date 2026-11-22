@@ -4,7 +4,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const routes=require('../cloudflare/site-routes.cjs');
 const listen=require('../api/listen.js');
-const vercel=require('../vercel.json');
+// The short-link patterns vercel.json "routes" had until 22 Nov 2026; the Worker must keep exactly these.
+const SHORT_LINKS=['/s/([0-9a-fA-F-]{36})/([0-9a-f]{32})/?','/t/([a-z0-9-]{1,80})/?','/p/([0-9]{1,18})/([a-fA-F0-9]{32})/?','/i/([a-fA-F0-9]{32})/?'];
 
 const ASSETS={fetch:async req=>{const r=req instanceof Request?req:new Request(req);ASSETS.last=new URL(r.url).pathname;return new Response('static '+ASSETS.last);}};
 const env=(extra={})=>({ASSETS,...extra});
@@ -18,9 +19,16 @@ function stubFetch(t,answer){
   return calls;
 }
 
-test('every short-link route in vercel.json has the same pattern in the Worker',()=>{
-  const fromVercel=vercel.routes.filter(r=>/^\/[stpi]\//.test(r.src||'')).map(r=>'^'+r.src+'$');
-  assert.deepEqual(routes.ROUTES.map(r=>r.re.source.replace(/\\\//g,'/')),fromVercel);
+test('every short-link route has the same pattern in the Worker',()=>{
+  assert.deepEqual(routes.ROUTES.map(r=>r.re.source.replace(/\\\//g,'/')),SHORT_LINKS.map(src=>'^'+src+'$'));
+});
+
+test('the pages the Worker makes carry the site headers from cloudflare/_headers',()=>{
+  const block=fs.readFileSync(path.join(__dirname,'../cloudflare/_headers'),'utf8').split(/\r?\n\r?\n/)
+    .map(b=>b.split(/\r?\n/).filter(l=>l.trim()&&!l.startsWith('#'))).find(b=>b[0]==='/*');
+  const site=block.slice(1).filter(l=>!l.trim().startsWith('!')).map(l=>[l.slice(0,l.indexOf(':')).trim(),l.slice(l.indexOf(':')+1).trim()]);
+  assert.ok(site.length>=3);
+  assert.deepEqual(routes.SITE_HEADERS,site);
 });
 
 test('paths are matched like Vercel did, and nothing else is caught',()=>{

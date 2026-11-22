@@ -1,5 +1,6 @@
 name: Verify production deployment
-# Runs when Vercel reports the production deployment ready. The live page must answer with the security
+# Runs by hand (workflow_dispatch), or when a production deployment_status event arrives (Vercel sent these
+# until it was retired in Nov 2026; the site now runs on Cloudflare). The live page must answer with the security
 # headers, carry the release the commit shipped, and pass the Premium Shell check (bottom dock at 390, left rail at 1440,
 # 44px targets, no horizontal overflow, header search behaviour, cumulative layout shift under 0.05).
 # Vercel has named the environment 'Production' and, from 11 Nov 2026 21:09 UTC, 'Production – sotakece'
@@ -37,8 +38,6 @@ jobs:
           grep -q '<title>Sota Kece' /tmp/body.html || { echo "page body unexpected"; exit 1; }
           expected=$(sed -n 's/.*<meta name="sota-release" content="\([^"]*\)".*/\1/p' index.html | head -1)
           grep -q "content=\"$expected\"" /tmp/body.html || { echo "live release is not $expected yet"; exit 1; }
-          code=$(curl -sS -o /dev/null -w '%{http_code}' https://sotakece.vercel.app/)
-          [ "$code" = "308" ] || { echo "vercel.app alias should redirect (308), got $code"; exit 1; }
       - name: Install Chromium
         run: |
           npm i --no-save --no-audit --no-fund playwright@1.63.0

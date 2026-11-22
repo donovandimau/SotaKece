@@ -227,14 +227,13 @@ test('only the maker of a finished sere is given its public link',async()=>{
   assert.equal((await run(job({status:'processing',output_video_url:null}),'11111111-1111-4111-8111-111111111111')).code,409);
 });
 test('the routes send /s and /t to the listen function ahead of the static files',()=>{
-  const cfg=JSON.parse(read('vercel.json')),routes=cfg.routes,fs_i=routes.findIndex(r=>r.handle==='filesystem');
-  const s=routes.findIndex(r=>r.dest==='/api/listen?sere=$1&k=$2'),t=routes.findIndex(r=>r.dest==='/api/listen?track=$1');
-  assert.ok(s>=0&&t>=0&&s<fs_i&&t<fs_i);
-  assert.ok(new RegExp('^'+routes[s].src+'$').test(`/s/${ID}/${listen.shareKey(SECRET,ID)}`));
-  assert.ok(new RegExp('^'+routes[t].src+'$').test('/t/fiji-remix-2026-01'));
-  assert.equal(new RegExp('^'+routes[t].src+'$').test('/terms.html'),false);
-  assert.equal(new RegExp('^'+routes[s].src+'$').test('/sere/index.html'),false);
-  assert.ok(cfg.functions['api/listen.js']);
+  /* The Cloudflare Worker (cloudflare/site-routes.cjs) answers /s/ and /t/ before the static files (run_worker_first). */
+  const siteRoutes=require('../cloudflare/site-routes.cjs'),wrangler=read('wrangler.jsonc');
+  assert.ok(wrangler.includes('"/s/*"')&&wrangler.includes('"/t/*"'));
+  const s=siteRoutes.match(`/s/${ID}/${listen.shareKey(SECRET,ID)}`),t=siteRoutes.match('/t/fiji-remix-2026-01');
+  assert.ok(s&&s.route.handler===listen&&t&&t.route.handler===listen);
+  assert.equal(siteRoutes.match('/terms.html'),null);
+  assert.equal(siteRoutes.match('/sere/index.html'),null);
 });
 
 // Home live feed and composer (10 Nov 2026).
