@@ -107,6 +107,36 @@
     if (ms < 1000 || ms > LIMITS.audio.maxMs) throw new Error('BAD_AUDIO');
     return { buffer: buffer, durationMs: ms, previewUrl: URL.createObjectURL(file), name: String(file.name || '').replace(/\.[^.]+$/, '').slice(0, 60) };
   }
+  /* Island songs (19 Nov 2026): the picture can sing one of the real songs already on Sota Kece,
+     so nobody has to find an MP3 first. Same list and storage the Music page plays from. */
+  var audioPick = 0;
+  var SONG_BASE = 'https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/fiji-audio/', songs = null;
+  function loadSongs() {
+    if (songs) return Promise.resolve(songs);
+    return fetch('/music-playlist.json?v=20261026-shared-music', { credentials: 'omit' }).then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (list) {
+        songs = (Array.isArray(list) ? list : []).filter(function (t) { return t && typeof t.path === 'string' && /^[a-z0-9-]+\.mp3$/.test(t.path) && t.title; })
+          .map(function (t) { return { id: String(t.id), title: String(t.title).trim().slice(0, 90), path: t.path }; });
+        return songs;
+      }).catch(function () { songs = null; return []; });
+  }
+  async function songAudio(id) {
+    var list = await loadSongs(), t = list.filter(function (x) { return x.id === id; })[0];
+    if (!t) throw new Error('Choose a sound.');
+    var r = await fetch(SONG_BASE + t.path, { credentials: 'omit' });
+    if (!r.ok) throw new Error('That song would not load. Try another.');
+    var b = await r.blob();
+    var meta = await decodeAudio(new File([b], t.path, { type: 'audio/mpeg' }));
+    meta.name = t.title.slice(0, 60); meta.songId = t.id;
+    return meta;
+  }
+  function songPicker() {
+    if (!songs) { loadSongs().then(function (l) { if (l.length && st.open && st.step === 'pick') paint(); }); return ''; }
+    if (!songs.length) return '';
+    var cur = st.audio && st.audio.songId;
+    return '<label class="sere-song">Or pick an island song <select data-sere="song"><option value="">Choose a song…</option>' +
+      songs.map(function (t) { return '<option value="' + esc(t.id) + '"' + (cur === t.id ? ' selected' : '') + '>' + esc(t.title) + '</option>'; }).join('') + '</select></label>';
+  }
   function cutAudio(meta, startMs) {
     var win = pickWindow(startMs, meta.durationMs);
     var wav = encodeWav(mixWindow(meta.buffer, win.startMs, win.endMs - win.startMs), meta.buffer.sampleRate);
@@ -264,9 +294,9 @@
       (st.remixOf
         ? '<div class="sere-drop has sere-remix"><span class="sere-ico">🔁</span><span>Remixing the sound from that sere</span><small>Your photo, their sound</small></div>'
         : say ? sayBox()
-        : '<label class="sere-drop' + (st.audio ? ' has' : '') + '">' + (st.audio ? '<span class="sere-ico">🎵</span><span>' + esc(st.audio.name || 'Your sound') + '</span><small>' + fmt(dur) + '</small>' : '<span class="sere-ico">🎵</span><span>Choose a sound</span><small>MP3 or WAV · up to 10 minutes</small>') +
+        : '<label class="sere-drop' + (st.audio ? ' has' : '') + '">' + (st.audio ? '<span class="sere-ico">🎵</span><span>' + esc(st.audio.name || 'Your sound') + '</span><small>' + fmt(dur) + '</small>' : '<span class="sere-ico">🎵</span><span>Use your own sound</span><small>MP3 or WAV · up to 10 minutes</small>') +
           '<input type="file" accept="audio/mpeg,audio/wav,.mp3,.wav" data-sere="audio" hidden></label>') +
-      '</div>' +
+      '</div>' + (!st.remixOf && !say ? songPicker() : '') +
       (st.audio && !st.remixOf && !say ? '<div class="sere-trim"><div class="sere-trim-head"><span>Sing from <b>' + fmt(win.startMs) + '</b> to <b>' + fmt(win.endMs) + '</b></span><button type="button" class="btn sm" data-sere="preview">▶ Hear it</button></div>' +
         '<input type="range" min="0" max="' + Math.max(0, dur - LIMITS.audio.windowMs) + '" step="500" value="' + win.startMs + '" data-sere="start" aria-label="Start of the part that sings"' + (dur <= LIMITS.audio.windowMs ? ' disabled' : '') + '>' +
         '<small>Up to 60 seconds sings. Slide to pick the part.</small><audio data-sere="player" src="' + st.audio.previewUrl + '" preload="none"></audio></div>' : '') +
@@ -312,7 +342,9 @@
       var k = t.dataset.sere;
       try {
         if (k === 'image') { st.image = await prepImage(t.files[0]); st.error = null; paint(); }
-        if (k === 'audio') { toast('Reading the sound…'); st.audio = await decodeAudio(t.files[0]); st.startMs = 0; st.error = null; paint(); }
+        // Only the latest sound choice wins: a slow song download must not replace a sound picked after it.
+        if (k === 'audio') { var na = ++audioPick; toast('Reading the sound…'); var fa = await decodeAudio(t.files[0]); if (na !== audioPick) return; st.audio = fa; st.startMs = 0; st.error = null; paint(); }
+        if (k === 'song' && t.value) { var ns = ++audioPick; toast('Getting the song…'); t.disabled = true; var fs = await songAudio(t.value); if (ns !== audioPick) return; st.audio = fs; st.startMs = 0; st.error = null; paint(); }
         if (k === 'scene') st.scene = t.value;
         if (k === 'voice') st.voice = t.value;
         if (k === 'caption') st.caption = t.value.slice(0, 140);

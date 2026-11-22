@@ -52,6 +52,8 @@
       if (old && old !== viti) old.remove();
       put(box, 'music', viti);
     }
+    // The Talanoa / Top Mates panel belongs with your people, not inside Music.
+    view.querySelectorAll(':scope > .sota-social-host, .sk-group-body .sota-social-host').forEach(function (n) { put(box, 'people', n); });
     // Your people: the hubs card (where your people are, invite someone).
     view.querySelectorAll(':scope > .hub-card').forEach(function (n) { put(box, 'people', n); });
   }
