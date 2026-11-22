@@ -5,7 +5,7 @@
   2. a member could send a friend request already marked accepted (or accept their own), becoming anyone's friend and seeing friends-only posts, stories and rooms;
   3. a member could tick their own "verified" badge;
   4. sign-up was broken: every new profile insert failed with "cannot insert into column age_band of view bv_profiles" (the view hides age_band behind a CASE).
-- `supabase/migrations/20261122200000_sota_table_rule_holes.sql` closes 1–3 (Koros joined only through the code functions; requests start pending and only the person asked accepts; badge columns not writable) and fixes 4 with an insert trigger on the view that runs as the member. New test `tests/table-rules-security.test.cjs` (PGlite: reproduces holes, then checks the fix and every normal path). Dry-run on live (rolled back) matched. Applied live only on Donovan's yes.
+- `supabase/migrations/20261122193235_sota_table_rule_holes.sql` closes 1–3 (Koros joined only through the code functions; requests start pending and only the person asked accepts; badge columns not writable) and fixes 4 with an insert trigger on the view that runs as the member. New test `tests/table-rules-security.test.cjs` (PGlite: reproduces holes, then checks the fix and every normal path). Dry-run on live (rolled back) matched. Applied live 22 Nov 19:32 UTC on Donovan's yes ("Yes, apply it"), migration 20261122193235; re-tested live as members (attacks refused, sign-up works).
 - Not changed: `bulavata.are_friends` and the trigger functions stay callable by anon (low risk, used inside row rules); coin tips can be sent to a post the tipper cannot see.
 ## 2026-11-22 — Up Next
 

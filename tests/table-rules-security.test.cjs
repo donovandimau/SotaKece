@@ -1,5 +1,5 @@
 'use strict';
-// Table rules for Koros, friendships and profiles (migration 20261122200000_sota_table_rule_holes.sql).
+// Table rules for Koros, friendships and profiles (migration 20261122193235_sota_table_rule_holes.sql).
 // Builds the exported live schema in PGlite (as run-baseline-db.cjs does), applies the migration, then
 // acts as ordinary signed-in members through the same public bv_* views and functions the app uses.
 // Never connects to Supabase. POSIX: NODE_PATH="$PWD/tests/talanoa-tools/node_modules" node tests/table-rules-security.test.cjs
@@ -12,7 +12,7 @@ const {pgcrypto} = require(require.resolve(pgliteModule).replace(/index\.c?js$/,
 const root = path.resolve(__dirname, '..');
 const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 const schema = read('supabase/baseline/sota_kece_schema.sql');
-const migration = read('supabase/migrations/20261122200000_sota_table_rule_holes.sql');
+const migration = read('supabase/migrations/20261122193235_sota_table_rule_holes.sql');
 
 const standIns = String.raw`
 CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS;
