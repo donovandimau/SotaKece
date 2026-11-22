@@ -7,6 +7,9 @@
   4. sign-up was broken: every new profile insert failed with "cannot insert into column age_band of view bv_profiles" (the view hides age_band behind a CASE).
 - `supabase/migrations/20261122200000_sota_table_rule_holes.sql` closes 1–3 (Koros joined only through the code functions; requests start pending and only the person asked accepts; badge columns not writable) and fixes 4 with an insert trigger on the view that runs as the member. New test `tests/table-rules-security.test.cjs` (PGlite: reproduces holes, then checks the fix and every normal path). Dry-run on live (rolled back) matched. Applied live only on Donovan's yes.
 - Not changed: `bulavata.are_friends` and the trigger functions stay callable by anon (low risk, used inside row rules); coin tips can be sent to a post the tipper cannot see.
+## 2026-11-22 — Up Next
+
+Codex claimed Dimau Ops task 1456. Show the upcoming songs, add any song with Play Next, and reorder with Up and Down on phone and desktop while the track keeps playing. Preserve the existing playlist revision and music motion.
 
 ## 2026-11-22 — Sign-up: plain message when a password is on a leaked list
 
