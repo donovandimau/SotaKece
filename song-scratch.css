@@ -110,3 +110,4 @@ h1,h2,.ss-brand span{font-family:Manrope,system-ui,sans-serif}
 .ss-draft img{width:36px;height:64px;object-fit:cover;border-radius:6px;background:var(--bg2)}
 .ss-modes{flex-wrap:wrap;justify-content:center}
 @media (max-width:420px){.ss-modes{flex-wrap:nowrap;gap:.15rem}.ss-mode{padding:.2rem .55rem;font-size:.76rem}}
+.ss-post{display:grid;gap:.5rem;padding:.8rem;border-radius:18px;border:1px solid rgba(135,206,235,.4);background:rgba(135,206,235,.07)}.ss-post h3{margin:0}.ss-post a{color:var(--sky)}.ss-post [hidden]{display:none}

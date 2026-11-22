@@ -266,24 +266,27 @@
   function storyViewer(person, index) {
     var items = person.items, i = Math.max(0, Math.min(index || 0, items.length - 1)), it = items[i];
     var old = document.getElementById('sp-viewer'); if (old) old.remove();
+    if (window.SotaStoryMedia) window.SotaStoryMedia.stop();
     var v = document.createElement('div'); v.id = 'sp-viewer'; v.className = 'sp-viewer'; v.setAttribute('role', 'dialog'); v.setAttribute('aria-label', 'Story');
     v.innerHTML = '<div class="sp-viewer-card" style="--ring:' + esc(person.accent || '#4FA8D8') + '">' +
       '<div class="sp-viewer-dots">' + items.map(function (_, k) { return '<i class="' + (k <= i ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
       '<div class="row" style="gap:8px"><span class="av sm">' + esc(person.avatar_emoji || '🌺') + '</span><b>' + esc(person.display_name || person.handle) + '</b>' +
         '<span class="handle">' + ago(it.created_at) + (it.audience === 'close' ? ' · 🟢 close friends' : '') + '</span><div class="spacer"></div>' +
         '<button type="button" class="luvbtn" data-sp="viewer-close" aria-label="Close">✕</button></div>' +
-      (it.media_url ? '<div class="sp-viewer-media">' + mediaMarkup(it.media_url) + '</div>' : '') +
+      (it.media_kind ? '<div class="sp-viewer-media sk-story-media">Opening…</div>'
+        : it.media_url ? '<div class="sp-viewer-media">' + mediaMarkup(it.media_url) + '</div>' : '') +
       (it.body ? '<div class="sp-viewer-text">' + rich(it.body) + '</div>' : '') +
       '<div class="row wrap" style="gap:6px">' +
         (i > 0 ? '<button type="button" class="btn sm ghost" data-sp="viewer-prev">‹</button>' : '') +
         (i < items.length - 1 ? '<button type="button" class="btn sm ghost" data-sp="viewer-next">›</button>' : '') +
         '<div class="spacer"></div>' +
         (person.is_me
-          ? '<span class="sub">👁 ' + (it.views || 0) + '</span><button type="button" class="btn sm ghost" data-sp="story-highlight" data-sid="' + it.id + '">⭐ Keep on my room</button><button type="button" class="btn sm ghost" data-sp="story-delete" data-sid="' + it.id + '">🗑</button>'
+          ? '<button type="button" class="btn sm ghost" data-sp="story-viewers" data-sid="' + it.id + '">👁 ' + (it.views || 0) + ' seen</button><button type="button" class="btn sm ghost" data-sp="story-highlight" data-sid="' + it.id + '">⭐ Keep on my room</button><button type="button" class="btn sm ghost" data-sp="story-delete" data-sid="' + it.id + '">🗑</button>'
           : REACTIONS.slice(0, 4).map(function (r) { return '<button type="button" class="sp-btn ' + (it.reactions && it.reactions.mine === r.key ? 'on' : '') + '" data-sp="story-react" data-sid="' + it.id + '" data-reaction="' + r.key + '">' + r.icon + '</button>'; }).join('')) +
-      '</div></div>';
+      '</div><div class="sk-story-viewers" hidden></div></div>';
     v.dataset.author = person.author; v.dataset.index = i;
     document.body.appendChild(v);
+    if (it.media_kind && window.SotaStoryMedia) window.SotaStoryMedia.mount(v.querySelector('.sk-story-media'), it, client);
     if (!person.is_me && !it.seen) { rpc('bv_story_seen', { p_id: it.id }).catch(function () {}); it.seen = true; }
   }
   function personFromStrip(author) {
@@ -296,6 +299,7 @@
     v.innerHTML = '<form class="sp-viewer-card" data-sp="story-form" data-kind="' + kind + '">' +
       '<div class="row"><h3 style="margin:0">' + (kind === 'note' ? 'A note for 24 hours' : 'A story for 24 hours') + '</h3><div class="spacer"></div><button type="button" class="luvbtn" data-sp="viewer-close" aria-label="Close">✕</button></div>' +
       '<div class="sub" style="margin:6px 0 10px">' + (kind === 'note' ? 'Short. Sits under your name on the strip. One at a time.' : 'Gone after a day unless you keep it as a highlight on your room.') + '</div>' +
+      (kind === 'story' ? '<a class="btn sm sk-story-make" href="/song-scratch.html">🎵 Make a photo, video or Song Scratch story</a><div class="sub" style="margin:8px 0">Or just write one:</div>' : '') +
       '<textarea name="body" maxlength="' + (kind === 'note' ? 60 : 300) + '" placeholder="' + (kind === 'note' ? 'e.g. at the market till 2' : 'What is happening…') + '" required></textarea>' +
       (kind === 'story' ? '<input name="media" type="url" placeholder="HTTPS image link (optional)" style="margin-top:8px">' +
         '<label class="sp-seg" style="margin-top:8px"><span>Who sees it</span><select name="audience"><option value="friends">All friends</option><option value="close">🟢 Close friends only</option></select></label>' : '') +
@@ -456,7 +460,7 @@
     var h = R.highlights || [];
     if (!h.length) return '';
     return '<div class="glass card sp-highlights"><h3>Highlights</h3><div class="sp-strip-scroll">' + h.map(function (s) {
-      return '<div class="sp-highlight">' + (s.media_url ? mediaMarkup(s.media_url) : '<div class="sp-highlight-text">' + rich(s.body) + '</div>') +
+      return '<div class="sp-highlight">' + (s.media_kind ? '<div class="sp-highlight-text">🎵 ' + (s.body ? rich(s.body) : 'Song story') + '</div>' : s.media_url ? mediaMarkup(s.media_url) : '<div class="sp-highlight-text">' + rich(s.body) + '</div>') +
         '<small>' + esc(s.title) + '</small>' + (R.is_me ? '<button type="button" class="sp-link" data-sp="unhighlight" data-sid="' + s.id + '">remove</button>' : '') + '</div>';
     }).join('') + '</div></div>';
   }
@@ -596,7 +600,18 @@
       if (act === 'story-new') return storyComposer('story');
       if (act === 'note-new') return storyComposer('note');
       if (act === 'story-open') { var person = personFromStrip(t.dataset.author); if (person) storyViewer(person, 0); return; }
-      if (act === 'viewer-close') { document.getElementById('sp-viewer').remove(); return; }
+      if (act === 'viewer-close') { if (window.SotaStoryMedia) window.SotaStoryMedia.stop(); document.getElementById('sp-viewer').remove(); return; }
+      if (act === 'story-viewers') {
+        var box2 = closest(t, '.sp-viewer-card').querySelector('.sk-story-viewers');
+        if (!box2.hidden) { box2.hidden = true; return; }
+        var seen = await rpc('bv_story_viewers', { p_id: Number(t.dataset.sid) }).catch(function () { return []; });
+        var icon = {}; REACTIONS.forEach(function (r) { icon[r.key] = r.icon; });
+        box2.innerHTML = '<div class="sub">Seen by</div>' + (seen && seen.length ? seen.map(function (p) {
+          return '<div class="row" style="gap:8px"><span class="av sm">' + esc(p.avatar_emoji || '🌺') + '</span><b>' + esc(p.display_name || p.handle) + '</b>' +
+            '<span class="handle">' + ago(p.seen_at) + '</span>' + (p.reaction ? '<span>' + (icon[p.reaction] || '') + '</span>' : '') + '</div>';
+        }).join('') : '<div class="sub">Nobody yet.</div>');
+        box2.hidden = false; return;
+      }
       if (act === 'viewer-next' || act === 'viewer-prev') {
         var v = document.getElementById('sp-viewer'), pp = personFromStrip(v.dataset.author);
         return storyViewer(pp, Number(v.dataset.index) + (act === 'viewer-next' ? 1 : -1));

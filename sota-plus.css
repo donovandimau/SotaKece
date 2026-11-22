@@ -104,3 +104,15 @@
 .sp-act+.sp-act{border-top:1px solid rgba(255,255,255,.08)}
 .sp-act.unread{background:rgba(79,168,216,.12)}
 .sp-act-icon{font-size:1.1rem;opacity:.8}
+/* stories made in Song Scratch (sota-story-media.js) */
+.sk-story-media{position:relative;min-height:120px;display:grid;place-items:center;color:#4d6577;font-size:.9rem}
+.sk-story-media.is-loading{opacity:.7}
+.sk-story-media video,.sk-story-media img{width:100%;max-height:70vh;object-fit:contain;border-radius:12px;background:#000}
+.sk-story-scratch{position:relative;width:100%}
+.sk-story-scratch canvas{display:block;width:100%;max-height:70vh;aspect-ratio:9/16;object-fit:contain;border-radius:12px;touch-action:none;cursor:crosshair;background:#0a2540}
+.sk-story-hint{position:absolute;left:50%;top:62%;transform:translateX(-50%);margin:0;padding:.45rem .9rem;border-radius:999px;background:rgba(6,24,43,.78);color:#fff;font-size:.85rem;pointer-events:none;white-space:nowrap}
+.sk-story-hint[hidden]{display:none}
+.sk-story-reveal{margin-top:6px}
+.sk-story-make{display:block;text-align:center;margin-bottom:4px}
+.sk-story-viewers{margin-top:8px;display:grid;gap:6px}
+.sk-story-viewers[hidden]{display:none}

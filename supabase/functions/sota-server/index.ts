@@ -16,7 +16,7 @@ const SECRET_SHA256 = "b97125921d10123dfbeb85305ccf571f587eca5ca18a49b45c929491f
 const BASE = Deno.env.get("SUPABASE_URL")!;
 const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
-const UPLOAD_BUCKETS = ["sere-video", "sere-images", "sere-audio", "bv-room-media", "profile-photos", "talanoa-voice"];
+const UPLOAD_BUCKETS = ["sere-video", "sere-images", "sere-audio", "bv-room-media", "profile-photos", "talanoa-voice", "sota-stories"];
 const PATH = "[A-Za-z0-9._/-]{1,300}";
 const JOB_COLUMNS = new Set(["status", "progress", "error", "output_video_url", "output_poster_url", "provider", "provider_job_id", "attempts", "audio_url"]);
 

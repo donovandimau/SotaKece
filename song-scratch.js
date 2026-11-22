@@ -934,8 +934,9 @@ function audioTap() {
   return tap;
 }
 
-$('ss-save').addEventListener('click', async () => {
-  if (!window.MediaRecorder || !stage.captureStream) { say('This browser cannot make videos. Use “Save picture” instead.'); return; }
+/** Record the story as a video (replaying the scratch with the music). Returns {blob, type, withMusic} or null. */
+async function recordStory() {
+  if (!window.MediaRecorder || !stage.captureStream) { say('This browser cannot make videos. Use “Save picture” instead.'); return null; }
   const mime = pickMime((m) => MediaRecorder.isTypeSupported(m));
   const tl = buildTimeline(S.scratch ? S.strokes : []);
   const moving = videos().length || S.layers.some((l) => (l.anim && l.anim !== 'none') || l.type === 'moving');
@@ -990,11 +991,44 @@ $('ss-save').addEventListener('click', async () => {
 
   const type = (rec.mimeType || mime || 'video/webm').split(';')[0];
   const blob = new Blob(chunks, { type });
-  if (!blob.size) { say('The video came out empty. Try again, or save a picture.'); return; }
-  const how = await deliver(blob, fileName(type.includes('mp4') ? 'mp4' : 'webm'));
+  if (!blob.size) { say('The video came out empty. Try again, or save a picture.'); return null; }
+  return { blob, type, withMusic: !!out || !S.song };
+}
+
+$('ss-save').addEventListener('click', async () => {
+  const v = await recordStory();
+  if (!v) return;
+  const how = await deliver(v.blob, fileName(v.type.includes('mp4') ? 'mp4' : 'webm'));
   if (how === 'cancelled') say('Video ready. Tap “Save story video” again to share it.');
-  else say(how === 'shared' ? 'Story shared.' : (out || !S.song ? 'Story video saved to your downloads.' : 'Video saved, but this browser kept the music out of it.'));
+  else say(how === 'shared' ? 'Story shared.' : (v.withMusic ? 'Story video saved to your downloads.' : 'Video saved, but this browser kept the music out of it.'));
 });
+
+/** The three layers of a scratch story, as files a friend's phone puts back together:
+    under = the song card, cover = what gets scratched away, over = text, stickers and drawings. */
+async function scratchLayers() {
+  const now = performance.now(), toBlob = (c, type, q) => new Promise((r) => c.toBlob(r, type, q));
+  const under = canvas(), uc = under.getContext('2d');
+  const keep = S.playing; S.playing = false;            // a still card: record not spinning, bars at rest
+  drawCard(uc, now, false);
+  S.playing = keep;
+  refreshBase();
+  const over = canvas(), oc = over.getContext('2d');
+  drawPaths(oc, S.paths);
+  const info = songInfo();
+  for (const L of S.layers) drawLayer(oc, L, info, 99, asset);  // 99 s: entrance animations finished
+  return {
+    under: await toBlob(under, 'image/webp', .88),
+    cover: await toBlob(base, 'image/webp', .88),
+    over: await toBlob(over, 'image/webp', .9),
+  };
+}
+
+async function stillPicture() {
+  render(performance.now(), true);
+  return new Promise((r) => stage.toBlob(r, 'image/webp', .9));
+}
+
+window.SongScratchStory = { recordStory, scratchLayers, stillPicture, state: () => S, say, songTitle: () => (S.song ? splitTitle(S.song.title).song : '') };
 
 /* ---------- start ---------- */
 

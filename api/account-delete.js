@@ -8,7 +8,7 @@
 const {SOTA_URL,SERVICE_URL,svcHeaders}=require('./_sota-server.js');
 const SOTA_KEY='sb_publishable_WFJ3jKwImNhGdTdrS9W6mg_3CUSUYIM';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice'];
+const BUCKETS=['sere-video','sere-images','sere-audio','bv-room-media','profile-photos','talanoa-voice','sota-stories'];
 
 async function who(auth,fetcher){
   if(typeof auth!=='string'||!/^Bearer [A-Za-z0-9_.-]{20,8192}$/.test(auth))return null;
