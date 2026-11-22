@@ -1,3 +1,7 @@
+## 2026-11-22 — Up Next
+
+Codex claimed Dimau Ops task 1456. Show the upcoming songs, add any song with Play Next, and reorder with Up and Down on phone and desktop while the track keeps playing. Preserve the existing playlist revision and music motion.
+
 ## 2026-11-22 — Shared music: up to 999 songs
 
 The shared catalogue now has 461 songs; this app's music player refused the whole list above 500. `shared-music/`: core.mjs updated to the museum's shared music player (3c05e31): limit 999 songs and playlist names kept (this app uses its own player; only the catalogue reader changes). Tests: no music tests.
