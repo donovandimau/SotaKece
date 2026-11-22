@@ -1,3 +1,10 @@
+## 2026-11-22 — Sign-up: plain message when a password is on a leaked list
+
+- Claude, Ops task 1458 (Donovan: "Yes, Sota Kece"). On 21 Nov a visitor (iPhone, NZ) tried email sign-up 11 times in a minute; the Sydney project's logs show every `/auth/v1/signup` refused 422 "Password is known to be weak and easy to guess" (leaked-password protection, which Donovan keeps on, 19 Nov). Nobody explained what to do, so they gave up.
+- `index.html`: new `passwordAdvice(error)`. A leaked password now says it "has shown up in a public data leak" and asks for a different one; a short one asks for 6 characters. The password box is cleared and focused, and the funnel logs `signup_error` with `step: "weak_password"` so it shows up in analytics. Other errors keep Supabase's wording. The password hint now says "At least 6 characters" (the owner rule, 19 Nov), not 8.
+- Release v211-password-advice (index.html meta and sw.js cache). New test `tests/password-advice.test.cjs` (5). Full suite: 0 failures, 469 pass on the branch versus 464 on the base. Stacked on Codex PR 531, the saved Ops revision.
+- Not changed: the shared `dimau-account.js` box shows the same raw Supabase message in other apps.
+
 ## 2026-11-22 — Shared music: up to 999 songs
 
 The shared catalogue now has 461 songs; this app's music player refused the whole list above 500. `shared-music/`: core.mjs updated to the museum's shared music player (3c05e31): limit 999 songs and playlist names kept (this app uses its own player; only the catalogue reader changes). Tests: no music tests.

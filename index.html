@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261122-v210-instruments">
+<meta name="sota-release" content="sota-kece-shell-20261122-v211-password-advice">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -443,7 +443,7 @@ function renderAuth(mode="in"){
         <div class="sub" style="margin-top:5px">Lowercase letters, numbers and underscores. This is your room address.</div></div>
       <div><label>Display name</label><input id="a-name" placeholder="Sina" maxlength="40"></div>`:''}
       <div><label for="a-email">Email</label><input id="a-email" type="email" placeholder="you@email.com" autocapitalize="off"></div>
-      <div><label for="a-pass">Password</label><input id="a-pass" type="password" placeholder="At least 8 characters"></div>
+      <div><label for="a-pass">Password</label><input id="a-pass" type="password" placeholder="At least 6 characters"></div>
       ${mode==='up'?`<div><label>Year you were born</label><input id="a-year" type="number" inputmode="numeric" placeholder="e.g. 2004" min="1900" max="${new Date().getFullYear()}">
         <div class="sub" style="margin-top:5px">Sota Kece is 16+. We ask once, store only an age band, and never a document.</div></div>`:''}
       <button class="btn" id="a-go">${mode==='up'?'Create my room':'Sign in'}</button>
@@ -480,6 +480,16 @@ async function signIn(){
    BAND only and never the birth year, which is what the form promises. */
 const bandFor = y => (new Date().getFullYear() - y) >= 18 ? "adult" : "teen";
 const oldEnough = y => { const a = new Date().getFullYear() - y; return a >= 16 && a < 120; };
+/* Supabase turns down passwords that appear in public data leaks (Donovan keeps this check on,
+   19 Nov 2026) and passwords under 6 characters. Its own wording ("Password is known to be weak
+   and easy to guess") left one visitor retrying the same sign-up 11 times on 21 Nov, so say
+   plainly what is wrong and what to do instead. Returns "" for any other error. */
+function passwordAdvice(error){
+  const code=String(error&&error.code||""), msg=String(error&&error.message||""), why=(error&&error.reasons)||[];
+  if(code!=="weak_password"&&!/known to be weak|easy to guess|at least \d+ characters/i.test(msg)) return "";
+  if(why.includes("length")||/at least \d+ characters/i.test(msg)) return "Your password needs at least 6 characters.";
+  return "That password has shown up in a public data leak, so it isn't safe to use. Please pick a different one (at least 6 characters) that you don't use anywhere else.";
+}
 async function signUp(){
   const b=$("#a-go"); b.disabled=true; const err=$("#a-err"); err.textContent="";
   const handle=$("#a-handle").value.trim().toLowerCase(), name=$("#a-name").value.trim(), year=parseInt($("#a-year").value);
@@ -490,7 +500,10 @@ async function signUp(){
   if(!he && free===false){ err.textContent="That handle is taken."; b.disabled=false; return; }
   window.SKFunnel("signup_provider",{provider:"email",mode:"up"});
   const {data,error} = await sb.auth.signUp({email:$("#a-email").value.trim(),password:$("#a-pass").value,options:{emailRedirectTo:location.origin+"/"}});
-  if(error){ err.textContent=error.message; b.disabled=false; window.SKFunnel("signup_error",{provider:"email",step:"signup"}); return; }
+  if(error){
+    const tip=passwordAdvice(error); err.textContent=tip||error.message; b.disabled=false;
+    if(tip){ const p=$("#a-pass"); p.value=""; p.focus(); }
+    window.SKFunnel("signup_error",{provider:"email",step:tip?"weak_password":"signup"}); return; }
   window.SKFunnel("signup_account_created",{provider:"email",confirm_email:data.session?0:1});
   const band = bandFor(year);
   if(!data.session){
