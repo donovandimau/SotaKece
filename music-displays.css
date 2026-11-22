@@ -264,3 +264,26 @@ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-display-enabled .sk-displ
   #sk-music-playlist .sk-display-theatre .sk-display-stage .sk-display-visual {height:clamp(230px,39svh,410px)}
   #sk-music-playlist .sk-display-theatre .sk-display-stage .sk-display-title {font-size:clamp(28px,8vw,46px)}
 }
+
+/* The listening view has its own type hierarchy inside each of Sota's page themes. */
+#sk-music-playlist dialog.sk-display-theatre[open] {
+  background:radial-gradient(ellipse at 28% 24%,#24273b,#0a0c12 82%) !important;
+  color-scheme:dark;
+}
+#sk-music-playlist .sk-display-stage,
+#sk-music-playlist .sk-display-stage :is(span,b,strong,small,button,label,output) {
+  font-family:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif !important;
+  text-shadow:none;
+}
+#sk-music-playlist .sk-display-stage .sk-display-title {
+  font-weight:700;letter-spacing:-.045em;line-height:1.08;
+}
+#sk-music-playlist .sk-display-stage .sk-display-layout-name,
+#sk-music-playlist .sk-display-stage .sk-display-chart-label,
+#sk-music-playlist .sk-display-stage .sk-display-band output,
+#sk-music-playlist .sk-display-stage .sk-dial-readout small {
+  font-family:Consolas,"Courier New",monospace !important;font-variant-numeric:tabular-nums;
+}
+#sk-music-playlist .sk-display-stage .sk-display-song {font-size:14px;font-weight:650}
+#sk-music-playlist .sk-display-stage .sk-display-queue-credit {font-size:11px;font-weight:400}
+#sk-music-playlist [data-layout=glass] .sk-display-band {grid-template-columns:minmax(52px,auto) minmax(50px,1fr) 45px}
