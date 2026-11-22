@@ -10,8 +10,8 @@
 //
 // The same handler files Vercel ran are used here, unchanged, through a small (req, res) adapter.
 // /t/, /p/ and /i/ need nothing secret. /s/ needs SOTA_SERVER_SECRET (the key for the sota-server edge
-// function, which reads the sere with the service key) and SERE_SECRET; while those are not set on the
-// Worker, /s/ links are passed to the Vercel deployment, so a shared singing photo keeps working.
+// function, which reads the sere with the service key) and SERE_SECRET, both set on the Worker. If either is
+// missing, /s/ answers a "try again" page (503); Vercel is retired, so there is nowhere to pass it to.
 // Everything else goes to the static files. /api/* is handled before this file is reached, in
 // cloudflare/site-worker.js.
 const listen = require('../api/listen.js');
@@ -20,8 +20,6 @@ const invite = require('../api/invite.js');
 const routesConfig = require('./routes.json');
 
 const SERE_HOST = 'sere.sotakece.com';
-// Vercel origin that still runs the functions (the same one dimau-api-forwarder uses).
-const VERCEL_ORIGIN = 'https://sotakece-donovandimau-3468s-projects.vercel.app';
 
 // The same patterns as the old vercel.json "routes" (vercel.json was retired on 22 Nov 2026).
 const ROUTES = [
@@ -91,20 +89,10 @@ async function handle(request, env, fetcher = fetch) {
   if (!found) return env.ASSETS.fetch(request);
 
   if (found.route.secret && !SERE_SECRETS.every((k) => env[k])) {
-    // No sere secrets on the Worker yet: ask the Vercel deployment, which has them.
+    // A sere secret is missing on the Worker: say so plainly rather than guess.
     if (request.method !== 'GET' && request.method !== 'HEAD') return withSiteHeaders(await runNode(listen, request, found.query));
-    try {
-      const upstream = await fetcher(VERCEL_ORIGIN + url.pathname, {
-        method: request.method,
-        headers: { accept: request.headers.get('accept') || 'text/html', 'x-forwarded-host': url.host },
-        redirect: 'manual',
-        signal: AbortSignal.timeout(8000),
-      });
-      return withSiteHeaders(upstream);
-    } catch (err) {
-      console.error('listen forward', err && err.message);
-      return withSiteHeaders(unavailable(request));
-    }
+    console.error('listen: SOTA_SERVER_SECRET or SERE_SECRET is not set on the Worker');
+    return withSiteHeaders(unavailable(request));
   }
   if (found.route.secret && typeof process !== 'undefined') {
     // api/listen.js reads process.env, as on Vercel.
@@ -113,4 +101,4 @@ async function handle(request, env, fetcher = fetch) {
   return withSiteHeaders(await runNode(found.route.handler, request, found.query));
 }
 
-module.exports = { handle, match, runNode, ROUTES, SITE_HEADERS, SERE_HOST, VERCEL_ORIGIN };
+module.exports = { handle, match, runNode, ROUTES, SITE_HEADERS, SERE_HOST };
