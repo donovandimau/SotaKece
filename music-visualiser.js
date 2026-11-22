@@ -20,10 +20,18 @@
     const C=root.AudioContext||root.webkitAudioContext;if(!C)throw Error('Audio visuals are unavailable in this browser. Music can keep playing.');
     if(!context||context.state==='closed')context=new C();
     const analyser=context.createAnalyser();analyser.fftSize=2048;analyser.smoothingTimeConstant=.78;
+    const filters=audio.id==='sota-playlist-audio' && context.createBiquadFilter
+      ? [60,230,910,3600,14000].map((hz,i)=>{
+        const filter=context.createBiquadFilter();
+        filter.type=i===0?'lowshelf':i===4?'highshelf':'peaking';
+        filter.frequency.value=hz;filter.Q.value=1;
+        return filter;
+      }) : [];
     const source=context.createMediaElementSource(audio);
-    // One speaker route. Analysis and recording branch from the same source.
-    source.connect(context.destination);source.connect(analyser);
-    graph={context,source,analyser,frequency:new Uint8Array(analyser.frequencyBinCount),wave:new Uint8Array(analyser.fftSize)};
+    let output=source;
+    for(const filter of filters){output.connect(filter);output=filter;}
+    output.connect(context.destination);output.connect(analyser);
+    graph={context,source,output,filters,analyser,frequency:new Uint8Array(analyser.frequencyBinCount),wave:new Uint8Array(analyser.fftSize)};
     graphs.set(audio,graph);return graph;
   }
   async function prepare(audio,{signal}={}){
@@ -367,17 +375,17 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
         try{
           graph=audioGraph(this.audio);await graph.context.resume();
           const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>root.MediaRecorder.isTypeSupported(t));if(!mime)throw Error('This browser cannot record WebM clips.');
-          destination=graph.context.createMediaStreamDestination();graph.source.connect(destination);
+          destination=graph.context.createMediaStreamDestination();graph.output.connect(destination);
           canvasStream=this.canvas.captureStream(30);stream=new root.MediaStream([...canvasStream.getVideoTracks(),...destination.stream.getAudioTracks()]);
           const recorder=new root.MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2500000});const chunks=[];
-          let cleaned=false;const cleanup=()=>{if(cleaned)return;cleaned=true;clearTimeout(this.recordTimer);graph.source.disconnect(destination);stream.getTracks().forEach(t=>t.stop());this.audio.removeEventListener('pause',this.finish);this.audio.removeEventListener('ended',this.finish);this.recording=null;symbolControl(this.exportButton,'record','Record visual clip');this.$('.toggle').disabled=false;};
+          let cleaned=false;const cleanup=()=>{if(cleaned)return;cleaned=true;clearTimeout(this.recordTimer);graph.output.disconnect(destination);stream.getTracks().forEach(t=>t.stop());this.audio.removeEventListener('pause',this.finish);this.audio.removeEventListener('ended',this.finish);this.recording=null;symbolControl(this.exportButton,'record','Record visual clip');this.$('.toggle').disabled=false;};
           recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};let failed=false;
           recorder.onerror=()=>{failed=true;this.note('Recording failed. Try a shorter clip.');};
           recorder.onstop=async()=>{const duration=(root.performance.now()-started)/1000;cleanup();if(failed||!chunks.length){this.note('No clip was captured. Try again while music is playing.');return;}if(this.downloadUrl)root.URL.revokeObjectURL(this.downloadUrl);let blob;try{blob=await finalizeWebmDuration(new root.Blob(chunks,{type:mime}),duration);}catch(e){this.note('Clip finalisation failed: '+e.message);return;}if(!this.isConnected)return;this.downloadUrl=root.URL.createObjectURL(blob);this.download.href=this.downloadUrl;this.download.hidden=false;this.note('Your clip is ready, with audio. Download WebM.');};
           const started=root.performance.now();recorder.start(250);this.recording=recorder;this.finish=()=>this.finishRecording();this.audio.addEventListener('pause',this.finish);this.audio.addEventListener('ended',this.finish);
           this.recordTimer=setTimeout(this.finish,clamp(seconds,1,60)*1000);symbolControl(this.exportButton,'stop','Finish clip');this.$('.toggle').disabled=true;this.download.hidden=true;
           this.note('Recording picture and sound. Keep this tab visible; up to '+seconds+' seconds.');
-        }catch(e){if(graph&&destination)try{graph.source.disconnect(destination);}catch{}stream?.getTracks().forEach(t=>t.stop());canvasStream?.getTracks().forEach(t=>t.stop());this.note('Could not record: '+e.message);}
+        }catch(e){if(graph&&destination)try{graph.output.disconnect(destination);}catch{}stream?.getTracks().forEach(t=>t.stop());canvasStream?.getTracks().forEach(t=>t.stop());this.note('Could not record: '+e.message);}
         finally{this.starting=false;this.exportButton.disabled=false;}
       }
       finishRecording(){if(this.recording&&this.recording.state!=='inactive')this.recording.stop();}

@@ -105,4 +105,5 @@ console.log(`cf-static-assets: ${out} ready (${headerRules} header rules, ${redi
 
 // Ops Room live check: write dist/ops-build.json (see scripts/ops-build-marker.mjs).
 import { execFileSync as opsMarkerRun } from 'node:child_process';
-opsMarkerRun(process.execPath, [new URL('./ops-build-marker.mjs', import.meta.url).pathname, 'dist', 'donovandimau/SotaKece'], { stdio: 'inherit' });
+import { fileURLToPath } from 'node:url';
+opsMarkerRun(process.execPath, [fileURLToPath(new URL('./ops-build-marker.mjs', import.meta.url)), out, 'donovandimau/SotaKece'], { stdio: 'inherit' });

@@ -55,12 +55,12 @@ function ended(){
 const s=api.selected();
 if(prefs.repeat==='one'&&s){audio.currentTime=0;return api.playTrack(api.index());}
 if(!prefs.autoplay)return api.say('Finished · '+(s?.title||'')+'. Auto-play is off — tap Next for another song.');
-const t=next(1,true);if(t<0)return api.say('End of the list. Turn on Repeat to keep the music going.');
-api.playTrack(t);
+api.move(1,true);
 }
 function start(){
 if(api.live())return api.pause();
 if(api.selected()&&api.index()>=0)return api.playTrack(api.index());
+if(api.queueEdited())return api.move(1);
 const items=(view==='mix'?null:current()?.items.map(byKey).filter(Boolean))||(view==='device'?device:api.catalogue());
 if(!items.length)return api.say('This list is empty. Add songs to it first.');
 api.playKey(items[prefs.shuffle?Math.floor(Math.random()*items.length):0].key);
@@ -78,9 +78,9 @@ seek.addEventListener('input',()=>{seeking=true;tick();});
 seek.addEventListener('change',()=>{const d=audio.duration;if(Number.isFinite(d))audio.currentTime=Number(seek.value)/1000*d;seeking=false;tick();});
 time.append(elapsed,seek,total);
 const main=el('div','','sk-deck-main');
-const shuffleBtn=ib('sk-deck-mode','Shuffle',ICON.shuffle,()=>{prefs.shuffle=!prefs.shuffle;if(prefs.shuffle)shuffled();keep();api.say(prefs.shuffle?'Shuffle on · songs play in a random order.':'Shuffle off · songs play in list order.');});
+const shuffleBtn=ib('sk-deck-mode','Shuffle',ICON.shuffle,()=>{prefs.shuffle=!prefs.shuffle;if(prefs.shuffle)shuffled();api.resetOrder();keep();api.say(prefs.shuffle?'Shuffle on · songs play in a random order.':'Shuffle off · songs play in list order.');});
 const playBtn=ib('sk-deck-play','Play',ICON.play,start);
-const repeatBtn=ib('sk-deck-mode sk-deck-repeat','Repeat',ICON.repeat,()=>{prefs.repeat={off:'all',all:'one',one:'off'}[prefs.repeat];keep();api.say(prefs.repeat==='one'?'Repeat on · this song plays again.':prefs.repeat==='all'?'Repeat on · the list starts again at the end.':'Repeat off.');});
+const repeatBtn=ib('sk-deck-mode sk-deck-repeat','Repeat',ICON.repeat,()=>{prefs.repeat={off:'all',all:'one',one:'off'}[prefs.repeat];api.resetOrder();keep();api.say(prefs.repeat==='one'?'Repeat on · this song plays again.':prefs.repeat==='all'?'Repeat on · the list starts again at the end.':'Repeat off.');});
 main.append(ib('sk-deck-skip','Previous song',ICON.prev,back),playBtn,ib('sk-deck-skip','Next song',ICON.next,()=>api.move(1)));
 const extra=el('div','','sk-deck-extra'),sw=el('label','','sk-deck-switch'),auto=el('input');auto.type='checkbox';auto.setAttribute('role','switch');
 auto.addEventListener('change',()=>{prefs.autoplay=auto.checked;keep();api.say(prefs.autoplay?'Auto-play on · the next song starts by itself.':'Auto-play off · music stops after each song.');});
@@ -116,6 +116,24 @@ if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='styleshee
 const session=navigator.mediaSession,set=(a,h)=>{try{session.setActionHandler(a,h);}catch(_){}};
 if(session){set('play',()=>{if(!api.live())start();});set('pause',api.pause);set('previoustrack',back);set('nexttrack',()=>api.move(1));set('seekto',d=>{if(Number.isFinite(d?.seekTime))audio.currentTime=d.seekTime;});}
 loud();modes();tick();
+// The visual layouts are loaded only when the existing player is opened.
+let display=null, loadingDisplay=false;
+async function openDisplay(){
+  if(!api.dialog.open || display || loadingDisplay)return;
+  loadingDisplay=true;
+  try{
+    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-instruments');
+    display=mountDisplays({api,deck,main,time,clock,queue});
+    display.sync();
+    watchDisplay.disconnect();
+  }catch(_){/* The original deck stays usable offline. */}
+  finally{loadingDisplay=false;}
+}
+function queue(){
+  return api.upcoming().slice(0,3).map(track=>({track,pick:()=>api.playUpcoming(track)}));
+}
+const watchDisplay=new MutationObserver(openDisplay);
+watchDisplay.observe(api.dialog,{attributes:true,attributeFilter:['open']});openDisplay();
 function setView(next){if(next.startsWith('pl:')&&!own(next.slice(3)))next='mix';view=next;write(VIEW,view);menuFor='';form='';api.clear();draw();api.render();}
 function save(){if(!write(LISTS,lists)){api.say('This browser could not save playlists. Check it is not in private mode.');return false;}return true;}
 function make(name,first){
@@ -191,8 +209,8 @@ li.append(menu);
 root.addEventListener('sota-music-change',loadDevice);
 draw();loadDevice();
 return {
-next,ended,
-sync(s,playing){modes();playBtn.innerHTML=playing?ICON.pause:ICON.play;label(playBtn,playing?'Pause':'Play');tick();
+next,ended,queueModes:()=>prefs,
+sync(s,playing){modes();playBtn.innerHTML=playing?ICON.pause:ICON.play;label(playBtn,playing?'Pause':'Play');tick();display?.sync();
 if(session&&s)try{if(root.MediaMetadata&&session.metadata?.title!==s.title)session.metadata=new MediaMetadata({title:s.title,artist:s.artist||'Sota Kece'});session.playbackState=playing?'playing':'paused';}catch(_){}},
 loaded(){draw();if(!pendingSong)return;const t=api.catalogue().find(x=>x.id===pendingSong);pendingSong='';if(t&&!api.live()){setView('mix');api.select(t.key);api.say('Shared with you · '+t.title+'. Tap Play to listen.');}},
 items:()=>view==='device'?device:view.startsWith('pl:')?(current()?.items||[]).map(byKey).filter(Boolean):null,
