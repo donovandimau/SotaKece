@@ -35,6 +35,20 @@
     var body = box.querySelector('[data-sk-group="' + key + '"] .sk-group-body');
     if (body && node && node.parentNode !== body) body.appendChild(node);
   }
+  var covered = new WeakSet();
+  function coverTracks(box) {
+    var buttons = box.querySelectorAll('.tw-track-play');
+    var pending = Array.from(buttons).filter(function (button) { return !covered.has(button); });
+    if (!pending.length || root.navigator?.connection?.saveData) return;
+    pending.forEach(function (button) { covered.add(button); });
+    import('./music-sleeves.mjs').then(function (art) {
+      pending.forEach(function (button) {
+        if (!button.isConnected) return;
+        art.sleeve(button, { id: button.dataset.id, title: button.dataset.title,
+          artist: button.dataset.credit, url: button.dataset.src });
+      });
+    }).catch(function () { /* Local photographic sleeves remain visible offline. */ });
+  }
   function arrange(app) {
     if (!app || app.dataset.worldPage !== 'pulse') return;
     var view = app.querySelector('#view');
@@ -52,6 +66,7 @@
       if (old && old !== viti) old.remove();
       put(box, 'music', viti);
     }
+    if (app.dataset.spacePalette === 'volcanic') coverTracks(box);
     // The Talanoa / Top Mates panel belongs with your people, not inside Music.
     view.querySelectorAll(':scope > .sota-social-host, .sk-group-body .sota-social-host').forEach(function (n) { put(box, 'people', n); });
     // Your people: the hubs card (where your people are, invite someone).
@@ -63,7 +78,7 @@
     app.dataset.skGroups = '1';
     var busy = false;
     var run = function () { if (busy) return; busy = true; try { arrange(app); } finally { busy = false; } };
-    new root.MutationObserver(function () { if (!busy) run(); }).observe(app, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-world-page'] });
+    new root.MutationObserver(function () { if (!busy) run(); }).observe(app, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-world-page', 'data-space-palette'] });
     run();
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = { arrange: arrange, start: start };

@@ -497,7 +497,7 @@
   /** One small player for the three songs: tap to play, tap again to stop, one at a time. */
   function playTrack(btn) {
     if (window.SotaNowPlaying) {
-      window.SotaNowPlaying.play(btn.dataset.src, { id: 'track:' + btn.dataset.id, title: btn.dataset.title, credit: btn.dataset.credit, kind: 'track' })
+      window.SotaNowPlaying.play(btn.dataset.src, { id: 'track:' + btn.dataset.id, title: btn.dataset.title, credit: btn.dataset.credit, kind: 'track', analyse: true })
         .then(function (r) { if (r === false) toast('That song could not start. Check your signal.'); syncTracks(); });
       syncTracks();
       return;

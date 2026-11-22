@@ -22,6 +22,33 @@
     return `<div data-dimau-header-bar>${headerBrand()}<div data-dimau-header-actions>${account}<span data-dimau-music-slot>${music}<span class="sx-music-badge" aria-hidden="true"><img class="sx-music-ring" src="/assets/music-badge-ring.svg" width="48" height="48" alt=""><img class="sx-music-note" src="/assets/music-badge-note.svg" width="48" height="48" alt=""></span>${musicEnd}</span><button type="button" class="sx-header-search" data-dps-search-open aria-expanded="false" aria-label="Search Sota Kece" title="Search (press /)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="dimau-header-sr-only">Search</span></button><button type="button" class="sx-header-apps" data-dimau-shell-open aria-haspopup="dialog" aria-expanded="false" aria-label="Dimau apps" title="Dimau apps"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><circle cx="5" cy="5" r="1.9"></circle><circle cx="12" cy="5" r="1.9"></circle><circle cx="19" cy="5" r="1.9"></circle><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle><circle cx="5" cy="19" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle><circle cx="19" cy="19" r="1.9"></circle></svg><span class="dimau-header-sr-only">Dimau apps</span></button><div data-dimau-menu-host><button type="button" data-dimau-menu-toggle aria-label="Menu" aria-controls="sota-header-menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span class="dimau-header-sr-only">Menu</span></button><div id="sota-header-menu" data-dimau-menu-panel class="" hidden>${accountMenu}${designEntry()}<button type="button" data-sota-share><span aria-hidden="true">${root.SotaShare?.icon||'↗'}</span> Share Sota Kece</button>${native}<button type="button" class="sx-menu-apps" data-dimau-shell-open aria-haspopup="dialog" aria-expanded="false"><span aria-hidden="true">⋮⋮</span> Dimau apps</button><a class="sx-menu-dimau" href="https://dimau-fintech.com/" target="_blank" rel="noopener">Dimau Group <span aria-hidden="true">↗</span></a>${member||example?endorsement():''}</div></div></div></div>`;
   }
   function creativeTools(member=false){return `<section class="sx-create-tools" aria-labelledby="sx-create-title"><header><span class="sx-eyebrow">MAKE IT YOURS</span><h2 id="sx-create-title">Your creative corner.</h2><p>${member?'Shape your space, find your look and build your soundtrack.':'Try the example, find your look and make a playlist. Page designs stay on this device.'}</p></header><div class="sx-create-actions"><button type="button" class="sx-create-tool" data-sx-design="profile" aria-haspopup="dialog" aria-controls="ssd-editor"><span aria-hidden="true">✦</span><strong>${member?'Edit my page':'Try page design'}</strong><small>Colours, type, buttons and backgrounds.</small></button><details class="sx-create-more" open><summary>Room skins and music</summary><div class="sx-create-secondary"><button type="button" class="sx-create-tool" data-sx-customise aria-haspopup="dialog"><span aria-hidden="true">▧</span><strong>Room Studio</strong><small>Choose a skin, cover and soundtrack.</small></button><${member?'button type="button" data-sx-member="music"':'a href="#music"'} class="sx-create-tool"><span aria-hidden="true">♫</span><strong>Your music</strong><small>Make playlists or bring music from your device.</small></${member?'button':'a'}></div></details></div></section>`;}
+  function volcanicPhoneLinks(tab){
+    return '<button type="button" class="sk-volcanic-link sk-create-moment" data-sx-member="moments" aria-label="Share a moment" aria-current="'+(tab==='moments'?'page':'false')+'"><span aria-hidden="true">+</span><small>Share</small></button>'+
+      '<button type="button" class="sk-volcanic-link sk-open-koro" data-sx-member="crews" aria-current="'+(tab==='crews'?'page':'false')+'">'+icon('people')+'<span>Koro</span></button>';
+  }
+  function watchPhoneNavigation(s,tab){
+    const {app}=s,nav=app.querySelector('.sx-nav'),menu=app.querySelector('.sx-utilities');
+    const phone=root.matchMedia?.('(max-width:760px)');
+    if(!nav||!menu||!phone)return;
+    const original=nav.querySelector('[aria-current="page"]');
+    function sync(){
+      const active=phone.matches&&app.dataset.spacePalette==='volcanic';
+      if(active===!!nav.querySelector('.sk-volcanic-link'))return;
+      if(active){
+        nav.insertAdjacentHTML('beforeend',volcanicPhoneLinks(tab));
+        if(tab==='moments'||tab==='crews')original?.setAttribute('aria-current','false');
+        menu.insertAdjacentHTML('beforebegin','<button type="button" class="sk-volcanic-link" data-sx-member="friends">People</button><button type="button" class="sk-volcanic-link" data-sx-member="room">My space</button>');
+      }else{
+        app.querySelectorAll('.sk-volcanic-link').forEach(node=>node.remove());
+        original?.setAttribute('aria-current','page');
+      }
+    }
+    const observer=new root.MutationObserver(sync);
+    observer.observe(app,{attributes:true,attributeFilter:['data-space-palette']});
+    phone.addEventListener?.('change',sync);
+    s.listeners.push(()=>{observer.disconnect();phone.removeEventListener?.('change',sync);});
+    sync();
+  }
   function nav(member=false,tab='home',pending=0){if(member)tab=({moments:'pulse',crews:'wall',circles:'wall',connections:'friends'})[tab]||tab;return `<nav class="sx-nav" data-dps-nav aria-label="Main navigation">${routes.map(([key,label,target])=>`<${member?'button type="button"':'a'} ${member?`data-sx-member="${target}"`:`href="#${key}" data-sx-route="${key}"`} data-dps-tab="${key}" aria-current="${tab===(member?target:key)?'page':'false'}">${icon(key)}<span>${label}</span>${key==='people'&&pending?`<b class="sx-count" aria-label="${pending} pending requests">${pending}</b>`:''}</${member?'button':'a'}>`).join('')}</nav>`;}
   function stop(){root.SotaWorlds?.stop();if(session){session.app.classList.remove('sx-has-mini');session.listeners.forEach(remove=>remove());session=null;}root.document?.body.classList.remove('sx-enabled','sx-guest','sx-member');}
   function start(app,member){stop();root.SotaIconControls?.stop();root.document.body.classList.add('sx-enabled',member?'sx-member':'sx-guest');app.classList.add('sx-app');session={app,listeners:[],member};return session;}
@@ -150,6 +177,7 @@
     const utilities=[...(top?.querySelectorAll('button,.luvchip')||[])].filter(node=>!node.matches('[data-sx-design],[data-sx-member],[data-sx-customise],[data-sota-share]')).filter((node,index,all)=>!all.some(other=>other!==node&&other.contains(node)));
     if(top){top.classList.add('sx-top');top.setAttribute('data-dimau-header','');top.innerHTML=headerBar(member,!member,state.me?.display_name||state.me?.handle||'friend');if(member)utilities.forEach(node=>top.querySelector('.sx-utilities').append(node));}
     const aside=root.document.createElement('aside');aside.className='sx-rail';aside.innerHTML=`${brand()}<p class="sx-rail-caption">A little closer to home.</p>${nav(member,member?state.tab:'talanoa',state.pending?.length||0)}<div class="sx-rail-bottom"><p>${esc(state.me?.display_name||state.me?.handle||'Your space')}</p><small>${state.me?.handle?'@'+esc(state.me.handle):'alive together'}</small></div>`;app.prepend(aside);
+    if(member)watchPhoneNavigation(s,state.tab);
     const selected=routes.find(r=>r[2]===state.tab),view=app.querySelector('#view');view.classList.add('sx-member-content');
 
     const designPage=state.tab==='room'?'profile':state.tab||'profile';app.dataset.frontPage=designPage;

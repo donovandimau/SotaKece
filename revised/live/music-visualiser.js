@@ -72,13 +72,15 @@
     }return result;
   }
   function draw(ctx,w,h,settings={},state={},data=null,background=true){
-    const colours=palettes[settings.theme]||palettes.rainbow,mode=modes.includes(settings.mode)?settings.mode:'spectrum';
+    const volcanic=settings.volcanic===true;
+    const colours=volcanic?['#20a799','#52e0c9','#bcfff1']:palettes[settings.theme]||palettes.rainbow;
+    const mode=volcanic?'waveform':modes.includes(settings.mode)?settings.mode:'spectrum';
     const preview=!data&&(state.preview===true||Number.isFinite(state.previewTime)),time=Number.isFinite(state.previewTime)?state.previewTime/1000:0;
     if(state.previewActive!==preview){state.peaks=null;state.previewActive=preview;}
     const gain=clamp(Number(settings.gain)||1,.5,2),f=preview?previewSpectrum(state.previewTime,64):bins(data?.frequency,64,data?.context?.sampleRate),wave=data?.wave;
     const unit=Math.min(w,h),base=h*.79;ctx.save();
     if(background){
-      const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,'#fff1b8');bg.addColorStop(.48,'#c8fff2');bg.addColorStop(1,'#f9d7f0');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+      const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,volcanic?'#091516':'#fff1b8');bg.addColorStop(.48,volcanic?'#123235':'#c8fff2');bg.addColorStop(1,volcanic?'#0a191b':'#f9d7f0');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
       const aura=ctx.createRadialGradient(w*.52,h*.4,0,w*.52,h*.4,w*.6);aura.addColorStop(0,colours[1]+'22');aura.addColorStop(1,colours[1]+'00');ctx.fillStyle=aura;ctx.fillRect(0,0,w,h);
       ctx.strokeStyle='#194f6620';ctx.lineWidth=1;for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(w*.06,h*i/5);ctx.lineTo(w*.94,h*i/5);ctx.stroke();}
     }
@@ -110,6 +112,7 @@
         ctx.fill();
       }
     }else{
+      if(volcanic){ctx.shadowColor='#52e0c9';ctx.shadowBlur=Math.min(8,h*.035);}
       const layers=mode==='ocean'?5:1;ctx.lineWidth=mode==='ocean'?1.4:2;
       for(let layer=0;layer<layers;layer++){
         ctx.globalAlpha=mode==='ocean'?.25+layer*.12:.95;ctx.beginPath();
@@ -283,7 +286,7 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
       connectedCallback(){
         if(this.built)return;this.built=true;
         try{const saved=JSON.parse(root.localStorage.getItem('dimau.music.visuals.v1')||'null');if(saved){if(modes.includes(saved.mode))this.settings.mode=saved.mode;if(palettes[saved.theme])this.settings.theme=saved.theme;this.settings.gain=clamp(Number(saved.gain)||1,.5,2);if(typeof saved.paused==='boolean')this.userPaused=saved.paused;}}catch{}
-        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" aria-label="Music visuals"><div class="heading"><strong>SOUND IN MOTION</strong><span class="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption"><span>FREQUENCY / FORM</span><span>DIMAU MUSIC</span></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Waveform</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
+        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" part="shell" aria-label="Music visuals"><div class="heading" part="heading"><strong part="label">SOUND IN MOTION</strong><span class="state" part="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas part="canvas" aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption" part="caption"><span>FREQUENCY / FORM</span><span>DIMAU MUSIC</span></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Waveform</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
         const $=s=>this.shadowRoot.querySelector(s);this.$=$;this.canvas=$('canvas');this.ctx=this.canvas.getContext('2d');
         for(const key of ['mode','theme','gain']){const control=$('.'+key);control.value=this.settings[key];control.addEventListener('input',()=>{this.settings[key]=key==='gain'?Number(control.value):control.value;this.persist();this.changed();this.render();});}
         $('.toggle').addEventListener('click',()=>this.toggle());
@@ -299,12 +302,19 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
         const visibility=()=>{if(root.document.hidden){if(this.recording)this.finishRecording();this.stop();}else this.wake();};root.document.addEventListener('visibilitychange',visibility);this.handlers.push(()=>root.document.removeEventListener('visibilitychange',visibility));
         this.resize=new root.ResizeObserver(()=>this.render());this.resize.observe(this);
         this.intersection=new root.IntersectionObserver(entries=>{this.visible=entries[0]?.isIntersecting!==false;this.wake();});this.intersection.observe(this);
-        if(root.MutationObserver){this.modalObserver=new root.MutationObserver(changes=>{if(changes.some(change=>change.type==='attributes'||[...change.addedNodes,...change.removedNodes].some(node=>node.tagName==='DIALOG'||node.querySelector?.('dialog'))))this.wake();});this.modalObserver.observe(root.document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['open']});}
+        const syncSource=()=>{
+          const previous=this.audio;this.bind();
+          if(this.audio!==previous&&this.audio&&!this.audio.paused&&this.enabled)this.analyse();
+          this.wake();
+        };
+        root.addEventListener('sota-now-playing',syncSource);this.handlers.push(()=>root.removeEventListener('sota-now-playing',syncSource));
+        if(root.MutationObserver){this.modalObserver=new root.MutationObserver(changes=>{if(changes.some(change=>change.type==='attributes'||[...change.addedNodes,...change.removedNodes].some(node=>node.tagName==='DIALOG'||node.querySelector?.('dialog'))))syncSource();});this.modalObserver.observe(root.document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['open','data-space-palette']});}
         this.bind();this.changed();this.wake();
         if(this.hasAttribute('export'))this.addExport();
       }
       bind(){
-        const audio=this._media||root.document.getElementById(this.getAttribute('for'));
+        const active=this.hasAttribute('compact')&&this.closest('[data-space-palette="volcanic"]')&&root.SotaNowPlaying?.active?.();
+        const audio=active?.kind==='track'&&active.audio.id==='sota-now-audio'?active.audio:this._media||root.document.getElementById(this.getAttribute('for'));
         if(this.audio===audio&&this.bindingActive)return;this.analysisController?.abort();this.prepareRun++;this.unbind?.();this.audio=audio;this.bindingActive=!!audio;if(!audio)return;
         const wake=()=>this.wake();const play=()=>{this.wake();if(this.enabled)this.analyse();};
         const names=['pause','ended','emptied','loadedmetadata','error','playing','waiting','stalled'];names.forEach(n=>audio.addEventListener(n,wake));audio.addEventListener('play',play);
@@ -356,7 +366,8 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
         const w=clamp(Math.round((bounds.width||600)*ratio),1,1920),h=clamp(Math.round((bounds.height||220)*ratio),1,1080);
         if(this.canvas.width!==w)this.canvas.width=w;if(this.canvas.height!==h)this.canvas.height=h;
         const data=this.liveData();this.drawState.preview=!data;
-        draw(this.ctx,w,h,this.settings,this.drawState,data);
+        const volcanic=this.hasAttribute('compact')&&this.closest('[data-space-palette="volcanic"]');
+        draw(this.ctx,w,h,volcanic?{...this.settings,volcanic:true}:this.settings,this.drawState,data);
       }
       stop(){if(this.frame)root.cancelAnimationFrame(this.frame);this.frame=0;}
       addExport(){

@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.join(__dirname,'..'),model=require('../space-design.js');
 const colours={
  lagoon:'Fiji Lagoon',sunset:'Island Sunset',electric:'Bula Beats',ocean:'Pacific Blue',night:'Reef Night',garden:'Tropical Grove',
- 'neon-cyan':'Reef Glow','neon-blue':'Pacific Neon','neon-purple':'Island Violet','neon-pink':'Hibiscus Pink','neon-orange':'Sunset Amber','neon-green':'Rainforest Green'
+ 'neon-cyan':'Reef Glow','neon-blue':'Pacific Neon','neon-purple':'Island Violet','neon-pink':'Hibiscus Pink','neon-orange':'Sunset Amber','neon-green':'Rainforest Green',volcanic:'Volcanic Dark'
 };
 const lum=hex=>hex.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((sum,x,i)=>sum+x*[.2126,.7152,.0722][i],0);
 const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
