@@ -1,3 +1,7 @@
+## 2026-11-22 — Music icon at vinyl LP speed
+
+- Codex, Ops task 1359. The Fiji flag turns once every 1.8 seconds (33⅓ RPM) during playback. The centred music note stays still, and reduced-motion settings disable the spin.
+
 ## 2026-11-14 — TRACKER merge prevention
 
 Added TRACKER.md merge=union while preserving other Git attributes. Git attribute resolution and a real concurrent-log merge pass. Application behavior is unchanged. Publication is tracked in this PR and Ops.
