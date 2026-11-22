@@ -55,3 +55,13 @@
 /* Owner-supplied woven mat, retained beneath the colour wash and available offline. */
 .sk-playlist{--sk-weave:url("/assets/music-weave-20261110.webp")}
 @media(forced-colors:active){.sk-playlist,.sk-playlist button,.sk-playlist input,.sk-playlist-hero,.sk-playlist-transport button,.sk-playlist-transport .sk-playlist-play,.sk-playlist-songs button,.sk-playlist-songs button[aria-current=true],.sk-playlist-number,.sk-playlist-record,.sk-playlist-record-label{background:Canvas;color:CanvasText;border:1px solid CanvasText;box-shadow:none}.sk-playlist-record::after{display:none}.sk-playlist-songs button[aria-current=true]{outline:2px solid Highlight;outline-offset:-3px}.sk-playlist-eyebrow,.sk-playlist-mood,.sk-playlist-subtitle,.sk-playlist-status,.sk-playlist label,.sk-playlist-queue,.sk-playlist-queue small,.sk-playlist-number,.sk-playlist-songs button::after,.sk-playlist-songs button[aria-current=true]::after{color:CanvasText}.sk-playlist-bars i{background:CanvasText}.sk-playlist button:focus-visible,.sk-playlist input:focus-visible{outline-color:Highlight}}
+
+.sk-playlist:not(.sk-playlist-inline){width:min(760px,calc(100vw - 24px))}
+.sk-playlist-browser{display:grid;gap:16px;min-width:0}
+.sk-playlist-results{display:grid;gap:9px;min-width:0;align-content:start}
+.sk-playlist-search-controls{display:flex;align-items:center;gap:8px;min-width:0}
+.sk-playlist-search-controls input{flex:1;min-width:0}
+.sk-playlist .sk-playlist-go,.sk-playlist .sk-playlist-search-controls button{width:auto;min-height:44px;padding:6px 12px;border-radius:12px;background:#fff;color:#3f2556;font-weight:800}
+.sk-playlist .sk-playlist-go{justify-self:start;align-self:flex-start}
+.sk-playlist [hidden]{display:none}
+@media(min-width:640px){.sk-playlist-browser:has(.sk-lib){grid-template-columns:minmax(140px,1fr) minmax(0,2.2fr)}}

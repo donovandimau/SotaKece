@@ -28,14 +28,32 @@ return saved.filter(l=>l&&typeof l.id==='string'&&/^[a-z0-9]{4,20}$/.test(l.id)&
 function attach(api){
 const doc=root.document;
 let lists=readLists(),device=[],view=String(read(VIEW,'mix')),menuFor='',form='',pendingAdd='',blobUrl={key:'',url:''};
-if(!/^(?:mix|device|pl:[a-z0-9]{4,20})$/.test(view))view='mix';
+if(!/^(?:mix|device|pl:[a-z0-9]{4,20}|category:.{1,60})$/.test(view))view='mix';
 const el=(tag,text,cls)=>{const n=doc.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
 const btn=(text,cls,fn)=>{const n=el('button',text,cls);n.type='button';n.addEventListener('click',fn);return n;};
 const own=id=>lists.find(l=>l.id===id)||null;
 const byKey=key=>key.startsWith('mix:')?api.catalogue().find(t=>t.key===key):device.find(t=>t.key===key);
 const current=()=>view.startsWith('pl:')?own(view.slice(3)):null;
-const bar=el('div','','sk-lib'),tools=el('div','','sk-lib-tools'),picker=el('input');
-bar.setAttribute('role','group');bar.setAttribute('aria-label','Your music lists');tools.hidden=true;
+const bar=el('div','','sk-lib'),nav=el('nav','','sk-lib-nav'),playlistPicker=el('select','','sk-lib-picker'),tools=el('div','','sk-lib-tools'),picker=el('input');
+nav.setAttribute('aria-label','Playlists');playlistPicker.setAttribute('aria-label','Playlist');tools.hidden=true;
+playlistPicker.addEventListener('change',()=>setView(playlistPicker.value));
+const entries=()=>{
+const counts=new Map();
+for(const track of api.catalogue())if(track.playlist)counts.set(track.playlist,(counts.get(track.playlist)||0)+1);
+return [
+  {key:'mix',name:'Island Mix',count:api.catalogue().length},
+  ...Array.from(counts,([name,count])=>({key:'category:'+name,name,count})),
+  {key:'device',name:'My music',count:device.length},
+  ...lists.map(list=>({key:'pl:'+list.id,name:list.name,count:list.items.filter(byKey).length}))
+];
+};
+const items=(key=view)=>{
+if(key==='device')return device;
+if(key.startsWith('pl:'))return (own(key.slice(3))?.items||[]).map(byKey).filter(Boolean);
+if(key.startsWith('category:'))return api.catalogue().filter(track=>track.playlist===key.slice(9));
+return api.catalogue();
+};
+const viewName=()=>view==='device'?'My music':current()?.name||(view.startsWith('category:')?view.slice(9):'Island Mix');
 picker.type='file';picker.multiple=true;picker.hidden=true;picker.accept=root.SotaLocalMusic?.accept||'audio/*';picker.setAttribute('aria-label','Choose songs from this device');
 api.host.append(bar,tools,picker);
 const prefs={shuffle:false,repeat:'off',autoplay:true,volume:1,muted:false};
@@ -61,9 +79,9 @@ api.playTrack(t);
 function start(){
 if(api.live())return api.pause();
 if(api.selected()&&api.index()>=0)return api.playTrack(api.index());
-const items=(view==='mix'?null:current()?.items.map(byKey).filter(Boolean))||(view==='device'?device:api.catalogue());
-if(!items.length)return api.say('This list is empty. Add songs to it first.');
-api.playKey(items[prefs.shuffle?Math.floor(Math.random()*items.length):0].key);
+const songs=items();
+if(!songs.length)return api.say('This list is empty. Add songs to it first.');
+api.playKey(songs[prefs.shuffle?Math.floor(Math.random()*songs.length):0].key);
 }
 function back(){if(audio.currentTime>3&&api.index()>=0){audio.currentTime=0;if(!api.live())api.playTrack(api.index());return;}api.move(-1);}
 function shareSong(){
@@ -111,11 +129,11 @@ for(const e of ['timeupdate','loadedmetadata','durationchange'])audio.addEventLi
 api.dialog.querySelector('.sk-playlist-transport')?.setAttribute('hidden','');
 audio.controls=false;audio.hidden=true;
 api.dialog.querySelector('.sk-playlist-hero').after(deck);
-if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='stylesheet';l.href='/music-controls.css?v=20261110-music-tidy-1';l.dataset.skDeck='1';doc.head.append(l);}
+if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='stylesheet';l.href='/music-controls.css?v=20261122-playlist-menu';l.dataset.skDeck='1';doc.head.append(l);}
 const session=navigator.mediaSession,set=(a,h)=>{try{session.setActionHandler(a,h);}catch(_){}};
 if(session){set('play',()=>{if(!api.live())start();});set('pause',api.pause);set('previoustrack',back);set('nexttrack',()=>api.move(1));set('seekto',d=>{if(Number.isFinite(d?.seekTime))audio.currentTime=d.seekTime;});}
 loud();modes();tick();
-function setView(next){if(next.startsWith('pl:')&&!own(next.slice(3)))next='mix';view=next;write(VIEW,view);menuFor='';form='';api.clear();draw();api.render();}
+function setView(next){view=entries().some(entry=>entry.key===next)?next:'mix';write(VIEW,view);menuFor='';form='';api.clear();draw();api.render();}
 function save(){if(!write(LISTS,lists)){api.say('This browser could not save playlists. Check it is not in private mode.');return false;}return true;}
 function make(name,first){
 name=clean(name);if(!name)return null;
@@ -142,10 +160,18 @@ api.say('Saving songs on this device…');
 try{const r=await root.SotaLocalMusic.importFiles(files);await loadDevice();api.say((r.saved.length?r.saved.length+' song'+(r.saved.length===1?'':'s')+' added to My music.':'No songs were added.')+(r.rejected.length?' '+r.rejected.slice(0,2).map(x=>x.fileName+': '+x.reason).join(' '):''));}
 catch(e){api.say(e.message||'Songs could not be saved. Check available device storage.');}
 });
-function chip(text,key,n){const c=btn('','sk-lib-chip',()=>setView(key));c.append(el('span',text),el('small',String(n)));c.setAttribute('aria-pressed',String(view===key));return c;}
+function chip(text,key,n){const c=btn('','sk-lib-chip',()=>setView(key));c.dataset.viewKey=key;c.append(el('span',text),el('small',String(n)));c.setAttribute('aria-pressed',String(view===key));return c;}
 function draw(){
-bar.textContent='';bar.append(chip('Island Mix','mix',api.catalogue().length),chip('My music','device',device.length),...lists.map(l=>chip(l.name,'pl:'+l.id,l.items.filter(byKey).length)));
-const add=btn('','sk-lib-chip sk-lib-new',()=>{form=form==='new'?'':'new';pendingAdd='';draw();});add.innerHTML=plus;add.append(el('span','New playlist'));add.setAttribute('aria-expanded',String(form==='new'));bar.append(add);
+const focused=nav.contains(doc.activeElement);
+const choices=entries();
+nav.replaceChildren(...choices.map(({name,key,count})=>chip(name,key,count)));
+playlistPicker.replaceChildren(...choices.map(({name,key,count})=>{const option=el('option',name+' · '+count);option.value=key;return option;}));
+playlistPicker.value=choices.some(entry=>entry.key===view)?view:'mix';
+if(!nav.isConnected)bar.append(nav,playlistPicker);
+if(focused)nav.querySelector('[aria-pressed="true"]')?.focus({preventScroll:true});
+const add=btn('','sk-lib-chip sk-lib-new',()=>{form=form==='new'?'':'new';pendingAdd='';draw();});add.innerHTML=plus;add.append(el('span','New playlist'));add.setAttribute('aria-expanded',String(form==='new'));
+const previousAdd=bar.querySelector('.sk-lib-new');
+if(previousAdd)previousAdd.replaceWith(add);else bar.append(add);
 tools.textContent='';const list=current();
 if(form){
 const editing=form==='rename'?list:null,f=el('form','','sk-lib-form'),input=el('input');
@@ -172,7 +198,7 @@ lists=lists.filter(l=>l!==list);save();api.say('Deleted '+list.name+'.');setView
 }));
 }
 tools.hidden=!tools.childNodes.length;
-const q=api.dialog.querySelector('.sk-playlist-queue span');if(q)q.textContent=(view==='device'?'My music':current()?.name||'Island Mix').toUpperCase();
+const q=api.dialog.querySelector('.sk-playlist-queue span');if(q)q.textContent=viewName().toUpperCase();
 }
 function row(track,li){
 li.classList.add('sk-song-row');
@@ -193,9 +219,14 @@ return {
 next,ended,
 sync(s,playing){modes();playBtn.innerHTML=playing?ICON.pause:ICON.play;label(playBtn,playing?'Pause':'Play');tick();
 if(session&&s)try{if(root.MediaMetadata&&session.metadata?.title!==s.title)session.metadata=new MediaMetadata({title:s.title,artist:s.artist||'Sota Kece'});session.playbackState=playing?'playing':'paused';}catch(_){}},
-loaded(){draw();if(!pendingSong)return;const t=api.catalogue().find(x=>x.id===pendingSong);pendingSong='';if(t&&!api.live()){setView('mix');api.select(t.key);api.say('Shared with you · '+t.title+'. Tap Play to listen.');}},
-items:()=>view==='device'?device:view.startsWith('pl:')?(current()?.items||[]).map(byKey).filter(Boolean):null,
-name:()=>view==='device'?'My music':current()?.name||'Island Mix',
+loaded(){if(!entries().some(entry=>entry.key===view))setView('mix');else draw();if(!pendingSong)return;const t=api.catalogue().find(x=>x.id===pendingSong);pendingSong='';if(t&&!api.live()){setView('mix');api.select(t.key);api.say('Shared with you · '+t.title+'. Tap Play to listen.');}},
+items:()=>items(),
+name:viewName,
+viewKey:()=>view,
+reveal(track,preferred){
+const containing=[view,preferred,track.key.startsWith('dev:')?'device':'mix'].find(key=>items(key).some(item=>item.key===track.key));
+if(containing&&containing!==view)setView(containing);
+},
 empty:()=>view==='device'?'No songs saved on this device yet. Tap “Add songs from this device”.':view.startsWith('pl:')?'This playlist is empty. Go to Island Mix or My music and tap + on a song.':'',
 urlFor(track){if(!track.blob)return '';if(blobUrl.key!==track.key){if(blobUrl.url)root.URL.revokeObjectURL(blobUrl.url);blobUrl={key:track.key,url:root.URL.createObjectURL(track.blob)};}return blobUrl.url;},
 row

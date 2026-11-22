@@ -1,3 +1,7 @@
+## 2026-11-22 — Roll out the responsive shared playlist menu
+
+Codex claimed Ops task 1410. Deploy the verified Museum playlist sidebar and phone picker, song search, My mixes and Go to song. Browsing keeps the playing queue intact. Only the flag spins at 33 1/3 RPM during playback. This player keeps the app’s existing catalogue and personal library.
+
 ## 2026-11-22 — Music icon at vinyl LP speed
 
 - Codex, Ops task 1359. The Fiji flag turns once every 1.8 seconds (33⅓ RPM) during playback. The centred music note stays still, and reduced-motion settings disable the spin.

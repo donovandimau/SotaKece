@@ -51,3 +51,12 @@
 .sk-playlist .sk-pl-fresh{border-style:dashed!important}
 .sk-playlist .sk-lib :focus-visible,.sk-playlist .sk-lib-tools :focus-visible,.sk-playlist .sk-song-act:focus-visible,.sk-playlist .sk-pl-option:focus-visible{outline:3px solid #994dbd;outline-offset:2px}
 @media(forced-colors:active){.sk-playlist .sk-lib-chip,.sk-playlist .sk-lib-action,.sk-playlist .sk-song-act,.sk-playlist .sk-pl-option{border:1px solid ButtonText!important}.sk-playlist .sk-lib-chip[aria-pressed=true],.sk-playlist .sk-pl-option[aria-pressed=true]{outline:2px solid Highlight}}
+
+.sk-playlist .sk-lib{display:grid;gap:10px}
+.sk-playlist .sk-lib-nav{display:grid;gap:6px}
+.sk-playlist .sk-lib-nav .sk-lib-chip{width:100%!important;justify-content:space-between;border-radius:12px;text-align:left;min-height:44px}
+.sk-playlist .sk-lib-chip span{overflow-wrap:anywhere}
+.sk-playlist .sk-lib-picker{display:none;width:100%;min-height:44px;padding:8px 10px;border:1px solid #a383c4;border-radius:12px;background:#fff;color:#3f2556;font:700 15px Nunito,system-ui,sans-serif}
+.sk-playlist .sk-lib-new{justify-content:center;min-height:44px}
+.sk-playlist .sk-lib-form input{min-width:0}
+@media(max-width:639px){.sk-playlist .sk-lib-nav{display:none}.sk-playlist .sk-lib-picker{display:block}}
