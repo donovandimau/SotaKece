@@ -19,7 +19,7 @@ html:root body #app.bv-welcome .sk-hero-artwork > .sk-artwork-play::before {
   inset: var(--sota-music-badge-inset);
   border-radius: 50%;
   background: transparent url('/assets/music-badge-ring.svg') center/100% 100% no-repeat;
-  animation: sota-music-ring-turn 2.4s linear infinite;
+  animation: sota-music-ring-turn 1.8s linear infinite;
   animation-play-state: paused;
   transform-origin: center;
   pointer-events: none;
@@ -49,7 +49,7 @@ html:root body .sk-playlist.sk-playlist .sk-playlist-record {
   rotate: none;
 }
 html:root body .sk-playlist.sk-playlist .sk-playlist-record::after {
-  animation: sota-music-ring-turn 2.4s linear infinite;
+  animation: sota-music-ring-turn 1.8s linear infinite;
   animation-play-state: paused;
   transform-origin: center;
 }
