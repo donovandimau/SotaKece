@@ -93,16 +93,14 @@ test('/i/<token> and /p/<post>/<token> run the invite and share pages against Su
   assert(calls.every(c=>!/service|secret/i.test(JSON.stringify(c.o.headers))));
 });
 
-test('/s/ without the sere secrets on the Worker is answered by the Vercel deployment that has them',async()=>{
+test('/s/ without the sere secrets on the Worker answers a try-again page and calls nothing (Vercel is retired)',async()=>{
   const seen=[];
-  const fetcher=async(url,o)=>{seen.push({url,o});return new Response('from vercel',{status:200,headers:{'content-type':'text/html; charset=utf-8'}});};
-  const r=await routes.handle(get(`https://sotakece.com/s/${SERE}/${'d'.repeat(32)}`),env(),fetcher);
-  assert.equal(await r.text(),'from vercel');
-  assert.equal(seen[0].url,`${routes.VERCEL_ORIGIN}/s/${SERE}/${'d'.repeat(32)}`);
-  assert.equal(seen[0].o.method,'GET');
-  assert.match(r.headers.get('content-security-policy'),/frame-ancestors/);
-  const down=await routes.handle(get(`https://sotakece.com/s/${SERE}/${'d'.repeat(32)}`),env(),async()=>{throw Error('offline');});
+  const fetcher=async(url,o)=>{seen.push({url,o});return new Response('should not be called',{status:200});};
+  const down=await routes.handle(get(`https://sotakece.com/s/${SERE}/${'d'.repeat(32)}`),env(),fetcher);
   assert.equal(down.status,503);assert.match(await down.text(),/That did not load/);
+  assert.equal(seen.length,0);
+  assert.match(down.headers.get('content-security-policy'),/frame-ancestors/);
+  assert.equal(down.headers.get('cache-control'),'no-store');
 });
 
 test('/s/ with the sere secrets on the Worker runs api/listen.js itself and checks the signed key',async t=>{
