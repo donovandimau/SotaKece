@@ -92,7 +92,8 @@ vol.addEventListener('input',()=>{prefs.volume=Number(vol.value)/100;prefs.muted
 sound.append(mute,vol);
 const options=el('div','','sk-deck-options');options.append(shuffleBtn,repeatBtn,sw);
 const share=ib('sk-deck-share','Share this song',ICON.share,shareSong);share.append(el('span','Share music'));
-extra.append(sound,share);deck.append(time,main,options,extra);
+const scratchStory=ib('sk-deck-share','Make a Song Scratch story with this song','<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 18c3-2 4-6 7-7s3 4 6 2 2-6 3-8"/><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".55"/></svg>',()=>{const s=api.selected();root.location.href='/song-scratch.html'+(s?.key?.startsWith('mix:')?'?song='+encodeURIComponent(s.id):'');});scratchStory.append(el('span','Scratch story'));
+extra.append(sound,share,scratchStory);deck.append(time,main,options,extra);
 function loud(){audio.volume=prefs.volume;audio.muted=prefs.muted;}
 function modes(){
 shuffleBtn.setAttribute('aria-pressed',String(prefs.shuffle));label(shuffleBtn,prefs.shuffle?'Shuffle on':'Shuffle off');

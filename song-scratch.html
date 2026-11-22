@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#062c49">
+<title>Song Scratch · Sota Kece</title>
+<meta name="description" content="Pick an Island Mix song, cover it with your photo, and scratch the photo away to reveal the song. Add text, stickers and drawings, then save it as a story video with the music.">
+<meta property="og:title" content="Song Scratch · Sota Kece"><meta property="og:description" content="Scratch your photo away to reveal the song. Make a music story with Island Mix."><meta property="og:type" content="website"><meta property="og:site_name" content="Sota Kece"><meta property="og:url" content="https://sotakece.com/song-scratch.html"><meta property="og:image" content="https://sotakece.com/assets/og-sota-kece-premium-20261111.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://sotakece.com/assets/og-sota-kece-premium-20261111.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/sota-favicon-32-20261027g.png"><link rel="apple-touch-icon" sizes="180x180" href="/icons/sota-apple-touch-icon-20261027g.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/song-scratch.css?v=20261122-editor-3">
+<script type="module" src="/song-scratch.js?v=20261122-editor-3"></script>
+</head><body>
+<header class="ss-top"><a class="ss-brand" href="/"><img src="/icons/sota-icon-192-20261027g.png" alt="" width="36" height="36"><span>Sota Kece</span></a><a class="ss-back" href="/">Back to Sota</a></header>
+<main class="ss-main">
+  <section class="ss-intro"><p class="ss-eyebrow">Song Scratch</p><h1>Scratch to hear the song.</h1><p>Choose a song, cover it with your photos or clips, then scratch it away with your finger. Add text, moving stickers and drawings, use a template, and save it as a story video with the music.</p></section>
+  <div id="ss-resume" class="ss-resume" hidden><span>Carry on with your last story?</span><button id="ss-resume-open" type="button" class="ss-btn ss-small ss-primary-sm">Open it</button><button id="ss-resume-no" type="button" class="ss-link">Start fresh</button></div>
+  <section class="ss-workspace">
+    <div class="ss-stage-col">
+      <div class="ss-modes" role="group" aria-label="What your finger does on the story">
+        <button type="button" class="ss-mode" data-mode="scratch" aria-pressed="true">Scratch</button>
+        <button type="button" class="ss-mode" data-mode="draw" aria-pressed="false">Draw</button>
+        <button type="button" class="ss-mode" data-mode="move" aria-pressed="false">Move</button>
+        <button type="button" class="ss-mode" data-mode="frame" aria-pressed="false">Frame</button>
+        <button id="ss-undo" type="button" class="ss-mode ss-undo" disabled aria-label="Undo">Undo</button>
+      </div>
+      <div class="ss-stage-wrap">
+        <canvas id="ss-canvas" class="ss-stage" aria-label="Your story. Drag your finger over it to scratch, draw or move things."></canvas>
+        <p id="ss-tip" class="ss-tip" hidden>Scratch here</p>
+        <div id="ss-bin" class="ss-bin" hidden aria-hidden="true">Drop here to delete</div>
+        <progress id="ss-progress" class="ss-progress" max="1" value="0" hidden></progress>
+      </div>
+      <div id="ss-selected" class="ss-selected" hidden>
+        <div class="ss-sel-head"><b id="ss-sel-name">Text</b><button id="ss-sel-done" type="button" class="ss-link">Done</button></div>
+        <label class="ss-slider">Size <input id="ss-sel-size" type="range" min="0.25" max="4" step="0.05" value="1"></label>
+        <label class="ss-slider">Turn <input id="ss-sel-turn" type="range" min="-180" max="180" step="1" value="0"></label>
+        <div id="ss-sel-anim" class="ss-chips ss-chips-sm" aria-label="Animation"></div>
+        <div class="ss-row">
+          <button id="ss-sel-edit" type="button" class="ss-btn ss-small">Edit text</button>
+          <button id="ss-sel-copy" type="button" class="ss-btn ss-small">Copy</button>
+          <button id="ss-replay" type="button" class="ss-btn ss-small">&#9654; Play animations</button>
+          <button id="ss-sel-front" type="button" class="ss-btn ss-small">To front</button>
+          <button id="ss-sel-delete" type="button" class="ss-btn ss-small ss-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+    <div class="ss-panel">
+      <div class="ss-tabs" role="tablist" aria-label="Story tools">
+        <button type="button" class="ss-tab" role="tab" data-tab="song"><span aria-hidden="true">♪</span>Song</button>
+        <button type="button" class="ss-tab" role="tab" data-tab="cover"><span aria-hidden="true">▣</span>Cover</button>
+        <button type="button" class="ss-tab" role="tab" data-tab="text"><span aria-hidden="true">Aa</span>Text</button>
+        <button type="button" class="ss-tab" role="tab" data-tab="stickers"><span aria-hidden="true">☺</span>Stickers</button>
+        <button type="button" class="ss-tab" role="tab" data-tab="draw"><span aria-hidden="true">✎</span>Draw</button>
+        <button type="button" class="ss-tab" role="tab" data-tab="look"><span aria-hidden="true">✦</span>Look</button>
+        <button type="button" class="ss-tab" role="tab" data-tab="save"><span aria-hidden="true">↓</span>Save</button>
+      </div>
+
+      <div id="ss-tab-song" class="ss-pane" role="tabpanel">
+        <p class="ss-picked">Chosen: <b id="ss-picked">none yet</b></p>
+        <input id="ss-search" class="ss-search" type="search" placeholder="Search Island Mix" aria-label="Search songs" autocomplete="off">
+        <ul id="ss-songs" class="ss-songs" aria-label="Songs"></ul>
+        <label class="ss-slider">Start at <input id="ss-start" type="range" min="0" max="0" step="1" value="0" disabled> <span id="ss-start-label">0:00</span></label>
+        <button id="ss-play" type="button" class="ss-btn ss-small">Play</button>
+      </div>
+
+      <div id="ss-tab-cover" class="ss-pane" role="tabpanel" hidden>
+        <label class="ss-switch"><input id="ss-scratch-on" type="checkbox" checked> <span>Scratch to reveal the song</span></label>
+        <p class="ss-help">On: the song card hides under your cover until someone scratches. Off: the card sits on your picture.</p>
+        <button id="ss-photo" type="button" class="ss-btn ss-wide">Add photos or clips (up to 4)</button>
+        <input id="ss-file" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" multiple hidden>
+        <h3>Layout</h3>
+        <div id="ss-layouts" class="ss-chips"></div>
+        <div id="ss-frame" class="ss-frame" hidden>
+          <div class="ss-sel-head"><b id="ss-frame-name">Photo</b><button id="ss-frame-mode" type="button" class="ss-link">Drag to move it</button></div>
+          <label class="ss-slider">Zoom <input id="ss-zoom" type="range" min="1" max="5" step="0.05" value="1"></label>
+          <div class="ss-row">
+            <button id="ss-rotate" type="button" class="ss-btn ss-small">Turn &#8635;</button>
+            <button id="ss-frame-reset" type="button" class="ss-btn ss-small">Reset</button>
+            <button id="ss-frame-replace" type="button" class="ss-btn ss-small">Replace</button>
+            <button id="ss-frame-remove" type="button" class="ss-btn ss-small ss-danger">Remove</button>
+          </div>
+        </div>
+        <h3>Or a background</h3>
+        <div id="ss-backgrounds" class="ss-chips"></div>
+        <h3>Scratching</h3>
+        <label class="ss-slider">Finger size <input id="ss-brush" type="range" min="20" max="110" step="2" value="46"></label>
+        <div class="ss-actions">
+          <button id="ss-reveal" type="button" class="ss-btn">Reveal all</button>
+          <button id="ss-reset" type="button" class="ss-btn">Cover again</button>
+        </div>
+      </div>
+
+      <div id="ss-tab-text" class="ss-pane" role="tabpanel" hidden>
+        <textarea id="ss-text" class="ss-search ss-textarea" rows="2" maxlength="160" placeholder="Type your words" aria-label="Text"></textarea>
+        <div id="ss-fonts" class="ss-chips" aria-label="Font"></div>
+        <div id="ss-text-colours" class="ss-swatches" aria-label="Text colour"></div>
+        <div id="ss-text-bg" class="ss-chips" aria-label="Text box"></div>
+        <div id="ss-text-align" class="ss-chips" aria-label="Line up"></div>
+        <h3>Animation</h3>
+        <div id="ss-text-anim" class="ss-chips ss-chips-sm" aria-label="Text animation"></div>
+        <button id="ss-text-add" type="button" class="ss-btn ss-primary">Add text</button>
+        <p class="ss-help">Tap text on the story to move it. Double-tap to change it.</p>
+      </div>
+
+      <div id="ss-tab-stickers" class="ss-pane" role="tabpanel" hidden>
+        <button id="ss-chip" type="button" class="ss-btn ss-wide">♪ Add the song sticker</button>
+        <h3>Moving</h3>
+        <div id="ss-moving" class="ss-chips" aria-label="Moving stickers"></div>
+        <h3>Words</h3>
+        <div id="ss-words" class="ss-words" aria-label="Word stickers"></div>
+        <h3>Emoji</h3>
+        <div id="ss-stickers" class="ss-stickers" aria-label="Emoji stickers"></div>
+        <button id="ss-own-sticker" type="button" class="ss-btn ss-wide">Make a sticker from my picture</button>
+        <input id="ss-sticker-file" type="file" accept="image/png,image/webp,image/jpeg,image/gif" hidden>
+        <p class="ss-help">Pinch with two fingers to resize and turn. Choose an animation when it is selected. Drag to the bin to delete.</p>
+      </div>
+
+      <div id="ss-tab-draw" class="ss-pane" role="tabpanel" hidden>
+        <div id="ss-pens" class="ss-chips" aria-label="Pen"></div>
+        <div id="ss-pen-colours" class="ss-swatches" aria-label="Pen colour"></div>
+        <label class="ss-slider">Thickness <input id="ss-pen-size" type="range" min="4" max="40" step="1" value="12"></label>
+        <button id="ss-draw-clear" type="button" class="ss-btn ss-small">Clear drawing</button>
+        <p class="ss-help">Draw on the story with your finger. Undo takes back the last line.</p>
+      </div>
+
+      <div id="ss-tab-look" class="ss-pane" role="tabpanel" hidden>
+        <h3>Templates</h3>
+        <div id="ss-templates" class="ss-chips"></div>
+        <h3>Photo filter</h3>
+        <div id="ss-filters" class="ss-chips"></div>
+        <h3>Song card</h3>
+        <div id="ss-cards" class="ss-chips"></div>
+      </div>
+
+      <div id="ss-tab-save" class="ss-pane" role="tabpanel" hidden>
+        <p class="ss-help">The video replays your scratch with the music, clips and animations, up to 30 seconds.</p>
+        <div class="ss-actions">
+          <button id="ss-picture" type="button" class="ss-btn" disabled>Save picture</button>
+          <button id="ss-save" type="button" class="ss-btn ss-primary" disabled>Save story video</button>
+        </div>
+        <h3>Drafts on this phone</h3>
+        <div class="ss-row"><input id="ss-draft-name" class="ss-search ss-grow" type="text" maxlength="40" placeholder="Draft name (optional)" aria-label="Draft name"><button id="ss-draft-save" type="button" class="ss-btn ss-small">Save draft</button></div>
+        <div id="ss-drafts" class="ss-drafts"></div>
+        <button id="ss-new" type="button" class="ss-btn ss-small">Start a new story</button>
+      </div>
+
+      <p id="ss-revealed" class="ss-revealed" aria-live="polite"></p>
+      <p id="ss-status" class="ss-status" aria-live="polite"></p>
+      <p class="ss-note">Your photo stays on your phone. Nothing is uploaded.</p>
+    </div>
+  </section>
+</main>
+<footer class="ss-foot">Part of Dimau Group</footer>
+</body></html>
