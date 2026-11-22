@@ -22,7 +22,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 - Live: https://sotakece.com
 
 ## Current state
-- Music Menu pilot (Ops 1429): five displays implemented for Sota Kece. Donovan reviews the pilot before a separate portfolio rollout.
+- Music Menu pilot (Ops 1429): the revised player adds an expanded listening view, spectral ribbons, a seek dial, a frequency landscape, a touch-controlled tone sculpture and a live EQ/spectrogram. Donovan reviews the Sota Kece pilot before any portfolio rollout.
 - Status: Live at sotakece.com, release v197. Open to overseas Fijians first; wallet and coins built but switched off until the Reserve Bank of Fiji decides (`SOTA_WALLET_ON` in the page, `coin_settings.buy_on / payout_on` in the database, both off on live as of 12 Nov).
 - Real use (live database, 12 Nov): 1 member (joined 10 Oct), 1 wall post (9 Nov), 0 shared links. Features are well ahead of the audience. The next gain is a first group of members, not another feature.
 - Database (dimau-core-sydney) is level with the code as of 12 Nov: the four migrations that were merged but not run are now applied (delete my data, voice notes, share stats, report/block and Top Mates). Before this, "Delete my data" on live would have deleted the shared Dimau login, the report and block sheet had nothing behind it, and voice notes and share stats could not work.

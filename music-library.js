@@ -122,7 +122,7 @@ async function openDisplay(){
   if(!api.dialog.open || display || loadingDisplay)return;
   loadingDisplay=true;
   try{
-    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-displays');
+    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-instruments');
     display=mountDisplays({api,deck,main,time,clock,queue});
     display.sync();
     watchDisplay.disconnect();

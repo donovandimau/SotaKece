@@ -5,7 +5,16 @@ export function makeArc(audio, clock) {
   arc.setAttribute('aria-label', 'Seek through song');
   arc.setAttribute('aria-valuemin', '0');
   arc.setAttribute('aria-valuemax', '100');
-  arc.innerHTML = '<svg viewBox="0 0 240 124" preserveAspectRatio="none" aria-hidden="true"><path d="M12 115 A108 108 0 0 1 228 115"/><path class="sk-display-arc-fill" pathLength="100" d="M12 115 A108 108 0 0 1 228 115"/><circle r="5.5"/></svg>';
+  const ticks=[];
+  for(let i=0;i<=60;i++){
+    const theta=Math.PI*(1-i/60),length=i%5===0?8:3;
+    const point=r=>[120+r*Math.cos(theta),115-r*Math.sin(theta)].join(' ');
+    ticks.push('M'+point(97)+'L'+point(97-length));
+  }
+  arc.innerHTML = '<svg viewBox="0 0 240 124" preserveAspectRatio="none" aria-hidden="true"><path class="arc-scale" d="'+ticks.join('')+'"/><path class="arc-rail" d="M12 115 A108 108 0 0 1 228 115"/><path class="sk-display-arc-fill" pathLength="100" d="M12 115 A108 108 0 0 1 228 115"/><line class="arc-needle" x1="120" y1="115"/><circle r="4"/></svg>';
+  const readout=document.createElement('span');readout.className='sk-dial-readout';
+  const elapsed=document.createElement('b'),fractionText=document.createElement('small');
+  readout.setAttribute('aria-hidden','true');readout.append(elapsed,fractionText);arc.append(readout);
   const enabled = () => Number.isFinite(audio.duration) && audio.duration > 0;
   function update() {
     const fraction = enabled() ? Math.max(0, Math.min(1, audio.currentTime / audio.duration)) : 0;
@@ -14,6 +23,10 @@ export function makeArc(audio, clock) {
     const dot = arc.querySelector('circle');
     dot.setAttribute('cx', String(120 + 108 * Math.cos(angle)));
     dot.setAttribute('cy', String(115 - 108 * Math.sin(angle)));
+    const needle=arc.querySelector('.arc-needle');
+    needle.setAttribute('x2',String(120+83*Math.cos(angle)));needle.setAttribute('y2',String(115-83*Math.sin(angle)));
+    elapsed.textContent=clock(audio.currentTime);
+    fractionText.textContent=enabled()?Math.round(fraction*100)+'% played':'Track position';
     arc.setAttribute('aria-valuenow', String(Math.round(100 * fraction)));
     arc.setAttribute('aria-valuetext', clock(audio.currentTime) + ' of ' + clock(audio.duration));
     arc.setAttribute('aria-disabled', String(!enabled()));

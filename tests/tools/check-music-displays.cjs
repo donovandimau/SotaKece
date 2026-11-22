@@ -53,6 +53,7 @@ async function check(browser,width) {
     if (!process.env.MUSIC_REVIEW_DIR) return;
     fs.mkdirSync(process.env.MUSIC_REVIEW_DIR,{recursive:true});
     await stage.screenshot({path:path.join(process.env.MUSIC_REVIEW_DIR,width+'-'+id+'.png')});
+    if(width===390)await stage.locator('.sk-display-visual').screenshot({path:path.join(process.env.MUSIC_REVIEW_DIR,'art-'+id+'.png')});
   }
   const position = () => page.evaluate(()=>window.testPlayer.currentTime);
   for (const id of ['wings','arc','studio','glass','wave']) {
@@ -65,6 +66,13 @@ async function check(browser,width) {
     if (id==='wings') {
       await page.waitForFunction(()=>window.DimauMusicVisuals.sample(window.testPlayer)?.frequency.some(v=>v>10));
       assert(await stage.locator('.sk-display-queue-item').count()>0);
+      await stage.getByRole('button',{name:'Bass',exact:true}).click();
+      assert.equal(await stage.getByRole('button',{name:'Bass',exact:true}).getAttribute('aria-pressed'),'true');
+      await stage.getByRole('button',{name:'Full',exact:true}).click();
+      await stage.getByRole('button',{name:'Expand player'}).click();
+      assert(await page.locator('.sk-display-theatre[open] .sk-display-stage').count());
+      await page.keyboard.press('Escape');
+      await stage.getByRole('button',{name:'Expand player'}).waitFor();
     }
     if (id==='arc') {
       await stage.getByRole('slider',{name:'Seek through song'}).press('ArrowRight');
@@ -74,10 +82,29 @@ async function check(browser,width) {
       assert(Math.abs(await position()-30)<2);
     }
     if (id==='studio') {
+      const chart=await stage.locator('.sk-display-field').boundingBox();
+      await page.mouse.click(chart.x+chart.width*.08,chart.y+chart.height*.34);
+      assert(Number(await stage.getByRole('slider',{name:'60 Hz gain',exact:true}).inputValue())>0);
       await stage.getByRole('slider',{name:'60 Hz gain',exact:true}).fill('6');
       await page.waitForFunction(()=>Math.abs(window.DimauMusicVisuals.sample(window.testPlayer).filters[0].gain.value-6)<0.1);
+      await stage.getByRole('button',{name:'Spectrogram',exact:true}).click();
+      await stage.locator('.sk-display-field').scrollIntoViewIfNeeded();
+      const scan=await stage.locator('.sk-display-field').boundingBox();
+      await stage.locator('.sk-display-field').click({position:{x:Math.floor(scan.width*.48),y:Math.floor(scan.height*.808)}});
+      await page.waitForFunction(()=>document.querySelector('.sk-display-chart-label')?.textContent.includes('s ago'));
+      await stage.getByRole('button',{name:'EQ curve',exact:true}).click();
     }
-    if (id==='glass') assert.equal(await stage.getByRole('slider',{name:'Bass gain'}).inputValue(),'6');
+    if (id==='glass') {
+      assert.equal(await stage.getByRole('slider',{name:'Bass gain'}).inputValue(),'6');
+      const pad=await stage.locator('.sk-display-field').boundingBox();
+      await page.mouse.click(pad.x+pad.width*.72,pad.y+pad.height*.35);
+      assert(Number(await stage.getByRole('slider',{name:'Treble gain'}).inputValue())>0);
+      await page.waitForFunction(()=>window.DimauMusicVisuals.sample(window.testPlayer).filters[4].gain.value>1);
+    }
+    if (id==='wave') {
+      await stage.getByRole('button',{name:'Switch to low perspective'}).click();
+      await stage.getByRole('button',{name:'Switch to high perspective'}).click();
+    }
     assert(await stage.evaluate(n=>n.scrollWidth<=n.clientWidth+1),'stage width at '+width+': '+id);
     await capture(id);
   }
@@ -95,6 +122,13 @@ async function check(browser,width) {
   await stage.getByRole('button',{name:'Displays',exact:true}).click();
   await page.keyboard.press('Escape');
   assert(await stage.getByRole('button',{name:'Displays',exact:true}).evaluate(n=>document.activeElement===n));
+  await page.goto('https://sota.test/?music-display=glass#music');
+  await page.locator('.sk-display-theatre[open] [data-layout="glass"].sk-display-stage').waitFor();
+  assert(await page.locator('#sota-playlist-audio').evaluate(audio=>audio.paused));
+  await select('wave');
+  assert(await page.locator('.sk-display-theatre[open] .sk-display-stage').isVisible());
+  await page.keyboard.press('Escape');
+  await stage.getByRole('button',{name:'Expand player'}).waitFor();
   assert.deepEqual(errors,[]);
   await page.close();
   console.log('Passed at '+width+'px: five layouts, playback continuity, real EQ, arc seek, queue navigation, keyboard and saved choice.');
