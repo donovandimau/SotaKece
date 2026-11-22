@@ -22,6 +22,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 - Live: https://sotakece.com
 
 ## Current state
+- Music Menu pilot (Ops 1429): five displays implemented for Sota Kece. Donovan reviews the pilot before a separate portfolio rollout.
 - Status: Live at sotakece.com, release v197. Open to overseas Fijians first; wallet and coins built but switched off until the Reserve Bank of Fiji decides (`SOTA_WALLET_ON` in the page, `coin_settings.buy_on / payout_on` in the database, both off on live as of 12 Nov).
 - Real use (live database, 12 Nov): 1 member (joined 10 Oct), 1 wall post (9 Nov), 0 shared links. Features are well ahead of the audience. The next gain is a first group of members, not another feature.
 - Database (dimau-core-sydney) is level with the code as of 12 Nov: the four migrations that were merged but not run are now applied (delete my data, voice notes, share stats, report/block and Top Mates). Before this, "Delete my data" on live would have deleted the shared Dimau login, the report and block sheet had nothing behind it, and voice notes and share stats could not work.
@@ -35,7 +36,6 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-22 | Codex | Ops 1429 · Five swappable Music Menu displays in Sota Kece. Donovan reviews before any wider rollout. | agent/codex/build-five-swappable-music-menu-displays-in-sota-kece/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
 | 2026-11-18 | Claude | Share links /s/ /t/ /p/ /i/ and sere.sotakece.com/ back on Cloudflare (Worker code) — built, waiting for Donovan to merge | fix/worker-short-links |
@@ -146,6 +146,7 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+- 2026-11-22 — Codex, Ops 1429 — Implemented Equalizer Wings, Arc Control, Wave Stage, Frosted Glass and Pro Studio EQ in the existing Music Menu. The chooser remembers the layout. All five use the playlist audio element and one five-band audio graph. The guest Music route passed real decoded-audio checks in Chromium at 390 and 1440 px, including uninterrupted switching, arc seeking, track navigation, live EQ, Flat reset and reload. 785 host tests passed with zero skips. Restricted to Sota Kece pending Donovan's review. Publication is tracked on the Ops card.
 - 2026-11-21 — Claude — **Dimau app switcher** (Ops task 1259; Donovan: "Add the Dimau app switcher to Sota Kece"; super-app SPEC rollout step 6). `dimau-shell.js` byte copy (data-app sota-kece, launcher none, no client id: Sota Kece already signs in on the shared project). 'Dimau apps' 9-dot button beside Search from 421 px up; on narrower phones it would squeeze the Sota Kece name, so it hides and a ☰ menu item opens the switcher (focus returns to ☰ on close). Release v208. Checked in a browser at 375 and 1440 px: opens, Sota Kece marked current, Escape closes, no sideways scroll, no console errors. 784/784 tests.
 - 2026-11-21 — Claude — **Cutover to the shared Dimau account (dimau-core-ireland)** (Ops task 1257; Donovan: "Done, run the cutover"). Baseline applied to Ireland (migration 20261121195543), sota-server deployed there, 26 rows and 9 files copied and verified identical to Sydney (same member id in both projects, so no id swap). This PR moves the site's connection: 22 files switched, release v207. Sydney keeps its copy, read-only fallback, for 30 days. Details in `docs/CUTOVER-IRELAND.md`.
 - 2026-11-21 — Claude — **One-switch move to the shared Dimau account prepared** (Ops task 1255; step 4). Sign-in and data share one connection, so they move together on the data-move day. `scripts/switch-backend.cjs` moves all 22 files that name Sydney (page, /api/*, share links, call room, Sere, deletion page, migration check, tests) and leaves the files that already use Ireland on purpose alone; `tests/backend-switch.test.cjs` fails if a new file names Sydney. Rehearsed in a throwaway LF copy: 779/779 tests before and after. Email sign-up now passes `emailRedirectTo` (Ireland's default page is the account site). Checklist: `docs/CUTOVER-IRELAND.md`. Still on Sydney; nothing live changed.

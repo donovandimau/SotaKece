@@ -115,6 +115,37 @@ if(!doc.querySelector('link[data-sk-deck]')){const l=el('link');l.rel='styleshee
 const session=navigator.mediaSession,set=(a,h)=>{try{session.setActionHandler(a,h);}catch(_){}};
 if(session){set('play',()=>{if(!api.live())start();});set('pause',api.pause);set('previoustrack',back);set('nexttrack',()=>api.move(1));set('seekto',d=>{if(Number.isFinite(d?.seekTime))audio.currentTime=d.seekTime;});}
 loud();modes();tick();
+// The visual layouts are loaded only when the existing player is opened.
+let display=null, loadingDisplay=false;
+async function openDisplay(){
+  if(!api.dialog.open || display || loadingDisplay)return;
+  loadingDisplay=true;
+  try{
+    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-displays');
+    display=mountDisplays({api,deck,main,time,clock,queue});
+    display.sync();
+    watchDisplay.disconnect();
+  }catch(_){/* The original deck stays usable offline. */}
+  finally{loadingDisplay=false;}
+}
+function queue(){
+  const items=api.tracks(),index=api.index();
+  if(index<0){
+    const visible=view==='mix'?api.catalogue():view==='device'?device:(current()?.items||[]).map(byKey).filter(Boolean);
+    return visible.slice(0,3).map(track=>({track,pick:()=>api.playKey(track.key)}));
+  }
+  if(prefs.repeat==='one')return [{track:items[index],pick:()=>api.playTrack(index)}];
+  if(prefs.shuffle && order.length!==items.length)shuffled();
+  const at=prefs.shuffle?order.indexOf(index):index,entries=[];
+  for(let step=1;step<=Math.min(3,items.length);step++){
+    if(at+step>=items.length && (prefs.repeat!=='all'||prefs.shuffle))break;
+    const pos=(at+step)%items.length,i=prefs.shuffle?order[pos]:pos;
+    entries.push({track:items[i],pick:()=>api.playTrack(i)});
+  }
+  return entries;
+}
+const watchDisplay=new MutationObserver(openDisplay);
+watchDisplay.observe(api.dialog,{attributes:true,attributeFilter:['open']});openDisplay();
 function setView(next){if(next.startsWith('pl:')&&!own(next.slice(3)))next='mix';view=next;write(VIEW,view);menuFor='';form='';api.clear();draw();api.render();}
 function save(){if(!write(LISTS,lists)){api.say('This browser could not save playlists. Check it is not in private mode.');return false;}return true;}
 function make(name,first){
@@ -191,7 +222,7 @@ root.addEventListener('sota-music-change',loadDevice);
 draw();loadDevice();
 return {
 next,ended,
-sync(s,playing){modes();playBtn.innerHTML=playing?ICON.pause:ICON.play;label(playBtn,playing?'Pause':'Play');tick();
+sync(s,playing){modes();playBtn.innerHTML=playing?ICON.pause:ICON.play;label(playBtn,playing?'Pause':'Play');tick();display?.sync();
 if(session&&s)try{if(root.MediaMetadata&&session.metadata?.title!==s.title)session.metadata=new MediaMetadata({title:s.title,artist:s.artist||'Sota Kece'});session.playbackState=playing?'playing':'paused';}catch(_){}},
 loaded(){draw();if(!pendingSong)return;const t=api.catalogue().find(x=>x.id===pendingSong);pendingSong='';if(t&&!api.live()){setView('mix');api.select(t.key);api.say('Shared with you · '+t.title+'. Tap Play to listen.');}},
 items:()=>view==='device'?device:view.startsWith('pl:')?(current()?.items||[]).map(byKey).filter(Boolean):null,
