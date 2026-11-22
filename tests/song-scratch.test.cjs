@@ -107,3 +107,68 @@ test('editor: every tool tab has its panel', () => {
   for (const m of html.matchAll(/data-tab="([a-z]+)"/g)) assert.match(html, new RegExp(`id="ss-tab-${m[1]}"`), m[1]);
   for (const m of ['scratch', 'draw', 'move']) assert.match(html, new RegExp(`data-mode="${m}"`));
 });
+
+const { pathToFileURL } = require('node:url');
+const media = () => import(pathToFileURL(path.join(root, 'song-scratch-media.mjs')).href);
+const drafts = () => import(pathToFileURL(path.join(root, 'song-scratch-drafts.mjs')).href);
+
+test('layouts: cells fill the story with a gap and taps find the right cell', async () => {
+  const { LAYOUTS, cellRects, cellAt, GAP } = await media();
+  for (const [k, l] of Object.entries(LAYOUTS)) {
+    const cells = cellRects(k, 720, 1280);
+    assert.equal(cells.length, l.n, k);
+    const area = cells.reduce((a, [, , w, h]) => a + w * h, 0);
+    assert.ok(area <= 720 * 1280 && area > 720 * 1280 * .95, `${k} covers the story`);
+  }
+  assert.deepEqual(cellRects('two-v', 720, 1280)[1], [0, (1280 - GAP) / 2 + GAP, 720, (1280 - GAP) / 2]);
+  assert.equal(cellAt('four', 720, 1280, 700, 1270), 3);
+  assert.equal(cellAt('four', 720, 1280, 360, 10), -1, 'the gap is no cell');
+});
+
+test('framing: cover-fit, turned pictures swap sides, panning stops at the edges', async () => {
+  const { frameBox, clampPan } = await media();
+  const size = { w: 800, h: 600 };
+  const b = frameBox(size, 720, 1280, { zoom: 1 });
+  assert.ok(Math.abs(b.h - 1280) < 1e-6 && b.w >= 720, 'landscape photo fills a tall story');
+  const t = frameBox(size, 720, 1280, { zoom: 1, rot: 90 });
+  assert.ok(t.w >= 1280 - 1e-6 && t.h >= 720 - 1e-6, 'turned photo still covers');
+  const p = clampPan(size, 720, 1280, { zoom: 1, px: 5000, py: 5000 });
+  assert.equal(p.py, 0, 'no room to move up or down');
+  assert.ok(p.px > 0 && p.px < 5000, 'sideways pan stops at the edge');
+});
+
+test('animations: entrances finish, loops stay near rest, typing reveals text', async () => {
+  const { animate, ANIMS } = await media();
+  for (const k of Object.keys(ANIMS)) {
+    const a = animate(k, 5, 3);
+    for (const v of Object.values(a)) assert.ok(Number.isFinite(v), k);
+  }
+  assert.equal(animate('pop', 2).ds, 1);
+  assert.equal(animate('fade', 0).alpha, 0);
+  assert.equal(animate('fade', 3).alpha, 1);
+  assert.equal(animate('type', 0.7).reveal, 0.5);
+  assert.equal(animate('type', 9).reveal, 1);
+  assert.deepEqual(animate('none', 1), { dx: 0, dy: 0, ds: 1, dr: 0, alpha: 1, reveal: 1 });
+});
+
+test('templates use real backgrounds, card styles, fonts and stickers', async () => {
+  const { TEMPLATES, BACKGROUNDS, MOVING, ANIMS } = await media();
+  const { CARD_STYLES, FONTS } = await editor();
+  for (const [k, t] of Object.entries(TEMPLATES)) {
+    assert.ok(BACKGROUNDS[t.bg], `${k} background`);
+    assert.ok(CARD_STYLES[t.card], `${k} card`);
+    for (const l of t.layers) {
+      if (l.type === 'text') assert.ok(FONTS[l.font], `${k} font`);
+      if (l.type === 'moving') assert.ok(MOVING[l.kind], `${k} moving sticker`);
+      if (l.anim) assert.ok(ANIMS[l.anim], `${k} animation`);
+    }
+  }
+});
+
+test('drafts: labels say how long ago', async () => {
+  const { draftLabel } = await drafts();
+  const now = Date.UTC(2026, 10, 22, 12);
+  assert.equal(draftLabel({ name: 'Bula', savedAt: now - 20000 }, now), 'Bula · just now');
+  assert.equal(draftLabel({ name: 'Bula', savedAt: now - 5 * 60000 }, now), 'Bula · 5 min ago');
+  assert.equal(draftLabel({ savedAt: now - 3 * 3600000 }, now), 'Story · 3 h ago');
+});

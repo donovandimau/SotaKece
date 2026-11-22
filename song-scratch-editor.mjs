@@ -1,5 +1,6 @@
 /* Sota Kece — Song Scratch editor: text, stickers, drawing and layer maths (no DOM; canvas passed in).
    Shared by song-scratch.js and tests. */
+import { MOVING, drawMoving, animate } from './song-scratch-media.mjs';
 
 export const FONTS = {
   classic: { label: 'Classic', css: (px) => `800 ${px}px Manrope, system-ui, sans-serif` },
@@ -9,7 +10,7 @@ export const FONTS = {
   neon: { label: 'Neon', css: (px) => `700 ${px}px Lexend, system-ui, sans-serif`, glow: true },
 };
 export const COLOURS = ['#ffffff', '#06182b', '#87CEEB', '#ff6856', '#ffcb47', '#2ecc71', '#ff5fa2', '#8e6cff'];
-export const EMOJI = ['🌺', '🌴', '🌊', '🥥', '🐚', '☀️', '🎶', '🎧', '❤️', '🔥', '✨', '😂', '🥹', '🙏', '💃', '🇫🇯'];
+export const EMOJI = ['🎉', '🎂', '🌺', '🌴', '🌊', '🥥', '🐚', '☀️', '🎶', '🎧', '❤️', '🔥', '✨', '😂', '🥹', '🙏', '💃', '🇫🇯'];
 export const WORDS = ['Bula!', 'Vinaka', 'Isa Lei', 'Sota tale', 'Mai kana', 'Lomana'];
 export const FILTERS = {
   none: { label: 'Normal', css: 'none' },
@@ -39,6 +40,8 @@ function lines(text) { return String(text || '').split('\n').slice(0, 8); }
 
 /** Size of a layer in its own (unscaled, unrotated) space. */
 export function layerSize(c, L) {
+  if (L.type === 'image') return { w: L.w || 200, h: L.h || 200 };
+  if (L.type === 'moving') { const m = MOVING[L.kind] || { w: 200, h: 200 }; return { w: m.w, h: m.h }; }
   if (L.type === 'emoji') return { w: EMOJI_PX * 1.15, h: EMOJI_PX * 1.15 };
   if (L.type === 'chip') return { w: 430, h: 112 };
   if (L.type === 'word') {
@@ -87,12 +90,20 @@ function textOn(colour) {
   return lum > .6 ? '#06182b' : '#ffffff';
 }
 
-/** Draw one layer. `song` = {song, artist, colours} for the song sticker. */
-export function drawLayer(c, L, song) {
+/** Draw one layer. `song` = {song, artist, colours} for the song sticker; `t` = seconds since the
+    story started playing (for animation); `asset(id)` gives the image for an image sticker. */
+export function drawLayer(c, L, song, t = 99, asset = () => null) {
+  const a = animate(L.anim, t, L.id || 0);
   c.save();
-  c.translate(L.x, L.y); c.rotate(L.r); c.scale(L.s, L.s);
+  c.globalAlpha = a.alpha;
+  c.translate(L.x + a.dx, L.y + a.dy); c.rotate(L.r + a.dr); c.scale(L.s * a.ds, L.s * a.ds);
   c.textBaseline = 'middle';
-  if (L.type === 'emoji') {
+  if (L.type === 'image') {
+    const img = asset(L.asset);
+    if (img) { try { c.drawImage(img, -L.w / 2, -L.h / 2, L.w, L.h); } catch (_) {} }
+  } else if (L.type === 'moving') {
+    drawMoving(c, L.kind, t);
+  } else if (L.type === 'emoji') {
     c.font = `${EMOJI_PX}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
     c.textAlign = 'center'; c.fillText(L.ch, 0, 6);
   } else if (L.type === 'word') {
@@ -116,9 +127,12 @@ export function drawLayer(c, L, song) {
     c.fillStyle = '#4d6577'; c.font = '400 22px Lexend, system-ui, sans-serif';
     c.fillText(fit(c, song?.artist || 'Island Mix · Sota Kece', w - 140), -w / 2 + 114, 22);
   } else {
-    const f = FONTS[L.font] || FONTS.classic, ls = lines(L.text), lh = TEXT_PX * 1.22;
+    const f = FONTS[L.font] || FONTS.classic, lh = TEXT_PX * 1.22;
+    const all = lines(L.text), total = all.join('').length, shown = Math.round(total * a.reveal);
+    let left = shown;
+    const ls = all.map((l) => { const part = l.slice(0, Math.max(0, left)); left -= l.length; return part; });
     c.font = f.css(TEXT_PX); c.textAlign = L.align || 'center';
-    const { w } = layerSize(c, L), top = -(ls.length * lh) / 2 + lh / 2;
+    const { w } = layerSize(c, L), top = -(all.length * lh) / 2 + lh / 2;
     const ax = L.align === 'left' ? -w / 2 + 18 : L.align === 'right' ? w / 2 - 18 : 0;
     ls.forEach((l, i) => {
       const y = top + i * lh;
@@ -132,7 +146,7 @@ export function drawLayer(c, L, song) {
       if (f.glow) { c.shadowColor = L.color; c.shadowBlur = 24; }
       else if (!L.bg || L.bg === 'none') { c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = 10; c.shadowOffsetY = 2; }
       c.fillText(l, ax, y + 2);
-      if (f.glow) { c.fillStyle = '#ffffff'; c.shadowBlur = 6; c.globalAlpha = .55; c.fillText(l, ax, y + 2); c.globalAlpha = 1; }
+      if (f.glow) { c.fillStyle = '#ffffff'; c.shadowBlur = 6; c.globalAlpha = a.alpha * .55; c.fillText(l, ax, y + 2); c.globalAlpha = a.alpha; }
       c.shadowColor = 'transparent'; c.shadowBlur = 0; c.shadowOffsetY = 0;
     });
   }

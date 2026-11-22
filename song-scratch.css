@@ -92,3 +92,21 @@ h1,h2,.ss-brand span{font-family:Manrope,system-ui,sans-serif}
 .ss-sticker{font-size:1.6rem;line-height:1;min-height:44px;border:0;border-radius:12px;background:transparent;cursor:pointer}
 .ss-sticker:hover,.ss-word:hover{transform:scale(1.08)}
 @media (max-width:420px){.ss-stickers{grid-template-columns:repeat(6,1fr)}.ss-tab{font-size:.6rem}}
+/* bigger editor */
+.ss-resume{display:flex;align-items:center;justify-content:center;gap:.6rem;flex-wrap:wrap;margin:0 auto 1rem;padding:.6rem 1rem;max-width:34rem;border-radius:18px;background:rgba(135,206,235,.12);border:1px solid rgba(135,206,235,.4);font-size:.9rem}
+.ss-resume[hidden]{display:none}
+.ss-primary-sm{background:linear-gradient(135deg,var(--sky2),#1F7FBF);border-color:transparent}
+.ss-switch{display:flex;align-items:center;gap:.6rem;font-weight:600;cursor:pointer}
+.ss-switch input{width:1.2rem;height:1.2rem;accent-color:var(--sky)}
+.ss-frame{padding:.7rem .8rem;border-radius:16px;border:1px solid rgba(135,206,235,.4);background:rgba(135,206,235,.07);display:grid;gap:.4rem}
+.ss-frame[hidden]{display:none}
+.ss-chips-sm .ss-chip{min-height:32px;font-size:.76rem;padding:.2rem .65rem}
+.ss-bg{color:#06182b;font-weight:600;border-color:rgba(255,255,255,.3)}
+.ss-bg[aria-pressed=true]{outline:3px solid var(--sky);outline-offset:2px}
+.ss-template{font-weight:700}
+.ss-grow{flex:1;min-width:8rem}
+.ss-drafts{display:grid;gap:.4rem}
+.ss-draft{display:grid;grid-template-columns:36px 1fr auto auto;align-items:center;gap:.5rem;font-size:.8rem}
+.ss-draft img{width:36px;height:64px;object-fit:cover;border-radius:6px;background:var(--bg2)}
+.ss-modes{flex-wrap:wrap;justify-content:center}
+@media (max-width:420px){.ss-modes{flex-wrap:nowrap;gap:.15rem}.ss-mode{padding:.2rem .55rem;font-size:.76rem}}
