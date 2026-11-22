@@ -315,6 +315,7 @@ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-display-enabled .sk-displ
 #sk-music-playlist .sk-wave-nav small {font-size:10px;color:#eccde3}
 #sk-music-playlist .sk-wave-nav button {width:44px;height:44px;min-height:44px;padding:0;border:0;border-radius:8px;background:transparent;color:#fff;font:400 25px/1 system-ui;box-shadow:none}
 #sk-music-playlist .sk-wave-nav button:disabled {opacity:.3}
+#sk-music-playlist .sk-display-bar button,#sk-music-playlist .sk-display-sheet button,#sk-music-playlist .sk-wave-nav button {touch-action:manipulation}
 #sk-music-playlist [data-layout=wave] .sk-display-angle {z-index:2}
 @media(prefers-reduced-motion:reduce){#sk-music-playlist .sk-display-stage .sk-wave-cover {transition:none}}
 #sk-music-playlist .sk-display-stage[data-layout=arc] {background:radial-gradient(ellipse at 15% 85%,#392a30,transparent 65%),#17161e}

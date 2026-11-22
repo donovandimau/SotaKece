@@ -42,7 +42,7 @@ export function waveBrowser(field) {
     index=bound(Math.round(value));paint(index);
     const track=items[index]?.track;
     title.textContent=track?.title||'Queue is empty';
-    credit.textContent=track ? [track.artist,track.key===playing?'Current track':'Tap sleeve to play'].filter(Boolean).join(' · ') : '';
+    credit.textContent=track ? [track.key===playing?'Current track':'Tap to play',track.artist].filter(Boolean).join(' · ') : '';
     back.disabled=index===0;next.disabled=index>=items.length-1;
   }
   function setItems(entries,currentKey) {

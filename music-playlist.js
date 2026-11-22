@@ -92,7 +92,8 @@ function createUpNext({el,button,available,changed}) {
     painted=signature;
     empty.hidden=!!songs.length;
     list.hidden=!songs.length;
-    list.replaceChildren(...songs.map((track,index)=>{
+    list.textContent='';
+    list.append(...songs.map((track,index)=>{
       const row=el('li',undefined,'up-next-track');
       row.dataset.queueTrack=key(track);
       row.append(el('span',track.title,'up-next-song'));
