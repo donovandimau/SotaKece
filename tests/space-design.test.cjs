@@ -71,3 +71,24 @@ domTest('blocked storage never applies or reports a successful one-colour save',
 domTest('a quick colour chosen inside an account dialog keeps Undo inside that active dialog',async()=>{
  const f=fixture();try{const account=f.d.createElement('dialog');account.innerHTML='<header><h2>Sign in</h2><button type="button" aria-label="Close account">×</button></header><input value="keep me">';f.d.body.append(account);account.showModal();f.api.decorateDialog(account);account.querySelector('.ssd-dialog-design').click();f.q('[data-ssd-quick="neon-purple"]').click();await flush();assert.equal(account.open,true);assert.equal(account.querySelector('input').value,'keep me');assert.equal(account.querySelector('.ssd-undo'),f.q('.ssd-undo'));assert.equal(account.querySelector('.ssd-design-feedback').hasAttribute('data-floating'),false);account.querySelector('.ssd-undo').click();assert.equal(f.app.hasAttribute('data-space-designed'),false);}finally{f.close();}
 });
+
+domTest('Volcanic Dark previews, cancels and persists for the selected page and account',async()=>{
+ const f=fixture({owner:'A',route:'pulse'});
+ try{
+  const audio=f.q('#sound');
+  f.api.open('pulse');f.pick('volcanic');
+  assert.equal(f.app.dataset.spacePalette,'volcanic');
+  f.q('.ssd-cancel').click();await flush();
+  assert.equal(f.app.dataset.spacePalette,undefined);
+  f.api.open('pulse');f.pick('volcanic');f.q('.ssd-save').click();await flush();
+  f.api.mount(f.app);
+  assert.equal(f.app.dataset.spacePalette,'volcanic');
+  f.app.dataset.frontPage='music';await flush();
+  assert.equal(f.app.dataset.spacePalette,undefined);
+  f.app.dataset.frontPage='pulse';await flush();
+  assert.equal(f.app.dataset.spacePalette,'volcanic');
+  assert.equal(f.q('#sound'),audio);
+  f.owner('B');f.api.mount(f.app);
+  assert.equal(f.app.dataset.spacePalette,undefined);
+ }finally{f.close();}
+});

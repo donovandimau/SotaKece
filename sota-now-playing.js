@@ -49,6 +49,7 @@
       if(!a.paused&&!a.ended){a.pause();return Promise.resolve(null);}
       return start(a);
     }
+    if(m?.analyse===true)a.crossOrigin='anonymous';else a.removeAttribute('crossorigin');
     meta=next;a.src=src;
     return start(a);
   }
@@ -69,6 +70,7 @@
     if(!m||!src||el.isConnected||el.ended)return false;
     const a=own();if(!a)return false;
     const at=Number.isFinite(el.currentTime)?el.currentTime:0;
+    if(el.crossOrigin)a.crossOrigin=el.crossOrigin;else a.removeAttribute('crossorigin');
     meta=m;a.src=src;
     const seek=()=>{try{if(at>0)a.currentTime=at;}catch(_){}};
     if(a.readyState>=1)seek();else a.addEventListener('loadedmetadata',seek,{once:true});

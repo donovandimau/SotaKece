@@ -78,3 +78,25 @@ browserTest('the persistent music control follows the same audio element and pla
  assert.equal(h.get('.sx-mini-player').hidden,false);assert.equal(h.get('.sx-mini-open b').textContent,'Test song');h.get('.sx-mini-toggle').click();assert.equal(taps,1);assert.equal(h.get('.sx-mini-open em').textContent,'Test artist');h.get('.sx-mini-skip[data-mini="next"]').click();h.get('.sx-mini-skip[data-mini="prev"]').click();assert.deepEqual(skips,['next','prev']);assert.equal(taps,1,'skipping never toggles play');const lights=h.get('.sx-mini-lights');assert.equal(lights.dataset.sotaLightsToggle,'icon');assert(lights.querySelector('svg'),'the lights switch keeps its symbol');Object.defineProperty(audio,'duration',{value:200,configurable:true});audio.currentTime=50;audio.dispatchEvent(new h.w.Event('timeupdate'));assert.equal(h.get('.sx-mini-progress i').style.width,'25%');h.get('.sx-mini-open').click();assert.equal(h.app.dataset.sxPage,'music');assert.equal(h.get('.sx-mini-player').hidden,true,'The full music page does not duplicate its controls in a floating bar');assert.equal(h.w.document.querySelectorAll('#sota-playlist-audio').length,1);
 });
 
+
+browserTest('Volcanic phone shortcuts follow the breakpoint and restore the standard navigation',async t=>{
+ const h=harness(t),page=h.app.ownerDocument.defaultView;
+ const phone=new page.EventTarget();phone.matches=true;
+ page.matchMedia=()=>phone;
+ h.app.innerHTML='<header class="top"></header><main id="view"></main>';
+ h.api.mountMember(h.app,{user:{id:'test'},me:{handle:'test'},tab:'moments',pending:[]});
+ assert.equal(h.app.querySelectorAll('.sk-volcanic-link').length,0);
+ h.app.dataset.spacePalette='volcanic';await new Promise(setImmediate);
+ const share=h.get('.sk-create-moment');
+ assert.equal(share.getAttribute('aria-current'),'page');
+ share.click();h.get('.sk-open-koro').click();
+ assert.deepEqual(h.calls.go,['moments','crews']);
+ assert.equal(h.app.querySelector('.sx-nav [data-sx-member="pulse"]').getAttribute('aria-current'),'false');
+ phone.matches=false;phone.dispatchEvent(new page.Event('change'));
+ assert.equal(h.app.querySelectorAll('.sk-volcanic-link').length,0);
+ assert.equal(h.app.querySelector('.sx-nav [data-sx-member="pulse"]').getAttribute('aria-current'),'page');
+ phone.matches=true;phone.dispatchEvent(new page.Event('change'));
+ assert.equal(h.app.querySelectorAll('.sx-nav .sk-volcanic-link').length,2);
+ delete h.app.dataset.spacePalette;await new Promise(setImmediate);
+ assert.equal(h.app.querySelectorAll('.sk-volcanic-link').length,0);
+});

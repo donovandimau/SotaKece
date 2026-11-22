@@ -112,7 +112,7 @@ test('page wiring: the link is remembered before sign-in, credited once a room e
   assert.match(html,/sb\.rpc\('bv_referral_claim',\{p_token:saved\.token\}\)/);
   const release=/<meta name="sota-release" content="([^"]+)">/.exec(html)[1];
   assert.match(read('sw.js'),new RegExp("const CACHE='"+release+"';"));
-  assert.match(html,/sota-pulse\.js\?v=2026111\d-[a-z-]+-\d+/);assert.match(html,/sota-plus\.js\?v=2026111\d-[a-z-]+-\d+/,'both scripts carry a release tag from this round of work');
+  assert.match(html,/sota-pulse\.js\?v=\d{8}-[a-z-]+-\d+/);assert.match(html,/sota-plus\.js\?v=2026111\d-[a-z-]+-\d+/,'both scripts carry a release tag from this round of work');
   const siteRoutes=require('../cloudflare/site-routes.cjs'),pr=siteRoutes.ROUTES.find(r=>r.handler===require('../api/share.js'));
   assert.ok(pr&&read('wrangler.jsonc').includes('"/p/*"'),'the /p/ route runs in the Worker before the static files');
   assert.equal(pr.re.source.replace(/\\\//g,'/'),'^/p/([0-9]{1,18})/([a-fA-F0-9]{32})/?$');
