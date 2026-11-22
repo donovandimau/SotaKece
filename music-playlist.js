@@ -92,7 +92,8 @@ function createUpNext({el,button,available,changed}) {
     painted=signature;
     empty.hidden=!!songs.length;
     list.hidden=!songs.length;
-    list.replaceChildren(...songs.map((track,index)=>{
+    list.textContent='';
+    list.append(...songs.map((track,index)=>{
       const row=el('li',undefined,'up-next-track');
       row.dataset.queueTrack=key(track);
       row.append(el('span',track.title,'up-next-song'));
@@ -310,7 +311,7 @@ upNext=createUpNext({el,button,available:view,changed:sync});
 dialog.append(head,hero,audio,transport,upNext.box,visuals,status,retry,extras,search,queue,list);root.document.body.append(dialog);
 const docHead=root.document.head;
 if(root.SotaMusicLibrary)extend(root.SotaMusicLibrary);
-else if(docHead){const s=el('script');s.src='/music-library.js?v=20261122-up-next';s.async=true;docHead.append(s);}
+else if(docHead){const s=el('script');s.src='/music-library.js?v=20261122-phone1';s.async=true;docHead.append(s);}
 audio.addEventListener('play',()=>{
 root.SotaPlayback?.activate('playlist',audio);
 beforePlay();root.document.querySelectorAll('audio').forEach(other=>{if(other!==audio)other.pause();});

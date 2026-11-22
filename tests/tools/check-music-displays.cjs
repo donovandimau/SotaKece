@@ -14,16 +14,17 @@ function tone() {
   wav.writeUInt32LE(16, 16); wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22);
   wav.writeUInt32LE(rate, 24); wav.writeUInt32LE(rate * 2, 28); wav.writeUInt16LE(2, 32);
   wav.writeUInt16LE(16, 34); wav.write('data', 36); wav.writeUInt32LE(data, 40);
-  for (let i = 0; i < rate * seconds; i++) wav.writeInt16LE(Math.round(2400 * Math.sin(i * 2 * Math.PI * 230 / rate)), 44 + i * 2);
+  for (let i = 0; i < rate * seconds; i++) wav.writeInt16LE(Math.round((i < rate*20 ? 800 : 6400) * Math.sin(i * 2 * Math.PI * 230 / rate)), 44 + i * 2);
   return wav;
 }
 async function check(browser,width) {
-  const page = await browser.newPage({viewport:{width,height:844},serviceWorkers:'block',reducedMotion:'reduce'});
+  const page = await browser.newPage({viewport:{width,height:844},hasTouch:width===390,serviceWorkers:'block',reducedMotion:'reduce'});
   const errors = [];
   page.on('pageerror',e=>errors.push(e.message));
   const wav = tone();
   await page.route('**/*', async route => {
     const url = new URL(route.request().url());
+    if(url.pathname==='/assets/music-waveforms.json')return route.fulfill({json:{}});
     if (url.hostname === 'sota.test') {
       const file = path.resolve(root,'.' + (url.pathname === '/' ? '/index.html' : decodeURIComponent(url.pathname)));
       if (file.startsWith(root + path.sep) && fs.existsSync(file) && fs.statSync(file).isFile())
@@ -55,6 +56,27 @@ async function check(browser,width) {
     await stage.screenshot({path:path.join(process.env.MUSIC_REVIEW_DIR,width+'-'+id+'.png')});
     if(width===390)await stage.locator('.sk-display-visual').screenshot({path:path.join(process.env.MUSIC_REVIEW_DIR,'art-'+id+'.png')});
   }
+  // Both cover sources must replace the typographic fallback on the actual rendered node.
+  const art=await page.evaluate(async()=>{
+    const {sleeve}=await import('/music-sleeves.mjs?v=1');
+    const cover=document.createElement('canvas');cover.width=cover.height=4;
+    const ctx=cover.getContext('2d');ctx.fillStyle='#54aa75';ctx.fillRect(0,0,4,4);
+    const png=new Uint8Array(await (await new Promise(resolve=>cover.toBlob(resolve))).arrayBuffer());
+    const picture=new Uint8Array([0,...new TextEncoder().encode('image/png'),0,3,0,...png]);
+    const word=new Uint8Array(4);new DataView(word.buffer).setUint32(0,picture.length);
+    const frame=new Uint8Array([...new TextEncoder().encode('APIC'),...word,0,0,...picture]);
+    const header=new Uint8Array([73,68,51,3,0,0,0,0,frame.length>>7,frame.length&127]);
+    const node=document.createElement('span');
+    sleeve(node,{key:'dev:art-test',title:'Cover check',blob:new Blob([header,frame])});
+    const initial=node.style.getPropertyValue('--photo');
+    for(let i=0;i<60&&node.style.getPropertyValue('--photo')===initial;i++)await new Promise(r=>setTimeout(r,15));
+    const embedded=node.style.getPropertyValue('--photo')!==initial;
+    const artUrl=location.origin+'/assets/music-instruments/wings.webp';
+    sleeve(node,{key:'mix:cover-test',title:'Published art',artworkUrl:artUrl});
+    for(let i=0;i<60&&!node.style.getPropertyValue('--photo').includes(artUrl);i++)await new Promise(r=>setTimeout(r,15));
+    return {embedded,listed:node.style.getPropertyValue('--photo').includes(artUrl)};
+  });
+  assert.deepEqual(art,{embedded:true,listed:true});
   const position = () => page.evaluate(()=>window.testPlayer.currentTime);
   for (const id of ['wings','arc','studio','glass','wave']) {
     const before = await position();
@@ -78,8 +100,14 @@ async function check(browser,width) {
       await stage.getByRole('slider',{name:'Seek through song'}).press('ArrowRight');
       assert(await position() >= before+4.9);
       const box = await stage.locator('.sk-display-arc').boundingBox();
+      await stage.locator('.sk-display-arc[data-wave="ready"]').waitFor();
+      assert((await stage.locator('.arc-wave').getAttribute('d')).length>1000);
       await page.mouse.click(box.x+box.width/2,box.y+box.height*0.06);
       assert(Math.abs(await position()-30)<2);
+      await page.mouse.move(box.x+box.width*.5,box.y+box.height*.06);await page.mouse.down();
+      assert.match(await stage.locator('.sk-dial-readout small').innerText(),/4×/);
+      await page.mouse.move(box.x+box.width*.7,box.y+box.height*.06,{steps:6});await page.mouse.up();
+      assert(Math.abs(await position()-33)<1.3,'one fifth of the dial at 4× advances three seconds');
     }
     if (id==='studio') {
       const chart=await stage.locator('.sk-display-field').boundingBox();
@@ -102,14 +130,37 @@ async function check(browser,width) {
       await page.waitForFunction(()=>window.DimauMusicVisuals.sample(window.testPlayer).filters[4].gain.value>1);
     }
     if (id==='wave') {
+      const original=await stage.locator('.sk-wave-nav b').innerText();
+      const firstArt=await stage.locator('.sk-wave-cover[aria-current="true"]').evaluate(n=>n.style.getPropertyValue('--photo'));
+      await stage.getByRole('button',{name:'Next sleeve'}).click();
+      assert.notEqual(await stage.locator('.sk-wave-nav b').innerText(),original);
+      const nextArt=await stage.locator('.sk-wave-cover[aria-current="true"]').evaluate(n=>n.style.getPropertyValue('--photo'));
+      assert.notEqual(firstArt,nextArt,'upcoming songs have individual sleeves');
+      assert(await page.evaluate(()=>!window.testPlayer.paused&&window.testPlayer.currentSrc===window.testSrc));
+      await stage.getByRole('button',{name:'Previous sleeve'}).click();
+      const fan=stage.locator('.sk-wave-fan');await fan.scrollIntoViewIfNeeded();
+      const b=await fan.boundingBox(),y=b.y+b.height*.45;
+      if(width===390){
+        const cdp=await page.context().newCDPSession(page);
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:b.x+b.width*.7,y}]});
+        for(let step=1;step<=10;step++)await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:b.x+b.width*(.7-step*.047),y}]});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();
+      }else{
+        await page.mouse.move(b.x+b.width*.7,y);await page.mouse.down();
+        await page.mouse.move(b.x+b.width*.23,y,{steps:12});await page.mouse.up();
+      }
+      assert.notEqual(await stage.locator('.sk-wave-nav b').innerText(),original);
+      assert(await page.evaluate(()=>!window.testPlayer.paused&&window.testPlayer.currentSrc===window.testSrc));
       await stage.getByRole('button',{name:'Switch to low perspective'}).click();
       await stage.getByRole('button',{name:'Switch to high perspective'}).click();
     }
     assert(await stage.evaluate(n=>n.scrollWidth<=n.clientWidth+1),'stage width at '+width+': '+id);
     await capture(id);
   }
-  await stage.locator('.sk-display-next').click();
+  const chosen=await stage.locator('.sk-wave-nav b').innerText();
+  await stage.locator('.sk-wave-cover[aria-current="true"]').click();
   await page.waitForFunction(()=>window.testPlayer.currentSrc !== window.testSrc);
+  assert.equal(await stage.locator('.sk-display-title').innerText(),chosen);
   await select('studio');
   await stage.getByRole('button',{name:'Reset to flat'}).click();
   await page.waitForFunction(()=>window.DimauMusicVisuals.sample(window.testPlayer).filters.every(f=>Math.abs(f.gain.value)<0.1));

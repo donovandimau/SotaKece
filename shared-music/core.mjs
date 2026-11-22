@@ -8,12 +8,14 @@ export function validateCatalogue(value){
   return Object.freeze(value.tracks.map(t=>{
     if(!t||typeof t.id!=='string'||!/^[a-z0-9][a-z0-9-]{0,79}$/.test(t.id)||ids.has(t.id)||typeof t.title!=='string'||!t.title.trim()||t.title.length>250||typeof t.path!=='string'||!(/^(?:fiji-default-soundtrack|fiji-(?:remix|song)-\d{2,3})\.mp3$/).test(t.path)||paths.has(t.path)||!Number.isSafeInteger(t.size)||t.size<1||t.size>262144000||t.type!=='audio/mpeg'||(t.fileName!==undefined&&(typeof t.fileName!=='string'||!t.fileName.trim()||t.fileName.length>250||/[\u0000-\u001f\u007f]/.test(t.fileName)))||(t.playlist!==undefined&&(typeof t.playlist!=='string'||!t.playlist.trim()||t.playlist.length>80||/[\u0000-\u001f\u007f]/.test(t.playlist)))||t.url!==undefined)throw Error('Music catalogue unavailable.');
     ids.add(t.id);paths.add(t.path);
-    return Object.freeze({id:t.id,title:t.title.trim(),path:t.path,fileName:t.fileName?.trim()||t.path,size:t.size,type:t.type,playlist:t.playlist?.trim()||OTHER,url:AUDIO_BASE+t.path});
+    const cover=t.artworkUrl||t.coverUrl||t.artwork;
+    const artwork=typeof cover==='string' && /^https:\/\//i.test(cover) && cover.length<2048 ? {artworkUrl:cover} : {};
+    return Object.freeze({id:t.id,title:t.title.trim(),path:t.path,fileName:t.fileName?.trim()||t.path,size:t.size,type:t.type,playlist:t.playlist?.trim()||OTHER,url:AUDIO_BASE+t.path,...artwork});
   }));
 }
 export const ALL='All songs',OTHER='Dimau Mix';
 export function playlists(tracks){const names=[];for(const t of tracks)if(!names.includes(t.playlist))names.push(t.playlist);return names;}
-const raw=tracks=>tracks.map(({id,title,path,fileName,size,type,playlist})=>({id,title,path,fileName,size,type,playlist}));
+const raw=tracks=>tracks.map(({id,title,path,fileName,size,type,playlist,artworkUrl})=>({id,title,path,fileName,size,type,playlist,...(artworkUrl?{artworkUrl}:{})}));
 function cached(){
   if(saved)return saved;
   try{const value=JSON.parse(globalThis.localStorage.getItem(KEY));if(value&&Number.isFinite(value.savedAt)&&value.savedAt>0&&value.savedAt<=Date.now()){saved={tracks:validateCatalogue(value),savedAt:value.savedAt};}}catch(_){}

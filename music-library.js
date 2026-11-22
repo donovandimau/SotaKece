@@ -122,15 +122,15 @@ async function openDisplay(){
   if(!api.dialog.open || display || loadingDisplay)return;
   loadingDisplay=true;
   try{
-    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-instruments');
+    const {mountDisplays}=await import('/music-displays.mjs?v=20261122-phone1');
     display=mountDisplays({api,deck,main,time,clock,queue});
     display.sync();
     watchDisplay.disconnect();
   }catch(_){/* The original deck stays usable offline. */}
   finally{loadingDisplay=false;}
 }
-function queue(){
-  return api.upcoming().slice(0,3).map(track=>({track,pick:()=>api.playUpcoming(track)}));
+function queue(limit=3){
+  return api.upcoming().slice(0,limit).map(track=>({track,pick:()=>api.playUpcoming(track)}));
 }
 const watchDisplay=new MutationObserver(openDisplay);
 watchDisplay.observe(api.dialog,{attributes:true,attributeFilter:['open']});openDisplay();

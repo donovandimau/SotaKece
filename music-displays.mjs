@@ -1,14 +1,8 @@
+import {sleeve} from './music-sleeves.mjs?v=1';
+import {waveBrowser} from './music-wave-browser.mjs?v=1';
 const layouts = [
   ['wings', 'Equalizer Wings'], ['arc', 'Arc Control'], ['wave', 'Wave Stage'],
   ['glass', 'Frosted Glass'], ['studio', 'Pro Studio EQ']
-];
-const pictures = [
-  '/assets/welcome-20261103/music-natural-768.webp',
-  '/assets/social-sunset-20261104/friends-guitar-clean-768.webp',
-  '/assets/social-sunset-20261104/music-friends-768.webp',
-  '/assets/feature-scenes/courtyard-guitars-20261105-720.webp',
-  '/assets/feature-scenes/talanoa-kava-jam-20261105-720.webp',
-  '/assets/social-sunset-20261104/beach-singalong-768.webp'
 ];
 const bands = ['60 Hz', '230 Hz', '910 Hz', '3.6 kHz', '14 kHz'];
 const storageKey = 'sota.music.display.v1';
@@ -25,11 +19,6 @@ function button(className, text, click) {
   node.type = 'button';
   node.addEventListener('click', click);
   return node;
-}
-function picture(track) {
-  let hash = 0;
-  for (const ch of track?.key || '') hash = (Math.imul(31, hash) + ch.charCodeAt(0)) >>> 0;
-  return 'url("' + pictures[hash % pictures.length] + '")';
 }
 export function mountDisplays({api, deck, main, time, clock, queue}) {
   const {audio, dialog} = api;
@@ -68,20 +57,6 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
   const title = element('span', 'sk-display-title'), credit = element('span', 'sk-display-credit');
   meta.append(title, credit);
   const detail = element('div', 'sk-display-detail');
-  let swipe = null;
-  visual.addEventListener('pointerdown', e => {
-    if (stage.dataset.layout === 'wave' && !e.target.closest('button')) {
-      swipe = {x:e.clientX, y:e.clientY, id:e.pointerId};
-      visual.setPointerCapture(e.pointerId);
-    }
-  });
-  visual.addEventListener('pointerup', e => {
-    if (swipe?.id !== e.pointerId) return;
-    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
-    if (Math.abs(dx)>36 && Math.abs(dx)>Math.abs(dy)*1.5) api.move(dx<0?1:-1);
-    swipe = null;
-  });
-  visual.addEventListener('pointercancel', () => { swipe = null; });
   stage.append(bar, visual, meta, time, main, detail, sheet);
   deck.prepend(stage);
   deck.append(theatre); expanded(false);
@@ -91,7 +66,7 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
     if (sheet.open) sheet.close();
     if (theatre.open) theatre.close();
   });
-  const css = element('link'); css.rel = 'stylesheet'; css.href = '/music-displays.css?v=20261122-instruments'; document.head.append(css);
+  const css = element('link'); css.rel = 'stylesheet'; css.href = '/music-displays.css?v=20261122-phone1'; document.head.append(css);
   dialog.classList.add('sk-display-enabled');
   sheet.addEventListener('close', () => { if (dialog.open) launch.focus({preventScroll:true}); });
   sheet.addEventListener('click', e => { if (e.target === sheet && !e.target.closest('.sk-display-sheet-head, .sk-display-choices')) {
@@ -99,7 +74,7 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
   }});
   let layout = 'wings', currentCanvas = null, arc = null, toneControls = [], lastKey = '', list = null;
   let frame = 0, visible = true, graph = null, paint = null, selection = 0, lastDraw = -Infinity;
-  let prismCanvas = null, prism = null, sleeveTitle = null, toneMarker = null;
+  let prismCanvas = null, prism = null, fan = null, toneMarker = null;
   let range = 'all', steep = true, activeBand = 2, studioMode='response', probe=null, plotCaption=null;
   const gains = [0,0,0,0,0];
   const hasEQ = () => !!(window.AudioContext || window.webkitAudioContext)?.prototype.createBiquadFilter;
@@ -166,35 +141,25 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
     arc?.update();
     if(reducedMotion() && layout==='studio')wake();
   });
-  function card(track, side, pick) {
-    const node = pick ? button('sk-display-card sk-display-' + side, '', pick) : element('div', 'sk-display-card sk-display-' + side);
-    node.style.setProperty('--photo', picture(track));
-    if (pick) node.setAttribute('aria-label', 'Play ' + track.title);
-    node.append(element('span', 'sk-display-card-caption', track?.title || 'Island Mix'));
-    return node;
-  }
   function sync() {
-    const selected = api.selected(), entries = queue();
+    const selected = api.selected(), entries = queue(layout === 'wave' ? Infinity : 3);
     const track = selected || entries[0]?.track;
     title.textContent = track?.title || 'Your island soundtrack';
     credit.textContent = track?.artist || track?.playlist || (track?.key?.startsWith('dev:') ? 'My music' : 'Island Mix');
     const signature = JSON.stringify([layout, selected?.key, track?.key, ...entries.map(e=>e.track.key)]);
     if (signature !== lastKey) {
-      lastKey = signature; stage.style.setProperty('--photo', picture(track));
-      if(sleeveTitle)sleeveTitle.textContent=track?.title||'Island Mix';
-      if (layout === 'wave') {
-        const row = visual.querySelector('.sk-display-cards');
-        row.textContent = '';
-        const others = entries.filter(e=>e.track.key !== track?.key);
-        if (others[1]) row.append(card(others[1].track,'far',others[1].pick));
-        if (others[0]) row.append(card(others[0].track,'next',others[0].pick));
-        row.append(card(track, 'front'));
+      lastKey = signature;
+      sleeve(stage,track);
+      arc?.setTrack(track);
+      if(fan){
+        const choices=selected?[{track:selected,pick:()=>{if(!api.live())api.playTrack(api.index());}},...entries.filter(item=>item.track.key!==selected.key)]:entries;
+        fan.setItems(choices,selected?.key||'');
       }
       if (list) {
         list.textContent = '';
         for (const item of entries) {
           const b = button('sk-display-queue-item','',item.pick);
-          const art=element('span','sk-display-queue-art');art.style.backgroundImage=picture(item.track);
+          const art=element('span','sk-display-queue-art');sleeve(art,item.track);
           const copy=element('span','sk-display-queue-copy');copy.append(element('span','sk-display-song',item.track.title));
           if(item.track.artist)copy.append(element('small','sk-display-queue-credit',item.track.artist));
           b.append(art,copy,element('span','sk-display-go','↗'));
@@ -255,13 +220,13 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
     for (const choice of choices.children) choice.setAttribute('aria-pressed',String(choice.dataset.layout === layout));
     visual.textContent = ''; detail.textContent = '';
     stage.querySelector('[data-transient]')?.remove();
-    currentCanvas = null; sleeveTitle=null; toneMarker=null; plotCaption=null;
+    arc?.destroy(); currentCanvas = null; fan=null; toneMarker=null; plotCaption=null;
     arc = null; list = null; lastKey = ''; toneControls = [];
     if(layout!=='arc' && layout!=='glass' && !paint)import('./music-display-visuals.mjs?v=instruments').then(module=>{paint=module;wake();}).catch(()=>{});
     if (layout === 'wings' || layout === 'wave') {
       currentCanvas = canvasFor(visual);
       if (layout === 'wave') {
-        visual.append(element('div','sk-display-cards'));
+        const surface=element('div','sk-wave-interaction');visual.append(surface);fan=waveBrowser(surface);
         const angle=button('sk-display-angle','',()=>{steep=!steep;updateAngle();wake();});
         function updateAngle(){angle.textContent=steep?'View · Peaks':'View · Low tide';angle.setAttribute('aria-label',steep?'Switch to low perspective':'Switch to high perspective');}
         updateAngle();visual.append(angle);
@@ -270,8 +235,7 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
         const currentArt=element('div','sk-display-edition');
         const disc=element('div','sk-display-vinyl');
         const sleeve=element('div','sk-display-sleeve');
-        sleeveTitle=element('b','sk-display-cover-title');
-        sleeve.append(sleeveTitle);currentArt.append(disc,sleeve);visual.append(currentArt);
+        currentArt.append(disc,sleeve);visual.append(currentArt);
         const bands=element('div','sk-display-ranges');bands.setAttribute('role','group');bands.setAttribute('aria-label','Spectrum frequency range');
         for (const [id,label] of [['all','Full'],['bass','Bass'],['mid','Mid'],['air','Air']]){
           const b=button('sk-display-range',label,()=>{range=id;for(const opt of bands.children)opt.setAttribute('aria-pressed',String(opt===b));wake();});
@@ -282,9 +246,9 @@ export function mountDisplays({api, deck, main, time, clock, queue}) {
         detail.append(element('span','sk-display-group-name','Up next'), list);
       }
     } else if (layout === 'arc') {
-      import('./music-display-arc.mjs?v=instruments').then(({makeArc}) => {
+      import('./music-display-arc.mjs?v=phone1').then(({makeArc}) => {
         if (turn !== selection) return;
-        arc = makeArc(audio, clock); visual.append(arc.node); stage.dataset.arcReady = 'true';
+        arc = makeArc(audio, clock); visual.append(arc.node);detail.append(arc.info);arc.setTrack(api.selected()||queue()[0]?.track);stage.dataset.arcReady = 'true';
       }).catch(() => {});
     } else {
       const rack = element('div','sk-display-rack');
