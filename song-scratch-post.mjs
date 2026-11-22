@@ -109,12 +109,13 @@ export const SITE = 'https://sotakece.com';
 export function linkError(e) {
   const m = String(e?.message || e || '');
   if (/LINK_LIMIT/.test(m)) return 'That is 30 links today. Try again tomorrow.';
+  if (/NOT_IN_KORO/.test(m)) return 'You can only bring people into a Koro you are in.';
   if (/bv_scratch_link_create|PGRST202|Could not find the function|Bucket not found/i.test(m)) return 'Sharing as a link is not switched on yet.';
   return postError(e);
 }
 
 /** Make a public scratch link for the current story. Returns {url, path}. */
-export async function makeScratchLink({ caption }, story, progress = () => {}) {
+export async function makeScratchLink({ caption, crew = null, befriend = false }, story, progress = () => {}) {
   const user = await member();
   if (!user) throw new Error('NOT_SIGNED_IN');
   const S = story.state();
@@ -134,9 +135,10 @@ export async function makeScratchLink({ caption }, story, progress = () => {}) {
     }
     const { data, error } = await sb().rpc('bv_scratch_link_create', {
       p_stem: stem, p_song_id: S.song.id, p_song_start: Math.round(S.start || 0), p_caption: (caption || '').trim() || null,
+      p_crew: crew, p_befriend: !!befriend,
     });
     if (error) throw error;
-    return { url: SITE + data.path, path: data.path };
+    return { url: SITE + data.path, path: data.path, koro: data.koro || null };
   } catch (e) {
     if (uploaded.length) sb().storage.from(LINK_BUCKET).remove(uploaded).catch(() => {});
     throw e;
@@ -190,18 +192,36 @@ export async function mountPostPanel(story) {
     }
   });
 
-  // Share as a link
+  // Share as a link: optionally bring people into one of my Koro, and be friends with them
+  const L = { crew: null, befriend: true, koro: [] };
+  const paintKoro = () => {
+    const host = $('ss-link-koro'); if (!host) return;
+    host.textContent = '';
+    for (const k of [{ id: null, name: 'No Koro', emoji: '' }, ...L.koro]) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'ss-chip'; b.setAttribute('aria-pressed', String(L.crew === k.id));
+      b.textContent = (k.emoji ? k.emoji + ' ' : '') + k.name + (k.members ? ' · ' + k.members : '');
+      b.addEventListener('click', () => { L.crew = k.id; paintKoro(); });
+      host.append(b);
+    }
+    $('ss-link-koro-wrap').hidden = !L.koro.length;
+  };
+  if (user) {
+    try { const { data } = await sb().rpc('bv_my_koro_for_links'); L.koro = Array.isArray(data) ? data : []; } catch (_) { L.koro = []; }
+  }
+  paintKoro();
+  if ($('ss-link-friends')) $('ss-link-friends').addEventListener('change', (e) => { L.befriend = e.target.checked; });
   $('ss-link-btn').disabled = !user;
   $('ss-link-btn').addEventListener('click', async () => {
     if (P.busy) return;
     P.busy = true; $('ss-link-btn').disabled = true;
     const note = (t) => { $('ss-link-status').textContent = t; };
     try {
-      const { url } = await makeScratchLink({ caption: $('ss-post-caption').value }, story, note);
+      const { url, koro } = await makeScratchLink({ caption: $('ss-post-caption').value, crew: L.crew, befriend: L.befriend }, story, note);
       note('');
       $('ss-link-out').value = url; $('ss-link-box').hidden = false;
       const name = story.songTitle();
-      const data = { title: 'A song to scratch · Sota Kece', text: name ? `Scratch this to hear a song I picked 🎵` : 'Scratch this 🎵', url };
+      const data = { title: 'A song to scratch · Sota Kece', text: koro ? 'Scratch this 🎵 then come and join ' + koro.name + ' on Sota Kece' : (name ? 'Scratch this to hear a song I picked 🎵' : 'Scratch this 🎵'), url };
       if (navigator.share) { try { await navigator.share(data); story.say('Link shared. You will see in Activity when someone joins through it.'); return; } catch (e) { if (e?.name === 'AbortError') return; } }
       try { await navigator.clipboard.writeText(url); story.say('Link copied. Paste it into WhatsApp, Messenger or anywhere.'); }
       catch (_) { story.say('Your link is ready below. Copy it and send it to friends.'); }

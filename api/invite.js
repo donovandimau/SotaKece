@@ -30,8 +30,20 @@ function scratchOf(card){
   return {urls:{under:LINK_FILES+f.under,cover:LINK_FILES+f.cover,over:LINK_FILES+f.over},song_id:x.song_id,
     song_start:Number.isFinite(start)&&start>=0&&start<=3600?Math.round(start):0,caption:String(x.caption||'').slice(0,140)};
 }
+/** What joining through this link does, in words. */
+function joinWords(card){
+  const name=String((card&&(card.display_name||card.handle))||'your friend').trim().slice(0,40);
+  const k=card&&card.koro&&typeof card.koro==='object'?card.koro:null;
+  const koro=k&&k.name?(String(k.emoji||'').slice(0,8)+' '+String(k.name).slice(0,40)).trim():'';
+  const n=k&&Number.isFinite(Number(k.members))?Number(k.members):0;
+  const parts=[];
+  if(koro)parts.push('puts you in '+koro+(n>1?' ('+n+' people already there)':''));
+  if(card&&card.befriend)parts.push('makes you friends with '+name);
+  return {koro,line:parts.length?'Joining '+parts.join(' and ')+'.':''};
+}
 function scratchPage(card,token,sx){
   const name=String(card.display_name||card.handle||'A friend').trim().slice(0,40);
+  const jw=joinWords(card);
   // the cover is what WhatsApp and Facebook show in the preview: a picture to scratch, the song kept secret
   return listen.page({title:`${name} sent you a song to scratch 🎵`,description:sx.caption||`Scratch it to hear the song, then reply on Sota Kece. ${ABOUT}`,
     url:pageUrl(token),image:sx.urls.cover,
@@ -41,10 +53,11 @@ function scratchPage(card,token,sx){
 .cta.after{animation:sxpulse 1.6s ease-in-out 3}@keyframes sxpulse{50%{transform:scale(1.04)}}@media(prefers-reduced-motion:reduce){.cta.after{animation:none}}</style>
 <article class="card"><div id="sx" class="sx sk-story-media" aria-live="polite">Opening the song story…</div>
 <div class="words"><h1>${esc(name)} sent you a song to scratch</h1><p>${sx.caption?esc(sx.caption):'Scratch the picture with your finger to hear it.'}</p></div></article>
-<a class="cta" id="sx-join" href="${esc(joinUrl(token))}">Reply on Sota Kece ↗</a>
-<p class="quiet">Join in a minute. Already a member? The button opens the app.</p>
+${jw.line?`<p class="quiet">${esc(jw.line)}</p>`:''}
+<a class="cta" id="sx-join" href="${esc(joinUrl(token))}">${jw.koro?`Join ${esc(jw.koro)} on Sota Kece ↗`:'Reply on Sota Kece ↗'}</a>
+<p class="quiet">Join in a minute. Already a member? The button opens the app${jw.koro?' and adds you to the Koro':''}.</p>
 <script src="/sota-story-media.js?v=20261122-links-1"></script>
-<script>SotaStoryMedia.mountUrls(document.getElementById('sx'),${JSON.stringify(sx.urls).replace(/</g,'\u003c')},${JSON.stringify({song_id:sx.song_id,song_start:sx.song_start})},function(){var j=document.getElementById('sx-join');j.classList.add('after');j.textContent='Liked it? Reply on Sota Kece ↗';});</script>`});
+<script>SotaStoryMedia.mountUrls(document.getElementById('sx'),${JSON.stringify(sx.urls).replace(/</g,'\u003c')},${JSON.stringify({song_id:sx.song_id,song_start:sx.song_start})},function(){var j=document.getElementById('sx-join');j.classList.add('after');${jw.koro?'':"j.textContent='Liked it? Reply on Sota Kece ↗';"}});</script>`});
 }
 function invitePage(card,token){
   const name=String(card.display_name||card.handle||'A friend').trim().slice(0,40),handle=String(card.handle||'').slice(0,20);
@@ -95,4 +108,4 @@ async function handler(req,res){
   }
 }
 module.exports=handler;
-Object.assign(module.exports,{invitePage,scratchPage,scratchOf,openInvite,joinUrl,pageUrl});
+Object.assign(module.exports,{invitePage,scratchPage,scratchOf,joinWords,openInvite,joinUrl,pageUrl});

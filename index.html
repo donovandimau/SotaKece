@@ -1208,6 +1208,8 @@ async function boot(){
   if(profileError)return shell(`<div class="glass card"><h3>Your room is still yours.</h3><p>Connection interrupted. Try loading it again when your signal returns.</p><button class="btn" onclick="boot()">Try again</button></div>`);
   if(!me) return finishRoom();
   S.me = me;
+  // An existing member who opened someone's link: accept it now (sign-up does this at room creation).
+  claimReferral();
   if(circleRoute){
     shell('<section class="glass card"><h1>Our Talanoa Circle</h1><p>Your circle link is ready to open.</p><button type="button" class="btn" onclick="go(\'crews\')">Your circles</button></section>');
     window.SotaCircles?.route();return;
@@ -1251,6 +1253,12 @@ async function claimReferral(){
   try{
     const {data}=await sb.rpc('bv_referral_claim',{p_token:saved.token});
     if(data&&data.claimed&&data.sharer)toast('@'+data.sharer+' brought you here. Say bula.');
+    // A group link also puts this person in the sender's Koro and can make them friends (new or existing member).
+    try{
+      const {data:acc}=await sb.rpc('bv_invite_accept',{p_token:saved.token});
+      if(acc&&acc.koro)toast('You are in '+(acc.koro.emoji?acc.koro.emoji+' ':'')+acc.koro.name+(acc.friends&&acc.sharer?' with @'+acc.sharer:'')+'. Say bula.');
+      else if(acc&&acc.friends&&acc.sharer)toast('You and @'+acc.sharer+' are friends now. Say bula.');
+    }catch(_){}
     return data||null;
   }catch(_){return null;}
 }

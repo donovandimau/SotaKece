@@ -5,10 +5,10 @@
 <meta property="og:title" content="Song Scratch · Sota Kece"><meta property="og:description" content="Scratch your photo away to reveal the song. Make a music story with Island Mix."><meta property="og:type" content="website"><meta property="og:site_name" content="Sota Kece"><meta property="og:url" content="https://sotakece.com/song-scratch.html"><meta property="og:image" content="https://sotakece.com/assets/og-sota-kece-premium-20261111.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://sotakece.com/assets/og-sota-kece-premium-20261111.jpg">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/sota-favicon-32-20261027g.png"><link rel="apple-touch-icon" sizes="180x180" href="/icons/sota-apple-touch-icon-20261027g.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/song-scratch.css?v=20261122-links-1">
+<link rel="stylesheet" href="/song-scratch.css?v=20261122-groups-1">
 <script defer src="/vendor/supabase-2.45.0.min.js"></script>
-<script type="module" src="/song-scratch.js?v=20261122-links-1"></script>
-<script type="module" src="/song-scratch-post.mjs?v=20261122-links-1"></script>
+<script type="module" src="/song-scratch.js?v=20261122-groups-1"></script>
+<script type="module" src="/song-scratch-post.mjs?v=20261122-groups-1"></script>
 </head><body>
 <header class="ss-top"><a class="ss-brand" href="/"><img src="/icons/sota-icon-192-20261027g.png" alt="" width="36" height="36"><span>Sota Kece</span></a><a class="ss-back" href="/">Back to Sota</a></header>
 <main class="ss-main">
@@ -149,6 +149,11 @@
           <p id="ss-post-done" class="ss-help" hidden>Posted. <a href="/">Open Sota Kece</a> to see it in Stories.</p>
           <h3>Or share it as a link</h3>
           <p class="ss-help">Anyone can open the link, even without Sota Kece. They scratch it to hear your song, then they are asked to join. You will see in Activity when someone joins through it.</p>
+          <div id="ss-link-koro-wrap" class="ss-link-koro" hidden>
+            <p class="ss-help">Posting it in a WhatsApp group? Choose a Koro and everyone who comes in through the link joins it with you.</p>
+            <div id="ss-link-koro" class="ss-chips" aria-label="Bring people into a Koro"></div>
+          </div>
+          <label class="ss-switch"><input id="ss-link-friends" type="checkbox" checked> <span>Be friends with people who join through it</span></label>
           <button id="ss-link-btn" type="button" class="ss-btn" disabled>Share as a link 🔗</button>
           <p id="ss-link-status" class="ss-status" aria-live="polite"></p>
           <div id="ss-link-box" class="ss-row" hidden><input id="ss-link-out" class="ss-search ss-grow" type="text" readonly aria-label="Your link"><button id="ss-link-copy" type="button" class="ss-btn ss-small">Copy</button></div>

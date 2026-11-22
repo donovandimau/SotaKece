@@ -201,3 +201,18 @@ test('scratch links: posting errors are put into plain words', async () => {
   assert.equal(post.extFor('image/jpeg'), 'jpg');
   assert.equal(post.extFor('text/html'), null);
 });
+
+test('group links: the page says which Koro you join and that you become friends; Sota accepts the link after sign-in', () => {
+  const inv = require(path.join(root, 'api', 'invite.js'));
+  const stem = '11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222';
+  const card = { handle: 'don', display_name: 'Donovan', befriend: true, koro: { name: 'Lautoka <youth>', emoji: '⛪', members: 12 },
+    scratch: { files: { under: stem + '-under.webp', cover: stem + '-cover.jpg', over: stem + '-over.webp' }, song_id: 'fiji-remix-2026-05', song_start: 0, caption: '' } };
+  const html = inv.scratchPage(card, 'b'.repeat(32), inv.scratchOf(card)).html;
+  assert.match(html, /Joining puts you in ⛪ Lautoka &lt;youth&gt; \(12 people already there\) and makes you friends with Donovan\./);
+  assert.match(html, /Join ⛪ Lautoka &lt;youth&gt; on Sota Kece ↗/);
+  assert.doesNotMatch(html, /<youth>/, 'Koro names are escaped');
+  assert.equal(inv.joinWords({ handle: 'x' }).line, '', 'a plain link promises nothing');
+  const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.match(index, /sb\.rpc\('bv_invite_accept',\{p_token:saved\.token\}\)/);
+  assert.match(index, /S\.me = me;\s*\/\/[^\n]*\n\s*claimReferral\(\);/, 'existing members accept a link on their next visit');
+});
