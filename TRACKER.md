@@ -1,3 +1,7 @@
+## 2026-11-22 — Up Next
+
+Codex claimed Dimau Ops task 1456. Show the upcoming songs, add any song with Play Next, and reorder with Up and Down on phone and desktop while the track keeps playing. Preserve the existing playlist revision and music motion.
+
 ## 2026-11-22 — Sign-up: plain message when a password is on a leaked list
 
 - Claude, Ops task 1458 (Donovan: "Yes, Sota Kece"). On 21 Nov a visitor (iPhone, NZ) tried email sign-up 11 times in a minute; the Sydney project's logs show every `/auth/v1/signup` refused 422 "Password is known to be weak and easy to guess" (leaked-password protection, which Donovan keeps on, 19 Nov). Nobody explained what to do, so they gave up.
