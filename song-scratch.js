@@ -1005,7 +1005,7 @@ $('ss-save').addEventListener('click', async () => {
 
 /** The three layers of a scratch story, as files a friend's phone puts back together:
     under = the song card, cover = what gets scratched away, over = text, stickers and drawings. */
-async function scratchLayers() {
+async function scratchLayers(opts = {}) {
   const now = performance.now(), toBlob = (c, type, q) => new Promise((r) => c.toBlob(r, type, q));
   const under = canvas(), uc = under.getContext('2d');
   const keep = S.playing; S.playing = false;            // a still card: record not spinning, bars at rest
@@ -1018,7 +1018,7 @@ async function scratchLayers() {
   for (const L of S.layers) drawLayer(oc, L, info, 99, asset);  // 99 s: entrance animations finished
   return {
     under: await toBlob(under, 'image/webp', .88),
-    cover: await toBlob(base, 'image/webp', .88),
+    cover: await toBlob(base, opts.coverType || 'image/webp', .88),
     over: await toBlob(over, 'image/webp', .9),
   };
 }

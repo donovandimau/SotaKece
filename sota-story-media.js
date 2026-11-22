@@ -48,7 +48,7 @@
     } catch (_) { return null; }
   }
 
-  function scratchPlayer(host, files, item) {
+  function scratchPlayer(host, files, item, onStart) {
     var wrap = document.createElement('div'); wrap.className = 'sk-story-scratch';
     var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     cv.setAttribute('aria-label', 'Scratch the picture with your finger to hear the song');
@@ -75,6 +75,7 @@
     }
     async function music() {
       if (started) return; started = true; hint.hidden = true;
+      if (typeof onStart === 'function') { try { onStart(); } catch (_) {} }
       var url = await songUrl(item.song_id);
       if (!url) return;
       audio = new Audio(url); audio.loop = true; playing.push(audio);
@@ -119,5 +120,14 @@
     }
   }
 
-  window.SotaStoryMedia = { mount: mount, stop: stop };
+  /** A scratch story from plain links (the public /i/<token> page): urls = {under, cover, over}. */
+  async function mountUrls(host, urls, item, onStart) {
+    stop();
+    if (!host || !urls) return;
+    host.textContent = '';
+    try { await scratchPlayer(host, { '-under': urls.under, '-cover': urls.cover, '-over': urls.over }, item || {}, onStart); }
+    catch (_) { host.textContent = 'This song story could not be opened.'; }
+  }
+
+  window.SotaStoryMedia = { mount: mount, mountUrls: mountUrls, stop: stop };
 })();
