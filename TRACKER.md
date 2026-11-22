@@ -35,6 +35,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-22 | Codex | Ops 1429 · Five swappable Music Menu displays in Sota Kece. Donovan reviews before any wider rollout. | agent/codex/build-five-swappable-music-menu-displays-in-sota-kece/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
 | 2026-11-18 | Claude | Share links /s/ /t/ /p/ /i/ and sere.sotakece.com/ back on Cloudflare (Worker code) — built, waiting for Donovan to merge | fix/worker-short-links |
