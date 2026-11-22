@@ -113,9 +113,9 @@ test('page wiring: the link is remembered before sign-in, credited once a room e
   const release=/<meta name="sota-release" content="([^"]+)">/.exec(html)[1];
   assert.match(read('sw.js'),new RegExp("const CACHE='"+release+"';"));
   assert.match(html,/sota-pulse\.js\?v=2026111\d-[a-z-]+-\d+/);assert.match(html,/sota-plus\.js\?v=2026111\d-[a-z-]+-\d+/,'both scripts carry a release tag from this round of work');
-  const cfg=JSON.parse(read('vercel.json')),routes=cfg.routes,fsi=routes.findIndex(r=>r.handle==='filesystem'),pi=routes.findIndex(r=>r.dest&&r.dest.startsWith('/api/share'));
-  assert.ok(pi>-1&&pi<fsi,'the /p/ route runs before the filesystem');
-  assert.equal(routes[pi].src,'/p/([0-9]{1,18})/([a-fA-F0-9]{32})/?');
+  const siteRoutes=require('../cloudflare/site-routes.cjs'),pr=siteRoutes.ROUTES.find(r=>r.handler===require('../api/share.js'));
+  assert.ok(pr&&read('wrangler.jsonc').includes('"/p/*"'),'the /p/ route runs in the Worker before the static files');
+  assert.equal(pr.re.source.replace(/\\\//g,'/'),'^/p/([0-9]{1,18})/([a-fA-F0-9]{32})/?$');
   assert.match(read('sota-plus.js'),/ACT_WORDS = \{ joined: 'joined Sota Kece through your link'/);
   assert.match(read('sota-plus.js'),/ACT_TARGET = \{ profile: ''/);
   assert.match(read('.github/workflows/talanoa-security.yml'),/node tests\/run-share-engine-db\.cjs/);

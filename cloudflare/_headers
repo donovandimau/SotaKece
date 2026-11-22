@@ -1,0 +1,6 @@
+# Security headers (CSP) and cache rules for this site on Cloudflare. Edit here.
+# Moved from vercel.json on 22 Nov 2026 (Vercel is retired). Syntax: https://developers.cloudflare.com/workers/static-assets/headers/
+/*
+  X-Content-Type-Options: nosniff
+  Content-Security-Policy: frame-ancestors 'self' https://*.dimau-fintech.com https://sotakece.com https://*.sotakece.com
+  Referrer-Policy: strict-origin-when-cross-origin

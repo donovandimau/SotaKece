@@ -17,13 +17,13 @@
 const listen = require('../api/listen.js');
 const share = require('../api/share.js');
 const invite = require('../api/invite.js');
-const vercel = require('../vercel.json');
+const routesConfig = require('./routes.json');
 
 const SERE_HOST = 'sere.sotakece.com';
 // Vercel origin that still runs the functions (the same one dimau-api-forwarder uses).
 const VERCEL_ORIGIN = 'https://sotakece-donovandimau-3468s-projects.vercel.app';
 
-// The same patterns as vercel.json "routes".
+// The same patterns as the old vercel.json "routes" (vercel.json was retired on 22 Nov 2026).
 const ROUTES = [
   { re: /^\/s\/([0-9a-fA-F-]{36})\/([0-9a-f]{32})\/?$/, handler: listen, query: (m) => ({ sere: m[1], k: m[2] }), secret: true },
   { re: /^\/t\/([a-z0-9-]{1,80})\/?$/, handler: listen, query: (m) => ({ track: m[1] }) },
@@ -32,9 +32,10 @@ const ROUTES = [
 ];
 const SERE_SECRETS = ['SOTA_SERVER_SECRET', 'SERE_SECRET'];
 
-// Vercel put these on every answer (first entry of vercel.json "routes"); the static files get them
-// from dist/_headers, the pages made here get them from this list.
-const SITE_HEADERS = Object.entries((vercel.routes || []).find((r) => r.src === '/(.*)' && r.headers && r.continue)?.headers || {});
+// The headers on every answer: the static files get them from dist/_headers (cloudflare/_headers),
+// the pages made here get them from cloudflare/routes.json (until 22 Nov 2026 both came from
+// vercel.json "routes"). tests/site-worker.test.cjs checks the two stay the same.
+const SITE_HEADERS = Object.entries(routesConfig.siteHeaders || {});
 
 function match(pathname) {
   for (const route of ROUTES) {
