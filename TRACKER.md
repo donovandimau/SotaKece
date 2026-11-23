@@ -1,3 +1,9 @@
+## 2026-11-23 — Trust fixes from the live-site review (text, email, sign-in return)
+
+- Claude. `privacy.html`: age now 16 and over (matches the sign-up check and communications.html); host line says Cloudflare, not Vercel. `privacy.html`, `terms.html`, `data-deletion.html`: contact email changed from support@fijiinvestment.com to support@sotakece.com (**Donovan: this mailbox must exist and forward to you**). Communications "Sign in on Sota Kece" now remembers the page (30 min, only /communications.html or /call.html) and `index.html` sends the member back once signed in.
+- Not done, need Donovan's go: private/friends/wall choice for seres (database + wall-post trigger change), theme saved to the profile (new column), Web Push for calls, two-way captions, lock external Jitsi rooms (or drop them), a welcome Talanoa for members with no Koro.
+- Checks: node --test tests: 469 pass, 1 fail (table-rules-security, same on the base, needs PGlite installed).
+
 ## 2026-11-22 — Security review: four table-rule holes closed (shared database)
 
 - Claude, Ops task 1491 (Donovan: "Yes, review it"). Reviewed all 171 Sota Kece database functions now in dimau-core-ireland: none uses the two guard bugs found in other Dimau apps (`current_user = postgres`, NULL `auth.uid()` passing an `if not (…)`), the money functions (wallet send, coins buy/tip/payout) check the caller properly, and none reads tables outside Sota Kece. The holes were in the table rules, each confirmed on live in a rolled-back transaction:

@@ -29,7 +29,7 @@
 <p class="muted">Works for Sota Kece and Sere — they share one account.</p>
 
 <p>Deleting your account removes your profile, your space, your posts, comments, gifts, friends, songs, chats, your seres and their videos, and your Sota Kece profile itself. It happens straight away and cannot be undone.</p>
-<p>Your sign-in is shared with the other Dimau apps, so the sign-in itself and anything you saved in those apps stay as they are. To have the sign-in removed as well, email <a href="mailto:support@fijiinvestment.com">support@fijiinvestment.com</a>.</p>
+<p>Your sign-in is shared with the other Dimau apps, so the sign-in itself and anything you saved in those apps stay as they are. To have the sign-in removed as well, email <a href="mailto:support@sotakece.com">support@sotakece.com</a>.</p>
 
 <h2>Do it yourself</h2>
 <p>Sign in below with the account you want gone, then press the red button.</p>
@@ -56,7 +56,7 @@
 <p class="status" id="status" role="status" aria-live="polite"></p>
 
 <h2>Or ask us</h2>
-<p>If you cannot sign in, email <a href="mailto:support@fijiinvestment.com">support@fijiinvestment.com</a> from the address on your account and say "delete my Sota Kece data". We will do it within 30 days and confirm by email.</p>
+<p>If you cannot sign in, email <a href="mailto:support@sotakece.com">support@sotakece.com</a> from the address on your account and say "delete my Sota Kece data". We will do it within 30 days and confirm by email.</p>
 
 <h2>Signed in with Facebook?</h2>
 <p>You can also remove Sota Kece from your Facebook settings (Settings → Apps and websites). That stops Facebook sharing anything more with us. To remove what we already hold, use the button above or email us.</p>
@@ -95,7 +95,7 @@
       const r=await fetch('/api/account-delete',{method:'POST',headers:{Authorization:'Bearer '+(session?.access_token||'')}});
       if(!r.ok) fail=(await r.json().catch(()=>({}))).error||('error '+r.status);
     }catch(e){fail=e.message;}
-    if(fail){status('Could not delete: '+fail+'. Email support@fijiinvestment.com and we will do it for you.');$('delete').disabled=false;return;}
+    if(fail){status('Could not delete: '+fail+'. Email support@sotakece.com and we will do it for you.');$('delete').disabled=false;return;}
     await sb.auth.signOut().catch(()=>{});
     $('ready').hidden=true; $('auth').hidden=true; $('done').hidden=false; status('');
   });

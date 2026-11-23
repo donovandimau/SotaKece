@@ -1244,6 +1244,7 @@ async function boot(){
     if($('#s-q')){ $('#s-q').value=pendingMate;try{sessionStorage.removeItem('sota-find-mate');}catch(_){}await search(); }
   }else {const destination=typeof location==='object'&&location.hash?window.SotaWorlds?.memberRouteFromHash(location.hash):null;if(destination)S.tab=destination;await render();if(typeof location==='object'&&location.hash==='#skins')window.BulaSkinStudio?.open(null,'All');if(S.tab==='pulse')window.SK?.keep?.(S.user.id,me.room_accent||'');}
   await window.SotaCircles?.resumeDraft?.();
+  try{const r=JSON.parse(localStorage.getItem('sota:return')||'null');if(r){localStorage.removeItem('sota:return');if(r.p&&Date.now()-r.t<18e5&&/^\/(?:communications|call)\.html(?:[?#]|$)/.test(r.p)&&!r.p.startsWith('//')){location.replace(r.p);return;}}}catch(_){}
 }
 /* Share engine: a link from a shared post carries ?ref=<token>. Keep it on this device (30 days) and
    clean the address; the hash that opens the post stays. The token is only ever sent back once, by
