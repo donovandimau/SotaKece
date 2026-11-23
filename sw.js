@@ -1,6 +1,6 @@
 if (typeof importScripts === 'function') importScripts('/dimau-page-timeout.js');
 // Only known public app files are cached. Auth, profiles, messages and uploaded media never enter this cache.
-const CACHE='sota-kece-shell-20261122-v214-volcanic';
+const CACHE='sota-kece-shell-20261123-v215-weak-signal';
 // Keep installation small and reliable: artwork and fonts are saved only after they are requested.
 const ASSETS=['/dimau-header-standard.js','/dimau-premium-shell.js','/dimau-shell.js','/sota-premium-shell.js','/circle-types.js','/circle-groups.js','/communications-core.js','/room-atmosphere.js','/music-visualiser.js','/skin-visuals.js','/skin-discovery.js','/skin-identities.js','/playback.js','/','/manifest.webmanifest','/dimau-install.js','/vendor/supabase-2.45.0.min.js','/skins.js','/room-media.js','/local-music.js','/music-playlist.js','/music-playlist.json','/skin-studio.js','/offline.js','/kava.js','/kava-ui.js','/connections.js','/friend-feed.js','/sota-styles-head.css'];
 const PUBLIC_IMAGES=['/assets/feature-scenes/moments-studio-20261105-880.webp','/assets/feature-scenes/koro-market-20261105-880.webp','/assets/feature-scenes/connections-ferry-20261105-880.webp','/assets/feature-scenes/pulse-cafe-20261105-880.webp','/assets/feature-scenes/courtside-friends-20261105-880.webp','/assets/feature-scenes/courtyard-guitars-20261105-1400.webp','/assets/feature-scenes/courtyard-guitars-20261105-720.webp','/assets/feature-scenes/design-together-20261105-880.webp','/assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp','/assets/feature-scenes/talanoa-kava-jam-20261105-720.webp','/assets/social-sunset-20261104/beach-singalong-768.webp','/assets/social-sunset-20261104/beach-singalong-1536.webp','/assets/social-sunset-20261104/garden-catchup-768.webp','/assets/social-sunset-20261104/garden-catchup-1536.webp','/assets/social-sunset-20261104/friends-guitar-clean-768.webp','/assets/social-sunset-20261104/friends-guitar-clean-1024.webp','/assets/social-sunset-20261104/friends-guitar-clean-1536.webp','/assets/music-weave-20261110.webp','/assets/og-sota-kece-premium-20261111.jpg','/assets/welcome-20261103/music-natural-768.webp','/assets/welcome-20261103/space-together-natural-768.webp','/icons/sota-icon-192-20261027g.png','/assets/life-galaxy-20261026.webp','/assets/music-badge-ring.svg','/assets/music-badge-note.svg','/assets/skins/studio/ocean-20261025.webp','/assets/skins/studio/coral-20261025.webp','/assets/skins/studio/rain-20261025.webp','/assets/skins/studio/retro-20261025.svg','/assets/dimau-visuals-icon.svg','/assets/sota-blue-white-background-20261021.png','/assets/sota-blue-white-background-20261110-1260.webp','/assets/sota-kece-logo-20261020.svg','/assets/sota-kece-logo-20261020.png','/assets/sota-blue-masi-lettering-20261020.png','/assets/music-badge-museum-20261018.svg','/assets/dimau-owner-logo-20260920.png','/assets/sota-kece-logo.png','/assets/fiji-music-icon-20261018.svg','/assets/fiji-sunset.jpg','/assets/front-reference.jpg','/assets/front-reference-brand.jpg','/assets/mobile-front-reference.png','/assets/mobile-front-reference-20261110.webp','/assets/mobile-front-reference-brand.jpg','/assets/fiji-music.jpg','/assets/friends.jpg','/assets/beach.jpg','/assets/masi-band.svg','/assets/masi-supplied.png','/assets/og-sota-kece-20261027g.jpg'];
@@ -23,7 +23,12 @@ self.addEventListener('install',event=>{event.waitUntil((async()=>{
   await self.skipWaiting();
 })());});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{
-  const keys=await caches.keys();await Promise.all(keys.filter(key=>key.startsWith('sota-kece-shell-')&&key!==CACHE).map(key=>caches.delete(key)));
+  const keys=await caches.keys(),old=keys.filter(key=>key.startsWith('sota-kece-shell-')&&key!==CACHE);
+  // Carry saved styles, pictures and fonts into the new release before clearing the old one,
+  // so a weak signal straight after an update still shows a styled page, not bare text.
+  const cache=await caches.open(CACHE);
+  for(const name of old){try{const prev=await caches.open(name);for(const req of await prev.keys()){if(!(await cache.match(req))){const res=await prev.match(req);if(res)await cache.put(req,res);}}}catch(_){}}
+  await Promise.all(old.map(key=>caches.delete(key)));
   await self.clients.claim();
   if(typeof self.clients.matchAll==='function')for(const client of await self.clients.matchAll({type:'window'}))client.postMessage({type:'SOTA_RELEASE',release:CACHE});
 })());});
@@ -56,7 +61,9 @@ self.addEventListener('fetch',event=>{
     // A new HTML version must receive its matching code immediately, even when
     // the single offline entry still holds an older deployment's file.
     if(url.searchParams.has('v')&&/\.(?:m?js|css|json|webmanifest)$/i.test(url.pathname)){
-      try{const response=await fresh;return response.ok?response:cached||response;}
+      // Weak signal: if a saved copy exists and the network has not answered in 4 seconds, use it.
+      const slow=cached&&typeof setTimeout==='function'?new Promise(resolve=>setTimeout(()=>resolve(null),4000)):null;
+      try{const response=await (slow?Promise.race([fresh,slow]):fresh);if(!response){event.waitUntil(fresh.catch(()=>{}));return cached;}return response.ok?response:cached||response;}
       catch(_){return cached||Response.error();}
     }
     if(cached){event.waitUntil(fresh.catch(()=>{}));return cached;}
