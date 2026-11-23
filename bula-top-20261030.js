@@ -10,7 +10,10 @@
     if(!acts||!pill)return;
     (pill.closest('.bw-group')||pill).style.removeProperty('display');
     var el=pill.closest('.bw-group')||pill;
-    if(el.parentNode!==acts)acts.insertBefore(el,acts.firstChild);
+    var guestHeader=acts.closest('.sx-top')&&document.body.classList.contains('sx-guest');
+    var compactMenu=guestHeader&&window.matchMedia('(max-width: 360px)').matches&&acts.querySelector('[data-dimau-menu-panel]');
+    var target=compactMenu||acts;
+    if(el.parentNode!==target)target.insertBefore(el,target.firstChild);
     // If bula-welcome floated it first (the header was not drawn yet), take off the floating position so it sits in the row,
     // exactly as when it is placed in the header directly. Without this the pill landed bottom-left on some loads.
     if(!pill.classList.contains('bw-inline')){pill.classList.add('bw-inline');el.classList.remove('bw-float');['top','right','bottom','left'].forEach(function(p){el.style.removeProperty(p);pill.style.removeProperty(p);});}
@@ -19,11 +22,12 @@
     // taking up the bar. It stays a working button, and opens out again while pointed at or focused.
     if(!shown){shown=Date.now();setTimeout(function(){folded=true;bulaTop();},HOLD);pill.addEventListener('mouseenter',function(){peek=true;bulaTop();});pill.addEventListener('mouseleave',function(){peek=false;bulaTop();});pill.addEventListener('focus',function(){peek=true;bulaTop();});pill.addEventListener('blur',function(){peek=false;bulaTop();});}
     if(!pill.title)pill.title='Bula! Welcome to Sota Kece';
-    var small=window.matchMedia('(max-width: 640px)').matches||(folded&&!peek);
+    var iconOnly=guestHeader&&!compactMenu&&window.matchMedia('(max-width: 760px)').matches;
+    var small=iconOnly||window.matchMedia('(max-width: 640px)').matches||(folded&&!peek);
     var set=function(e,p,v){if(e&&(e.style.getPropertyValue(p)!==v||e.style.getPropertyPriority(p)!=='important'))e.style.setProperty(p,v,'important');};
     set(pill,'white-space','nowrap');set(pill,'flex','0 0 auto');set(pill,'width','auto');set(pill,'max-width','none');set(pill,'align-self','center');set(pill,'margin','0');
     set(pill.querySelector('.bw-long'),'display',small?'none':'inline');
-    set(pill.querySelector('.bw-short'),'display',small?'inline':'none');
+    set(pill.querySelector('.bw-short'),'display',small&&!iconOnly?'inline':'none');
   }
   // Move the pill in the same task it is added (a microtask, before paint) so the page never shows it on its own line first: no layout jump.
   var q=0;new MutationObserver(function(){if(q)return;q=1;Promise.resolve().then(function(){q=0;bulaTop();});}).observe(document.documentElement,{childList:true,subtree:true});

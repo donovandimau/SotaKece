@@ -6,12 +6,19 @@
    Every start of the sign-up flow sends cta_click {cta:'join'} through the shared Dimau beacon. */
 (function () {
   'use strict';
-  var KEY = 'sk-join-nudge-off', WEEK = 7 * 864e5, bar = null, shown = false, taps = 0;
+  var KEY = 'sk-join-nudge-off', WEEK = 7 * 864e5, bar = null, shown = false, taps = 0, observer, volau;
   function ev(name, props) { try { if (window.SKEvent) window.SKEvent(name, props); else if (window.dimau && window.dimau.track) window.dimau.track(name, props); } catch (e) {} }
   function off() { try { var t = Number(localStorage.getItem(KEY) || 0); return t && Date.now() - t < WEEK; } catch (e) { return false; } }
   /* Guests have the sign-up button; its form sits in the #bv-entry dialog, which is open while signing up or in. */
   function guest() { return !!document.getElementById('sk-sign-up') && !document.querySelector('dialog.bv-account-dialog[open]'); }
-  function hide() { if (bar) { bar.remove(); bar = null; } }
+  function hide() {
+    if (!bar) return;
+    observer?.disconnect();
+    bar.remove();
+    bar = null;
+    volau?.removeAttribute('part');
+    document.documentElement.style.removeProperty('--sk-join-dock');
+  }
   function show() {
     if (shown || off() || !guest()) return;
     shown = true;
@@ -22,6 +29,10 @@
     bar.innerHTML = '<p>Free to join. Make your own space.</p><button type="button" class="sk-join-go" data-sk-join>Join free</button><button type="button" class="sk-join-x" aria-label="Not now">×</button>';
     bar.querySelector('.sk-join-x').addEventListener('click', function () { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} hide(); });
     document.body.appendChild(bar);
+    if (window.ResizeObserver) {
+      observer = new ResizeObserver(place);
+      observer.observe(bar);
+    }
     place();
     requestAnimationFrame(function () { if (bar) bar.classList.add('sk-in'); });
   }
@@ -36,7 +47,11 @@
       var r = n.getBoundingClientRect();
       if (r.height > 0 && r.bottom >= vh - 4 && r.width > vw * 0.5) lift = Math.max(lift, vh - r.top);
     });
-    bar.style.bottom = lift ? 'calc(' + Math.round(lift + 10) + 'px + 0px)' : '';
+    bar.style.bottom = lift ? Math.ceil(lift + 10) + 'px' : '';
+    // Expose the shared shell's floating button to the local stylesheet.
+    volau = document.querySelector('[data-dimau-super-app]')?.shadowRoot?.querySelector('.volau');
+    volau?.setAttribute('part','sota-volau');
+    document.documentElement.style.setProperty('--sk-join-dock', 'calc(' + getComputedStyle(bar).bottom + ' + ' + (bar.offsetHeight + 10) + 'px)');
   }
   window.addEventListener('resize', place);
   function check() {

@@ -283,24 +283,6 @@
   function discoveryMarkup() {
     return `<section class="bv-discovery" id="bv-your-room" tabindex="-1" aria-labelledby="bv-discovery-title"><header><div><span class="bv-discovery-kicker">MAKE IT YOURS</span><h2 id="bv-discovery-title">Make it yours.</h2><p>Browse a look, or start with your own ideas.</p><small class="bv-discovery-selected">Selected skin · <span id="bv-welcome-skin-name"></span></small></div><button type="button" class="bv-discovery-all">Explore all ${skins.presets.length} skins <span aria-hidden="true">↗</span></button></header>${discovery?`<div class="bv-collection-grid">${collectionMarkup()}</div>`:''}<p class="bv-discovery-note">Original cover artwork. Community-made designs. A space to make your own.</p></section>`;
   }
-  // Guest Home: the example room under the welcome photo waits for that photo (the largest paint) before
-  // fetching its own pictures (about 700 KB), so on a slow phone they do not share the line with it.
-  // Until then they show what an unloaded picture shows, nothing; once fetched the room looks the same.
-  function holdRoomMedia(markup) {
-    return markup.replace('<div class="bv-preview bv-art-room"','<div class="bv-preview bv-art-room sk-media-hold"').split(`<image href="${ORIGINAL_SHEET}"`).join('<image data-sk-hold');
-  }
-  function releaseRoomMedia(root) {
-    let done=false;
-    const release=()=>{
-      if(done)return;done=true;
-      root.querySelectorAll('image[data-sk-hold]').forEach(image=>{image.removeAttribute('data-sk-hold');image.setAttribute('href',ORIGINAL_SHEET);});
-      root.querySelectorAll('.sk-media-hold').forEach(node=>node.classList.remove('sk-media-hold'));
-    };
-    const photo=root.querySelector('img[fetchpriority="high"]');
-    if(!photo||photo.complete)return release();
-    photo.addEventListener('load',release,{once:true});photo.addEventListener('error',release,{once:true});
-    addEventListener('load',release,{once:true});
-  }
   const ORIGINAL_SHEET='/assets/mobile-front-reference-20261110.webp';
   function originalCrop(x,y,w,h,label) {
     return `<svg class="sk-photo" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(label)}"><image href="${ORIGINAL_SHEET}" width="1008" height="1792"/></svg>`;
@@ -317,6 +299,148 @@
   }
   function frontAvatar(label) { return originalCrop(121,951,215,215,label); }
   function showcasePortrait() { return frontAvatar('Sema — My Space showcase model'); }
+
+  const roomVibes = [['hibiscus','Hibiscus Heat'],['midnight','Suva Night'],['lagoon','Lagoon']];
+  const roomMates = ['Litia','Jone','Mere','Peni','Ana','Saki','Adi','Vili'];
+  const roomGroove = 'Sunset on the Veranda';
+  const roomReactions = new Set();
+  let roomVibe, roomTab, roomOpenedAt;
+  // RMS levels from the bundled recording, in playback order.
+  const roomWave = [95,48,86,67,71,96,53,86,72,76,100,50,84,69,69,99,50,86,70,73,96,51,85,64,70,95,51,87,72,76,95,54,89,69,73,99,51,88,69,73];
+  function guestPortrait(slug, size) {
+    return `<img src="/assets/sema-room/${slug}.webp" alt="" width="${size}" height="${size}" decoding="async">`;
+  }
+  function guestRoom() {
+    const vibe = roomVibe ? skins.normalize({id:roomVibe}) : picked();
+    const notes = [['Donu','Same time, same sunset?',2],['Jo','Bring your favourite track.',6]];
+    return `<div class="sx-living-room" style="${esc(skins.inline(vibe))}">
+      <div class="sx-room-intro">
+        <div class="sx-room-face">${guestPortrait('sema',54)}<span aria-hidden="true"></span></div>
+        <div><h2>Sema’s space</h2><span class="sx-room-demo">Demo room</span><span class="sx-room-presence" role="status">Suva</span></div>
+        <p>${esc(example.bio)}</p>
+      </div>
+      <div class="sx-room-player">
+        <button type="button" data-room-play aria-label="Play ${roomGroove}"><span aria-hidden="true">▶</span></button>
+        <div class="sx-room-track"><b>${roomGroove}</b><small data-room-audio-status>Island groove · 15 sec loop</small></div>
+        <div class="sx-room-wave" aria-hidden="true">${roomWave.map(peak=>`<i style="--peak:${peak}%"></i>`).join('')}</div>
+      </div>
+      <div class="sx-room-vibes" role="group" aria-label="Room colour">
+        ${roomVibes.map(([id,label])=>`<button type="button" data-room-vibe="${id}" aria-pressed="${id===vibe.id}">${label}</button>`).join('')}
+      </div>
+      <div class="sx-room-tabs" role="tablist" aria-label="Explore Sema’s space">
+        <button type="button" id="sx-room-talk-tab" role="tab" aria-selected="true" aria-controls="sx-room-talk">Talanoa</button>
+        <button type="button" id="sx-room-mates-tab" role="tab" aria-selected="false" aria-controls="sx-room-mates" tabindex="-1">Tanoa 8</button>
+      </div>
+      <section class="sx-room-notes" id="sx-room-talk" role="tabpanel" aria-labelledby="sx-room-talk-tab">
+        ${notes.map(([name,body,age])=>`<article class="sx-room-note">${guestPortrait(name.toLowerCase(),38)}
+          <div><b>${name}</b> <time data-room-age="${age}">${age}m ago</time><p>${body}</p></div>
+          <button type="button" class="sx-room-uro" data-room-note="${name}" aria-label="Uro for ${name}’s note" aria-pressed="${roomReactions.has(name)}"><span aria-hidden="true">${roomReactions.has(name)?'♥':'♡'}</span> Uro</button></article>`).join('')}
+      </section>
+      <section class="sx-room-mates" id="sx-room-mates" role="tabpanel" aria-labelledby="sx-room-mates-tab" tabindex="0" hidden>
+        <ul aria-label="Sema’s eight top mates">${roomMates.map(name=>`<li>${guestPortrait(name.toLowerCase(),68)}<span>${name}</span></li>`).join('')}</ul>
+      </section>
+    </div>`;
+  }
+  function wireGuestRoom(host) {
+    const room = host.querySelector('.sx-living-room');
+    const play = room.querySelector('[data-room-play]');
+    const audio = document.createElement('audio');
+    audio.dataset.sotaPlaybackSource = 'guest-room';
+    audio.preload = 'none';
+    audio.loop = true;
+    room.querySelector('.sx-room-player').append(audio);
+    const status = room.querySelector('[data-room-audio-status]');
+    const presence = room.querySelector('.sx-room-presence');
+    const wave = Array.from(room.querySelectorAll('.sx-room-wave i'));
+    const vibes = Array.from(room.querySelectorAll('[data-room-vibe]'));
+    const tabs = Array.from(room.querySelectorAll('[role="tab"]'));
+    if(!roomOpenedAt)roomOpenedAt = Date.now();
+    const notes = Array.from(room.querySelectorAll('[data-room-age]'), time=>{
+      const stamp = roomOpenedAt - Number(time.dataset.roomAge)*60000;
+      time.dateTime = new Date(stamp).toISOString();
+      return {time,stamp};
+    });
+    let frame = 0, previousPosition = -1;
+    function refreshTimes() {
+      const now = Date.now();
+      for(const {time,stamp} of notes) {
+        const minutes = Math.floor((now-stamp)/60000);
+        time.textContent = minutes < 60 ? `${minutes}m ago` : `${Math.floor(minutes/60)}h ago`;
+      }
+    }
+    refreshTimes();
+    const timer = setInterval(refreshTimes,60000);
+    function selectTab(tab, focus=false) {
+      roomTab = tab.id;
+      for(const candidate of tabs) {
+        const selected = candidate===tab;
+        candidate.setAttribute('aria-selected',String(selected));
+        candidate.tabIndex = selected ? 0 : -1;
+        room.querySelector('#'+candidate.getAttribute('aria-controls')).hidden = !selected;
+      }
+      if(focus)tab.focus();
+    }
+    if(roomTab)selectTab(tabs.find(tab=>tab.id===roomTab));
+    room.addEventListener('click',event=>{
+      const button = event.target.closest('button');
+      if(!button)return;
+      if(vibes.includes(button)) {
+        roomVibe = button.dataset.roomVibe;
+        room.style.cssText = skins.inline({id:roomVibe});
+        for(const vibe of vibes)vibe.setAttribute('aria-pressed',String(vibe===button));
+      }
+      if(tabs.includes(button))selectTab(button);
+      if(button.classList.contains('sx-room-uro')) {
+        const on = button.getAttribute('aria-pressed')!=='true';
+        if(on)roomReactions.add(button.dataset.roomNote);
+        else roomReactions.delete(button.dataset.roomNote);
+        button.setAttribute('aria-pressed',String(on));
+        button.firstElementChild.textContent = on ? '♥' : '♡';
+        if(on&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches)navigator.vibrate?.(18);
+      }
+    });
+    room.querySelector('[role="tablist"]').addEventListener('keydown',event=>{
+      const index = tabs.indexOf(event.target);
+      const offset = {ArrowLeft:-1,ArrowRight:1}[event.key];
+      if(index<0||(!offset&&event.key!=='Home'&&event.key!=='End'))return;
+      event.preventDefault();
+      selectTab(tabs[event.key==='Home'?0:event.key==='End'?tabs.length-1:(index+offset+tabs.length)%tabs.length],true);
+    });
+    function drawPlayhead() {
+      const position = audio.duration ? Math.floor(audio.currentTime/audio.duration*wave.length) : 0;
+      if(position!==previousPosition) {
+        wave.forEach((bar,index)=>bar.classList.toggle('is-heard',index<=position));
+        previousPosition = position;
+      }
+      frame = requestAnimationFrame(drawPlayhead);
+    }
+    function playing(on) {
+      cancelAnimationFrame(frame);
+      room.classList.toggle('is-listening',on);
+      play.firstElementChild.textContent = on ? 'Ⅱ' : '▶';
+      play.setAttribute('aria-label',`${on?'Pause':'Play'} ${roomGroove}`);
+      presence.textContent = on ? `Listening to ${roomGroove}` : 'Suva';
+      status.textContent = 'Island groove · 15 sec loop';
+      if(on)frame = requestAnimationFrame(drawPlayhead);
+    }
+    play.addEventListener('click',()=>{
+      if(!audio.paused) {audio.pause();return;}
+      if(!audio.getAttribute('src'))audio.src = '/assets/sema-room/sunset-on-the-veranda.mp3';
+      audio.play().catch(()=>{
+        if(!room.isConnected||!audio.paused)return;
+        playing(false);
+        status.textContent = 'Couldn’t play · tap to retry';
+        if(audio.error)audio.removeAttribute('src');
+      });
+    });
+    audio.addEventListener('playing',()=>playing(true));
+    audio.addEventListener('pause',()=>playing(false));
+    return ()=>{
+      clearInterval(timer);
+      audio.pause();
+      cancelAnimationFrame(frame);
+    };
+  }
   async function shareApp(copyOnly=false) {
     const url='https://sotakece.com/';
     if(!copyOnly&&typeof window==='object'&&window.SotaShare){const kind=await window.SotaShare.share({title:'Sota Kece',text:'Join me on Sota Kece for friends, music and talanoa.',url});return {kind,message:kind==='cancelled'?'Sharing cancelled.':kind==='shared'?'Sharing options opened.':'Choose how to send your invitation.'};}
@@ -412,8 +536,8 @@
     wireInvite($('#sk-share-app'),$('#sk-share-status'),{input:$('#sk-invite-url')});
     wireInvite($('#sk-copy-invite'),$('#sk-share-status'),{copyOnly:true,input:$('#sk-invite-url')});
     showWelcome(picked(),homeSkinChosen);
-    window.SotaExperience?.mountGuest(app,{roomMarkup:holdRoomMedia(preview(example,picked()))});
-    app.classList.remove('sk-handover');releaseRoomMedia(app);
+    window.SotaExperience?.mountGuest(app,{roomMarkup:guestRoom(),mountRoom:wireGuestRoom});
+    app.classList.remove('sk-handover');
     wireMedia(app.querySelector('.sx-room-example')||app);
     if(expanded){account.showModal();$(mode==='up'?'#a-handle':'#a-email').focus();}
   };
