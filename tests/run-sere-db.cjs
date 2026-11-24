@@ -66,7 +66,7 @@ INSERT INTO auth.users VALUES ('11111111-1111-1111-1111-111111111111','ana@x'),(
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261110010000_sota_account_delete_sota_only.sql'),'utf8'));
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261109220000_sota_sere_engines.sql'),'utf8'));
   const results=await db.exec(fs.readFileSync(path.join(root,'tests/sere-db.sql'),'utf8'));
-  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261124100000_sota_sere_visibility_and_prefs.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261124085352_sota_sere_visibility_and_prefs.sql'),'utf8'));
   const vis=await db.exec(fs.readFileSync(path.join(root,'tests/sere-visibility-db.sql'),'utf8'));
   const visChecks=vis.flatMap(r=>r.rows||[]).flatMap(row=>Object.values(row)).filter(v=>typeof v==='string'&&v.startsWith('PASS '));
   for(const check of visChecks)process.stdout.write(check+'\n');
