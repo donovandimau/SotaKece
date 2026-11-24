@@ -168,7 +168,7 @@ check('core markup keeps a main landmark, native social controls, named inputs a
   const circleName=/<input\b[^>]*\bid="([^"]+)"[^>]*\bdata-tc-name\b/.exec(circleForm);assert(circleName,'Named native circle input is rendered');
   assert(circleForm.includes('<label for="'+circleName[1]+'">Circle name</label>'));
   for(const field of ['type','visibility']){const select=new RegExp('<select\\b[^>]*\\bid="([^"]+)"[^>]*\\bdata-tc-'+field+'\\b').exec(circleForm);assert(select,'Native '+field+' select is rendered');assert(circleForm.includes('<label for="'+select[1]+'">'));}
-  for(const id of ['f-handle','f-name','f-year'])assert.match(html,new RegExp('<label for="'+id+'">'));
+  for(const id of ['f-handle','f-name'])assert.match(html,new RegExp('<label for="'+id+'">'));
   assert.match(html,/id="a-err" role="alert"/);assert.match(html,/id="f-err" role="alert"/);assert.match(html,/id="cm-error" role="alert"/);
   const ctx=harness({document:{documentElement:{style:{setProperty(){}}}},window:{BulaSkinStudio:{apply(){}}},sb:{rpc:async()=>({data:{found:true,visible:true,is_me:true,profile:{handle:'sina'},top:[{slot:1,handle:'mate',avatar_emoji:'🌺'}]},error:null})}});
   load(ctx,'async function viewRoom()','// Every view owns its pending reads');await ctx.viewRoom();

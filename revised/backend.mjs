@@ -27,5 +27,5 @@ export class Service{
  joinCircle(code){return this.guarded(owner=>result(this.sb.rpc('bv_join_circle',{p_code:code,p_show_on_graph:false,p_expected_owner:owner})));}
  saveProfile(p){return this.guarded(owner=>result(this.sb.from('bv_profiles').update({display_name:p.name,bio:p.bio,avatar_emoji:p.emoji}).eq('id',owner)));}
  async room(handle){return this.guarded(()=>result(this.sb.rpc('bv_room',{p_handle:handle})));}
- setup(p){return this.guarded(async owner=>{const free=await result(this.sb.rpc('bv_handle_free',{p_handle:p.handle}));if(!free)throw Error('That handle is taken. Try another one.');return result(this.sb.from('bv_profiles').insert({id:owner,handle:p.handle,display_name:p.name,avatar_emoji:'☀️',age_band:p.ageBand}));});}
+ setup(p){return this.guarded(async owner=>{const free=await result(this.sb.rpc('bv_handle_free',{p_handle:p.handle}));if(!free)throw Error('That handle is taken. Try another one.');return result(this.sb.from('bv_profiles').insert({id:owner,handle:p.handle,display_name:p.name,avatar_emoji:'☀️'}));});}
 }

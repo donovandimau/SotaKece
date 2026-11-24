@@ -10,7 +10,7 @@
   var REASONS = [
     ['spam', 'Spam or fake account'], ['scam', 'Scam or money trick'], ['bullying', 'Bullying or harassment'],
     ['hate', 'Hate against a group'], ['violence', 'Violence or threats'], ['sexual', 'Sexual content'],
-    ['underage', 'Someone under 16'], ['other', 'Something else']
+    ['other', 'Something else']
   ];
   var blocked = new Set(), loaded = false, sheet = null, lastFocus = null;
 

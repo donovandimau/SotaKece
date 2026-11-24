@@ -1,3 +1,9 @@
+## 2026-11-24 — No age question at sign-up
+
+- Claude (Donovan: "get rid of the age fill information or any fill in information, until users actually want"). Sign-up and "Make my room" (`index.html`) and the Revised preview (`revised/app.mjs`, `revised/backend.mjs`) no longer ask for birth year or age group, and nothing about age is sent. A plain line says Sota Kece is for people aged 16 and over. New profiles get `age_band = 'unconfirmed'` from the database default (checked live: column default and the insert trigger both cover it). Display name, handle, email and password are still asked because the account needs them. 
+- Donovan's decision (24 Nov): no age line either. This is a Fijian social group; children should be able to talk with grandparents and family, and call services do not ask for details first. Removed the "16 and over" line from sign-up, "Make my room", the Revised preview and the communications page; `privacy.html` Children section now says Sota Kece does not ask for your age and families can use it together; the "Someone under 16" report choice is gone from `sota-safety.js` (the database still accepts the old reason). Release v220-no-age-line.
+- Checks: node --test tests/*.test.cjs 473 pass (1 needs PGlite, passes with it).
+
 ## 2026-11-24 — Trust fixes part 2: private seres, saved design, calls inside Koro, captions both ways, welcome Koro
 
 - Claude (Donovan: "do it all"). Code only; **the migration was applied live on 24 Nov on Donovan's "apply the migration" / "retry the migration"** (version 20261124085352, project dimau-core-ireland). Checked live afterwards: visibility column present (existing sere kept 'wall', new default 'private'), member_prefs has row security and no table grants, the three new functions run only for signed-in members.
@@ -9,7 +15,7 @@
 - Calls: "Tell them on WhatsApp" button; honest note that phones sleep pages. No Koro: the empty state offers the open starter Koro (`bv_hubs`/`bv_hub_join`).
 - Sign-in return now runs for every sign-in path (moved earlier in `index.html`).
 - Review fixes (same PR): a failed wall choice now says so and leaves the sere private (only a missing function falls back to the old auto-post); old public links to a sere stop working once it is private (`api/listen.js`); a stale design on a new device no longer overwrites the account's saved design (the local copy is kept as `sota-page-design-backup:<id>`). Tests: `tests/trust-fixes.test.cjs`.
-- Known limit: the sere video files sit in the public `sere-video` bucket, so anyone who already has a video's direct address (user id and sere id in the path) can still load it after the maker makes the sere private. The wall post, the wall feed, the sere row and the share page are all closed off. Closing the files too means a private bucket with signed addresses; needs Donovan's decision.
+- Known limit: the sere video files sit in the public `sere-video` bucket, so anyone who already has a video's direct address (user id and sere id in the path) can still load it after the maker makes the sere private. The wall post, the wall feed, the sere row and the share page are all closed off. Closing the files too would mean a private bucket with signed addresses. Donovan decided on 24 Nov to leave it as is.
 - Not done: **Web Push for calls** (needs a VAPID key pair set as Worker secrets, a subscription table and a sender; nothing is half-built) and a **Friends-only** choice for seres (needs the wall's read rules and `bv_talanoa_feed` changed).
 - Checks: `node --test tests/*.test.cjs` all pass with PGlite available; release v216-trust-fixes.
 
