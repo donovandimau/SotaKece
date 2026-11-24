@@ -13,10 +13,13 @@ test('a private sere has no public page, and the old query is used before the vi
   assert.ok(wall && wall.job.id === 'id1');
   urls.length = 0;
   let calls = 0;
-  const old = async url => { urls.push(url); calls++; return calls === 1 ? { ok: false, json: async () => ({}) } : { ok: true, json: async () => [{ id: 'id1', user_id: 'u', output_video_url: video }] }; };
+  const old = async url => { urls.push(url); calls++; return calls === 1 ? { ok: false, status: 400, json: async () => ({}) } : { ok: true, json: async () => [{ id: 'id1', user_id: 'u', output_video_url: video }] }; };
   const before = await listen.readSere(env, 'id1', old);
   assert.ok(before && before.job.id === 'id1');
   assert.ok(urls[0].includes(',visibility') && !urls[1].includes('visibility'));
+  // a temporary database error must never fall back to serving a sere that may be private
+  const down = async () => ({ ok: false, status: 503, json: async () => ({}) });
+  await assert.rejects(() => listen.readSere(env, 'id1', down), /db/);
 });
 
 function fakeStorage(init = {}) {

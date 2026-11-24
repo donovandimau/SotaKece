@@ -9,6 +9,7 @@
 - Calls: "Tell them on WhatsApp" button; honest note that phones sleep pages. No Koro: the empty state offers the open starter Koro (`bv_hubs`/`bv_hub_join`).
 - Sign-in return now runs for every sign-in path (moved earlier in `index.html`).
 - Review fixes (same PR): a failed wall choice now says so and leaves the sere private (only a missing function falls back to the old auto-post); old public links to a sere stop working once it is private (`api/listen.js`); a stale design on a new device no longer overwrites the account's saved design (the local copy is kept as `sota-page-design-backup:<id>`). Tests: `tests/trust-fixes.test.cjs`.
+- Known limit: the sere video files sit in the public `sere-video` bucket, so anyone who already has a video's direct address (user id and sere id in the path) can still load it after the maker makes the sere private. The wall post, the wall feed, the sere row and the share page are all closed off. Closing the files too means a private bucket with signed addresses; needs Donovan's decision.
 - Not done: **Web Push for calls** (needs a VAPID key pair set as Worker secrets, a subscription table and a sender; nothing is half-built) and a **Friends-only** choice for seres (needs the wall's read rules and `bv_talanoa_feed` changed).
 - Checks: `node --test tests/*.test.cjs` all pass with PGlite available; release v216-trust-fixes.
 

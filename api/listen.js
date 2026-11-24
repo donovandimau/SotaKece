@@ -98,7 +98,7 @@ async function readSere(env,id,fetcher){
   // A sere its maker took off the wall is private, so its old links stop working. Before the visibility column
   // exists the first query is refused and the old query is used.
   let r=await fetcher(base+',visibility',{headers,signal:AbortSignal.timeout(5000)});
-  if(!r.ok)r=await fetcher(base,{headers,signal:AbortSignal.timeout(5000)});
+  if(!r.ok&&r.status===400)r=await fetcher(base,{headers,signal:AbortSignal.timeout(5000)});   // 400 = no such column yet; any other error must not serve a sere
   if(!r.ok)throw Error('db');
   const job=(await r.json())[0];
   if(!job||job.visibility==='private'||!ourVideo(job.output_video_url))return null;
