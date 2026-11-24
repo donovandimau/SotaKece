@@ -212,6 +212,18 @@
         restarts: 0, exhausted: false, closed: false, counters: null
       };
       peers.set(id, peer);
+      // Captions travel to the other members over the call's own peer connection (never through the server).
+      // A negotiated channel needs no extra signalling: both sides open id 1.
+      if (typeof pc.createDataChannel === 'function') {
+        try {
+          peer.captions = pc.createDataChannel('captions', { negotiated: true, id: 1, ordered: true });
+          peer.captions.onmessage = function (event) {
+            if (!active(peer)) return;
+            var message; try { message = JSON.parse(event.data); } catch (_) { return; }
+            if (message && message.t === 'cap' && typeof message.text === 'string') callback('onCaption', [id, message.text.slice(0, 500), Boolean(message.final)]);
+          };
+        } catch (_) { peer.captions = null; }
+      }
       pc.onnegotiationneeded = function () { enqueue(peer, 'negotiate', function () { return negotiate(peer, false); }).catch(function () {}); };
       pc.onicecandidate = function (event) {
         if (!active(peer)) return;
@@ -329,6 +341,7 @@
       peer.trackHandlers.forEach(function (entry) { entry.track.removeEventListener('ended', entry.listener); });
       peer.remoteTracks.forEach(function (track) { if (!Object.values(currentTracks).includes(track)) track.stop(); });
       peer.remoteTracks.clear();
+      if (peer.captions) { try { peer.captions.onmessage = null; peer.captions.close(); } catch (_) {} peer.captions = null; }
       peer.pc.close();
       callback('onPeerState', [id, 'closed', { restarts: peer.restarts }]);
       updateAllQuality();
@@ -422,6 +435,10 @@
       setAudioEnabled: function (value) { return setEnabled('audio', value); },
       setVideoEnabled: function (value) { return setEnabled('video', value); },
       setLowDataMode: function (value) { lowData = Boolean(value); updateAllQuality(); return lowData; },
+      sendCaption: function (text, final) {
+        var message = JSON.stringify({ t: 'cap', text: String(text || '').slice(0, 500), final: Boolean(final) });
+        peers.forEach(function (peer) { var channel = peer.captions; if (channel && channel.readyState === 'open') { try { channel.send(message); } catch (_) {} } });
+      },
       removePeer: removePeer, getStats: getStats, updateIceServers: updateIceServers,
       close: function () {
         if (closed) return;
