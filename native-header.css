@@ -1,4 +1,5 @@
 @layer dimau-header-standard {
+  body.sx-guest #app.sx-app:has(> .sx-guest-bar) {padding-top:0!important}
   body.sx-enabled #app.sx-app {padding-top:65px!important}
   body.sx-enabled #app.sx-app > header[data-dimau-header] {position:fixed!important;left:0!important;right:0!important;top:0!important;transform:none!important;--dimau-header-bg:#f7f6ef;--dimau-header-ink:#173e38;--dimau-header-line:#d5dfd7;--dimau-header-accent:#287c70}
   body.sx-enabled #app.sx-app .sx-rail {top:73px!important;height:calc(100dvh - 73px)!important}

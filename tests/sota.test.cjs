@@ -43,7 +43,12 @@ vm.runInContext(html.slice(html.indexOf('function mediaMarkup'),html.indexOf('fu
 assert(context.wallMarkup('[sota-meme]'+JSON.stringify({note:'<script>oops</script>',url:'https://example.com/meme.jpg'})).includes('&lt;script&gt;'));
 assert(!context.mediaMarkup('javascript:alert(1)').includes('button'));
 assert(!context.mediaMarkup('https://example.com/meme.jpg').includes('<img'));
-assert(!source('skin-studio.js').includes('<audio')); // No audio request before a tap.
+// Only the guest demo gets a player. Keep it idle until the visitor chooses play.
+const roomAudio = source('skin-studio.js').match(/<audio\b[^>]*>/g) || [];
+assert.equal(roomAudio.length, 1);
+assert.match(roomAudio[0], /controls preload="none"/);
+assert.match(roomAudio[0], /src="\/assets\/kocokoco-room-preview\.mp3"/);
+assert(!roomAudio[0].includes('autoplay'));
 async function pin(rows,readError=null){
   const inserts=[],messages=[];context.toast=m=>messages.push(m);
   context.sb={from:()=>({select:()=>({eq:async()=>({data:rows,error:readError})}),insert:async value=>{inserts.push(value);return {error:null};}})};
