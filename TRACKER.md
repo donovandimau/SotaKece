@@ -1,3 +1,9 @@
+## 2026-11-24 — No age question at sign-up
+
+- Claude (Donovan: "get rid of the age fill information or any fill in information, until users actually want"). Sign-up and "Make my room" (`index.html`) and the Revised preview (`revised/app.mjs`, `revised/backend.mjs`) no longer ask for birth year or age group, and nothing about age is sent. A plain line says Sota Kece is for people aged 16 and over. New profiles get `age_band = 'unconfirmed'` from the database default (checked live: column default and the insert trigger both cover it). Display name, handle, email and password are still asked because the account needs them. Release v218-no-age-field.
+- Decision for Donovan: with no age question the 16+ rule rests on that line and the terms only; nothing stops a younger person signing up. Say if you want a one-tap "I am 16 or over" box instead.
+- Checks: node --test tests/*.test.cjs 473 pass (1 needs PGlite, passes with it).
+
 ## 2026-11-24 — Trust fixes part 2: private seres, saved design, calls inside Koro, captions both ways, welcome Koro
 
 - Claude (Donovan: "do it all"). Code only; **the migration was applied live on 24 Nov on Donovan's "apply the migration" / "retry the migration"** (version 20261124085352, project dimau-core-ireland). Checked live afterwards: visibility column present (existing sere kept 'wall', new default 'private'), member_prefs has row security and no table grants, the three new functions run only for signed-in members.

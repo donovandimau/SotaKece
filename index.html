@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261124-v217-trust-fixes">
+<meta name="sota-release" content="sota-kece-shell-20261124-v218-no-age-field">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -446,8 +446,7 @@ function renderAuth(mode="in"){
       <div><label>Display name</label><input id="a-name" placeholder="Sina" maxlength="40"></div>`:''}
       <div><label for="a-email">Email</label><input id="a-email" type="email" placeholder="you@email.com" autocapitalize="off"></div>
       <div><label for="a-pass">Password</label><input id="a-pass" type="password" placeholder="At least 6 characters"></div>
-      ${mode==='up'?`<div><label>Year you were born</label><input id="a-year" type="number" inputmode="numeric" placeholder="e.g. 2004" min="1900" max="${new Date().getFullYear()}">
-        <div class="sub" style="margin-top:5px">Sota Kece is 16+. We ask once, store only an age band, and never a document.</div></div>`:''}
+      ${mode==='up'?`<div class="sub">Sota Kece is for people aged 16 and over. We do not ask for your age or any other detail you do not need.</div>`:''}
       <button class="btn" id="a-go">${mode==='up'?'Create my room':'Sign in'}</button>
       <div class="sub" id="a-err" role="alert" style="color:var(--coral);text-align:center"></div>
     </div>
@@ -476,12 +475,6 @@ async function signIn(){
   if(error){ $("#a-err").textContent=error.message; b.disabled=false; window.SKFunnel("signup_error",{provider:"email",step:"signin"}); }
   else { window.SKFunnel("signup_signed_in",{provider:"email",new_account:0}); boot(); }
 }
-/* Age is worked out against TODAY. It used to be measured against a 2026
-   written into the code, so from 1 January the sum was a year out and the
-   gate started turning away people who really were 16. We also keep the age
-   BAND only and never the birth year, which is what the form promises. */
-const bandFor = y => (new Date().getFullYear() - y) >= 18 ? "adult" : "teen";
-const oldEnough = y => { const a = new Date().getFullYear() - y; return a >= 16 && a < 120; };
 /* Supabase turns down passwords that appear in public data leaks (Donovan keeps this check on,
    19 Nov 2026) and passwords under 6 characters. Its own wording ("Password is known to be weak
    and easy to guess") left one visitor retrying the same sign-up 11 times on 21 Nov, so say
@@ -494,10 +487,9 @@ function passwordAdvice(error){
 }
 async function signUp(){
   const b=$("#a-go"); b.disabled=true; const err=$("#a-err"); err.textContent="";
-  const handle=$("#a-handle").value.trim().toLowerCase(), name=$("#a-name").value.trim(), year=parseInt($("#a-year").value);
+  const handle=$("#a-handle").value.trim().toLowerCase(), name=$("#a-name").value.trim();
   if(!/^[a-z0-9_]{3,20}$/.test(handle)){ err.textContent="Handle: 3–20 lowercase letters, numbers or _"; b.disabled=false; return; }
   if(!name){ err.textContent="Pick a display name."; b.disabled=false; return; }
-  if(!oldEnough(year)){ err.textContent="Sota Kece is for 16 and over."; b.disabled=false; return; }
   const {data:free, error:he} = await sb.rpc("bv_handle_free",{p_handle:handle});
   if(!he && free===false){ err.textContent="That handle is taken."; b.disabled=false; return; }
   window.SKFunnel("signup_provider",{provider:"email",mode:"up"});
@@ -507,13 +499,12 @@ async function signUp(){
     if(tip){ const p=$("#a-pass"); p.value=""; p.focus(); }
     window.SKFunnel("signup_error",{provider:"email",step:tip?"weak_password":"signup"}); return; }
   window.SKFunnel("signup_account_created",{provider:"email",confirm_email:data.session?0:1});
-  const band = bandFor(year);
   if(!data.session){
-    try{ localStorage.setItem("bv_pending", JSON.stringify({handle,name,band})); }catch(_){}
+    try{ localStorage.setItem("bv_pending", JSON.stringify({handle,name})); }catch(_){}
     err.textContent="Check your email to confirm, then sign in — your handle is saved.";
     b.disabled=false; return;
   }
-  const {error:pe} = await sb.from("bv_profiles").insert({id:data.user.id,handle,display_name:name,age_band:band,...initialSkin()});
+  const {error:pe} = await sb.from("bv_profiles").insert({id:data.user.id,handle,display_name:name,...initialSkin()});
   if(pe){ err.textContent=pe.message; b.disabled=false; return; }
   window.SKTrack("signup",{kind:"email"});window.SKEvent("lead",{kind:"signup"});window.SKFunnel("signup_space_setup",{via:"email"},true);
   await claimReferral();
@@ -1285,7 +1276,7 @@ function finishRoom(){
       <div><label for="f-handle">Your handle</label><input id="f-handle" value="${esc(pre.handle||'')}" placeholder="bula_sina" maxlength="20" autocapitalize="off">
         <div class="sub" style="margin-top:5px">Lowercase letters, numbers and underscores.</div></div>
       <div><label for="f-name">Display name</label><input id="f-name" value="${esc(pre.name||S.user?.user_metadata?.full_name||S.user?.user_metadata?.name||'')}" placeholder="Sina" maxlength="40"></div>
-      <div><label for="f-year">Year you were born</label><input id="f-year" type="number" inputmode="numeric" placeholder="e.g. 2004" min="1900" max="${new Date().getFullYear()}"></div>
+      <div class="sub">Sota Kece is for people aged 16 and over. We do not ask for your age.</div>
       <button class="btn" id="f-go">Make my room</button>
       <div class="sub" id="f-err" role="alert" style="color:var(--coral);text-align:center"></div>
       <button class="btn ghost" onclick="sb.auth.signOut().then(()=>location.reload())">Sign out instead</button>
@@ -1293,14 +1284,13 @@ function finishRoom(){
   </div>`;
   $("#f-go").onclick = async () => {
     const b=$("#f-go"), err=$("#f-err"); b.disabled=true; err.textContent="";
-    const handle=$("#f-handle").value.trim().toLowerCase(), name=$("#f-name").value.trim(), year=parseInt($("#f-year").value);
+    const handle=$("#f-handle").value.trim().toLowerCase(), name=$("#f-name").value.trim();
     if(!/^[a-z0-9_]{3,20}$/.test(handle)){ err.textContent="Handle: 3-20 lowercase letters, numbers or _"; b.disabled=false; return; }
     if(!name){ err.textContent="Pick a display name."; b.disabled=false; return; }
-    if(!oldEnough(year)){ err.textContent="Sota Kece is for 16 and over."; b.disabled=false; return; }
-    const {data:free}=await sb.rpc("bv_handle_free",{p_handle:handle});
+      const {data:free}=await sb.rpc("bv_handle_free",{p_handle:handle});
     if(free===false){ err.textContent="That handle is taken."; b.disabled=false; return; }
     const {error}=await sb.from("bv_profiles").insert({id:S.user.id,handle,display_name:name,
-      age_band:bandFor(year),...initialSkin()});
+      ...initialSkin()});
     if(error){ err.textContent=error.message; b.disabled=false; return; }
     try{ localStorage.removeItem("bv_pending"); localStorage.setItem("sk-tour-pending","1"); }catch(_){}
     window.SKTrack("signup",{kind:"room"});window.SKEvent("lead",{kind:"signup"});window.SKFunnel("signup_space_setup",{via:"room"},true);
