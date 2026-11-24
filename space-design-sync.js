@@ -26,6 +26,9 @@
     var res = await client.rpc('bv_prefs_get'); if (res.error) return;
     var server = res.data && res.data.page_design, serverJson = valid(server) ? JSON.stringify(server) : '';
     if (id !== uid) return;
+    // First time this device meets this account's saved design: the account wins, so a stale local copy cannot
+    // overwrite it. The local copy is kept aside rather than thrown away.
+    if (serverJson && localJson && last === null && localJson !== serverJson) { try { st.setItem('sota-page-design-backup:' + encodeURIComponent(String(id).slice(0, 180)), localJson); } catch (_) {} local = null; localJson = ''; }
     if (localJson && localJson !== last && localJson !== serverJson) { await push(); return; }      // changed here: send it
     if (serverJson && serverJson !== localJson) {                                                    // changed elsewhere: take it
       var cur; try { cur = JSON.parse(st.getItem(key(id)) || 'null'); } catch (_) { cur = null; }

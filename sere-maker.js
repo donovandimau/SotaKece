@@ -40,6 +40,7 @@
     for (var k in SAY) if (m.indexOf(k) !== -1) return SAY[k];
     return fallback || 'That did not go through. Try again in a moment.';
   }
+  function visibilityMissing(e) { var t = String(e && (e.code || '') + ' ' + (e && e.message || '')); return /PGRST202|42883|Could not find the function|does not exist/i.test(t); }
   async function rpc(name, args) { var r = await client.rpc(name, args || {}); if (r.error) throw r.error; return r.data; }
   function $(sel, el) { return (el || document).querySelector(sel); }
   function fmt(ms) { var s = Math.round(ms / 1000); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
@@ -192,9 +193,13 @@
       }
       st.id = row.id; localStorage.setItem('sere:job', row.id);
       // New seres start private; choosing the wall is set before the render can finish. If the database does not
-      // know about visibility yet, the sere keeps the old behaviour and posts itself.
-      if (st.visibility === 'wall') { try { await rpc('bv_sere_set_visibility', { p_id: row.id, p_visibility: 'wall' }); } catch (_) {} }
-      else { try { await rpc('bv_sere_set_visibility', { p_id: row.id, p_visibility: 'private' }); } catch (_) { st.visibility = 'wall'; } }
+      // have visibility yet (the function is missing), the sere keeps the old behaviour and posts itself, so the
+      // screen says so. Any other failure leaves it private and says so; "Post to the wall" is still offered.
+      try { await rpc('bv_sere_set_visibility', { p_id: row.id, p_visibility: st.visibility }); }
+      catch (e) {
+        if (visibilityMissing(e)) st.visibility = 'wall';
+        else { if (st.visibility === 'wall') toast('Could not set it for the wall, so it stays private. You can post it when it is ready.'); st.visibility = 'private'; }
+      }
       if (window.SKTrack) window.SKTrack('first_action', { kind: 'sere' }, 'sk-first-action');
       var pi = 0, pa = cut ? 0 : 1, tick = function () { st.pct = Math.round((pi * 0.3 + pa * 0.7) * 100); paintProgress(); };
       await Promise.all([

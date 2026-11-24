@@ -8,6 +8,7 @@
 - Captions: each member's words are sent over the call's own peer connection (negotiated data channel, `native-call-media.js` `sendCaption`/`onCaption`) so everyone sees everyone; test added.
 - Calls: "Tell them on WhatsApp" button; honest note that phones sleep pages. No Koro: the empty state offers the open starter Koro (`bv_hubs`/`bv_hub_join`).
 - Sign-in return now runs for every sign-in path (moved earlier in `index.html`).
+- Review fixes (same PR): a failed wall choice now says so and leaves the sere private (only a missing function falls back to the old auto-post); old public links to a sere stop working once it is private (`api/listen.js`); a stale design on a new device no longer overwrites the account's saved design (the local copy is kept as `sota-page-design-backup:<id>`). Tests: `tests/trust-fixes.test.cjs`.
 - Not done: **Web Push for calls** (needs a VAPID key pair set as Worker secrets, a subscription table and a sender; nothing is half-built) and a **Friends-only** choice for seres (needs the wall's read rules and `bv_talanoa_feed` changed).
 - Checks: `node --test tests/*.test.cjs` all pass with PGlite available; release v216-trust-fixes.
 

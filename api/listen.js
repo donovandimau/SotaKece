@@ -94,10 +94,14 @@ function gone(what){
 
 async function readSere(env,id,fetcher){
   const headers=svcHeaders(env);
-  const r=await fetcher(`${SERVICE_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&status=eq.completed&select=id,user_id,caption,output_video_url,output_poster_url`,{headers,signal:AbortSignal.timeout(5000)});
+  const base=`${SERVICE_URL}/rest/v1/bv_sere_media_generations?id=eq.${id}&status=eq.completed&select=id,user_id,caption,output_video_url,output_poster_url`;
+  // A sere its maker took off the wall is private, so its old links stop working. Before the visibility column
+  // exists the first query is refused and the old query is used.
+  let r=await fetcher(base+',visibility',{headers,signal:AbortSignal.timeout(5000)});
+  if(!r.ok)r=await fetcher(base,{headers,signal:AbortSignal.timeout(5000)});
   if(!r.ok)throw Error('db');
   const job=(await r.json())[0];
-  if(!job||!ourVideo(job.output_video_url))return null;
+  if(!job||job.visibility==='private'||!ourVideo(job.output_video_url))return null;
   let name='';
   try{
     const p=await fetcher(`${SERVICE_URL}/rest/v1/bv_profiles?id=eq.${job.user_id}&select=display_name,handle`,{headers,signal:AbortSignal.timeout(4000)});
