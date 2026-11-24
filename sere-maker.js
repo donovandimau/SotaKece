@@ -33,7 +33,7 @@
 
   function fresh() {
     return { open: false, step: 'pick', mode: 'sing', image: null, imageMeta: null, audio: null, audioMeta: null, startMs: 0, scene: 'none',
-             engine: 'quick', text: '', voice: 'bella', caption: '', remixOf: null, id: null, pct: 0, status: null, error: null, channel: null, scenes: null, mine: [] };
+             engine: 'quick', text: '', voice: 'bella', caption: '', visibility: 'private', remixOf: null, id: null, pct: 0, status: null, error: null, channel: null, scenes: null, mine: [] };
   }
   function say(err, fallback) {
     var m = (err && err.message) || String(err || '');
@@ -191,6 +191,10 @@
         });
       }
       st.id = row.id; localStorage.setItem('sere:job', row.id);
+      // New seres start private; choosing the wall is set before the render can finish. If the database does not
+      // know about visibility yet, the sere keeps the old behaviour and posts itself.
+      if (st.visibility === 'wall') { try { await rpc('bv_sere_set_visibility', { p_id: row.id, p_visibility: 'wall' }); } catch (_) {} }
+      else { try { await rpc('bv_sere_set_visibility', { p_id: row.id, p_visibility: 'private' }); } catch (_) { st.visibility = 'wall'; } }
       if (window.SKTrack) window.SKTrack('first_action', { kind: 'sere' }, 'sk-first-action');
       var pi = 0, pa = cut ? 0 : 1, tick = function () { st.pct = Math.round((pi * 0.3 + pa * 0.7) * 100); paintProgress(); };
       await Promise.all([
@@ -220,8 +224,9 @@
   }
   function onUpdate(row) {
     if (!row || row.id !== st.id) return;
+    if (row.visibility) st.visibility = row.visibility === 'wall' ? 'wall' : 'private';
     st.status = row.status; st.pct = Number(row.progress) || st.pct;
-    if (row.status === 'completed') { localStorage.removeItem('sere:job'); st.step = 'done'; st.video = row.output_video_url; st.poster = row.output_poster_url; unsubscribe(); paint(); toast('Your sere is on the wall.'); }
+    if (row.status === 'completed') { localStorage.removeItem('sere:job'); st.step = 'done'; st.video = row.output_video_url; st.poster = row.output_poster_url; unsubscribe(); paint(); toast(st.visibility === 'wall' ? 'Your sere is on the wall.' : 'Your sere is ready. Only you can see it.'); }
     else if (row.status === 'failed') { localStorage.removeItem('sere:job'); st.step = 'pick'; st.error = row.error || 'The render failed. Try another photo or sound.'; unsubscribe(); paint(); }
     else paintProgress();
   }
@@ -230,7 +235,7 @@
       var sess = await client.auth.getSession();
       var r = await fetch('/api/sere', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sess.data.session.access_token }, body: JSON.stringify({ action: 'check', id: id }) });
       var j = await r.json().catch(function () { return {}; });
-      if (j.status === 'completed' || j.status === 'failed') { var mine = await rpc('bv_sere_mine'); var row = (mine || []).filter(function (m) { return m.id === id; })[0]; if (row) onUpdate({ id: id, status: row.status, progress: row.progress, output_video_url: row.video, output_poster_url: row.poster, error: row.error }); }
+      if (j.status === 'completed' || j.status === 'failed') { var mine = await rpc('bv_sere_mine'); var row = (mine || []).filter(function (m) { return m.id === id; })[0]; if (row) onUpdate({ id: id, status: row.status, progress: row.progress, output_video_url: row.video, output_poster_url: row.poster, visibility: row.visibility, error: row.error }); }
       return j.status || 'processing';
     } catch (_) { return 'processing'; }
   }
@@ -241,7 +246,7 @@
       if (!row) { localStorage.removeItem('sere:job'); return; }
       st.id = id; st.status = row.status;
       if (row.status === 'processing' || row.status === 'pending') { st.step = 'working'; st.pct = row.progress || 0; subscribe(id); }
-      else onUpdate({ id: id, status: row.status, progress: row.progress, output_video_url: row.video, output_poster_url: row.poster, error: row.error });
+      else onUpdate({ id: id, status: row.status, progress: row.progress, output_video_url: row.video, output_poster_url: row.poster, visibility: row.visibility, error: row.error });
     } catch (_) {}
   }
 
@@ -301,6 +306,8 @@
         '<input type="range" min="0" max="' + Math.max(0, dur - LIMITS.audio.windowMs) + '" step="500" value="' + win.startMs + '" data-sere="start" aria-label="Start of the part that sings"' + (dur <= LIMITS.audio.windowMs ? ' disabled' : '') + '>' +
         '<small>Up to 60 seconds sings. Slide to pick the part.</small><audio data-sere="player" src="' + st.audio.previewUrl + '" preload="none"></audio></div>' : '') +
       engineRow() +
+      '<div class="sere-row"><label>Who can see it <select data-sere="visibility"><option value="private"' + (st.visibility === 'private' ? ' selected' : '') + '>Only me (try it first)</option><option value="wall"' + (st.visibility === 'wall' ? ' selected' : '') + '>Talanoa Wall (all members)</option></select></label></div>' +
+      '<p class="sere-note"><small>Only use photos of people who are happy for you to. A sere stays private until you post it.</small></p>' +
       '<div class="sere-row"><label>Scene <select data-sere="scene">' + sceneOptions() + '</select></label>' +
         '<label class="sere-cap">Caption <input type="text" maxlength="140" data-sere="caption" value="' + esc(st.caption) + '" placeholder="Say something (optional)"></label></div>' +
       (st.error ? '<p class="sere-error" role="alert">' + esc(st.error) + '</p>' : '') +
@@ -316,7 +323,10 @@
   }
   function doneStep() {
     return '<div class="sere-done"><video class="sere-video" controls playsinline preload="metadata" poster="' + esc(st.poster || '') + '" src="' + esc(st.video || '') + '"></video>' +
-      '<p>It is on the wall.</p><div class="sere-actions"><button type="button" class="btn" data-sere="wall">See it on the wall</button><button type="button" class="btn sm" data-sere="again">Make another</button></div></div>';
+      (st.visibility === 'wall'
+        ? '<p>It is on the wall.</p><div class="sere-actions"><button type="button" class="btn" data-sere="wall">See it on the wall</button>'
+        : '<p>Only you can see it. Post it when you are happy with it.</p><div class="sere-actions"><button type="button" class="btn" data-sere="post">Post to the wall</button>') +
+      '<button type="button" class="btn sm" data-sere="again">Make another</button></div></div>';
   }
   function sheet() {
     return '<div class="sere-sheet glass card" role="dialog" aria-modal="true" aria-label="Make a photo sing">' +
@@ -346,6 +356,7 @@
         if (k === 'audio') { var na = ++audioPick; toast('Reading the sound…'); var fa = await decodeAudio(t.files[0]); if (na !== audioPick) return; st.audio = fa; st.startMs = 0; st.error = null; paint(); }
         if (k === 'song' && t.value) { var ns = ++audioPick; toast('Getting the song…'); t.disabled = true; var fs = await songAudio(t.value); if (ns !== audioPick) return; st.audio = fs; st.startMs = 0; st.error = null; paint(); }
         if (k === 'scene') st.scene = t.value;
+        if (k === 'visibility') st.visibility = t.value === 'wall' ? 'wall' : 'private';
         if (k === 'voice') st.voice = t.value;
         if (k === 'caption') st.caption = t.value.slice(0, 140);
       } catch (e) { st.error = say(e, e && e.message); paint(); }
@@ -367,6 +378,12 @@
       if (k === 'check') return check(st.id);
       if (k === 'again') { var keep = st.scenes; st = fresh(); st.scenes = keep; st.open = true; return paint(); }
       if (k === 'wall') { close(); if (go) go('pulse'); return; }
+      if (k === 'post') {
+        t.disabled = true;
+        rpc('bv_sere_set_visibility', { p_id: st.id, p_visibility: 'wall' }).then(function () { st.visibility = 'wall'; paint(); toast('Your sere is on the wall.'); })
+          .catch(function () { t.disabled = false; toast('Could not post it. Try again.'); });
+        return;
+      }
       if (k === 'preview') {
         var a = $('[data-sere="player"]'); if (!a) return;
         var win = pickWindow(st.startMs, st.audio.durationMs);

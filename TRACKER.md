@@ -1,3 +1,16 @@
+## 2026-11-24 — Trust fixes part 2: private seres, saved design, calls inside Koro, captions both ways, welcome Koro
+
+- Claude (Donovan: "do it all"). Code only; **the migration is NOT applied to live** — it changes the shared database, so it waits for Donovan's yes.
+- `supabase/migrations/20261124100000_sota_sere_visibility_and_prefs.sql`: seres get `visibility` ('private' default for new, 'wall' for existing). A private sere writes no wall post and other members cannot read it; `bv_sere_set_visibility` posts it or takes the post back. New table `bulavata.member_prefs` (+ `bv_prefs_get/save`) keeps the page design on the account; it goes with "Delete my data". Tested in PGlite: `tests/sere-visibility-db.sql` via `tests/run-sere-db.cjs` (15 new checks, the old 51 still pass).
+- `sere-maker.js`: "Who can see it" (Only me / Talanoa Wall, default Only me) and a "Post to the wall" button on the finished sere. Until the migration is live the calls fail quietly and seres keep posting as before.
+- `space-design-sync.js` (new) + `SotaSpaceDesign.reload()`: the design follows the member to other devices (wallpaper pictures stay on the device). Quiet no-op until the migration is live.
+- External Jitsi invitations removed from `communications.html`/`.js` (they could not enforce Koro membership); calls stay inside the member-only native calls. Page description is now true.
+- Captions: each member's words are sent over the call's own peer connection (negotiated data channel, `native-call-media.js` `sendCaption`/`onCaption`) so everyone sees everyone; test added.
+- Calls: "Tell them on WhatsApp" button; honest note that phones sleep pages. No Koro: the empty state offers the open starter Koro (`bv_hubs`/`bv_hub_join`).
+- Sign-in return now runs for every sign-in path (moved earlier in `index.html`).
+- Not done: **Web Push for calls** (needs a VAPID key pair set as Worker secrets, a subscription table and a sender; nothing is half-built) and a **Friends-only** choice for seres (needs the wall's read rules and `bv_talanoa_feed` changed).
+- Checks: `node --test tests/*.test.cjs` all pass with PGlite available; release v216-trust-fixes.
+
 ## 2026-11-23 — Trust fixes from the live-site review (text, email, sign-in return)
 
 - Claude. `privacy.html`: age now 16 and over (matches the sign-up check and communications.html); host line says Cloudflare, not Vercel. `privacy.html`, `terms.html`, `data-deletion.html`: contact email changed from support@fijiinvestment.com to support@sotakece.com (**Donovan: this mailbox must exist and forward to you**). Communications "Sign in on Sota Kece" now remembers the page (30 min, only /communications.html or /call.html) and `index.html` sends the member back once signed in.

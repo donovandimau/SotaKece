@@ -383,3 +383,27 @@ test('explicit ICE refresh restarts share the finite recovery budget', async t =
   assert.equal(pc.restarts, 2);
   h.api.close(); assert.equal(await h.api.updateIceServers([]), false);
 });
+
+const h0 = [];
+test('Captions travel over a negotiated data channel to every other member, and only that', () => {
+  const sent = [], heard = [];
+  const channel = { readyState: 'open', send(m) { sent.push(m); }, close() { this.closed = true; } };
+  const h = harness({
+    onCaption: (id, text, final) => heard.push({ id, text, final }),
+    peerConnectionFactory: config => { const pc = new Connection(config); pc.createDataChannel = (label, opts) => { pc.channelOpts = { label, ...opts }; return channel; }; h0.push(pc); return pc; }
+  });
+  h.api.addPeer('b');
+  const pc = h0[0];
+  assert.deepEqual(pc.channelOpts, { label: 'captions', negotiated: true, id: 1, ordered: true });
+  h.api.sendCaption('bula vinaka', true);
+  assert.deepEqual(JSON.parse(sent[0]), { t: 'cap', text: 'bula vinaka', final: true });
+  channel.onmessage({ data: JSON.stringify({ t: 'cap', text: 'moce', final: false }) });
+  channel.onmessage({ data: 'not json' });
+  channel.onmessage({ data: JSON.stringify({ t: 'other', text: 'x' }) });
+  assert.deepEqual(heard, [{ id: 'b', text: 'moce', final: false }]);
+  h.api.removePeer('b');
+  assert.equal(channel.closed, true);
+  h.api.sendCaption('after', true);
+  assert.equal(sent.length, 1);
+  h.api.close();
+});

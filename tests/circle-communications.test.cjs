@@ -8,7 +8,7 @@ const types=require('../circle-types.js');
 const skins=require('../skins.js');
 const source=fs.readFileSync(path.join(__dirname,'../communications.js'),'utf8');
 const helpers=source.slice(source.indexOf(' const circleStyleKeys='),source.indexOf(' window.SotaCircles?.init('));
-const handlers=source.slice(source.indexOf(" handleForm('createGroup',"),source.indexOf(" for(const mode of ['audio','video'])"));
+const handlers=source.slice(source.indexOf(" handleForm('createGroup',"),source.indexOf(" $('inviteGroup').addEventListener('click'"));
 assert(helpers.includes('async function circleAccount')&&handlers.includes('bv_join_circle'),'extract the current implementation');
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
