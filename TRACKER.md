@@ -1,6 +1,6 @@
 ## 2026-11-24 — No age question at sign-up
 
-- Claude (Donovan: "get rid of the age fill information or any fill in information, until users actually want"). Sign-up and "Make my room" (`index.html`) and the Revised preview (`revised/app.mjs`, `revised/backend.mjs`) no longer ask for birth year or age group, and nothing about age is sent. A plain line says Sota Kece is for people aged 16 and over. New profiles get `age_band = 'unconfirmed'` from the database default (checked live: column default and the insert trigger both cover it). Display name, handle, email and password are still asked because the account needs them. Release v218-no-age-field.
+- Claude (Donovan: "get rid of the age fill information or any fill in information, until users actually want"). Sign-up and "Make my room" (`index.html`) and the Revised preview (`revised/app.mjs`, `revised/backend.mjs`) no longer ask for birth year or age group, and nothing about age is sent. A plain line says Sota Kece is for people aged 16 and over. New profiles get `age_band = 'unconfirmed'` from the database default (checked live: column default and the insert trigger both cover it). Display name, handle, email and password are still asked because the account needs them. Release v219-no-age-field.
 - Decision for Donovan: with no age question the 16+ rule rests on that line and the terms only; nothing stops a younger person signing up. Say if you want a one-tap "I am 16 or over" box instead.
 - Checks: node --test tests/*.test.cjs 473 pass (1 needs PGlite, passes with it).
 
@@ -196,6 +196,8 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+
+- 24 Nov 2026 (Codex, Ops 1525) — Simplified guest navigation, stacked the mobile room cards, removed the join banner, added a credited 15-second preview of Kocokoco Ni Lomamu from the shared Fiji catalogue, and updated the homepage share card. Verified account dialogs and audio on phone and desktop. All 812 tests and the Cloudflare asset build passed.
 
 - 24 Nov 2026 (Codex, Ops 1524) — Guest Home opens with an original AI-generated Fiji veranda music scene. Three responsive WebPs serve first paint and the interactive page. The default welcome uses a deep lagoon background with the existing account actions and example room. Checked 390 × 844 and 1440 × 900 in Chrome, no horizontal overflow. CSS build verified and 808 tests passed with zero skips. Publication pending on PR #545. GitHub Actions refused to start the jobs because the account is billing-locked. Rerun after Actions is restored.
 
