@@ -191,6 +191,8 @@ Do not carry over the prototype's dark theme, its invented village content or it
 
 ## Done — newest first
 
+- 24 Nov 2026 (Codex, Ops 1525) — Simplified guest navigation, stacked the mobile room cards, removed the join banner, added a credited 15-second preview of Kocokoco Ni Lomamu from the shared Fiji catalogue, and updated the homepage share card. Verified account dialogs and audio on phone and desktop. All 812 tests and the Cloudflare asset build passed.
+
 - 24 Nov 2026 (Codex, Ops 1524) — Guest Home opens with an original AI-generated Fiji veranda music scene. Three responsive WebPs serve first paint and the interactive page. The default welcome uses a deep lagoon background with the existing account actions and example room. Checked 390 × 844 and 1440 × 900 in Chrome, no horizontal overflow. CSS build verified and 808 tests passed with zero skips. Publication pending on PR #545. GitHub Actions refused to start the jobs because the account is billing-locked. Rerun after Actions is restored.
 
 - 22 Nov 2026 (Codex) — Built Volcanic Dark in the native page designer. It can be previewed and saved per page or applied site-wide with Undo. Home uses the existing veranda photo, Talanoa and Koro components, track sleeves and a compact audio waveform. The phone bar adds Share and Koro while keeping People and My space in Menu. All 808 Node tests pass locally with no skips. The public homepage returned Cloudflare 1027 during development.

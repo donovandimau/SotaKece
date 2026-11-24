@@ -566,3 +566,43 @@ body.sx-enabled #app.sx-app[data-space-designed] :is(.sx-mini-skip,.sx-mini-ligh
 @media(max-width:380px){.sx-mini-lights{display:none!important}}
 @media(prefers-reduced-motion:reduce){.sx-mini-player.is-playing .sx-mini-icon{animation:none}.sx-mini-progress i{transition:none}}
 @media(forced-colors:active){.sx-mini-controls button{border:1px solid ButtonText!important}.sx-mini-progress i{background:Highlight}.sx-mini-lights[aria-pressed=true]{outline:2px solid Highlight}}
+
+/* The public welcome keeps a short masthead. Members retain their full app shell. */
+body.sx-guest:has(.sx-guest-bar) { background: #102828 !important; }
+body.sx-guest #app.sx-app:has(.sx-guest-bar) { padding: 0 !important; }
+.sx-guest-tools[hidden] { display: none !important; }
+.sx-guest-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1220px; margin: 0 auto; padding: 10px clamp(16px,3vw,40px);
+  color: #fff7e9; background: #102828;
+}
+.sx-guest-bar a, .sx-guest-bar button {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: inherit; text-decoration: none; font: 800 15px/1.2 Nunito,system-ui,sans-serif;
+}
+.sx-guest-bar a { gap: 10px; font-size: 20px; }
+.sx-guest-bar button { border: 1px solid #758f89; border-radius: 8px; padding: 0 15px; background: transparent; cursor: pointer; }
+body.sx-guest #app.sx-app .sx-content { max-width: 1220px; margin-inline: auto; }
+body.sx-guest .sx-hero-room .sx-room-track { padding: 16px; background: #301d31; color: #fff4ea; border-radius: 12px; }
+body.sx-guest .sx-hero-room .sx-room-track h3 { color: #fff4ea; font-size: 19px; margin: 8px 0 4px; }
+body.sx-guest .sx-room-track small { color: #f2c6ae; letter-spacing: .09em; font-size: 10px; }
+body.sx-guest .sx-hero-room .sx-room-track p { color: #f6e1e8; font-size: 13px; margin: 0 0 12px; }
+.sx-room-track audio { display: block; width: 100%; min-width: 0; height: 44px; }
+@media (max-width: 760px) {
+  body.sx-guest #app.sx-app .sx-hero-room .bv-preview-columns { grid-template-columns: minmax(0,1fr) !important; }
+  body.sx-guest #app.sx-app .sx-hero-room .bv-preview-wall { display: block; }
+  body.sx-guest #app.sx-app .sx-hero-room .bv-photo-note p { font-size: 14px !important; line-height: 1.45 !important; }
+  body.sx-guest #app.sx-app .sx-hero-room .bv-photo-friends { grid-template-columns: repeat(8,minmax(0,1fr)) !important; }
+}
+
+/* Default desktop frame around the member's canvas. Saved room palettes supply their own colours. */
+@media (min-width:761px) {
+  body.sx-member #app.sx-app:not([data-space-designed]) > .sx-top {
+    --dimau-header-bg: #102828; --dimau-header-ink: #fff7e9; --dimau-header-line: #36524d;
+  }
+  body.sx-member #app.sx-app:not([data-space-designed]) .sx-rail {
+    --sx-ink: #fff7e9; --sx-muted: #c8dbd6; color: #fff7e9; background: #102828; border-color: #36524d;
+  }
+  body.sx-member #app.sx-app:not([data-space-designed]) .sx-rail :is(.sx-rail-caption,.sx-rail-bottom,.sx-world-rail-links button) { color: #dcebe5; }
+  body.sx-member #app.sx-app:not([data-space-designed]) .sx-nav :is(a,button):hover { color: #fff; background: #29534e; }
+}
