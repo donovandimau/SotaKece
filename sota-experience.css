@@ -320,11 +320,41 @@ body:has(.sx-mini-player:not([hidden])) #sota-update{bottom:104px}
 @media(max-width:600px){#sota-update{width:calc(100vw - 24px);max-width:none;flex-wrap:wrap;gap:8px;padding:16px}#sota-update p{flex-basis:100%;margin-bottom:4px}#sota-update button{flex:1}}
 @media(forced-colors:active){#sota-update{background:Canvas;color:CanvasText;border-color:CanvasText}#sota-update button{background:ButtonFace;color:ButtonText;border:1px solid ButtonText}}
 
-/* Owner's social photograph stays inside the existing split welcome layout. */
-.sx-hero-social{display:block;width:100%;margin:22px 0 0;border:1px solid #fff6;border-radius:14px;overflow:hidden;box-shadow:0 8px 26px #25103233;background:#593a40}
-.sx-hero-social>img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain}
-@media(max-width:760px){.sx-hero-social{margin-top:20px;border-radius:12px}}
-
+/* Guest welcome: the photograph leads, with a solid reading surface for the controls. */
+body.sx-guest #app.sx-app:not([data-space-palette="volcanic"]) .sx-hero {
+  background: #103e40;
+  padding: clamp(18px, 2.5vw, 38px) !important;
+  gap: clamp(18px, 2.5vw, 38px);
+  align-items: center;
+}
+body.sx-guest #app.sx-app:not([data-space-palette="volcanic"]) .sx-hero::before {
+  background: linear-gradient(150deg, #195255, #103e40 52%, #0c3234);
+}
+.sx-hero-copy { display: flex; flex-direction: column; align-items: flex-start; }
+.sx-hero-social {
+  order: -1;
+  display: block;
+  width: 100%;
+  margin: 0 0 clamp(18px, 2vw, 28px);
+  overflow: hidden;
+  border-radius: 10px;
+  background: #204748;
+}
+.sx-hero-social > img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  object-position: center 38%;
+}
+.sx-hero-copy .sx-actions { width: 100%; }
+.sx-hero-room { transform: none; }
+.sx-hero-caption { display: none; }
+@media (max-width:760px) {
+  body.sx-guest #app.sx-app:not([data-space-palette="volcanic"]) .sx-hero { padding: 14px 14px 22px !important; }
+  .sx-hero-social { border-radius: 8px; }
+  .sx-hero-copy h1 { margin-block: 12px; }
+}
 
 /* Feature photographs carry their headings; music stays behind an explicit action. */
 .sx-discover-card.sx-photo-card{display:flex;flex-direction:column;justify-content:flex-end;min-height:310px;padding:26px;isolation:isolate;color:#fff!important;background:#30263a!important;border:1px solid #ffffff80;box-shadow:0 8px 24px #3e235326;transition:box-shadow .2s,border-color .2s,transform .2s}
