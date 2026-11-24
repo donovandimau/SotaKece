@@ -63,7 +63,6 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-24 | Codex | Guest home Fiji imagery and responsive art direction | Ops 1524 |
 | 2026-11-22 | Claude | Song Scratch (Ops task 1428): new page song-scratch.html, scratch a photo away to reveal a playing Island Mix song card, save as story video or picture, plus a story editor (text, stickers, drawing, filters, card styles, move/pinch/turn, bin, undo) and the bigger editor (video clips, photo layouts, crop/zoom/turn, moving stickers, animated text, own stickers, templates, backgrounds, scratch on/off, drafts on the phone). Built, waiting for merge | agent/claude/song-scratch-story-scratch-a-photo-away-to-reveal-a-song-card/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
@@ -176,6 +175,8 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+
+- 24 Nov 2026 (Codex, Ops 1524) — Guest Home opens with an original AI-generated Fiji veranda music scene. Three responsive WebPs serve first paint and the interactive page. The default welcome uses a deep lagoon background with the existing account actions and example room. Checked 390 × 844 and 1440 × 900 in Chrome, no horizontal overflow. CSS build verified and 808 tests passed with zero skips.
 
 - 22 Nov 2026 (Codex) — Built Volcanic Dark in the native page designer. It can be previewed and saved per page or applied site-wide with Undo. Home uses the existing veranda photo, Talanoa and Koro components, track sleeves and a compact audio waveform. The phone bar adds Share and Koro while keeping People and My space in Menu. All 808 Node tests pass locally with no skips. The public homepage returned Cloudflare 1027 during development.
 - 2026-11-22 — Codex, Ops 1429 — Built the phone pilot on the saved sign-up and Up Next revisions. Arc shows measured whole-track waveforms and a four-times magnified seek window with release-to-seek and cancellation. The first eight catalogue envelopes total 11.5 KB. Sleeves use catalogue artwork, embedded MP3 cover art or an individual title-and-artist design. Dragging through Wave Stage preserves playback until a sleeve is tapped. Confirmed real touch events at 390×844, landscape fit, keyboard and mouse controls, both artwork paths, and uninterrupted catalogue playback from Laffy Taffy to Self Invited. The Sota Kece Ops card tracks the phone review link. Portfolio rollout awaits Donovan's phone trial.
