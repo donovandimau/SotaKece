@@ -69,6 +69,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 - Live: https://sotakece.com
 
 ## Current state
+- The guest room keeps Talanoa visible through the tablet layout breakpoint.
 - Issue #541 guest-room controls prepared on codex/541-interactive-guest-room for review.
 - Volcanic Dark is an opt-in Home appearance under Design this page, tested locally on branch feat/volcanic-dark-home.
 - Music Menu pilot (Ops 1429): the revised player adds an expanded listening view, spectral ribbons, a seek dial, a frequency landscape, a touch-controlled tone sculpture and a live EQ/spectrogram. Donovan reviews the Sota Kece pilot before any portfolio rollout.
@@ -85,7 +86,6 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-26 | Codex | Restore Talanoa on tablet-sized guest rooms | codex/talanoa-tablet-widths |
 | 2026-11-22 | Claude | Song Scratch (Ops task 1428): new page song-scratch.html, scratch a photo away to reveal a playing Island Mix song card, save as story video or picture, plus a story editor (text, stickers, drawing, filters, card styles, move/pinch/turn, bin, undo) and the bigger editor (video clips, photo layouts, crop/zoom/turn, moving stickers, animated text, own stickers, templates, backgrounds, scratch on/off, drafts on the phone). Built, waiting for merge | agent/claude/song-scratch-story-scratch-a-photo-away-to-reveal-a-song-card/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
@@ -198,6 +198,7 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+- 26 November 2026, Codex — removed the tablet rule hiding Talanoa and its Uro controls in Sema’s guest room.
 - 2026-11-26 — Claude — **Older phones no longer get a blank site** (Donovan: "go on the old-phone fix"; branch claude/old-phone-fix). The visit counter showed 21 "Uncaught SyntaxError: Unexpected token ." reports from 8 visitors (29 Oct–23 Nov, CN/DE/FR/GB/PL): browsers older than about 2020 cannot read `?.`/`??`, so nothing ran. New `scripts/legacy-js.mjs`, run at the end of `scripts/cf-static-assets.mjs`, rewrites the PUBLISHED copies in dist/ (external .js/.mjs and inline <script> blocks in the pages) with esbuild 0.24.0 to chrome67/safari14/firefox68/edge79. Source files are untouched; any file that will not convert, or a failed esbuild download, publishes unchanged and never fails the build. Local build: 77 scripts converted, 0 `?.`/`??` left; every converted file parses as ES2019. (The replaceChildren/Object.hasOwn crashes were already fixed 14 Nov and are guarded by tests/older-browsers.test.cjs.)
 - 26 Nov 2026, Codex — implemented #541 on the review branch. Sema’s guest preview has local theme and Uro controls, eight demo friends and a measured waveform for the credited clip.
 
