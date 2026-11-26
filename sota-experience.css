@@ -282,7 +282,7 @@ html body.sx-enabled #app.sx-app #sk-music-playlist .sk-playlist-songs>li>button
 .sx-side-card{background:linear-gradient(135deg,#fbd4e8,#e6d7ff);border-color:#cba8e1}.sx-side-card h2{color:#542775}.sx-side-card p{color:#634b72}
 .sx-enabled .sx-panel .bv-circle-feature{background:linear-gradient(145deg,#412479,#a33a74);border:1px solid #d6a9de}
 .sx-create-more[open] .sx-create-secondary{grid-template-columns:repeat(2,minmax(0,1fr))}
-@media(max-width:1100px){body.sx-enabled #app.sx-app .sx-hero{grid-template-columns:1fr 1.1fr;gap:20px;padding:36px 4% 52px}.sx-hero h1{font-size:48px}.sx-hero-room .bv-preview-columns{grid-template-columns:1fr!important}.sx-hero-room .bv-preview-wall{display:none}.sx-hero-room .bv-photo-friends{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
+@media(max-width:1100px){body.sx-enabled #app.sx-app .sx-hero{grid-template-columns:1fr 1.1fr;gap:20px;padding:36px 4% 52px}.sx-hero h1{font-size:48px}.sx-hero-room .bv-preview-columns{grid-template-columns:1fr!important}.sx-hero-room .bv-photo-friends{grid-template-columns:repeat(8,minmax(0,1fr))!important}}
 /* Computers: the welcome title at the size the shared Dimau heading cap gives it (dimau-consistency.js sets page
    titles to 44px / 1.15 on screens 700px and wider, inline, once it loads). Drawn at that size from the start, the
    fast-paint welcome no longer jumps when the script runs (desktop layout shift, 15 Nov 2026). Phones: premium-finish.css. */
