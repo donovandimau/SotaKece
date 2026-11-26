@@ -101,6 +101,9 @@ for (const name of ['_headers', '_redirects']) {
   if (headerRules > 100) { console.error('cf-static-assets: more than 100 header rules'); process.exit(1); }
   cpSync(src, join(out, name));
 }
+// Older phones: lower `?.` / `??` in the published copies only (scripts/legacy-js.mjs). Never fails the build.
+{ const { execFileSync: legacyRun } = await import('node:child_process'); const { fileURLToPath: legacyPath } = await import('node:url');
+  try { legacyRun(process.execPath, [legacyPath(new URL('./legacy-js.mjs', import.meta.url)), out], { stdio: 'inherit' }); } catch (e) { console.warn('legacy-js failed, scripts left as they are:', e.message); } }
 console.log(`cf-static-assets: ${out} ready (${headerRules} header rules, ${redirects} redirects)`);
 
 // Ops Room live check: write dist/ops-build.json (see scripts/ops-build-marker.mjs).
