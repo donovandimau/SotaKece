@@ -69,6 +69,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 - Live: https://sotakece.com
 
 ## Current state
+- Issue #541 guest-room controls prepared on codex/541-interactive-guest-room for review.
 - Volcanic Dark is an opt-in Home appearance under Design this page, tested locally on branch feat/volcanic-dark-home.
 - Music Menu pilot (Ops 1429): the revised player adds an expanded listening view, spectral ribbons, a seek dial, a frequency landscape, a touch-controlled tone sculpture and a live EQ/spectrogram. Donovan reviews the Sota Kece pilot before any portfolio rollout.
 - Status: Live at sotakece.com, release v197. Open to overseas Fijians first; wallet and coins built but switched off until the Reserve Bank of Fiji decides (`SOTA_WALLET_ON` in the page, `coin_settings.buy_on / payout_on` in the database, both off on live as of 12 Nov).
@@ -84,7 +85,6 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-26 | Codex | Interactive guest room, issue #541 / Ops 1521 | codex/541-interactive-guest-room |
 | 2026-11-22 | Claude | Song Scratch (Ops task 1428): new page song-scratch.html, scratch a photo away to reveal a playing Island Mix song card, save as story video or picture, plus a story editor (text, stickers, drawing, filters, card styles, move/pinch/turn, bin, undo) and the bigger editor (video clips, photo layouts, crop/zoom/turn, moving stickers, animated text, own stickers, templates, backgrounds, scratch on/off, drafts on the phone). Built, waiting for merge | agent/claude/song-scratch-story-scratch-a-photo-away-to-reveal-a-song-card/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
@@ -197,6 +197,7 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+- 26 Nov 2026, Codex — implemented #541 on the review branch. Sema’s guest preview has local theme and Uro controls, eight demo friends and a measured waveform for the credited clip.
 
 - 24 Nov 2026 (Codex, Ops 1525) — Simplified guest navigation, stacked the mobile room cards, removed the join banner, added a credited 15-second preview of Kocokoco Ni Lomamu from the shared Fiji catalogue, and updated the homepage share card. Verified account dialogs and audio on phone and desktop. All 812 tests and the Cloudflare asset build passed.
 
