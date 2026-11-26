@@ -606,3 +606,17 @@ body.sx-guest .sx-hero-room .sx-room-track p { color: #f6e1e8; font-size: 13px; 
   body.sx-member #app.sx-app:not([data-space-designed]) .sx-rail :is(.sx-rail-caption,.sx-rail-bottom,.sx-world-rail-links button) { color: #dcebe5; }
   body.sx-member #app.sx-app:not([data-space-designed]) .sx-nav :is(a,button):hover { color: #fff; background: #29534e; }
 }
+.bv-guest-theme, .bv-guest-jumps { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 12px; }
+.bv-guest-theme select { max-width:100%; min-width:0; }
+[data-guest-demo] :is(button,select) { min-height:44px; }
+.bv-guest-circle { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+.bv-guest-circle li { display:grid; justify-items:center; align-content:start; text-align:center; }
+.bv-guest-circle li small { font-size:11px; }
+.bv-guest-wave { height:32px; display:flex; align-items:center; gap:1px; margin-block:8px; }
+.bv-guest-wave i { flex:1; border-radius:2px; background:#987e93; }
+.bv-guest-wave .played { background:#ffcf83; }
+@media(max-width:760px) {
+  body.sx-guest #app .sx-room-example [data-guest-demo] .bv-preview-columns { display:grid; grid-template-columns:minmax(0,1fr)!important; }
+  body.sx-guest #app .sx-room-example [data-guest-demo] .bv-preview-wall { display:block; }
+}
+.bv-guest-circle .sk-photo { width:100%; max-width:48px; aspect-ratio:1; border-radius:50%; }

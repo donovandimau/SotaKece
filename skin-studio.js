@@ -56,21 +56,69 @@
     const s=skins.normalize(settings),p=skins.presets.find(p=>p.id===s.id);
     return `${window.SotaRoomAtmosphere?.markup(s)||''}${s.coverPath?coverMediaMarkup(s):''}<div class="bv-cover-placement"><div class="bv-cover-copy"><span class="bv-skin-tag">${s.customName?'YOUR OWN DESIGN':esc(p.category)+' · Your community'}</span><h3 class="bv-identity-title">${esc(s.customName||themeLabel(p))}</h3><div class="bv-cover-words">${esc(s.note||p.note)}</div></div></div>`;
   }
+  const guestCircle = ['Donu','Jo','Mere','Litia','Ana','Jone','Ravi','Sera'];
+  // Peak amplitude of each of 64 equal intervals in the credited 15-second preview.
+  const guestPeaks = [51,30,8,52,45,98,64,68,99,83,84,79,100,88,69,42,60,84,96,69,91,100,89,88,55,93,62,19,10,83,81,94,68,83,77,91,93,82,99,58,49,24,70,72,100,54,72,95,50,84,80,99,70,27,13,49,63,96,59,83,80,63,48,23];
+  function guestWave() {
+    return `<div class="bv-guest-wave" aria-hidden="true">${guestPeaks.map(peak=>`<i style="height:${peak}%"></i>`).join('')}</div>`;
+  }
+  function guestRoomControls(settings) {
+    return `<label class="bv-guest-theme">Room theme <select data-guest-theme>${skins.presets.map(p=>`<option value="${esc(p.id)}" ${p.id===settings.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label>
+      <nav class="bv-guest-jumps" aria-label="Sema’s room sections">${[['wall','Talanoa'],['mates','Tanoa 8'],['soundtrack','Groove']].map(([target,label])=>`<button type="button" data-guest-jump="${target}">${label}</button>`).join('')}<button type="button" data-sx-auth="up">Join free</button></nav>`;
+  }
+  function bindGuestRoom(host) {
+    const room=host?.querySelector('[data-guest-demo]');
+    if (!room) return;
+    const theme=room.querySelector('[data-guest-theme]');
+    theme.addEventListener('change',()=>{
+      const settings=skins.normalize({id:theme.value});
+      const preset=skins.presets.find(p=>p.id===settings.id);
+      room.style.cssText=skins.inline(settings);
+      room.dataset.look=preset.look;
+      room.dataset.identityLayout=discovery?.layout(preset)||'social';
+      const cover=room.querySelector('.bv-cover');
+      cover.dataset.pattern=settings.pattern;
+      cover.innerHTML=coverContent(settings);
+      window.SotaRoomAtmosphere?.mount(cover);
+    });
+    for (const button of room.querySelectorAll('[data-guest-jump]')) {
+      button.addEventListener('click',()=>{
+        const section=room.querySelector('.bv-preview-'+button.dataset.guestJump);
+        section.tabIndex=-1;
+        section.focus();
+        section.scrollIntoView({block:'center'});
+      });
+    }
+    for (const button of room.querySelectorAll('[data-guest-uro]')) {
+      button.addEventListener('click',()=>{
+        const pressed=button.getAttribute('aria-pressed')!=='true';
+        button.setAttribute('aria-pressed',String(pressed));
+        button.textContent=pressed?'♥ Uro · 1':'♡ Uro';
+      });
+    }
+    const audio=room.querySelector('audio');
+    const bars=room.querySelectorAll('.bv-guest-wave i');
+    function syncWave() {
+      const count=Number.isFinite(audio.duration)?Math.floor(bars.length*audio.currentTime/audio.duration):0;
+      bars.forEach((bar,index)=>bar.classList.toggle('played',index<count));
+    }
+    for (const event of ['timeupdate','seeked','ended','emptied']) audio.addEventListener(event,syncWave);
+  }
   function preview(profile, settings, guestSoundtrack=false) {
     const s=skins.normalize(settings),p=skins.presets.find(p=>p.id===s.id);
     const roomLayout=discovery?.layout(p)||'social';
     const interests=s.interests.split(',').map(x=>x.trim()).filter(Boolean).slice(0,8);
     const portraits=Array.from({length:16},(_,i)=>originalMate(i%14,`Example friend ${i+1}`));
     const avatar=profile.avatar_emoji?`<span class="bv-avatar-emoji">${esc(profile.avatar_emoji)}</span>`:frontAvatar('Sema — example profile portrait');
-    const soundtrack=guestSoundtrack ? `<section class="sx-room-track" aria-label="Sema’s soundtrack"><small>SEMA’S SOUNDTRACK · 15 SEC</small><h3>Kocokoco Ni Lomamu</h3><p>Malumu ni Tobu kei Naivaukura ft. Savu Ni Delai Lomai</p><audio controls preload="none" aria-label="Play 15 seconds of Kocokoco Ni Lomamu" src="/assets/kocokoco-room-preview.mp3"></audio></section>` : `${s.trackUrl||s.trackPath||s.songRef?trackMarkup(s):window.SotaLocalMusic?.hasSelected()?`<div class="bv-track"><span>♫ ${esc(window.SotaLocalMusic.title())}</span><button type="button" class="btn sm ghost" data-local-music-toggle>Play my music</button><small>Saved on this device.</small></div>`:`<div class="bv-skin-player"><span class="bv-vinyl" aria-hidden="true"></span><div><small>THE SOUND OF YOUR ROOM</small><b>Your own mixtape</b><p>Add a track in Create your own.</p></div><span class="bv-player-wave" aria-hidden="true">▂▅▃▇▂▆▃</span></div>`}${skinSongs(s)}`;
-    return `<div class="bv-preview bv-art-room" style="${esc(skins.inline(s))}" data-layout="${s.layout}" data-music-position="${s.musicPosition}" data-look="${p.look}" data-identity-layout="${roomLayout}">
+    const soundtrack=guestSoundtrack ? `<section class="sx-room-track" aria-label="Sema’s soundtrack"><small>SEMA’S SOUNDTRACK · 15 SEC</small><h3>Kocokoco Ni Lomamu</h3><p>Malumu ni Tobu kei Naivaukura ft. Savu Ni Delai Lomai</p>${guestWave()}<audio controls preload="none" aria-label="Play 15 seconds of Kocokoco Ni Lomamu" src="/assets/kocokoco-room-preview.mp3"></audio></section>` : `${s.trackUrl||s.trackPath||s.songRef?trackMarkup(s):window.SotaLocalMusic?.hasSelected()?`<div class="bv-track"><span>♫ ${esc(window.SotaLocalMusic.title())}</span><button type="button" class="btn sm ghost" data-local-music-toggle>Play my music</button><small>Saved on this device.</small></div>`:`<div class="bv-skin-player"><span class="bv-vinyl" aria-hidden="true"></span><div><small>THE SOUND OF YOUR ROOM</small><b>Your own mixtape</b><p>Add a track in Create your own.</p></div><span class="bv-player-wave" aria-hidden="true">▂▅▃▇▂▆▃</span></div>`}${skinSongs(s)}`;
+    return `<div class="bv-preview bv-art-room" ${guestSoundtrack?'data-guest-demo':''} style="${esc(skins.inline(s))}" data-layout="${s.layout}" data-music-position="${s.musicPosition}" data-look="${p.look}" data-identity-layout="${roomLayout}">
       <div class="bv-cover" data-pattern="${s.pattern}">${coverContent(s)}</div>
       <div class="bv-profile-intro"><div class="bv-profile-avatar">${avatar}</div><div class="bv-room-identity"><h2>${esc(profile.display_name||profile.handle||'Your name')}</h2><p class="bv-room-handle">@${esc(profile.handle||'yourhandle')}</p></div><span class="bv-room-sticker" aria-hidden="true">✦</span><p class="bv-room-bio">${esc(profile.bio||'Good people. Brighter days.')}</p>
         ${interests.length?`<div class="bv-interests">${interests.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}</div>
-      <div class="bv-room-tabs"><span>Talanoa</span><span>Top Mates · 16</span><span>My soundtrack</span></div>
+      ${guestSoundtrack?guestRoomControls(s):'<div class="bv-room-tabs"><span>Talanoa</span><span>Top Mates · 16</span><span>My soundtrack</span></div>'}
       ${guestSoundtrack||s.musicPosition==='top'||s.musicPosition==='auto'&&roomLayout==='music'?`<div class="bv-soundstage bv-preview-soundtrack">${soundtrack}</div>`:''}
-      <div class="bv-preview-columns"><section class="bv-mini-card bv-preview-wall"><h3>Talanoa <small>Example notes</small></h3><div class="bv-photo-note">${frontCrop(660,500,46,49,'Example portrait of Donu')}<div><b>Donu</b><p>Same time, same sunset?</p></div></div><div class="bv-photo-note">${frontCrop(658,562,46,48,'Example portrait of Jo')}<div><b>Jo</b><p>Bring your favourite track.</p></div></div></section>
-      <section class="bv-mini-card bv-preview-mates"><h3>My people <small>Example Top Mates</small></h3><div class="bv-photo-friends">${portraits.map(p=>`<span>${p}</span>`).join('')}</div></section></div>
+      <div class="bv-preview-columns"><section class="bv-mini-card bv-preview-wall"><h3>Talanoa <small>Example notes</small></h3><div class="bv-photo-note">${frontCrop(660,500,46,49,'Example portrait of Donu')}<div><b>Donu</b><p>Same time, same sunset?</p>${guestSoundtrack?'<button type="button" data-guest-uro aria-pressed="false">♡ Uro</button>':''}</div></div><div class="bv-photo-note">${frontCrop(658,562,46,48,'Example portrait of Jo')}<div><b>Jo</b><p>Bring your favourite track.</p>${guestSoundtrack?'<button type="button" data-guest-uro aria-pressed="false">♡ Uro</button>':''}</div></div></section>
+      <section class="bv-mini-card bv-preview-mates">${guestSoundtrack?`<h3>Tanoa 8 <small>Demo presence</small></h3><ul class="bv-guest-circle">${guestCircle.map((name,i)=>`<li>${originalMate(i,name)}<b>${name}</b><small>${i%3===0?'In the room':'Away'}</small></li>`).join('')}</ul>`:`<h3>My people <small>Example Top Mates</small></h3><div class="bv-photo-friends">${portraits.map(p=>`<span>${p}</span>`).join('')}</div>`}</section></div>
       ${!guestSoundtrack&&(s.musicPosition==='bottom'||s.musicPosition==='auto'&&roomLayout!=='music')?`<div class="bv-preview-soundtrack">${soundtrack}</div>`:''}</div>`;
   }
   function chatPreview(profile, settings) {
@@ -415,6 +463,7 @@
     window.SotaExperience?.mountGuest(app,{roomMarkup:holdRoomMedia(preview(example,picked(),true))});
     app.classList.remove('sk-handover');releaseRoomMedia(app);
     wireMedia(app.querySelector('.sx-room-example')||app);
+    bindGuestRoom(app);
     if(expanded){account.showModal();$(mode==='up'?'#a-handle':'#a-email').focus();}
   };
   function showWelcome(settings,themed=true) {
@@ -668,4 +717,5 @@
   window.SotaPlayback?.register('sample',stopSampleOnly);
   window.BulaSkinStudio={musicMarkup,apply,previewLive,applyChat,reset,open,preview,chatPreview,showcasePortrait,closeForOwnerChange};
 })();
+
 
