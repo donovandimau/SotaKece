@@ -56,6 +56,18 @@ body.dps-search-open .dps-fab{visibility:hidden}
  body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-apps[aria-expanded=true]{color:#1E90FF!important;border-color:#1E90FF!important}
  body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-apps:focus-visible{outline:3px solid #1E90FF!important;outline-offset:2px!important}
  @media (max-width:420px){body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-apps{display:none!important}}
+  /* App Share button (Dimau standard): first of the header's right-hand buttons (order -2: ahead of Sign in and the Bula pill, which scripts insert), 44px tall; icon + Share on desktop, icon-only 44x44 on phones (never hidden). */
+ body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-share{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+  order:-2!important;flex:0 0 auto!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0 14px!important;
+  border:1px solid var(--dimau-header-line,#d3dfe7)!important;border-radius:10px!important;white-space:nowrap!important;
+  color:var(--dimau-header-control-ink,var(--dimau-header-ink,#123247))!important;background:var(--dimau-header-control-bg,var(--dimau-header-bg,#fff))!important;
+  box-shadow:0 1px 2px #1232470d!important;cursor:pointer!important;font:600 14px/20px Arial,Helvetica,sans-serif!important}
+ body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-share svg{display:block!important;width:20px!important;height:20px!important;flex:none!important}
+ body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-share:hover{background:#fff!important;box-shadow:0 2px 8px rgba(11,42,74,.12)!important}
+ body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-share:focus-visible{outline:3px solid #1E90FF!important;outline-offset:2px!important}
+ @media (max-width:767.98px){body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-share{width:44px!important;min-width:44px!important;max-width:44px!important;flex:0 0 44px!important;padding:0!important}body.sx-enabled #app.sx-app [data-dimau-header-actions] .sx-header-share .sx-share-label{display:none!important}}
+  /* With Share in the header there is no room left for the words "Sota Kece" on narrow phones or just above the 768px tablet break (they were already cut short there). The logo stays; the name stays for screen readers. */
+ @media (max-width:519.98px),(min-width:768px) and (max-width:839.98px){body.sx-enabled #app.sx-app header[data-dimau-header] [data-dimau-title]{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}}
 }
 /* Shared Dimau Group badge (dimau-consistency.js): it never floats over the app. It renders as the page footer, under everything and clear of the dock. */
 body.sx-enabled > [data-dimau-group-footer]{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:0!important;display:flex!important;justify-content:center!important;align-items:center!important;
