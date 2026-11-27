@@ -26,6 +26,38 @@
     return '<button type="button" class="sk-volcanic-link sk-create-moment" data-sx-member="moments" aria-label="Share a moment" aria-current="'+(tab==='moments'?'page':'false')+'"><span aria-hidden="true">+</span><small>Share</small></button>'+
       '<button type="button" class="sk-volcanic-link sk-open-koro" data-sx-member="crews" aria-current="'+(tab==='crews'?'page':'false')+'">'+icon('people')+'<span>Koro</span></button>';
   }
+  // A mobile skin can collapse the member header while the feed is mounted.
+  // Keep the same sharing action accessible until the normal control has a usable box.
+  function watchHomeShare(session, header) {
+    const primary = header?.querySelector('.sx-header-share');
+    const phone = root.matchMedia?.('(max-width:767px)');
+    if (!phone || !root.ResizeObserver) return;
+    const button = root.document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('data-sota-share', '');
+    button.setAttribute('aria-label', 'Share Sota Kece');
+    button.innerHTML = primary?.innerHTML || 'Share';
+    button.className = 'sx-home-share-recovery';
+    function update() {
+      const box = primary?.getBoundingClientRect();
+      const missing = !box || box.width < 32 || box.height < 32;
+      if (phone.matches && missing) {
+        if (!button.isConnected) root.document.body.append(button);
+      } else {
+        button.remove();
+      }
+    }
+    const observer = new root.ResizeObserver(update);
+    if (primary) observer.observe(primary);
+    if (header) observer.observe(header);
+    phone.addEventListener('change', update);
+    session.listeners.push(() => {
+      observer.disconnect();
+      phone.removeEventListener('change', update);
+      button.remove();
+    });
+    update();
+  }
   function watchPhoneNavigation(s,tab){
     const {app}=s,nav=app.querySelector('.sx-nav'),menu=app.querySelector('.sx-utilities');
     const phone=root.matchMedia?.('(max-width:760px)');
@@ -180,6 +212,7 @@
     if(top){top.classList.add('sx-top');top.setAttribute('data-dimau-header','');top.innerHTML=headerBar(member,!member,state.me?.display_name||state.me?.handle||'friend');if(member)utilities.forEach(node=>top.querySelector('.sx-utilities').append(node));}
     const aside=root.document.createElement('aside');aside.className='sx-rail';aside.innerHTML=`${brand()}<p class="sx-rail-caption">A little closer to home.</p>${nav(member,member?state.tab:'talanoa',state.pending?.length||0)}<div class="sx-rail-bottom"><p>${esc(state.me?.display_name||state.me?.handle||'Your space')}</p><small>${state.me?.handle?'@'+esc(state.me.handle):'alive together'}</small></div>`;app.prepend(aside);
     if(member)watchPhoneNavigation(s,state.tab);
+    if(member && state.tab === 'pulse') watchHomeShare(s,top);
     const selected=routes.find(r=>r[2]===state.tab),view=app.querySelector('#view');view.classList.add('sx-member-content');
 
     const designPage=state.tab==='room'?'profile':state.tab||'profile';app.dataset.frontPage=designPage;
