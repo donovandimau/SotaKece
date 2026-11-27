@@ -13,7 +13,7 @@ const migration=await readFile(new URL('../supabase/migrations/20261025190921_na
 await db.exec(migration);
 await db.exec(await readFile(new URL('../supabase/migrations/20261025192250_native_call_rejoin_signal_cleanup.sql',import.meta.url),'utf8'));
 const results=await db.exec(await readFile(new URL('./native-calls-db.sql',import.meta.url),'utf8'));
-await db.exec(await readFile(new URL('../supabase/migrations/20261127120000_sota_call_push.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../supabase/migrations/20261127124829_sota_call_push.sql',import.meta.url),'utf8'));
 const pushResults=await db.exec(await readFile(new URL('./call-push-db.sql',import.meta.url),'utf8'));
 results.push(...pushResults);
 console.log(JSON.stringify({checks:results.flatMap(r=>r.rows).filter(r=>r.result),fixturesRemaining:(await db.query('select count(*)::int n from auth.users')).rows[0].n},null,2));
