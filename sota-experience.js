@@ -108,13 +108,13 @@
     </a>
     <section class="sx-home-soundtrack sx-band-panel" aria-labelledby="sx-soundtrack-title">
       <a href="#music" class="sx-discover-card sx-photo-card sx-photo-wide sx-discover-music sx-band-link">
-        <img class="sx-card-photo" src="/assets/feature-scenes/courtyard-guitars-20261105-1400.webp" srcset="/assets/feature-scenes/courtyard-guitars-20261105-720.webp 720w, /assets/feature-scenes/courtyard-guitars-20261105-1400.webp 1400w" sizes="(max-width:760px) 100vw, (max-width:1450px) 80vw, 1280px" alt="" width="1400" height="788" loading="lazy" decoding="async">
+        <img class="sx-card-photo" src="/assets/feature-scenes/courtyard-guitars-20261105-1400.webp" srcset="/assets/feature-scenes/courtyard-guitars-20261105-720.webp 720w, /assets/feature-scenes/courtyard-guitars-20261105-1400.webp 1400w" sizes="auto, (max-width:760px) calc(100vw - 32px), (max-width:1450px) 80vw, 1280px" alt="" width="1400" height="788" loading="lazy" decoding="async">
         <small>YOUR ROOM. YOUR SOUNDTRACK.</small><h3 id="sx-soundtrack-title">Viti roots.<br>Volume up.</h3><span>Explore the music ↗</span>
       </a>
       <div class="sx-home-visuals" data-world-home-visual aria-label="Music visualiser"></div>
     </section>
     <a class="sx-discover-card sx-photo-card sx-photo-wide sx-discover-talanoa" href="#talanoa">
-      <img class="sx-card-photo" src="/assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp" srcset="/assets/feature-scenes/talanoa-kava-jam-20261105-720.webp 720w, /assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp 1400w" sizes="(max-width:760px) 100vw, (max-width:1450px) 80vw, 1280px" alt="" width="1400" height="788" loading="lazy" decoding="async">
+      <img class="sx-card-photo" src="/assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp" srcset="/assets/feature-scenes/talanoa-kava-jam-20261105-720.webp 720w, /assets/feature-scenes/talanoa-kava-jam-20261105-1400.webp 1400w" sizes="auto, (max-width:760px) calc(100vw - 32px), (max-width:1450px) 80vw, 1280px" alt="" width="1400" height="788" loading="lazy" decoding="async">
       <small>SIT DOWN. CATCH UP.</small><h3>There’s a place for you<br>in the circle.</h3><span>Explore Talanoa ↗</span>
     </a>
   </div>`;}
