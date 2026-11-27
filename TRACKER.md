@@ -1,3 +1,7 @@
+## 2026-11-27 — Share button in the header (Dimau standard)
+
+Claude, Ops task 1631 (owner request: the Share button sits in the same place in every Dimau app). sotakece.com had no Share button in the header for guests. Guests: Share is now first of the welcome bar's right-hand buttons, before Sign in (`.sx-guest-actions`, also in the first-paint copy in index.html). Members: `.sx-header-share` is the first item of `[data-dimau-header-actions]` (CSS `order:-2`, ahead of Sign in and the Bula pill). 44px tall, icon + "Share" from 768px, icon-only 44x44 below; it opens the existing `SotaShare` sheet (`data-sota-share`). The member header hides the words "Sota Kece" (logo stays, name kept for screen readers) below 520px and from 768 to 839px, where they no longer fit. The old-browser header chip moved to the front too. The "Share Sota Kece" item in the menu stays. Checked in headless Chromium at 1440 and 390: one header Share button, first, 44px, no overlap, no horizontal scroll, opens the share sheet.
+
 ## 2026-11-27 — Saved phone artwork for Music and Talanoa
 
 Codex, Ops task 1595. Use the measured panel width for the lazy-loaded Music and Talanoa images on guest Home. A 390 px phone at 2× can use the existing 720 px WebPs. Wide displays keep the 1400 px versions. The artwork, crop and panel links are preserved.
@@ -211,6 +215,8 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+
+- 2026-11-27 — Codex — Added Cancel before voluntary sign-out and playful, rotating English farewells to the native account controls. Night-only lines use device-local time.
 - 26 November 2026, Codex — removed the tablet rule hiding Talanoa and its Uro controls in Sema’s guest room.
 - 2026-11-26 — Claude — **Older phones no longer get a blank site** (Donovan: "go on the old-phone fix"; branch claude/old-phone-fix). The visit counter showed 21 "Uncaught SyntaxError: Unexpected token ." reports from 8 visitors (29 Oct–23 Nov, CN/DE/FR/GB/PL): browsers older than about 2020 cannot read `?.`/`??`, so nothing ran. New `scripts/legacy-js.mjs`, run at the end of `scripts/cf-static-assets.mjs`, rewrites the PUBLISHED copies in dist/ (external .js/.mjs and inline <script> blocks in the pages) with esbuild 0.24.0 to chrome67/safari14/firefox68/edge79. Source files are untouched; any file that will not convert, or a failed esbuild download, publishes unchanged and never fails the build. Local build: 77 scripts converted, 0 `?.`/`??` left; every converted file parses as ES2019. (The replaceChildren/Object.hasOwn crashes were already fixed 14 Nov and are guarded by tests/older-browsers.test.cjs.)
 - 26 Nov 2026, Codex — implemented #541 on the review branch. Sema’s guest preview has local theme and Uro controls, eight demo friends and a measured waveform for the credited clip.

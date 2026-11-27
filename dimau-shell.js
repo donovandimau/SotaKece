@@ -251,7 +251,13 @@
     }
     return el('div', { class: 'acct' }, [
       el('div', { class: 'who' }, [el('strong', { text: u.name || u.email || 'Signed in' }), el('a', { class: 'small', href: ACCOUNT, text: 'Manage your Dimau account' })]),
-      el('button', { class: 'quiet', type: 'button', text: 'Sign out', onclick: function () { auth.signOut(); } })
+      el('button', { class: 'quiet', type: 'button', text: 'Sign out', onclick: function () {
+          var name = u.name ? ', ' + u.name : '';
+          if (!window.confirm('Sign out' + name + '?')) return;
+          auth.signOut();
+          notice = 'Moce mada' + name + '. Enjoy the rest of your day.';
+          render();
+        } })
     ]);
   }
 
