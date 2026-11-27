@@ -582,6 +582,11 @@ body.sx-guest #app.sx-app:has(.sx-guest-bar) { padding: 0 !important; }
 }
 .sx-guest-bar a { gap: 10px; font-size: 20px; }
 .sx-guest-bar button { border: 1px solid #758f89; border-radius: 8px; padding: 0 15px; background: transparent; cursor: pointer; }
+/* App Share button (Dimau standard): first of the header's right-hand buttons, 44px tall; icon + Share on desktop, icon-only 44x44 on phones. */
+.sx-guest-actions { display: flex; align-items: center; gap: 8px; }
+.sx-guest-bar .sx-header-share { gap: 6px; height: 44px; padding: 0 14px; white-space: nowrap; }
+.sx-guest-bar .sx-header-share svg { flex: none; }
+@media (max-width: 767.98px) { .sx-guest-bar .sx-header-share { width: 44px; padding: 0; justify-content: center; } .sx-guest-bar .sx-share-label { display: none; } }
 body.sx-guest #app.sx-app .sx-content { max-width: 1220px; margin-inline: auto; }
 body.sx-guest .sx-hero-room .sx-room-track { padding: 16px; background: #301d31; color: #fff4ea; border-radius: 12px; }
 body.sx-guest .sx-hero-room .sx-room-track h3 { color: #fff4ea; font-size: 19px; margin: 8px 0 4px; }
