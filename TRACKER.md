@@ -1,3 +1,7 @@
+## 2026-11-27 — Saved phone artwork for Music and Talanoa
+
+Codex, Ops task 1595. Use the measured panel width for the lazy-loaded Music and Talanoa images on guest Home. A 390 px phone at 2× can use the existing 720 px WebPs. Wide displays keep the 1400 px versions. The artwork, crop and panel links are preserved.
+
 ## 2026-11-27 — Web Push for calls (built; migration applied live, still needs the two keys)
 
 - Claude (Donovan: "build the web push for calls"). A phone with Sota Kece closed gets "Sina is calling · Family Koro · video call"; tapping it opens Koro calls. Built, tested, not live.
