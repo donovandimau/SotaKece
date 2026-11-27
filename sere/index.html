@@ -59,6 +59,7 @@
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#0b2a4a;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:70;box-shadow:0 10px 30px rgba(11,42,74,.3)}
   @media (max-width:720px){.hero{grid-template-columns:1fr;padding:18px}.hero video,.hero img{max-height:360px;object-fit:cover}}
 </style>
+<script src="/session-messages.js"></script>
 </head>
 <body>
 <header>
@@ -130,10 +131,10 @@
     if(!session){who.innerHTML='';return renderAuth();}
     S.user=session.user;
     const {data:me}=await sb.from('bv_profiles').select('*').eq('id',S.user.id).maybeSingle();
-    if(!me){app.innerHTML=`<section class="glass auth"><h2 style="margin-top:0">One more step</h2><p>Your account exists but has no room yet. Create it on Sota Kece (30 seconds), then come back.</p><a class="btn" href="https://sotakece.com">Create my room</a> <button type="button" class="btn ghost sm" id="out">Sign out</button></section>`;document.getElementById('out').onclick=()=>sb.auth.signOut().then(()=>location.reload());return;}
+    if(!me){app.innerHTML=`<section class="glass auth"><h2 style="margin-top:0">One more step</h2><p>Your account exists but has no room yet. Create it on Sota Kece (30 seconds), then come back.</p><a class="btn" href="https://sotakece.com">Create my room</a> <button type="button" class="btn ghost sm" id="out">Sign out</button></section>`;document.getElementById('out').onclick=()=>confirmSotaSignOut(sb, 'Sere');return;}
     S.me=me;
     who.innerHTML=`<span style="font-size:14px;color:var(--ink-soft)">@${esc(me.handle)}</span> <button type="button" class="btn sm ghost" id="out">Sign out</button>`;
-    document.getElementById('out').onclick=()=>sb.auth.signOut().then(()=>location.reload());
+    document.getElementById('out').onclick=()=>confirmSotaSignOut(sb, 'Sere');
     window.SotaSere.init({client:sb,state:S,toast,esc,go:()=>home()});
     home();
   }

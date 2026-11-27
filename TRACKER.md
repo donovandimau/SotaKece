@@ -211,6 +211,8 @@ Do not carry over the prototype's dark theme, its invented village content or it
 - Testing: not tested
 
 ## Done — newest first
+
+- 2026-11-27 — Codex — Added Cancel before voluntary sign-out and playful, rotating English farewells to the native account controls. Night-only lines use device-local time.
 - 26 November 2026, Codex — removed the tablet rule hiding Talanoa and its Uro controls in Sema’s guest room.
 - 2026-11-26 — Claude — **Older phones no longer get a blank site** (Donovan: "go on the old-phone fix"; branch claude/old-phone-fix). The visit counter showed 21 "Uncaught SyntaxError: Unexpected token ." reports from 8 visitors (29 Oct–23 Nov, CN/DE/FR/GB/PL): browsers older than about 2020 cannot read `?.`/`??`, so nothing ran. New `scripts/legacy-js.mjs`, run at the end of `scripts/cf-static-assets.mjs`, rewrites the PUBLISHED copies in dist/ (external .js/.mjs and inline <script> blocks in the pages) with esbuild 0.24.0 to chrome67/safari14/firefox68/edge79. Source files are untouched; any file that will not convert, or a failed esbuild download, publishes unchanged and never fails the build. Local build: 77 scripts converted, 0 `?.`/`??` left; every converted file parses as ES2019. (The replaceChildren/Object.hasOwn crashes were already fixed 14 Nov and are guarded by tests/older-browsers.test.cjs.)
 - 26 Nov 2026, Codex — implemented #541 on the review branch. Sema’s guest preview has local theme and Uro controls, eight demo friends and a measured waveform for the credited clip.
