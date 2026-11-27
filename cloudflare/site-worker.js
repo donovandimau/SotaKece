@@ -1,7 +1,7 @@
 // Cloudflare Worker entry for sotakece.com, www.sotakece.com and sere.sotakece.com.
 // Static files are served from dist/ (the ASSETS binding). The Worker runs first only for the paths
 // in wrangler.jsonc "run_worker_first":
-//   - /api/*: the same eight api/*.js handlers Vercel ran, through cloudflare/node-adapter.js, so the
+//   - /api/*: the same api/*.js handlers Vercel ran, through cloudflare/node-adapter.js, so the
 //     API no longer needs Vercel. (While dimau-api-forwarder still has routes for <host>/api/*, those
 //     routes win and this code is not reached for /api/*; remove them once the secrets below are set.)
 //   - the share links /s/, /t/, /p/, /i/ and the home page "/" (so sere.sotakece.com/ can open the
@@ -13,6 +13,8 @@
 //   SERE_SECRET         signs /s/ share links and the render webhook address (fresh on 18 Nov 2026)
 //   REPLICATE_API_TOKEN the render service (Donovan's Replicate account); without it Sere says it is paused
 //   optional: CF_TURN_KEY_ID, CF_TURN_API_TOKEN, CALLS_TURN_URLS, CALLS_TURN_SECRET (call relay)
+//   optional: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY (call alerts to closed phones, /api/push; make them with
+//   node scripts/make-vapid-keys.mjs), VAPID_SUBJECT
 // With nodejs_compat and this compatibility date, Worker secrets also appear in process.env, which is
 // where the handlers read them, as on Vercel.
 import routes from './site-routes.cjs';
@@ -22,6 +24,7 @@ import callConfig from '../api/call-config.js';
 import guestCallConfig from '../api/guest-call-config.js';
 import invite from '../api/invite.js';
 import listen from '../api/listen.js';
+import push from '../api/push.js';
 import sereCallback from '../api/sere-callback.js';
 import sere from '../api/sere.js';
 import share from '../api/share.js';
@@ -32,6 +35,7 @@ export const API = {
   '/api/guest-call-config': guestCallConfig,
   '/api/invite': invite,
   '/api/listen': listen,
+  '/api/push': push,
   '/api/sere-callback': sereCallback,
   '/api/sere': sere,
   '/api/share': share,
