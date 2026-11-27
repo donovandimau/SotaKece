@@ -1,3 +1,7 @@
+## 2026-11-27 - Communications startup
+
+Codex, Ops task 1684. Reset the legacy calls list only when present so the current native-calls layout can open for members.
+
 ## 2026-11-27 - Signed-in sign-out controls
 
 The Dimau app picker now uses the active Sota member session. The picker and revised settings each preserve the session on Cancel and show rotating farewells after confirmation. The farewell remains visible when the signed-in view is replaced.
