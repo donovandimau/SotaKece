@@ -1,3 +1,7 @@
+## 2026-11-27 - Signed-in sign-out controls
+
+The Dimau app picker now uses the active Sota member session. The picker and revised settings each preserve the session on Cancel and show rotating farewells after confirmation. The farewell remains visible when the signed-in view is replaced.
+
 ## 2026-11-27 — Share button in the header (Dimau standard)
 
 Claude, Ops task 1631 (owner request: the Share button sits in the same place in every Dimau app). sotakece.com had no Share button in the header for guests. Guests: Share is now first of the welcome bar's right-hand buttons, before Sign in (`.sx-guest-actions`, also in the first-paint copy in index.html). Members: `.sx-header-share` is the first item of `[data-dimau-header-actions]` (CSS `order:-2`, ahead of Sign in and the Bula pill). 44px tall, icon + "Share" from 768px, icon-only 44x44 below; it opens the existing `SotaShare` sheet (`data-sota-share`). The member header hides the words "Sota Kece" (logo stays, name kept for screen readers) below 520px and from 768 to 839px, where they no longer fit. The old-browser header chip moved to the front too. The "Share Sota Kece" item in the menu stays. Checked in headless Chromium at 1440 and 390: one header Share button, first, 44px, no overlap, no horizontal scroll, opens the share sheet.

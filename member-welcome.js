@@ -130,7 +130,7 @@
     note.id = 'dm-greeting-note';
     note.setAttribute('role','status');
     note.lang = greetingLanguage();
-    (document.querySelector('main') || document.body).prepend(note);
+    (moment === 'out' ? document.body : (document.querySelector('main') || document.body)).prepend(note);
     note.textContent = moment === 'return'
       ? nextReturnMessage(note.lang, LABEL, user.id, usedPassword)
       : 'Moce mada! ' + nextDepartureMessage(note.lang, user && user.id, false);

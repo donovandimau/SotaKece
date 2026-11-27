@@ -264,7 +264,43 @@ function nextExitFarewell() {
   return messages[index];
 }
 
+  // Sota's member session belongs to its Supabase client, including when
+  // the optional cross-app SSO client is not configured.
+  var memberSessionWatch;
+  var sotaMember;
+  function watchSotaMember() {
+    if (APP !== 'sota-kece' || memberSessionWatch || !root.sb || !root.sb.auth) return;
+    memberSessionWatch = root.sb.auth.onAuthStateChange(function (_, session) {
+      sotaMember = session && session.user;
+      if (sheet && !sheet.hidden) render();
+    }).data.subscription;
+  }
   function accountRow() {
+    if (sotaMember) {
+      var member = sotaMember;
+      var name = member.user_metadata && (member.user_metadata.display_name || member.user_metadata.full_name);
+      return el('div', { class: 'acct' }, [
+        el('strong', { text: name || member.email || 'Signed in' }),
+        el('button', { class: 'quiet', type: 'button', text: 'Sign out', onclick: async function () {
+          if (!root.confirm('Sign out of Sota Kece?')) return;
+          this.disabled = true;
+          var previousNote = doc.getElementById('dm-greeting-note');
+          try {
+            var result = await root.sb.auth.signOut();
+            if (result.error) throw result.error;
+          } catch (error) {
+            notice = 'Could not sign out. Please try again.';
+            render();
+            return;
+          }
+          close();
+          if (root.DimauMemberWelcome && doc.getElementById('dm-greeting-note') === previousNote) {
+            root.DimauMemberWelcome.left(member);
+          }
+        } }),
+        notice ? el('p', { role: 'alert', text: notice }) : null
+      ]);
+    }
     if (!auth.enabled) return el('p', { class: 'small', text: 'Use your one Dimau account in every Dimau app.' });
     var u = auth.user();
     if (!u) {
@@ -331,7 +367,7 @@ function nextExitFarewell() {
   }
 
   function open() {
-    ensureHost(); lastFocus = doc.activeElement; sheet.hidden = false; render();
+    ensureHost(); watchSotaMember(); lastFocus = doc.activeElement; sheet.hidden = false; render();
     setExpanded(true);
     var t = sheet.querySelector('#dsa-title'); if (t) t.focus();
   }
@@ -343,7 +379,7 @@ function nextExitFarewell() {
   function setExpanded(v) { [].forEach.call(doc.querySelectorAll('[data-dimau-shell-open]'), function (b) { b.setAttribute('aria-expanded', v ? 'true' : 'false'); }); }
 
   function openVolau() {
-    ensureHost(); lastFocus = doc.activeElement;
+    ensureHost(); watchSotaMember(); lastFocus = doc.activeElement;
     if (!volauSheet) {
       var src = new URL(VOLAU); src.searchParams.set('from', APP || 'dimau');
       volauSheet = el('div', { class: 'scrim', onclick: function (e) { if (e.target === volauSheet) closeVolau(); } }, [
