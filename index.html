@@ -887,7 +887,7 @@ function installAuthLifecycle(){
   let owner=S.user?.id||null,change=0;
   const result=sb.auth.onAuthStateChange((event,session)=>{
     const next=session?.user?.id||null,previous=owner||S.user?.id||null;
-    if(event==='SIGNED_OUT'){window.DimauMemberWelcome.left(S.user);greetedMemberId=null;}
+    if(event==='SIGNED_OUT'){window.DimauMemberWelcome?.left(S.user);S.greetedMemberId=null;}
     if(event==='INITIAL_SESSION'&&(!previous||next===previous)){owner=next;return;}
     if(event!=='SIGNED_OUT'&&next===previous){owner=next;return;}
     owner=next;const revision=++change;
@@ -1192,7 +1192,6 @@ async function render(){
   if(S.tab==="wallet"){ if(window.SOTA_WALLET_ON) return viewWallet(); S.tab="pulse"; return viewPulse(); }
   if(S.tab==="music") return viewMusic();
 }
-let greetedMemberId = null;
 async function boot(){
   if(typeof location==='object'&&location.hash==="#connections=example")return window.SotaConnections.preview();
   rememberReferral();
@@ -1206,10 +1205,10 @@ async function boot(){
   if(!stillHere())return;
   if(!session){renderAuth('in',personal);if(circleRoute)window.SotaCircles?.route();return;}
   S.user = session.user;
-  if (greetedMemberId !== S.user.id) {
+  if (window.DimauMemberWelcome && S.greetedMemberId !== S.user.id) {
     const pending = sessionStorage.getItem('sota.greeting.auth');
     const first = !S.user.user_metadata?.welcome_sotakece && !localStorage.getItem('welcome_sotakece.' + S.user.id);
-    greetedMemberId = S.user.id;
+    S.greetedMemberId = S.user.id;
     if (first || pending) {
       sessionStorage.removeItem('sota.greeting.auth');
       window.DimauMemberWelcome.entered(session,pending === 'password',marker => sb.auth.updateUser({data:{[marker]:true}}));
