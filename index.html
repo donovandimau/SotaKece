@@ -335,11 +335,11 @@ nav.bottom button.on{background:#fff;color:var(--accent);box-shadow:0 2px 10px r
 <script src="/dimau-header-standard.js?v=20261029-header-v4" defer></script>
 <script src="/dimau-install.js?v=20261103-glass-option-1" data-app="bulavata" data-label="Sota Kece" data-prompt="manual" data-notify="off" data-buttons="glass" defer></script>
 <script src="/dimau-premium-shell.js?v=20261109-shell-1" defer></script>
+<script defer src="/member-welcome.js"></script>
 <script src="/sota-premium-shell.js?v=20261121-apps-1" defer></script>
 <script src="/dimau-shell.js?v=1" data-app="sota-kece" data-launcher="none" defer></script>
 --><script>SK.js()</script>
 <script src="https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js" data-surface="sota-kece" defer></script>
-<script defer src="/member-welcome.js"></script>
 </head>
 <body class="dps-shell dps-has-nav">
 <div class="bubbles" id="bubbles"></div>
@@ -1205,6 +1205,7 @@ async function boot(){
   if(!stillHere())return;
   if(!session){renderAuth('in',personal);if(circleRoute)window.SotaCircles?.route();return;}
   S.user = session.user;
+  window.SKAuthReturned?.(S.user);
   if (window.DimauMemberWelcome && S.greetedMemberId !== S.user.id) {
     const pending = sessionStorage.getItem('sota.greeting.auth');
     const first = !S.user.user_metadata?.welcome_sotakece && !localStorage.getItem('welcome_sotakece.' + S.user.id);
@@ -1214,7 +1215,6 @@ async function boot(){
       window.DimauMemberWelcome.entered(session,pending === 'password',marker => sb.auth.updateUser({data:{[marker]:true}}));
     }
   }
-  window.SKAuthReturned?.(S.user);
   window.SotaSpaceDesign?.apply();
   if(run)run.user=S.user.id;
   if(publicGraphRoute){

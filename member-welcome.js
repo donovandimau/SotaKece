@@ -12,7 +12,7 @@
   function greetingLanguage() {
     let code;
     try { code = localStorage.getItem('dimau.greeting.language'); } catch (_) {}
-    return Object.hasOwn(greetingCopy, code) ? code : 'en';
+    return Object.prototype.hasOwnProperty.call(greetingCopy, code) ? code : 'en';
   }
   function greetingElement(tag, value) {
     const element = document.createElement(tag);
@@ -206,11 +206,13 @@
         }
         if (!stops.length) {
           heading.textContent = greetingCopy[language][11];
-          dialog.replaceChildren(heading, feature, done);
+          dialog.textContent = '';
+          dialog.append(heading, feature, done);
         } else {
           heading.textContent = greetingCopy[language][11];
           next.onclick = advance;
-          dialog.replaceChildren(heading, preview, next, done);
+          dialog.textContent = '';
+          dialog.append(heading, preview, next, done);
           advance();
           next.focus();
         }
