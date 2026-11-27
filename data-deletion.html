@@ -19,6 +19,7 @@
 <link rel="icon" href="/icons/icon-32.png">
 <link rel="stylesheet" href="/legal/legal.css">
 <script src="/vendor/supabase-2.45.0.min.js"></script>
+<script src="/session-messages.js"></script>
 </head>
 <body>
 <header><img src="/icons/icon-192.png" alt=""><a href="/">Sota Kece</a></header>
@@ -86,7 +87,7 @@
     status(error?error.message:'');
   });
   $('confirm').addEventListener('input',()=>{$('delete').disabled=$('confirm').value.trim()!=='DELETE';});
-  $('signout').addEventListener('click',async()=>{await sb.auth.signOut();status('');});
+  $('signout').addEventListener('click',async()=>{if (!await window.DimauSessionMessages.confirmAccountExit("Sign out of Sota Kece?", '', '')) return;const result=await sb.auth.signOut();if(!result.error){status('');window.DimauSessionMessages.signedOut("Sota Kece");}});
   $('delete').addEventListener('click',async()=>{
     $('delete').disabled=true; status('Deleting…');
     const {data:{session}}=await sb.auth.getSession();
