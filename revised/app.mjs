@@ -80,7 +80,33 @@ function clearMember(){worldView?.dispose();worldView=null;studio.selected='';st
 function setMember(session){if(!session?.user){if(state.mode==='member'){clearMember();loadPage();}return;}if(state.mode==='member'&&state.service?.user?.id===session.user.id)return;clearMember();state.service.owner(session.user);state.mode='member';state.member={me:null,posts:[],people:[],pending:[],circles:[],messages:{}};if(state.page==='welcome')go('home');else loadPage();}
 let authReady,authEvent=0;
 async function ensureAuth(){if(!authReady)authReady=(async()=>{state.sb=await client();state.service=new Service(state.sb);state.sb.auth.onAuthStateChange((_event,session)=>{const event=++authEvent;if(state.mode==='member'&&state.service.user?.id!==session?.user?.id){clearMember();render();}setTimeout(()=>{if(event===authEvent){setMember(session);if(_event==='PASSWORD_RECOVERY'){state.recovery=true;recoveryDialog();}}},0);});return state.sb;})().catch(()=>{authReady=null;throw Error('Sign-in could not connect. Check your connection and try again.');});return authReady;}
-async function signout(){const {error}=await state.sb.auth.signOut();if(error)throw Error(error.message);clearMember();go('welcome');toast('Signed out. Your member pages have been cleared.');}
+let departureIndex = 0;
+function nextExitFarewell() {
+  const messages = [
+      'Logged out. Off to pretend that you did some hard work and need a break. 🌿',
+      'Session closed. Your excuses are getting better. 🚶',
+      'Signed out. The server is going to lie down and recover for a bit. 🛌',
+      'Logging off. Whatever you just did, we all saw it. 🤐',
+      'Session ended. Go forth and ignore important things elsewhere. 👀',
+      "Out for now. Don't worry, we didn't complain while we did all the work for you. 🔋",
+      "Logged out. You're free—until you start getting bored and nosey again. 🔔",
+      'Session closed. Go drink some water. I never said grog or beer. 💧'
+    ];
+  const hour = new Date().getHours();
+  if (hour < 5) messages.push('It’s past midnight. Are we going to pretend to do some real work now? 🌙');
+  if (hour < 5 || hour >= 22) messages.push('Logging out late. Go to sleep before your eyes start looking like you drank grog all night. 🛌');
+  const key = 'dimau.farewell.' + location.pathname;
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved !== null && /^\d+$/.test(saved)) departureIndex = Number(saved);
+  } catch {}
+  const index = departureIndex % messages.length;
+  departureIndex = (index + 1) % messages.length;
+  try { localStorage.setItem(key, String(departureIndex)); } catch {}
+  return messages[index];
+}
+
+async function signout(){const {error}=await state.sb.auth.signOut();if(error)throw Error(error.message);clearMember();go('welcome');toast(nextExitFarewell() + ' Your member pages have been cleared.');}
 async function action(name,value,button){
  if(name==='design-page'){window.SotaRevisedDesign?.open();return;}
  switch(name){
