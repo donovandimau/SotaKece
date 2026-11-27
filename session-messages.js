@@ -1,27 +1,29 @@
 (() => {
   'use strict';
   if (typeof window === 'undefined' || window.DimauSessionMessages) return;
-const sessionLineIndexes = new Map();
+  const sessionLineIndexes = new Map();
   function nextSessionLine(bucket, lines, appName) {
-    const key = 'dimau.session-lines.v1.' + appName + '.' + bucket;
+    const key = 'dimau.session-lines.v2.' + appName + '.' + bucket;
     let index = sessionLineIndexes.get(key) || 0;
     try {
-      const stored = localStorage.getItem(key);
-      if (stored !== null && /^\d+$/.test(stored)) index = Number(stored) || 0;
+      const stored = Number(localStorage.getItem(key));
+      if (Number.isSafeInteger(stored) && stored >= 0 && localStorage.getItem(key) !== null) index = stored;
     } catch (_) {}
     const next = (index + 1) % lines.length;
     sessionLineIndexes.set(key, next);
     try { localStorage.setItem(key, String(next)); } catch (_) {}
     return lines[index % lines.length];
   }
-  function playfulFarewell(appName, hour = new Date().getHours()) {
+  function playfulFarewell(appName, hour = new Date().getHours(), workSaved = false) {
     const lines = [
-      'Logged out. Off to do some “real work”, supposedly. 🌿',
-      'Session closed. Try not to accidentally break anything on the way out. 🚶',
-      'Signed out. Here’s hoping your dignity survived that last meeting. 💀',
-      appName + ' promises not to gossip while you’re gone. 🤐',
-      'Session ended. Have fun wasting the company’s money. 👀',
-      'Out for now. I’ll be here scratching my head until you come back. 🔋'
+      'Logged out. Off to pretend that you did some hard work and need a break. 🌿',
+      workSaved ? 'Session closed. Your work is saved; your excuses are getting better. 🚶' : 'Session closed. Your excuses are getting better. 🚶',
+      'Signed out. The server is going to lie down and recover for a bit. 🛌',
+      'Logging off. Whatever you just did, we all saw it. 🤐',
+      'Session ended. Go forth and ignore important things elsewhere. 👀',
+      "Out for now. Don't worry, we didn't complain while we did all the work for you. 🔋",
+      "Logged out. You're free—until you start getting bored and nosey again. 🔔",
+      'Session closed. Go drink some water. I never said grog or beer. 💧'
     ];
     if (hour < 5) lines.push('It’s past midnight. Are we going to pretend to do some real work now? 🌙');
     if (hour < 5 || hour >= 22) {
@@ -30,9 +32,14 @@ const sessionLineIndexes = new Map();
     }
     return nextSessionLine('day', lines, appName);
   }
-  function lateWelcome(appName, hour = new Date().getHours()) {
-    if (hour >= 5 && hour < 22) return '';
-    return nextSessionLine('late-arrival', ['', 'Signed in late. Brave of you to trust your judgment at this hour. 🫠'], appName);
+  function arrivalAside(appName, hour = new Date().getHours()) {
+    const lines = ['', 'Signed in. You again. We were just planning to escape from you. 🫠',
+      '', "Authenticated. Somehow we're still doing this. Give us a break. ⚙️"];
+    if (hour >= 22 || hour < 5) {
+      lines.push('Signed in late. Brave of you to trust your judgment at this hour. 🫠');
+      return nextSessionLine('night-arrival', lines, appName);
+    }
+    return nextSessionLine('day-arrival', lines, appName);
   }
 async function confirmAccountExit(title, name, detail) {
   if (document.querySelector('[data-account-exit]')) return false;
@@ -100,7 +107,7 @@ async function confirmAccountExit(title, name, detail) {
       if (notice && typeof notice.text === 'string' && Date.now() - notice.time < 30000) show(notice.text);
     } catch (_) {}
   }
-  window.DimauSessionMessages = {confirmAccountExit, playfulFarewell, lateWelcome, signedOut, show};
+  window.DimauSessionMessages = {confirmAccountExit, playfulFarewell, arrivalAside, signedOut, show};
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', restore, {once:true});
   else restore();
 })();
