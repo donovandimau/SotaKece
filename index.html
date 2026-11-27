@@ -339,6 +339,7 @@ nav.bottom button.on{background:#fff;color:var(--accent);box-shadow:0 2px 10px r
 <script src="/dimau-shell.js?v=1" data-app="sota-kece" data-launcher="none" defer></script>
 --><script>SK.js()</script>
 <script src="https://xnxmumbvgtmlpenutlii.supabase.co/functions/v1/track/beacon.js" data-surface="sota-kece" defer></script>
+<script defer src="/member-welcome.js"></script>
 </head>
 <body class="dps-shell dps-has-nav">
 <div class="bubbles" id="bubbles"></div>
@@ -462,6 +463,7 @@ async function oauthSignIn(provider){
   const buttons=[...document.querySelectorAll(".social-btn")];buttons.forEach(b=>{b.disabled=true;b.setAttribute("aria-busy","true");});
   if(err)err.textContent="Opening "+(provider==="google"?"Google":"Facebook")+"…";
   window.SKFunnel("signup_provider",{provider});window.SKAuthPending(provider);
+  sessionStorage.setItem('sota.greeting.auth','provider');
   let error;try{({error}=await sb.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+"/"}}));}catch(e){error=e||Error("failed");}
   if(error){buttons.forEach(b=>{b.disabled=false;b.removeAttribute("aria-busy");});window.SKAuthPending(null);
     const off=/not enabled|unsupported/i.test(String(error.message||""));window.SKFunnel("signup_error",{provider,step:off?"provider_off":"provider"});
@@ -470,6 +472,7 @@ async function oauthSignIn(provider){
 async function signIn(){
   const b=$("#a-go"); b.disabled=true; $("#a-err").textContent="";
   window.SKFunnel("signup_provider",{provider:"email",mode:"in"});
+  sessionStorage.setItem('sota.greeting.auth','password');
   const {error} = await sb.auth.signInWithPassword({email:$("#a-email").value.trim(),password:$("#a-pass").value});
   if(error){ $("#a-err").textContent=error.message; b.disabled=false; window.SKFunnel("signup_error",{provider:"email",step:"signin"}); }
   else { window.SKFunnel("signup_signed_in",{provider:"email",new_account:0}); boot(); }
@@ -884,6 +887,7 @@ function installAuthLifecycle(){
   let owner=S.user?.id||null,change=0;
   const result=sb.auth.onAuthStateChange((event,session)=>{
     const next=session?.user?.id||null,previous=owner||S.user?.id||null;
+    if(event==='SIGNED_OUT'){window.DimauMemberWelcome.left(S.user);greetedMemberId=null;}
     if(event==='INITIAL_SESSION'&&(!previous||next===previous)){owner=next;return;}
     if(event!=='SIGNED_OUT'&&next===previous){owner=next;return;}
     owner=next;const revision=++change;
@@ -1188,6 +1192,7 @@ async function render(){
   if(S.tab==="wallet"){ if(window.SOTA_WALLET_ON) return viewWallet(); S.tab="pulse"; return viewPulse(); }
   if(S.tab==="music") return viewMusic();
 }
+let greetedMemberId = null;
 async function boot(){
   if(typeof location==='object'&&location.hash==="#connections=example")return window.SotaConnections.preview();
   rememberReferral();
@@ -1201,6 +1206,15 @@ async function boot(){
   if(!stillHere())return;
   if(!session){renderAuth('in',personal);if(circleRoute)window.SotaCircles?.route();return;}
   S.user = session.user;
+  if (greetedMemberId !== S.user.id) {
+    const pending = sessionStorage.getItem('sota.greeting.auth');
+    const first = !S.user.user_metadata?.welcome_sotakece && !localStorage.getItem('welcome_sotakece.' + S.user.id);
+    greetedMemberId = S.user.id;
+    if (first || pending) {
+      sessionStorage.removeItem('sota.greeting.auth');
+      window.DimauMemberWelcome.entered(session,pending === 'password',marker => sb.auth.updateUser({data:{[marker]:true}}));
+    }
+  }
   window.SKAuthReturned?.(S.user);
   window.SotaSpaceDesign?.apply();
   if(run)run.user=S.user.id;
