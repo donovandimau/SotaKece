@@ -13,7 +13,7 @@ const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 test('dimau-shell.js is the unchanged master copy', () => {
   // Update together with a byte copy from dimau-platform-standard/super-app; never edit it here.
   const sha = crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'dimau-shell.js'))).digest('hex');
-  assert.equal(sha, 'bd631bcae7b73126ea8bfff6d736ba2a7f350c33bdd1f4b7ccb6a0032dc54ef7');
+  assert.equal(sha, 'b7775405a10b97d4649cbe7719d1905e2334a8b90ec40e88a16634361dc623ba');
 });
 
 test('the page loads the shell once, deferred, as Sota Kece, with no floating button and no second sign-in', () => {

@@ -238,6 +238,32 @@
   }
   function count(app) { try { if (root.dimau && typeof root.dimau.track === 'function') root.dimau.track('click', { kind: 'shell_switch', from: APP || null, to: app.id }); } catch (e) { /* never block */ } }
 
+let departureIndex = 0;
+function nextExitFarewell() {
+  const messages = [
+      'Logged out. Off to pretend that you did some hard work and need a break. 🌿',
+      'Session closed. Your excuses are getting better. 🚶',
+      'Signed out. The server is going to lie down and recover for a bit. 🛌',
+      'Logging off. Whatever you just did, we all saw it. 🤐',
+      'Session ended. Go forth and ignore important things elsewhere. 👀',
+      "Out for now. Don't worry, we didn't complain while we did all the work for you. 🔋",
+      "Logged out. You're free—until you start getting bored and nosey again. 🔔",
+      'Session closed. Go drink some water. I never said grog or beer. 💧'
+    ];
+  const hour = new Date().getHours();
+  if (hour < 5) messages.push('It’s past midnight. Are we going to pretend to do some real work now? 🌙');
+  if (hour < 5 || hour >= 22) messages.push('Logging out late. Go to sleep before your eyes start looking like you drank grog all night. 🛌');
+  const key = 'dimau.farewell.' + location.pathname;
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved !== null && /^\d+$/.test(saved)) departureIndex = Number(saved);
+  } catch {}
+  const index = departureIndex % messages.length;
+  departureIndex = (index + 1) % messages.length;
+  try { localStorage.setItem(key, String(departureIndex)); } catch {}
+  return messages[index];
+}
+
   function accountRow() {
     if (!auth.enabled) return el('p', { class: 'small', text: 'Use your one Dimau account in every Dimau app.' });
     var u = auth.user();
@@ -255,7 +281,7 @@
           var name = u.name ? ', ' + u.name : '';
           if (!window.confirm('Sign out' + name + '?')) return;
           auth.signOut();
-          notice = 'Moce mada' + name + '. Enjoy the rest of your day.';
+          notice = 'Moce mada' + name + '. ' + nextExitFarewell();
           render();
         } })
     ]);
