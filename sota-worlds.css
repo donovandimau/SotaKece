@@ -516,7 +516,7 @@ html body.sx-enabled #app.sx-app #sk-music-playlist.sk-playlist-inline .sk-playl
 }
 @media(max-width:760px){
  #app.sx-app .sx-world-hero.sx-world-hero-compact{grid-template-columns:minmax(0,1fr)}
- #app.sx-app .sx-world-hero-compact .sx-world-hero-photo{display:none}
+ #app.sx-app .sx-world-hero-compact .sx-world-hero-photo{display:block;height:clamp(100px,30vw,155px)}
  #app.sx-app .sx-world-hero-compact .sx-world-hero-copy{padding:16px 18px}
  #app.sx-app .sx-world-hero-compact .sx-world-hero-copy h1{font-size:24px!important}
 }
@@ -609,3 +609,13 @@ body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side .sk-grou
 body.sx-member #app.sx-app[data-world-page="pulse"] #view>.sk-home-side>[data-sk-group="yours"] .sk-group-actions{grid-template-columns:1fr}}
 @media(max-width:400px){#app.sx-app .sk-group-actions{grid-template-columns:1fr}}
 @media(forced-colors:active){#app.sx-app .sk-group,#app.sx-app .sk-group-actions button{background:Canvas;color:CanvasText;border-color:CanvasText}}
+
+/* Keep native headings and their actions together beside their page photograph. */
+#app .sx-native-photo-heading{display:flow-root}
+#app .sx-native-photo-heading>img:first-child{display:block;float:right;width:44%;height:clamp(140px,16vw,224px);object-fit:cover;object-position:50% 36%;border-radius:14px;margin:0 0 8px 24px}
+#app .sx-room-scene>img{display:block;width:100%;height:clamp(150px,19vw,260px);object-fit:cover;object-position:center 36%;border-radius:16px}
+#app[data-front-page="connect"] .bv-connect-header:before{content:"";display:block;width:100%;height:clamp(140px,18vw,240px);background:center 35%/cover url('/assets/page-scenes-nov27/connect-1200.webp');border-radius:16px}
+@media(max-width:760px){
+ #app .sx-native-photo-heading>img:first-child{float:none;width:100%;height:auto;aspect-ratio:2.35;object-fit:cover;margin:0 0 14px}
+ #app[data-front-page="connect"] .bv-connect-header:before{background-image:url('/assets/page-scenes-nov27/connect-640.webp')}
+}

@@ -1,3 +1,7 @@
+## 2026-11-27 — Photography across Sota Kece
+
+Added 17 page-specific scenes with responsive WebP sizes, including a wide Settings composition. Guest first paint and Home use the same source. Member Koro and circle headings retain their controls. Verified stylesheet bundles and 21 first-paint and navigation checks.
+
 ## 2026-11-27 - Communications startup
 
 Codex, Ops task 1684. Reset the legacy calls list only when present so the current native-calls layout can open for members.
