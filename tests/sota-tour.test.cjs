@@ -1,5 +1,5 @@
 'use strict';
-// Guided tour for new members (11 Nov 2026): Talanoa Wall -> starter Koro -> Music -> Sere -> My space.
+// Guided tour for new members (11 Nov 2026): Talanoa Wall -> starter Village -> Music -> Sere -> My space.
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -13,7 +13,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 
 const PAGES={
   pulse:'<h1>Talanoa Wall</h1><div class="tw-wrap">wall</div><section class="hub-card">hubs</section><button data-tw="sere">Make a photo sing</button>',
-  music:'<h1>Music</h1>',room:'<h1>My space</h1>',crews:'<h1>Koro</h1>'
+  music:'<h1>Music</h1>',room:'<h1>My space</h1>',crews:'<h1>Village</h1>'
 };
 function boot({member=true,sere=true,pending=false,done=false}={}){
   const d=new JSDOM('<!doctype html><body><main id="view"></main></body>',{runScripts:'outside-only',pretendToBeVisual:true,url:'https://sotakece.com/'});
@@ -43,7 +43,7 @@ test('the tour walks the five stops in order, rings each one and ends cleanly',d
   assert.equal(h.q('[data-tour="back"]').hidden,true);
   const titles=['The Talanoa Wall'];
   for(let k=0;k<4;k++){h.q('[data-tour="next"]').click();await wait(40);titles.push(h.q('#sk-tour-title').textContent);}
-  assert.deepEqual(titles,['The Talanoa Wall','Join a starter Koro','Your island soundtrack','Make a photo sing','My space']);
+  assert.deepEqual(titles,['The Talanoa Wall','Join a starter Village','Your island soundtrack','Make a photo sing','My space']);
   assert.deepEqual(h.went,['music','pulse','room']);
   assert.equal(h.q('[data-tour="next"]').textContent,'Finish');
   h.q('[data-tour="next"]').click();await wait(10);
@@ -55,7 +55,7 @@ test('the tour walks the five stops in order, rings each one and ends cleanly',d
 
 test('Sere is left out when that feature is not loaded, and Esc ends the tour',dom,async()=>{
   const h=boot({sere:false});h.w.SotaTour.init({state:h.state,go:h.go});
-  assert.deepEqual(Array.from(h.w.SotaTour.stops(),s=>s.title),['The Talanoa Wall','Join a starter Koro','Your island soundtrack','My space']);
+  assert.deepEqual(Array.from(h.w.SotaTour.stops(),s=>s.title),['The Talanoa Wall','Join a starter Village','Your island soundtrack','My space']);
   h.w.SotaTour.start();await wait(20);
   assert.equal(h.q('#sk-tour-step').textContent,'Step 1 of 4');
   h.w.document.dispatchEvent(new h.w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await wait(5);

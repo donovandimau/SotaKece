@@ -117,11 +117,11 @@ browserTest('seven signed-in worlds have five choices and a feed choice changes 
  assert.equal(h.get('#p-text').placeholder,'Say something');
 });
 
-browserTest('Koro choices use native group type and naming controls',t=>{
+browserTest('Village choices use native group type and naming controls',t=>{
  const h=harness(t);
  const {app,w}=h;
  w.SotaExperience.stop();
- app.innerHTML='<header class="top"></header><main id="view"><section id="koro-create"><input data-tc-name placeholder="Circle name"><select data-tc-type><option value="koro">Koro</option><option value="mataqali">Mataqali</option></select></section></main>';
+ app.innerHTML='<header class="top"></header><main id="view"><section id="koro-create"><input data-tc-name placeholder="Circle name"><select data-tc-type><option value="koro">Village</option><option value="mataqali">Mataqali</option></select></section></main>';
  w.SotaExperience.mountMember(app,{user:{id:'choice-test-member'},me:{handle:'fixture'},tab:'crews'});
  const menu=h.get('[data-world-choice=crews]');
  for(const [choice,type,placeholder] of [['yasana','koro',/provincial/],['mataqali','mataqali',/mataqali/],['island','koro',/island/]]){

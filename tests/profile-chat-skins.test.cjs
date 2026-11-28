@@ -34,7 +34,7 @@ test('chat sample escapes profile text and contains no live message form or remo
   assert(html.includes('class="msg mine"'));
 });
 
-test('Koro uses its current owner skin and removes old tokens when changing screen',()=>{
+test('Village uses its current owner skin and removes old tokens when changing screen',()=>{
   const classes=new Set(),styles=[];
   let activeStyle=null,hasMessages=true;
   const context=vm.createContext({skins,S:{me:{room_accent:'#046e86'}},stopSample(){},app:{classList:{remove(){}}},window:{},

@@ -1,4 +1,4 @@
-/* Sota Kece — who is around, and a quick way into your Koro.
+/* Sota Kece — who is around, and a quick way into your Village.
  * Presence uses what friends can already see of each other (the "last seen" time on the
  * friends list); nothing new is stored or shared. A member counts as online for ten minutes
  * after the app last checked in, because the check-in is saved at most once every five. */
@@ -52,7 +52,7 @@
     void doc;return count;
   }
 
-  /* ------------------------------------------------------------ Koro quick-switch */
+  /* ------------------------------------------------------------ Village quick-switch */
   function folded(){try{return root.localStorage.getItem(FOLD)==='1';}catch{return false;}}
   function koroList(rows){
     return (Array.isArray(rows)?rows:[]).filter(c=>c&&Number.isSafeInteger(Number(c.id))&&typeof c.name==='string'&&c.name.trim()).slice(0,50);
@@ -78,18 +78,18 @@
       if(people&&people.parentNode===nav)people.after(box);else nav.after(box);
     }
     box.dataset.key=key;box.textContent='';
-    const summary=doc.createElement('summary');summary.textContent='Your Koro';
+    const summary=doc.createElement('summary');summary.textContent='Your Village';
     const count=doc.createElement('b');count.textContent=String(list.length);summary.append(count);box.append(summary);
-    const items=doc.createElement('div');items.className='sl-koro-list';items.setAttribute('role','group');items.setAttribute('aria-label','Your Koro');
+    const items=doc.createElement('div');items.className='sl-koro-list';items.setAttribute('role','group');items.setAttribute('aria-label','Your Village');
     for(const c of list.slice(0,MAX_KORO)){
       const b=doc.createElement('button');b.type='button';b.dataset.liveKoro=String(c.id);
       const here=S.tab==='crews'&&Number(S.crew)===Number(c.id);b.setAttribute('aria-current',here?'page':'false');
       const mark=doc.createElement('span');mark.className='sl-koro-mark';mark.setAttribute('aria-hidden','true');mark.textContent=c.emoji||'🌴';
       const name=doc.createElement('span');name.className='sl-koro-name';name.textContent=c.name.trim();
-      b.append(mark,name);b.setAttribute('aria-label','Open '+c.name.trim()+' Koro');items.append(b);
+      b.append(mark,name);b.setAttribute('aria-label','Open '+c.name.trim()+' Village');items.append(b);
     }
     const all=doc.createElement('button');all.type='button';all.className='sl-koro-all';all.dataset.liveKoro='all';
-    all.textContent=list.length>MAX_KORO?'All '+list.length+' Koro ↗':'All Koro ↗';items.append(all);
+    all.textContent=list.length>MAX_KORO?'All '+list.length+' Villages ↗':'All Villages ↗';items.append(all);
     box.append(items);
   }
   async function loadKoro(force){

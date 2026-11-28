@@ -1,7 +1,7 @@
 const fs=require('fs'),assert=require('assert/strict'),{randomUUID}=require('crypto');
 const {JSDOM}=require(process.env.COMMS_JSDOM||'jsdom');
 const dir=require('path').resolve(__dirname,'..'),C=require(dir+'/communications-core.js');
-const id='12345678-1234-4234-8234-123456789abc';let groups=[{id:1,name:'Test Koro',members:2,join_code:'private-code'}],seq=5,poll,authHandler;
+const id='12345678-1234-4234-8234-123456789abc';let groups=[{id:1,name:'Test Village',members:2,join_code:'private-code'}],seq=5,poll,authHandler;
 let rows=[{id:1,crew_id:1,author:'u2',body:'Bula <img src=x onerror=alert(1)>',created_at:'2026-10-25T12:00:00.000Z'},
 {id:2,crew_id:1,author:'u2',body:C.encode({kind:'task',id,title:'Bring supplies',status:'todo'}),created_at:'2026-10-25T12:00:01.000Z'},
 {id:3,crew_id:1,author:'u2',body:C.encode({kind:'thread',id,title:'Sunday',text:'Plan for the day'}),created_at:'2026-10-25T12:00:02.000Z'}];
@@ -10,10 +10,10 @@ function query(table){let inserted,after;const q={select(){return q},eq(){return
 const sb={auth:{async getSession(){return {data:{session:user?{user}:null},error:null}},onAuthStateChange(fn){authHandler=fn;return {data:{subscription:{unsubscribe(){}}}}},async signOut(){user=null;authHandler('SIGNED_OUT',null);return {error:null}}},from:query,async rpc(){return {data:groups,error:null}}};
 const dom=new JSDOM(fs.readFileSync(dir+'/communications.html','utf8'),{url:'https://sotakece.com/communications.html?app=fiji-learn',runScripts:'outside-only',pretendToBeVisual:true});const w=dom.window;w.supabase={createClient:()=>sb};w.crypto.randomUUID=randomUUID;w.setInterval=fn=>{poll=fn;return 1};w.eval(fs.readFileSync(dir+'/communications-core.js','utf8'));w.eval(fs.readFileSync(dir+'/communications.js','utf8'));
 const flush=async()=>{for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));};const $=s=>w.document.querySelector(s);
-(async()=>{await flush();assert.equal($('#signedOut').hidden,true);assert.equal($('#sourceLabel').textContent,'CONNECTED FROM FIJI LEARN');$('.group-button').click();await flush();assert.equal($('#roomName').textContent,'Test Koro');assert.equal($('#messages img'),null);assert.match($('#messages').textContent,/<img src=x/);assert.match($('#board').textContent,/Bring supplies/);
+(async()=>{await flush();assert.equal($('#signedOut').hidden,true);assert.equal($('#sourceLabel').textContent,'CONNECTED FROM FIJI LEARN');$('.group-button').click();await flush();assert.equal($('#roomName').textContent,'Test Village');assert.equal($('#messages img'),null);assert.match($('#messages').textContent,/<img src=x/);assert.match($('#board').textContent,/Bring supplies/);
 $('#chatText').value='Shared message';$('#sendChat').dispatchEvent(new w.Event('submit',{cancelable:true,bubbles:true}));await flush();assert.equal(C.parse(inserts.at(-1).body).text,'Shared message');assert.equal($('#chatText').value,'');
 $('#tab-board').click();$('#board .text-button').click();$('#board form input').value='Draft card edit';poll();await flush();assert.equal($('#board form input').value,'Draft card edit');$('#board form').dispatchEvent(new w.Event('submit',{cancelable:true,bubbles:true}));await flush();assert.equal(C.parse(inserts.at(-1).body).title,'Draft card edit');assert.equal($('#board form'),null);
 $('#tab-calls').click();$('#createAudio').click();await flush();assert.ok(C.validMeetingUrl($('#calls a').href));assert.equal($('#calls a').target,'_blank');assert.equal($('#calls iframe'),null);assert.equal($('#calls video'),null);
 $('#chatText').value='Must clear when membership lost';groups=[];poll();await flush();assert.equal($('#groupWorkspace').hidden,true);assert.equal($('#chatText').value,'');assert.equal($('#messages').textContent,'');
-$('#signOut').click();await flush();assert.equal($('#signedOut').hidden,false);assert.equal($('#groups').textContent,'No Koro yet. Create one below or join with an invitation.');
+$('#signOut').click();await flush();assert.equal($('#signedOut').hidden,false);assert.equal($('#groups').textContent,'No Village yet. Create one below or join with an invitation.');
 console.log('DOM mock checks passed: auth, escaped text, persistent send, board draft/save, Jitsi link, revocation, signout.');dom.window.close();})().catch(e=>{console.error(e);process.exitCode=1;dom.window.close()});

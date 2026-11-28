@@ -14,9 +14,9 @@
     moments:{label:'Moments',title:'Little moments. Yours to keep.',line:'The good days, everyday stories and memories worth sharing.',tone:'sun',action:'Share a moment',focus:'#m-body'},
     friends:{label:'Friends',title:'Good people. Great connections.',line:'Keep your circle close. Find a mate, visit a room and catch up.',tone:'rose',action:'Find a friend',focus:'#s-q'},
     room:{label:'My space',title:'A world with your name on it.',line:'Your look, your people, your soundtrack. Make every detail feel like you.',tone:'lilac',action:'Open Room Studio',tool:'studio',sere:true},
-    crews:{label:'Your Koro',title:'Your people. Your Koro.',line:'Private groups for the people you want to bring together.',tone:'coral',action:'Start a Koro',focus:'#koro-create input'},
+    crews:{label:'Your Village',title:'Your people. Your Village.',line:'Private groups for the people you want to bring together.',tone:'coral',action:'Start a Village',focus:'#koro-create input'},
     circles:{label:'Talanoa circles',title:'A place for every voice.',line:'Familiar voices, fresh stories and space for your circle.',tone:'coral',action:'Explore your circles',focus:'#kc-retry,.kava-room button'},
-    connections:{label:'Your connections',title:'Every connection has a story.',line:'Discover the friendships and Koro that make up your world.',tone:'lime',action:'Explore the map',focus:'#sc-search,.sc-map,#sota-connections'}
+    connections:{label:'Your connections',title:'Every connection has a story.',line:'Discover the friendships and Villages that make up your world.',tone:'lime',action:'Explore the map',focus:'#sc-search,.sc-map,#sota-connections'}
   };
   const publicPages=['home','people','talanoa','music','profile','skins','world'];
   const memberPages=['pulse','moments','friends','crews','circles','room','music','connections'];
@@ -55,12 +55,12 @@
       ]
     },
     crews:{
-      label:'Who is your Koro for?',
+      label:'Who is your Village for?',
       options:[
-        ['yasana','Your yasana','Name your provincial Koro','koro'],
+        ['yasana','Your yasana','Name your provincial Village','koro'],
         ['mataqali','Your mataqali','Name your mataqali circle','mataqali'],
-        ['island','Your island','Name your island Koro','koro'],
-        ['village','Your village','Name your village Koro','koro'],
+        ['island','Your island','Name your island Village','koro'],
+        ['village','Your village','Name your village','koro'],
         ['family','Your family','Name your family circle','family']
       ]
     },
@@ -77,7 +77,7 @@
     connections:{
       label:'How do you want to explore?',
       action:'Open this map view',
-      options:[['all','Everyone'],['people','Friends only'],['groups','Koro only'],['search','Search names'],['summary','Connection summary']]
+      options:[['all','Everyone'],['people','Friends only'],['groups','Village only'],['search','Search names'],['summary','Connection summary']]
     }
   };
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

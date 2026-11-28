@@ -1,6 +1,6 @@
 'use strict';
 // Cold-start work (10 Nov 2026): Viti Pulse at the end of the wall, the Sere-first composer,
-// starter Koro (hubs), the public listen pages and the maker-only share link.
+// starter Village (hubs), the public listen pages and the maker-only share link.
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -91,7 +91,7 @@ test('only the maker shares a sere as a public page; everyone else shares the in
   assert.equal(h.shared[1].url,'https://sotakece.com/#talanoa=8');
 });
 
-// ---------------------------------------------------------------- starter Koro
+// ---------------------------------------------------------------- starter Village
 function bootHubs(rpcImpl){
   const d=new JSDOM('<!doctype html><body><div id="app"></div></body>',{runScripts:'outside-only',url:'https://sotakece.com/'});
   const w=d.window;windows.push(w);w.eval(read('sota-hubs.js'));
@@ -103,17 +103,17 @@ function bootHubs(rpcImpl){
   return {w,app,calls,toasts,opened,inserts,q:s=>app.querySelector(s),all:s=>[...app.querySelectorAll(s)]};
 }
 const HUBS=()=>[{slug:'suva',name:'Suva',emoji:'🌴',members:0,joined:false,crew_id:null},{slug:'west',name:'Nadi & Lautoka',emoji:'🌅',members:4,joined:false,crew_id:9},{slug:'diaspora',name:'UK & overseas',emoji:'✈️',members:1,joined:false,crew_id:10}];
-test('the starter Koro card shows three one-tap pills and up to three people to greet',dom,async()=>{
+test('the starter Village card shows three one-tap pills and up to three people to greet',dom,async()=>{
   const h=bootHubs(async name=>name==='bv_hubs'?HUBS():[{id:'u-bo',handle:'bo',display_name:'Bo <b>',avatar_emoji:'🥥',posts:2,hub:null}]);
   h.app.innerHTML=h.w.SotaHubs.html('mates');
   assert.equal(h.q('[data-hubs]').hidden,true,'nothing shows until the hubs are known');
   assert.equal(await h.w.SotaHubs.fill(h.app),true);
   assert.deepEqual(h.all('.hub-pill').map(b=>b.querySelector('b').textContent),['Suva','Nadi & Lautoka','UK & overseas']);
-  assert.match(h.q('[data-slug="suva"]').textContent,/Open Koro · join/);assert.match(h.q('[data-slug="west"]').textContent,/4 members/);assert.match(h.q('[data-slug="diaspora"]').textContent,/1 member ·/);
+  assert.match(h.q('[data-slug="suva"]').textContent,/Open Village · join/);assert.match(h.q('[data-slug="west"]').textContent,/4 members/);assert.match(h.q('[data-slug="diaspora"]').textContent,/1 member ·/);
   assert.equal(h.q('.hub-who b').textContent,'Bo <b>','names are text, never markup');
   assert.equal(JSON.stringify(h.calls.find(c=>c.name==='bv_people_to_meet').args),'{"p_limit":3}');
 });
-test('joining is one tap: the pill flips to open, people refresh, and the Koro opens on the next tap',dom,async()=>{
+test('joining is one tap: the pill flips to open, people refresh, and the Village opens on the next tap',dom,async()=>{
   let joined=false;
   const h=bootHubs(async(name,args)=>{
     if(name==='bv_hubs')return HUBS();
@@ -146,7 +146,7 @@ test('a failed join leaves the pill ready to try again',dom,async()=>{
   h.app.innerHTML=h.w.SotaHubs.html('wall');await h.w.SotaHubs.fill(h.app);
   h.q('[data-slug="west"]').click();await flush();
   assert.equal(h.q('[data-slug="west"]').disabled,false);assert.equal(h.q('[data-slug="west"]').dataset.hub,'join');
-  assert.deepEqual(h.toasts,['That Koro is not open yet.']);
+  assert.deepEqual(h.toasts,['That Village is not open yet.']);
 });
 
 // ---------------------------------------------------------------- page wiring

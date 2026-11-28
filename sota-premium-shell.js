@@ -9,14 +9,14 @@
     {label:'Talanoa wall',hint:'The Talanoa Wall for every member',member:'pulse',icon:'🌊'},
     {label:'Moments',hint:'Photos and notes from your friends',member:'moments',icon:'🐚'},
     {label:'People',hint:'Find your people and send an ask',guest:'#people',member:'friends',icon:'🤝'},
-    {label:'Koro',hint:'Circles, Koro and conversations',guest:'#talanoa',member:'crews',icon:'🥥'},
+    {label:'Village',hint:'Circles, Villages and conversations',guest:'#talanoa',member:'crews',icon:'🥥'},
     {label:'Circles',hint:'Your Talanoa Circles',member:'circles',icon:'🪸'},
     {label:'Music',hint:'Your island soundtrack',guest:'#music',member:'music',icon:'🎵'},
     {label:'My space',hint:'Your room, your rules',guest:'#profile',member:'room',icon:'🌺'},
     {label:'Skins',hint:'Fiji-first looks for your room',guest:'#skins',member:'skins',icon:'🎨'},
     {label:'3D connections',hint:'Your people as a map',guest:'#people',member:'connections',icon:'🧭'},
     {label:'Communications',hint:'Chat, boards and calls',href:'/communications.html?app=sota-kece',icon:'📞'},
-    {label:'Hub map',hint:'The starter Koro on a satellite map of Fiji',memberOnly:true,run:function(){window.SotaHubMap&&window.SotaHubMap.open();},icon:'🗺️'},
+    {label:'Hub map',hint:'The starter Villages on a satellite map of Fiji',memberOnly:true,run:function(){window.SotaHubMap&&window.SotaHubMap.open();},icon:'🗺️'},
     {label:'Show me around',hint:'A one-minute tour of Sota Kece',memberOnly:true,run:function(){window.SotaTour&&window.SotaTour.start();},icon:'🧭'}
   ];
   function goTo(p){

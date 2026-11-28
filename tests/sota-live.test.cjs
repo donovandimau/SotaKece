@@ -1,6 +1,6 @@
 'use strict';
-// Presence rings and the Koro quick-switch (10 Nov 2026). No database change: presence is read from
-// the "last seen" time friends can already see, and the Koro list from the existing bv_my_crews.
+// Presence rings and the Village quick-switch (10 Nov 2026). No database change: presence is read from
+// the "last seen" time friends can already see, and the Village list from the existing bv_my_crews.
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 let JSDOM;try{({JSDOM}=require(process.env.JSDOM_MODULE||'jsdom'));}catch(_){}
 const dom=JSDOM?{}:{skip:'jsdom is not installed'};
@@ -30,10 +30,10 @@ test('rings go only on friends\' avatars, come off again, and never change the p
   live.mark(app,[],NOW);
   assert.equal(q('[data-handle=mere].av').className,'av tw-av');assert.equal(q('[data-handle=mere].av').hasAttribute('title'),false);assert.equal(q('[data-live-text=mere]').textContent,'2m');
 });
-test('the Koro quick-switch sits under People, opens the chosen Koro and treats names as text',dom,async()=>{
+test('the Village quick-switch sits under People, opens the chosen Village and treats names as text',dom,async()=>{
   const d=new JSDOM('<div id="app"><aside class="sx-rail"><nav class="sx-nav"><button data-dps-tab="home">Home</button><button data-dps-tab="people">People</button><button data-dps-tab="talanoa">Talanoa</button></nav></aside><main id="view"></main></div>',{url:'https://sotakece.com/',pretendToBeVisual:true});
   const w=d.window,app=w.document.getElementById('app'),calls=[],opened=[],went=[];
-  const crews=[{id:3,name:'Rugby <b>lads</b>',emoji:'🏉'},{id:1,name:'Family',emoji:'🌺'},{id:'x',name:'bad id'},{id:9,name:'   '},...Array.from({length:6},(_,i)=>({id:20+i,name:'Koro '+i}))];
+  const crews=[{id:3,name:'Rugby <b>lads</b>',emoji:'🏉'},{id:1,name:'Family',emoji:'🌺'},{id:'x',name:'bad id'},{id:9,name:'   '},...Array.from({length:6},(_,i)=>({id:20+i,name:'Village '+i}))];
   const client={rpc:async name=>{calls.push(name);return {data:name==='bv_my_crews'?crews:[],error:null};}};
   const S={user:{id:'u1'},friends:[],tab:'pulse',crew:null};
   const api=new w.Function('globalThis','module',read('sota-live.js')+';return globalThis.SotaLive;')(w,undefined);
@@ -41,9 +41,9 @@ test('the Koro quick-switch sits under People, opens the chosen Koro and treats 
   const box=app.querySelector('.sl-koro');assert(box,'the switcher is drawn');
   assert.equal(box.previousElementSibling.dataset.dpsTab,'people');assert.equal(box.tagName,'DETAILS');assert.equal(box.open,true);
   const rows=[...box.querySelectorAll('[data-live-koro]')];
-  assert.deepEqual(rows.map(b=>b.dataset.liveKoro),['3','1','20','21','22','all'],'five Koro at most, then the link to all of them');
+  assert.deepEqual(rows.map(b=>b.dataset.liveKoro),['3','1','20','21','22','all'],'five Village at most, then the link to all of them');
   assert.equal(rows[0].querySelector('.sl-koro-name').textContent,'Rugby <b>lads</b>');assert.equal(box.querySelector('b b'),null);assert.equal(box.querySelectorAll('.sl-koro-name b').length,0);
-  assert.equal(rows.at(-1).textContent,'All 8 Koro ↗');
+  assert.equal(rows.at(-1).textContent,'All 8 Village ↗');
   rows[1].click();assert.deepEqual(opened,[1]);rows.at(-1).click();assert.deepEqual(went,['crews']);
   assert.equal(calls.filter(n=>n==='bv_my_crews').length,1,'the list is read once, not on every page change');
   S.tab='crews';S.crew=3;api.refresh();await new Promise(r=>w.setTimeout(r,30));
@@ -52,7 +52,7 @@ test('the Koro quick-switch sits under People, opens the chosen Koro and treats 
   S.user=null;api.refresh();await new Promise(r=>w.setTimeout(r,30));assert.equal(app.querySelector('.sl-koro'),null,'signing out removes it');
   api.stop();w.close();
 });
-test('the page loads the module, starts it with the Koro opener, and the worker may cache it',()=>{
+test('the page loads the module, starts it with the Village opener, and the worker may cache it',()=>{
   const html=read('index.html'),sw=read('sw.js');
   assert.match(html,/<script src="\/sota-live\.js\?v=[a-z0-9-]+"><\/script>/);assert.match(html,/<link rel="stylesheet" href="\/sota-live\.css\?v=[a-z0-9-]+">/);
   assert.match(html,/window\.SotaLive\?\.init\(\{client:sb,state:S,app,/);

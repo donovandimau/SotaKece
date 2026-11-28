@@ -14,7 +14,7 @@ function client({fr=friends,gr=crews,members=[],profiles=[],user=me,authError=fa
     from(table){const call={table,filters:{}};calls.push(call);return {select(columns){call.columns=columns;return this;},in(key,values){call.filters[key]=values;return this;},async limit(n){call.limit=n;return {data:profiles,error:null};},async range(start,end){call.range=[start,end];return {data:members.slice(start,end+1),error:memberError?{}:null};}};}};
 }
 (async()=>{
-  await check('only accepted-friend and own-Koro IDs can create membership edges',()=>{
+  await check('only accepted-friend and own-Village IDs can create membership edges',()=>{
     const g=c.model(me,friends,crews,[{member:'a',crew_id:1},{member:'stranger',crew_id:1},{member:'a',crew_id:999},{member:'me',crew_id:1}]);
     assert.equal(g.nodes.length,5);assert.equal(g.edges.length,5);assert(!JSON.stringify(g).includes('stranger'));assert(!JSON.stringify(g).includes('999'));
     assert(!g.edges.some(e=>e.source==='person:a'&&e.target==='person:b'));
@@ -58,13 +58,13 @@ function client({fr=friends,gr=crews,members=[],profiles=[],user=me,authError=fa
   await check('empty network needs no membership query',async()=>{
     const api=client({fr:[],gr:[]});const r=await c.load(api,{user:me,me});assert.equal(r.graph.nodes.length,1);assert.equal(r.graph.edges.length,0);assert.equal(api.calls.length,2);
   });
-  await check('inline friend graph reads only accepted friends, never Koro or memberships',async()=>{
-    const api=client({gr:[{id:1,name:'Private Koro'}],members:[{member:'a',crew_id:1}]});
+  await check('inline friend graph reads only accepted friends, never Village or memberships',async()=>{
+    const api=client({gr:[{id:1,name:'Private Village'}],members:[{member:'a',crew_id:1}]});
     const r=await c.load(api,{user:me,me},{friendsOnly:true});
     assert.deepEqual(api.calls,[{rpc:'bv_my_friends'}]);
     assert.equal(r.graph.nodes.length,3);assert.equal(r.graph.edges.length,2);
     assert(r.graph.edges.every(e=>e.type==='friend'&&e.source===r.graph.self));
-    assert(!JSON.stringify(r.graph).includes('Private Koro'));
+    assert(!JSON.stringify(r.graph).includes('Private Village'));
   });
   await check('inline positions stay stable through addition, removal and RPC reordering',()=>{
     const slots=new Map(),first=c.model(me,friends,[],[]),a=c.friendPositions(first,slots);

@@ -21,10 +21,10 @@
     for(const f of friends){person(f,false);if(f.id&&pid(f.id)!==self)edge(self,pid(f.id),'friend');}
     for(const c of groups){
       if(c.id==null||crews.has(String(c.id)))continue;
-      crews.add(String(c.id));nodes.push({id:gid(c.id),key:String(c.id),type:'group',label:String(c.name||'Your Koro'),emoji:String(c.emoji||'🪸')});
+      crews.add(String(c.id));nodes.push({id:gid(c.id),key:String(c.id),type:'group',label:String(c.name||'Your Village'),emoji:String(c.emoji||'🪸')});
       edge(self,gid(c.id),'member');
     }
-    // A membership is drawn only for an accepted friend AND a Koro returned by bv_my_crews.
+    // A membership is drawn only for an accepted friend AND a Village returned by bv_my_crews.
     // It never discovers strangers, private groups or someone else's friendship network.
     for(const m of memberships){
       if(people.has(String(m.member))&&crews.has(String(m.crew_id))&&pid(m.member)!==self)edge(pid(m.member),gid(m.crew_id),'member');
@@ -54,15 +54,15 @@
     const handles=new Map(resolved.map(p=>[p.handle,p.id]));
     const friends=bounded.map(f=>({...f,id:f.id||handles.get(f.handle)})).filter(f=>f.id&&String(f.id)!==owner);
     if(friends.length<bounded.filter(f=>String(f.id||'')!==owner).length&&!notices.length)notices.push('Some friend records could not be mapped.');
-    if(groups.length<Math.min(allGroups.length,MAX_GROUPS))notices.push('Some Koro records could not be mapped.');
-    if(allFriends.length>MAX_FRIENDS||allGroups.length>MAX_GROUPS)notices.push(friendsOnly?'Showing the first 120 accepted friends.':'Showing up to 120 friends and 40 Koro.');
+    if(groups.length<Math.min(allGroups.length,MAX_GROUPS))notices.push('Some Village records could not be mapped.');
+    if(allFriends.length>MAX_FRIENDS||allGroups.length>MAX_GROUPS)notices.push(friendsOnly?'Showing the first 120 accepted friends.':'Showing up to 120 friends and 40 Villages.');
     const memberships=[];
     if(friends.length&&groups.length){
       // Narrow both sides before reading. The signed-in Supabase client retains its existing policies.
       for(let offset=0;offset<5000;offset+=1000){
         const r=await client.from('bv_crew_members').select('crew_id,member')
           .in('crew_id',groups.map(c=>c.id)).in('member',friends.map(f=>f.id)).range(offset,offset+999);
-        if(r.error){notices.push('Shared Koro memberships are unavailable. Your direct connections are shown.');memberships.length=0;break;}
+        if(r.error){notices.push('Shared Village memberships are unavailable. Your direct connections are shown.');memberships.length=0;break;}
         const page=r.data||[];memberships.push(...page);if(page.length<1000)break;
         if(offset===4000)notices.push('Shared memberships are limited to the first 5,000 visible records.');
       }
@@ -167,7 +167,7 @@
     on(document,'visibilitychange',()=>feed.refresh());on(window,'online',()=>feed.refresh());on(window,'offline',()=>feed.refresh());on(window,'focus',()=>feed.refresh());
   }
   const hero=()=>`<section class="glass sc-hero"><p class="sc-kicker">Sota Kece</p><h1>Our people. Our circles.</h1>
-    <p>Explore how friendships and Koro bring a community together.</p></section>`;
+    <p>Explore how friendships and Villages bring a community together.</p></section>`;
   function preview(){
     if(typeof window==='object')window.SotaView?.invalidate();
     stop();const run=epoch;
@@ -197,26 +197,26 @@
       document.querySelector('#sc-retry').onclick=expired?()=>{stop();ctx.auth('in',true);}:viewLive;
     }
   }
-  function summaryRows(v){return [{Category:'Friends',Count:v.nodes.filter(n=>n.type==='person').length},{Category:'Koro',Count:v.nodes.filter(n=>n.type==='group').length},{Category:'Friendship links',Count:v.edges.filter(e=>e.type==='friend').length},{Category:'Membership links',Count:v.edges.filter(e=>e.type==='member').length}];}
+  function summaryRows(v){return [{Category:'Friends',Count:v.nodes.filter(n=>n.type==='person').length},{Category:'Village',Count:v.nodes.filter(n=>n.type==='group').length},{Category:'Friendship links',Count:v.edges.filter(e=>e.type==='friend').length},{Category:'Membership links',Count:v.edges.filter(e=>e.type==='member').length}];}
   function mount(host,result,options){
     host.className='sc-workspace';const graph=result.graph,byId=new Map(graph.nodes.map(n=>[n.id,n]));
     let selected=graph.self,filter='all',query='',focus=false,scale=1,pan={x:0,y:0},drag=null,disposed=false;
     const listeners=[];
     function on(el,type,fn){el.addEventListener(type,fn);listeners.push(()=>el.removeEventListener(type,fn));}
     host.innerHTML=`${options.demo?'<div class="sc-notice"><b>Example community</b> · These people, groups and connections are fictional. Explore the example with search, filters and selection.</div>':''}
-      <div class="sc-toolbar glass"><div class="sc-search"><label for="sc-search">Find a person or Koro</label><input id="sc-search" type="search" maxlength="80" placeholder="Search names…" autocomplete="off"></div>
-      <fieldset class="sc-filters"><legend>Show connections</legend><button type="button" data-filter="all" aria-pressed="true">Everyone</button><button type="button" data-filter="people" aria-pressed="false">Friends</button><button type="button" data-filter="groups" aria-pressed="false">Koro</button></fieldset>
+      <div class="sc-toolbar glass"><div class="sc-search"><label for="sc-search">Find a person or Village</label><input id="sc-search" type="search" maxlength="80" placeholder="Search names…" autocomplete="off"></div>
+      <fieldset class="sc-filters"><legend>Show connections</legend><button type="button" data-filter="all" aria-pressed="true">Everyone</button><button type="button" data-filter="people" aria-pressed="false">Friends</button><button type="button" data-filter="groups" aria-pressed="false">Village</button></fieldset>
       <button class="btn sm ghost" id="sc-refresh" ${options.demo?'hidden':''}>Refresh</button></div>
       <div class="sc-columns"><section class="glass sc-map-card" aria-label="Community connection map">
       <div class="sc-map-heading"><div><h2>Your connection map</h2><p id="sc-count" role="status" aria-live="polite"></p></div><label class="sc-focus"><input type="checkbox" id="sc-focus"> Focus selection</label></div>
-      <div class="sc-key"><span>● You</span><span>○ Friend</span><span>◇ Koro</span><span>— Friendship</span><span>┄ Membership</span></div>
-      <div class="sc-map"><svg id="sc-svg" viewBox="0 0 900 620" role="group" aria-label="Interactive map. Select a person or Koro, or use the list below."><g id="sc-camera"></g></svg>
+      <div class="sc-key"><span>● You</span><span>○ Friend</span><span>◇ Village</span><span>— Friendship</span><span>┄ Membership</span></div>
+      <div class="sc-map"><svg id="sc-svg" viewBox="0 0 900 620" role="group" aria-label="Interactive map. Select a person or Village, or use the list below."><g id="sc-camera"></g></svg>
       <div class="sc-zoom"><button id="sc-in" aria-label="Zoom in">+</button><button id="sc-out" aria-label="Zoom out">−</button><button id="sc-fit">Reset view</button></div></div>
       <p class="sc-hint">Tap a name to explore. Drag the background to move the map. The list offers the same connections.</p>
-      <div class="sc-list-area"><h3>People &amp; Koro</h3><div class="sc-list" id="sc-list"></div></div></section>
+      <div class="sc-list-area"><h3>People &amp; Villages</h3><div class="sc-list" id="sc-list"></div></div></section>
       <aside class="glass sc-detail"><p class="sc-kicker">Connection details</p><div id="sc-detail" aria-live="polite"></div></aside></div>
       <details class="dv-summary" id="sc-visual-summary"><summary>See your connections at a glance</summary><p>Counts follow the current search, category and focus filters. Only connections already shown in this map are counted. Personal records stay inside Sota Kece.</p><div id="sc-visual-chart"></div></details>
-      <div class="glass sc-privacy"><strong>${options.demo?'About this example':'Your view of the community'}</strong><p>${options.demo?'All names and connections are made up. Circles represent people and diamonds represent Koro. Solid lines show friendships; dashed lines show group membership. A shared group does not imply friendship. This example never loads member records.':'Only your accepted friends and Koro you belong to appear here. Shared memberships appear when available to your account. A shared Koro does not mean two people are friends. This is not a map of every member.'}</p>
+      <div class="glass sc-privacy"><strong>${options.demo?'About this example':'Your view of the community'}</strong><p>${options.demo?'All names and connections are made up. Circles represent people and diamonds represent Villages. Solid lines show friendships; dashed lines show group membership. A shared group does not imply friendship. This example never loads member records.':'Only your accepted friends and Villages you belong to appear here. Shared memberships appear when available to your account. A shared Village does not mean two people are friends. This is not a map of every member.'}</p>
       <p id="sc-fresh">${options.demo?'Fictional example · no member data is loaded.':'Loaded '+esc(result.updated.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}))+'. Refresh to check for changes.'}</p>
       ${result.notices.map(n=>`<p class="sc-warning" role="status">${esc(n)}</p>`).join('')}</div>`;
     const q=s=>host.querySelector(s),svg=q('#sc-svg'),camera=q('#sc-camera');
@@ -232,10 +232,10 @@
       const n=byId.get(selected)||byId.get(graph.self),related=graph.edges.filter(e=>e.source===n.id||e.target===n.id);
       const neighbours=related.map(e=>({node:byId.get(e.source===n.id?e.target:e.source),type:e.type}));
       const route=path(graph,n.id).map(id=>byId.get(id).label);
-      q('#sc-detail').innerHTML=`<div class="sc-avatar" aria-hidden="true">${esc(n.type==='you'?'🏝':n.emoji)}</div><h2>${esc(n.label)}</h2><p>${n.type==='group'?(options.demo?'Example Koro':'Your Koro'):n.type==='you'?(options.demo?'You in the example':'Your place in the community'):(options.demo?'Example friend':'Your accepted friend')}${n.type!=='group'&&n.handle?' · @'+esc(n.handle):''}</p>
+      q('#sc-detail').innerHTML=`<div class="sc-avatar" aria-hidden="true">${esc(n.type==='you'?'🏝':n.emoji)}</div><h2>${esc(n.label)}</h2><p>${n.type==='group'?(options.demo?'Example Village':'Your Village'):n.type==='you'?(options.demo?'You in the example':'Your place in the community'):(options.demo?'Example friend':'Your accepted friend')}${n.type!=='group'&&n.handle?' · @'+esc(n.handle):''}</p>
         ${n.id!==graph.self?`<p class="sc-route"><b>How you connect</b><br>${route.map(esc).join(' → ')}</p>`:'<p>Select a person or group to see what connects you.</p>'}
-        ${!options.demo&&n.type!=='you'&&(n.type==='group'||n.handle)?'<button class="btn sm" id="sc-open">'+(n.type==='group'?'Open Koro':'Visit room')+'</button>':''}
-        <h3>Visible connections (${neighbours.length})</h3><div class="sc-neighbours">${neighbours.map(({node:x,type})=>`<button type="button" data-select="${esc(x.id)}"><strong>${esc(x.label)}</strong><span>${type==='friend'?'Accepted friendship':'Koro membership'}</span></button>`).join('')||'<p>No connections yet. Add a friend or join a Koro to grow your map.</p>'}</div>
+        ${!options.demo&&n.type!=='you'&&(n.type==='group'||n.handle)?'<button class="btn sm" id="sc-open">'+(n.type==='group'?'Open Village':'Visit room')+'</button>':''}
+        <h3>Visible connections (${neighbours.length})</h3><div class="sc-neighbours">${neighbours.map(({node:x,type})=>`<button type="button" data-select="${esc(x.id)}"><strong>${esc(x.label)}</strong><span>${type==='friend'?'Accepted friendship':'Village membership'}</span></button>`).join('')||'<p>No connections yet. Add a friend or join a Village to grow your map.</p>'}</div>
         ${!options.demo&&!related.length?'<button class="btn sm ghost" id="sc-find">Find friends</button>':''}`;
       if(q('#sc-open'))q('#sc-open').onclick=()=>{if(options.valid())options.open(n);};
       if(q('#sc-find'))q('#sc-find').onclick=()=>rootGo('friends');
@@ -248,10 +248,10 @@
       v.edges.forEach(e=>{if(e.source===selected)adjacent.add(e.target);if(e.target===selected)adjacent.add(e.source);});
       camera.innerHTML=v.edges.map(e=>{const a=p.get(e.source),b=p.get(e.target),active=e.source===selected||e.target===selected;
         return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="sc-edge ${e.type==='member'?'sc-membership':''} ${active?'sc-active':''}"/>`;}).join('')+
-        v.nodes.map(n=>{const a=p.get(n.id);return `<g class="sc-node sc-${n.type} ${n.id===selected?'sc-selected':''} ${adjacent.has(n.id)?'sc-near':''}" transform="translate(${a.x} ${a.y})" role="button" tabindex="0" aria-label="${esc(n.label+' · '+(n.type==='group'?'Koro':n.type==='you'?'you':'friend'))}" aria-pressed="${n.id===selected}" data-select="${esc(n.id)}">
+        v.nodes.map(n=>{const a=p.get(n.id);return `<g class="sc-node sc-${n.type} ${n.id===selected?'sc-selected':''} ${adjacent.has(n.id)?'sc-near':''}" transform="translate(${a.x} ${a.y})" role="button" tabindex="0" aria-label="${esc(n.label+' · '+(n.type==='group'?'Village':n.type==='you'?'you':'friend'))}" aria-pressed="${n.id===selected}" data-select="${esc(n.id)}">
           <title>${esc(n.label)}</title><circle class="sc-hit" r="30"/>${n.type==='group'?'<rect x="-24" y="-24" width="48" height="48" rx="8" transform="rotate(45)"/>':'<circle r="25"/>'}<text class="sc-symbol" y="7" text-anchor="middle" aria-hidden="true">${esc(n.type==='you'?'🏝':n.emoji)}</text><text class="sc-label" y="49" text-anchor="middle">${esc(n.label.length>18?n.label.slice(0,16)+'…':n.label)}</text></g>`;}).join('');
-      setCamera();q('#sc-count').textContent=`${v.nodes.filter(n=>n.type==='person').length} friends · ${v.nodes.filter(n=>n.type==='group').length} Koro · ${v.edges.length} connections shown`;
-      q('#sc-list').innerHTML=v.nodes.map(n=>`<button type="button" data-select="${esc(n.id)}" aria-pressed="${n.id===selected}"><span aria-hidden="true">${esc(n.type==='you'?'🏝':n.emoji)}</span><span>${esc(n.label)}<small>${n.type==='group'?'Koro':n.type==='you'?'You':'Friend'}</small></span></button>`).join('')+(v.nodes.length<=1&&query?'<p>No matching people or Koro.</p>':'');
+      setCamera();q('#sc-count').textContent=`${v.nodes.filter(n=>n.type==='person').length} friends · ${v.nodes.filter(n=>n.type==='group').length} Village${v.nodes.filter(n=>n.type==='group').length===1?'':'s'} · ${v.edges.length} connections shown`;
+      q('#sc-list').innerHTML=v.nodes.map(n=>`<button type="button" data-select="${esc(n.id)}" aria-pressed="${n.id===selected}"><span aria-hidden="true">${esc(n.type==='you'?'🏝':n.emoji)}</span><span>${esc(n.label)}<small>${n.type==='group'?'Village':n.type==='you'?'You':'Friend'}</small></span></button>`).join('')+(v.nodes.length<=1&&query?'<p>No matching people or Villages.</p>':'');
       detail();
       if(q('#sc-visual-summary').open)drawSummary(v);
     }

@@ -1,5 +1,5 @@
 /* Sota Kece guided tour (11 November 2026).
-   A short "show me around" for new members: Talanoa Wall -> starter Koro -> Music -> Sere -> My space.
+   A short "show me around" for new members: Talanoa Wall -> starter Village -> Music -> Sere -> My space.
    It moves through the member's real pages with the existing go(), rings the part being explained and
    shows one small card. No backend, nothing stored except two device-only flags:
      sk-tour-pending  set when a member has just created their room (index.html #f-go)
@@ -17,7 +17,7 @@
   var STOPS = [
     { view: 'pulse', find: ['.tw-wrap', '#view h1'], title: 'The Talanoa Wall',
       text: 'One live feed for every member, at home and overseas. Say bula: your first post can be a single line.' },
-    { view: 'pulse', find: ['.hub-card', '#view h1'], title: 'Join a starter Koro',
+    { view: 'pulse', find: ['.hub-card', '#view h1'], title: 'Join a starter Village',
       text: 'Suva, Nadi & Lautoka, or UK & overseas. Joining one is the quickest way to meet people and get your feed going.',
       fallbackView: 'crews' },
     { view: 'music', find: ['#view h1', '#view'], title: 'Your island soundtrack',
@@ -68,7 +68,7 @@
     return null;
   }
 
-  // Panels such as the starter Koro fill in after the page renders, so look for a moment before giving up.
+  // Panels such as the starter Village fill in after the page renders, so look for a moment before giving up.
   function waitFor(list, token) {
     return new Promise(function (done) {
       var tries = 0;

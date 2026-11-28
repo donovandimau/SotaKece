@@ -10,7 +10,7 @@
     {id:'tale',label:'Sota Tale Circle',skin:'studio-ocean',emoji:'🤝',accent:'#6de6dd'},
     {id:'kakase',label:'Kakase Circle',skin:'kula',emoji:'💬',accent:'#b52b50'},
     {id:'lotu',label:'Lotu Circle',skin:'masi-white',emoji:'🙏',accent:'#756035'},
-    {id:'koro',label:'Koro Circle',skin:'village',emoji:'🪸',accent:'#246347'},
+    {id:'koro',label:'Village Circle',skin:'village',emoji:'🪸',accent:'#246347'},
     {id:'mataqali',label:'Mataqali Circle',skin:'core-masi',emoji:'🌿',accent:'#7a412c'},
     {id:'school',label:'School Circle',skin:'varsity',emoji:'🎓',accent:'#8f2d40'},
     {id:'old-boys',label:'Old Boys Circle',skin:'occasion-school-reunion',emoji:'🎓',accent:'#875016'},

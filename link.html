@@ -42,7 +42,7 @@
       var a = document.createElement('a'); a.href = '/'; a.textContent = 'Other ways to sign in'; act.appendChild(a);
       return;
     }
-    lead.textContent = app.name + ' will show your mates’ latest activity and the newest message in each of your Koro. It can only read — it can never post, react or message as you. You can disconnect at any time from either app.';
+    lead.textContent = app.name + ' will show your mates’ latest activity and the newest message in each of your Villages. It can only read — it can never post, react or message as you. You can disconnect at any time from either app.';
     btn('Allow', '', function (e) {
       e.target.disabled = true;
       sb.rpc('bv_link_app', { p_app: appKey }).then(function (res) {

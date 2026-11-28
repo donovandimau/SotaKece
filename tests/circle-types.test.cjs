@@ -12,7 +12,7 @@ const expected=[
   ['tale','Sota Tale Circle','studio-ocean'],
   ['kakase','Kakase Circle','kula'],
   ['lotu','Lotu Circle','masi-white'],
-  ['koro','Koro Circle','village'],
+  ['koro','Village Circle','village'],
   ['mataqali','Mataqali Circle','core-masi'],
   ['school','School Circle','varsity'],
   ['old-boys','Old Boys Circle','occasion-school-reunion'],

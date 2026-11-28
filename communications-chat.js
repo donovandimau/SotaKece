@@ -18,7 +18,7 @@
   // "Mere · 25 Oct 2026, 20:12" -> name, day, time
   function splitMeta(text) {
     const at = text.indexOf(' · ');
-    const name = at > 0 ? text.slice(0, at) : 'Koro member';
+    const name = at > 0 ? text.slice(0, at) : 'Village member';
     const when = at > 0 ? text.slice(at + 3) : text;
     const comma = when.lastIndexOf(', ');
     return { name, day: comma > 0 ? when.slice(0, comma) : when, time: comma > 0 ? when.slice(comma + 2) : '' };
@@ -107,7 +107,7 @@
 
     // Left: search the conversation list.
     const search = el('input', 'sk-search');
-    search.id = 'skSearch'; search.type = 'search'; search.placeholder = 'Search your Koro'; search.setAttribute('aria-label', 'Search your Koro');
+    search.id = 'skSearch'; search.type = 'search'; search.placeholder = 'Search your Village'; search.setAttribute('aria-label', 'Search your Village');
     search.addEventListener('input', filterGroups);
     groups.parentNode.insertBefore(search, groups);
     new MutationObserver(() => { filterGroups(); syncDetails(); }).observe(groups, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
@@ -121,13 +121,13 @@
     }, true);
 
     // Centre: chat header with avatar, back, voice and video.
-    const back = iconButton('sk-back', 'Back to your Koro', () => openRoom(false));
+    const back = iconButton('sk-back', 'Back to your Village', () => openRoom(false));
     const headAv = el('span', 'sk-head-av'); headAv.id = 'skHeadAv'; headAv.setAttribute('aria-hidden', 'true');
     heading.prepend(back, headAv);
     const actions = el('div', 'sk-head-actions');
     actions.append(iconButton('sk-call', 'Start a voice call', () => startCall('audio')), iconButton('sk-video', 'Start a video call', () => startCall('video')));
     const invite = $('inviteGroup');
-    if (invite) { invite.classList.add('sk-icon', 'sk-invite'); invite.setAttribute('aria-label', 'Invite to Koro'); invite.title = 'Invite to Koro'; actions.append(invite); }
+    if (invite) { invite.classList.add('sk-icon', 'sk-invite'); invite.setAttribute('aria-label', 'Invite to Village'); invite.title = 'Invite to Village'; actions.append(invite); }
     heading.append(actions);
     new MutationObserver(syncDetails).observe(heading, { childList: true, subtree: true, characterData: true });
 
@@ -152,9 +152,9 @@
     document.addEventListener('pointerdown', e => { if (!picker.hidden && !e.target.closest('#skEmoji,.sk-emoji')) { picker.hidden = true; emo.setAttribute('aria-expanded', 'false'); } });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !picker.hidden) { picker.hidden = true; emo.focus(); } });
 
-    // Right (wide screens): details and shortcuts for the open Koro.
+    // Right (wide screens): details and shortcuts for the open Village.
     const details = el('aside', 'sk-details panel');
-    details.setAttribute('aria-label', 'Koro details');
+    details.setAttribute('aria-label', 'Village details');
     const card = el('div', 'sk-detail-card');
     const dav = el('span', 'sk-detail-av'); dav.id = 'skDetailAv'; dav.setAttribute('aria-hidden', 'true');
     const dn = el('h3', 'sk-detail-name'); dn.id = 'skDetailName';
@@ -163,7 +163,7 @@
     const quick = el('div', 'sk-quick');
     const q = (cls, label, fn) => { const b = el('button', 'sk-quick-btn ' + cls, label); b.type = 'button'; b.addEventListener('click', fn); return b; };
     quick.append(q('sk-q-call', 'Voice call', () => startCall('audio')), q('sk-q-video', 'Video call', () => startCall('video')), q('sk-q-disc', 'Discussions', () => $('tab-discussions')?.click()), q('sk-q-board', 'Board', () => $('tab-board')?.click()));
-    const note = el('p', 'sk-detail-note', 'Messages are shared with members of this Koro only. Camera and microphone stay off until you join a call.');
+    const note = el('p', 'sk-detail-note', 'Messages are shared with members of this Village only. Camera and microphone stay off until you join a call.');
     details.append(card, quick, note);
     connected.appendChild(details);
 

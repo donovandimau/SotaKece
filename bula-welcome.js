@@ -302,7 +302,7 @@
     "note": "The programme is an independent proposal. It does not operate government identity, payment or data-exchange services."
   },
   "villageos": {
-    "name": "Koro",
+    "name": "Village",
     "line": "Explore village services and organise community records.",
     "items": [
       [

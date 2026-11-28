@@ -124,13 +124,13 @@
   function chatPreview(profile, settings) {
     const s=skins.normalize(settings),p=skins.presets.find(p=>p.id===s.id);
     return `<section data-look="${p.look}" class="bv-chat-preview" style="${esc(skins.inline(s))}" aria-label="Chat skin preview">
-      <header class="bv-chat-heading">${window.SotaRoomAtmosphere?.markup(s)||''}<span class="bv-chat-avatar" aria-hidden="true">✦</span><div><h3>Your circle</h3><p>Example Koro · ${esc(profile.display_name||profile.handle||'You')}</p></div></header>
+      <header class="bv-chat-heading">${window.SotaRoomAtmosphere?.markup(s)||''}<span class="bv-chat-avatar" aria-hidden="true">✦</span><div><h3>Your circle</h3><p>Example Village · ${esc(profile.display_name||profile.handle||'You')}</p></div></header>
       <div class="bv-chat-messages"><p class="bv-chat-caption">Example conversation</p>
         <div class="msg"><span class="who">Donu</span>Same time, same sunset?</div>
         <div class="msg mine"><span class="who">You</span>Absolutely. I’ll bring the playlist.</div>
         <div class="msg"><span class="who">Jo</span>See you there! 🌺</div>
       </div><div class="bv-chat-compose" aria-label="Example composer"><span>Write a message…</span><button type="button" disabled aria-label="Send (preview only)">↑</button></div>
-      <p class="bv-chat-caption">Preview only · your saved skin also styles your Koro chats.</p>
+      <p class="bv-chat-caption">Preview only · your saved skin also styles your Village chats.</p>
     </section>`;
   }
   function coverMediaMarkup(settings) {
