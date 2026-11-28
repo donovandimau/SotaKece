@@ -71,18 +71,66 @@
       result[i]=clamp(.12+envelope*(.52+.24*Math.sin(time*1.1+i*.31)+.12*Math.sin(time*1.9-i*.17)),.08,.9);
     }return result;
   }
+  // Project the strands of a twisting ribbon along the sound's centre line.
+  function drawRibbon(ctx,w,h,colours,time,gain,levels,wave,preview){
+    const steps=120, strands=18;
+    const centre=new Float32Array(steps+1), radius=new Float32Array(steps+1);
+    for(let i=0;i<=steps;i++){
+      const x=i/steps, edge=Math.pow(Math.sin(Math.PI*x),.65);
+      const energy=clamp(levels[Math.min(63,Math.floor(x*64))]*gain,0,1);
+      const sample=wave?.length?(wave[Math.floor(x*(wave.length-1))]-128)/128:0;
+      const flow=preview?Math.sin(x*8-time*.8)*.11+Math.sin(x*16+time*.55)*.035:sample*gain*.22;
+      centre[i]=h*(.51+edge*(flow+.065*Math.sin(x*8+time*.42)));
+      radius[i]=h*edge*(.024+energy*.34);
+    }
+    const ink=ctx.createLinearGradient(0,0,w,0);
+    colours.forEach((colour,i)=>ink.addColorStop(i/(colours.length-1),colour));
+    ctx.strokeStyle=ink;ctx.lineJoin='round';
+    for(let j=0;j<strands;j++){
+      const v=j/(strands-1);
+      ctx.beginPath();
+      for(let i=0;i<=steps;i++){
+        const x=i/steps;
+        const twist=x*10-time*.8+v*3.8;
+        const y=centre[i]+radius[i]*(Math.sin(twist)*(.48+.52*Math.sin(Math.PI*v))+.24*(2*v-1));
+        if(i===0)ctx.moveTo(0,y);else ctx.lineTo(x*w,y);
+      }
+      const rim=j===0||j===strands-1;
+      if(rim){
+        ctx.globalAlpha=.08;ctx.lineWidth=h*.075;ctx.stroke();
+        ctx.globalAlpha=.2;ctx.lineWidth=h*.032;ctx.stroke();
+      }
+      ctx.globalAlpha=rim?1:.45+.3*Math.sin(Math.PI*v);
+      ctx.lineWidth=Math.max(1,h*(rim?.013:.0055));ctx.stroke();
+      if(j%4===0){
+        const at=Math.floor(((time*.08+j*.17)%1)*steps);
+        const twist=at/steps*10-time*.8+v*3.8;
+        const y=centre[at]+radius[at]*(Math.sin(twist)*(.48+.52*Math.sin(Math.PI*v))+.24*(2*v-1));
+        ctx.fillStyle='#e5ffff';ctx.beginPath();ctx.arc(w*at/steps,y,Math.max(1,h*.009),0,Math.PI*2);ctx.fill();
+      }
+    }
+    ctx.globalAlpha=1;
+  }
   function draw(ctx,w,h,settings={},state={},data=null,background=true){
     const volcanic=settings.volcanic===true;
-    const colours=volcanic?['#20a799','#52e0c9','#bcfff1']:palettes[settings.theme]||palettes.rainbow;
+    const stagePalettes={ocean:['#29e9ef','#60ffc4','#73a4ff','#b578ff','#38e4ff'],ember:['#ff527c','#ffac50','#ffe283'],violet:['#83aaff','#c18aff','#ff70b6'],mono:['#8caac3','#f4fcff','#a6bbd6']};
+    const colours=volcanic?['#20a799','#52e0c9','#bcfff1']:stagePalettes[settings.theme]||palettes.rainbow;
     const mode=volcanic?'waveform':modes.includes(settings.mode)?settings.mode:'spectrum';
     const preview=!data&&(state.preview===true||Number.isFinite(state.previewTime)),time=Number.isFinite(state.previewTime)?state.previewTime/1000:0;
     if(state.previewActive!==preview){state.peaks=null;state.previewActive=preview;}
     const gain=clamp(Number(settings.gain)||1,.5,2),f=preview?previewSpectrum(state.previewTime,64):bins(data?.frequency,64,data?.context?.sampleRate),wave=data?.wave;
     const unit=Math.min(w,h),base=h*.79;ctx.save();
     if(background){
-      const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,volcanic?'#091516':'#fff1b8');bg.addColorStop(.48,volcanic?'#123235':'#c8fff2');bg.addColorStop(1,volcanic?'#0a191b':'#f9d7f0');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+      const bg=ctx.createLinearGradient(0,0,w,h);bg.addColorStop(0,volcanic?'#091516':'#06182c');bg.addColorStop(.48,volcanic?'#123235':'#100d30');bg.addColorStop(1,volcanic?'#0a191b':'#180d24');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
       const aura=ctx.createRadialGradient(w*.52,h*.4,0,w*.52,h*.4,w*.6);aura.addColorStop(0,colours[1]+'22');aura.addColorStop(1,colours[1]+'00');ctx.fillStyle=aura;ctx.fillRect(0,0,w,h);
-      ctx.strokeStyle='#194f6620';ctx.lineWidth=1;for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(w*.06,h*i/5);ctx.lineTo(w*.94,h*i/5);ctx.stroke();}
+      // A sparse, deterministic star field gives the moving ribbon depth.
+      for(let i=1;i<=38;i++){
+        const x=((i*137)%389)/389*w,y=((i*i*31)%251)/251*h;
+        const size=Math.max(1,unit*(i%7===0?.009:.004));
+        ctx.globalAlpha=.24+.34*(i%5)/4;ctx.fillStyle=i%3===0?colours[1]:'#e6f5ff';
+        ctx.fillRect(x,y,size,size);
+      }
+      ctx.globalAlpha=1;
     }
     const gradient=ctx.createLinearGradient(w*.07,0,w*.93,0);colours.forEach((colour,i)=>gradient.addColorStop(i/(colours.length-1),colour));ctx.fillStyle=gradient;ctx.strokeStyle=gradient;
     if(mode==='spectrum'){
@@ -94,9 +142,11 @@
         const decay=Number.isFinite(state.dt)?clamp(state.dt,0,100)/1000*.32:.012;
         state.peaks[i]=Math.max(v,state.peaks[i]-decay);ctx.globalAlpha=.9;ctx.fillStyle=colours[Math.min(colours.length-1,Math.floor(i/64*colours.length))];ctx.fillRect(x,base-state.peaks[i]*h*.62-3,bw,1.5);ctx.fillStyle=gradient;
       }
+    }else if(mode==='waveform'&&!volcanic){
+      drawRibbon(ctx,w,h,colours,time,gain,f,wave,preview);
     }else if(mode==='halo'){
       const radius=unit*.22,cx=w/2,cy=h*.49;
-      ctx.lineWidth=1;ctx.globalAlpha=.2;for(let ring=0;ring<3;ring++){ctx.beginPath();ctx.arc(cx,cy,radius-ring*5,0,Math.PI*2);ctx.stroke();}
+      ctx.lineWidth=1;ctx.globalAlpha=.2;for(let ring=0;ring<3;ring++){ctx.beginPath();ctx.arc(cx,cy,Math.max(0,radius-ring*5),0,Math.PI*2);ctx.stroke();}
       ctx.lineWidth=Math.max(1,unit*.008);ctx.globalAlpha=.95;
       for(let i=0;i<128;i++){const a=i/128*Math.PI*2-Math.PI/2+(preview?time*.16:0),v=f[i<64?i:127-i]*gain,r=radius+clamp(v,0,1)*unit*.2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*radius,cy+Math.sin(a)*radius);ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);ctx.stroke();}
       ctx.globalAlpha=.7;ctx.fillStyle=colours[2];ctx.font=`500 ${Math.max(10,unit*.045)}px system-ui`;ctx.textAlign='center';ctx.fillText('D I M A U',cx,cy+4);
@@ -279,14 +329,18 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
 .symbol-control[data-control-kind=download]{--dome-light:#cffff4;--dome-mid:#82d8c2;--dome-deep:#449f93;--dome-glow:#baffdc}
 .tools>.symbol-control{flex:0 0 44px;align-self:end}.symbol-control:hover{filter:brightness(1.06);box-shadow:inset 0 2px 2px #fff,inset 0 -4px 5px #14385245,0 4px 8px #19354959,0 0 0 1px #85aabc}.symbol-control[aria-pressed=true]{box-shadow:inset 0 2px 2px #fffffff0,inset 0 -4px 5px #14385245,0 3px 5px #19354942,0 0 0 1px #48627385,0 0 0 3px #67b7c035}.symbol-control:active{filter:brightness(.95);box-shadow:inset 0 2px 5px #17384f50,0 1px 3px #19354942,0 0 0 1px #48627385}.symbol-control:focus-visible{outline:3px solid #64349d;outline-offset:5px}.symbol-control:disabled{opacity:.45;cursor:default}:host(:fullscreen) .fullscreen-exit.symbol-control{box-shadow:inset 0 2px 2px #fffffff0,inset 0 -4px 5px #14385245,inset 2px 0 3px #ffffff8c,inset -2px 0 3px #305c7340,0 3px 5px #19354942,0 0 0 1px #48627385}
 @media(prefers-reduced-transparency:reduce){.symbol-control{background:linear-gradient(145deg,var(--sota-unified-tint,var(--dome-light)),var(--sota-unified-tint,var(--dome-mid)) 58%,var(--sota-unified-tint,var(--dome-deep)))!important;backdrop-filter:none}}@media(forced-colors:active){.symbol-control{background:ButtonFace!important;color:ButtonText!important;border:1px solid ButtonText!important;box-shadow:none;backdrop-filter:none}.symbol-control::before,.symbol-control::after{display:none}.symbol-control svg{filter:none}.symbol-control:focus-visible{outline-color:Highlight}}
+.shell{border:1px solid #384563;background:#f5f7fc;border-radius:14px}
+.heading{background:#0b1426;border-bottom:1px solid #27344c;color:#e6faff}
+.heading strong{color:#d6f8ff;letter-spacing:.14em}.state{color:#a1f5dd}
+.stage{background:#080e22}.caption:empty{display:none}
 `;
   if(root.HTMLElement&&root.customElements){
     class Visualiser extends root.HTMLElement{
-      constructor(){super();this.attachShadow({mode:'open'});this.settings={mode:'spectrum',theme:'rainbow',gain:1};this.enabled=true;this.userPaused=false;this.frame=0;this.visible=true;this.last=0;this.drawState={preview:true,previewTime:0};this.handlers=[];this.prepareRun=0;}
+      constructor(){super();this.attachShadow({mode:'open'});this.settings={mode:'waveform',theme:'ocean',gain:1};this.enabled=true;this.userPaused=false;this.frame=0;this.visible=true;this.last=0;this.drawState={preview:true,previewTime:0};this.handlers=[];this.prepareRun=0;}
       connectedCallback(){
         if(this.built)return;this.built=true;
         try{const saved=JSON.parse(root.localStorage.getItem('dimau.music.visuals.v1')||'null');if(saved){if(modes.includes(saved.mode))this.settings.mode=saved.mode;if(palettes[saved.theme])this.settings.theme=saved.theme;this.settings.gain=clamp(Number(saved.gain)||1,.5,2);if(typeof saved.paused==='boolean')this.userPaused=saved.paused;}}catch{}
-        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" part="shell" aria-label="Music visuals"><div class="heading" part="heading"><strong part="label">SOUND IN MOTION</strong><span class="state" part="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas part="canvas" aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption" part="caption"><span>FREQUENCY / FORM</span><span>DIMAU MUSIC</span></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Waveform</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
+        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" part="shell" aria-label="Music visuals"><div class="heading" part="heading"><strong part="label">SOUND IN MOTION</strong><span class="state" part="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas part="canvas" aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption" part="caption"></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Aurora ribbon</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
         const $=s=>this.shadowRoot.querySelector(s);this.$=$;this.canvas=$('canvas');this.ctx=this.canvas.getContext('2d');
         for(const key of ['mode','theme','gain']){const control=$('.'+key);control.value=this.settings[key];control.addEventListener('input',()=>{this.settings[key]=key==='gain'?Number(control.value):control.value;this.persist();this.changed();this.render();});}
         $('.toggle').addEventListener('click',()=>this.toggle());

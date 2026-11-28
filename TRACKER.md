@@ -1,3 +1,7 @@
+## 2026-11-28 — Aurora music visualiser
+
+The waveform draws a luminous, twisting ribbon on a dark stage. Playback uses the shared audio analyser and the silent preview uses synthetic motion. Checked the canvas at 316 and 1100 pixels and ran 49 visualiser, first-paint and offline checks.
+
 ## 2026-11-28 — Village naming
 
 Renamed the community feature across navigation, invitations, starter groups, maps, chat, calls, notifications, skins and privacy text. Existing group IDs, invitation codes and links remain compatible.
