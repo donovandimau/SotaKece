@@ -1,3 +1,7 @@
+## 2026-11-28 — Record deck and equaliser
+
+The default visualiser shows a rotating vinyl record, tonearm and 24 frequency bands. The feed follows the active wall song, displays its title and restores the playlist source after it pauses. Verified the 316-pixel render and 51 focused checks.
+
 ## 2026-11-28 — Aurora music visualiser
 
 The waveform draws a luminous, twisting ribbon on a dark stage. Playback uses the shared audio analyser and the silent preview uses synthetic motion. Checked the canvas at 316 and 1100 pixels and ran 49 visualiser, first-paint and offline checks.
@@ -123,7 +127,6 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
-| 2026-11-28 | Codex | Make music and the playing track recognisable on the visualiser | codex/music-stage |
 | 2026-11-22 | Claude | Song Scratch (Ops task 1428): new page song-scratch.html, scratch a photo away to reveal a playing Island Mix song card, save as story video or picture, plus a story editor (text, stickers, drawing, filters, card styles, move/pinch/turn, bin, undo) and the bigger editor (video clips, photo layouts, crop/zoom/turn, moving stickers, animated text, own stickers, templates, backgrounds, scratch on/off, drafts on the phone). Built, waiting for merge | agent/claude/song-scratch-story-scratch-a-photo-away-to-reveal-a-song-card/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |

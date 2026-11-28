@@ -56,3 +56,20 @@ run('reconnecting the same visualiser rebinds its unchanged media element',async
 run('buffering is labelled Preview and returning audio is labelled Live again',async()=>{
  const f=fixture();try{await f.audio.play();await flush();assert.equal(f.visual.shadowRoot.querySelector('.state').textContent,'LIVE AUDIO');f.buffer(2);assert.equal(f.visual.shadowRoot.querySelector('.state').textContent,'Preview');assert.equal(f.visual.drawState.preview,true);assert.equal(f.frames.size,1);f.buffer(4);assert.equal(f.visual.shadowRoot.querySelector('.state').textContent,'LIVE AUDIO');assert.equal(f.visual.drawState.preview,false);assert.equal(f.counters().sources,1);}finally{f.close();}
 });
+
+run('feed visualiser follows the current wall song and restores the playlist after it pauses',async()=>{
+ const f=fixture();
+ try{
+  f.visual.setAttribute('compact','');
+  const wall=f.d.createElement('audio');wall.id='sota-now-audio';wall.src='/wall.mp3';
+  let paused=false;Object.defineProperty(wall,'paused',{get:()=>paused});
+  f.d.body.append(wall);
+  f.w.SotaNowPlaying={active:()=>({kind:'track',audio:wall,title:'Island song'})};
+  f.w.dispatchEvent(new f.w.Event('sota-now-playing'));await flush();
+  assert.equal(f.visual.audio,wall);
+  assert.equal(f.visual.shadowRoot.querySelector('.heading strong').textContent,'Island song');
+  paused=true;f.w.dispatchEvent(new f.w.Event('sota-now-playing'));await flush();
+  assert.equal(f.visual.audio,f.audio);
+  assert.equal(f.visual.shadowRoot.querySelector('.heading strong').textContent,'Music visualiser');
+ }finally{f.close();}
+});

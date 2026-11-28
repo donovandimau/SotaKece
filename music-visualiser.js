@@ -111,6 +111,49 @@
     }
     ctx.globalAlpha=1;
   }
+  function drawTurntable(ctx,w,h,colours,time,gain,levels){
+    const radius=Math.min(w*.183,h*.36),cx=w*.235,cy=h*.52;
+    const circle=(x,y,r,fill)=>{
+      ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();
+    };
+    // The grooves and moving label are readable even in a small, paused mobile panel.
+    circle(cx,cy+radius*.05,radius*1.05,'#03060b');
+    circle(cx,cy,radius*1.025,'#90a5b0');
+    const vinyl=ctx.createLinearGradient(cx-radius,cy-radius,cx+radius,cy+radius);
+    ['#09121c','#485569','#101721','#04070d','#364357','#0c131e'].forEach((c,i)=>vinyl.addColorStop(i/5,c));
+    circle(cx,cy,radius,vinyl);
+    ctx.lineWidth=Math.max(.7,radius*.012);
+    for(let ring=0;ring<14;ring++){
+      const r=radius*(.37+ring*.046);
+      ctx.beginPath();ctx.strokeStyle='#8195a44c';ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.strokeStyle='#e0fbffc2';ctx.arc(cx,cy,r,3.65+ring*.009,4.23+ring*.009);ctx.stroke();
+    }
+    circle(cx,cy,radius*.328,'#ff9956');
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,radius*.327,time*1.65,time*1.65+2.45);ctx.fillStyle='#ffcd83';ctx.fill();
+    circle(cx,cy,radius*.092,'#432a36');circle(cx,cy,radius*.045,'#e9f3f0');
+    // Chrome tonearm, cartridge and pivot.
+    const pivotX=cx+radius*.98,pivotY=cy-radius*.91;
+    for(const [ink,weight] of [['#101729',.09],['#d1dfe5',.045]]){
+      ctx.beginPath();ctx.strokeStyle=ink;ctx.lineWidth=Math.max(1,radius*weight);
+      ctx.moveTo(pivotX,pivotY);ctx.lineTo(cx+radius*1.04,cy-radius*.24);ctx.lineTo(cx+radius*.71,cy+radius*.21);ctx.stroke();
+    }
+    circle(pivotX,pivotY,radius*.095,'#718797');circle(pivotX,pivotY,radius*.047,'#c6d5dc');
+    ctx.fillStyle='#ffb768';ctx.fillRect(cx+radius*.65,cy+radius*.17,radius*.14,radius*.09);
+    const left=w*.48,right=w*.95,top=h*.21,bottom=h*.73;
+    const bands=24,rows=16,step=(right-left)/bands,row=(bottom-top)/rows;
+    for(let i=0;i<bands;i++){
+      const value=clamp(levels[Math.round(i*63/(bands-1))]*gain,0,1);
+      const active=Math.round(rows*value);
+      for(let j=0;j<rows;j++){
+        ctx.fillStyle=j<active?(j>=13?'#ff906b':j>=10?'#ffe08b':colours[Math.floor(i*(colours.length-1)/(bands-1))]):'#263345';
+        ctx.fillRect(left+i*step,bottom-(j+1)*row,step*.75,row*.71);
+      }
+    }
+    ctx.fillStyle='#c1d2db';ctx.font='600 '+Math.max(7,Math.min(h*.065,w*.024))+'px system-ui';
+    for(const [label,x,align] of [['BASS',left,'left'],['MIDS',(left+right)/2,'center'],['TREBLE',right,'right']]){
+      ctx.textAlign=align;ctx.fillText(label,x,bottom+h*.11);
+    }
+  }
   function draw(ctx,w,h,settings={},state={},data=null,background=true){
     const volcanic=settings.volcanic===true;
     const stagePalettes={ocean:['#29e9ef','#60ffc4','#73a4ff','#b578ff','#38e4ff'],ember:['#ff527c','#ffac50','#ffe283'],violet:['#83aaff','#c18aff','#ff70b6'],mono:['#8caac3','#f4fcff','#a6bbd6']};
@@ -133,7 +176,9 @@
       ctx.globalAlpha=1;
     }
     const gradient=ctx.createLinearGradient(w*.07,0,w*.93,0);colours.forEach((colour,i)=>gradient.addColorStop(i/(colours.length-1),colour));ctx.fillStyle=gradient;ctx.strokeStyle=gradient;
-    if(mode==='spectrum'){
+    if(mode==='waveform'&&background&&!volcanic){
+      drawTurntable(ctx,w,h,colours,time,gain,f);
+    }else if(mode==='spectrum'){
       if(!state.peaks)state.peaks=new Float32Array(64);
       for(let i=0;i<64;i++){
         const v=clamp(f[i]*gain,0,1),x=w*.07+i*w*.86/64,bw=Math.max(1,w*.86/64*.65),height=Math.max(1,v*h*.62);
@@ -331,7 +376,7 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
 @media(prefers-reduced-transparency:reduce){.symbol-control{background:linear-gradient(145deg,var(--sota-unified-tint,var(--dome-light)),var(--sota-unified-tint,var(--dome-mid)) 58%,var(--sota-unified-tint,var(--dome-deep)))!important;backdrop-filter:none}}@media(forced-colors:active){.symbol-control{background:ButtonFace!important;color:ButtonText!important;border:1px solid ButtonText!important;box-shadow:none;backdrop-filter:none}.symbol-control::before,.symbol-control::after{display:none}.symbol-control svg{filter:none}.symbol-control:focus-visible{outline-color:Highlight}}
 .shell{border:1px solid #384563;background:#f5f7fc;border-radius:14px}
 .heading{background:#0b1426;border-bottom:1px solid #27344c;color:#e6faff}
-.heading strong{color:#d6f8ff;letter-spacing:.14em}.state{color:#a1f5dd}
+.heading strong{color:#e4fbff;font-size:14px;letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.heading .state{flex:none}.state{color:#a1f5dd}
 .stage{background:#080e22}.caption:empty{display:none}
 `;
   if(root.HTMLElement&&root.customElements){
@@ -340,7 +385,7 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
       connectedCallback(){
         if(this.built)return;this.built=true;
         try{const saved=JSON.parse(root.localStorage.getItem('dimau.music.visuals.v1')||'null');if(saved){if(modes.includes(saved.mode))this.settings.mode=saved.mode;if(palettes[saved.theme])this.settings.theme=saved.theme;this.settings.gain=clamp(Number(saved.gain)||1,.5,2);if(typeof saved.paused==='boolean')this.userPaused=saved.paused;}}catch{}
-        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" part="shell" aria-label="Music visuals"><div class="heading" part="heading"><strong part="label">SOUND IN MOTION</strong><span class="state" part="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas part="canvas" aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption" part="caption"></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Aurora ribbon</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
+        this.shadowRoot.innerHTML=`<style>${css}</style><section class="shell" part="shell" aria-label="Music visuals"><div class="heading" part="heading"><strong part="label">Music visualiser</strong><span class="state" part="state">Preview</span><button class="fullscreen-exit" type="button" aria-label="Exit fullscreen music visualiser" hidden>×</button></div><div class="stage"><canvas part="canvas" aria-label="Audio-reactive music visualiser" role="img"></canvas><div class="caption" part="caption"></div></div><div class="tools"><button class="toggle" type="button" aria-pressed="true">Pause visuals</button><label>Visual<select class="mode"><option value="spectrum">Spectrum</option><option value="waveform">Record deck</option><option value="halo">Halo</option><option value="ocean">Ocean waves</option><option value="orbit">Orbit</option></select></label><label>Colour<select class="theme"><option value="rainbow">Rainbow</option><option value="ocean">Ocean</option><option value="ember">Ember</option><option value="violet">Violet</option><option value="mono">Silver</option></select></label><label>Intensity<input class="gain" type="range" min="0.5" max="2" step="0.1" value="1"></label><button class="fullscreen" type="button">Fullscreen</button></div><p class="note" role="status">Animated preview. Play a song to follow your music.</p></section>`;
         const $=s=>this.shadowRoot.querySelector(s);this.$=$;this.canvas=$('canvas');this.ctx=this.canvas.getContext('2d');
         for(const key of ['mode','theme','gain']){const control=$('.'+key);control.value=this.settings[key];control.addEventListener('input',()=>{this.settings[key]=key==='gain'?Number(control.value):control.value;this.persist();this.changed();this.render();});}
         $('.toggle').addEventListener('click',()=>this.toggle());
@@ -363,12 +408,15 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
         };
         root.addEventListener('sota-now-playing',syncSource);this.handlers.push(()=>root.removeEventListener('sota-now-playing',syncSource));
         if(root.MutationObserver){this.modalObserver=new root.MutationObserver(changes=>{if(changes.some(change=>change.type==='attributes'||[...change.addedNodes,...change.removedNodes].some(node=>node.tagName==='DIALOG'||node.querySelector?.('dialog'))))syncSource();});this.modalObserver.observe(root.document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['open','data-space-palette']});}
+        const onPlayerPlay=event=>{if(event.target.id===this.getAttribute('for'))syncSource();};
+        root.document.addEventListener('playing',onPlayerPlay,true);
+        this.handlers.push(()=>root.document.removeEventListener('playing',onPlayerPlay,true));
         this.bind();this.changed();this.wake();
         if(this.hasAttribute('export'))this.addExport();
       }
       bind(){
-        const active=this.hasAttribute('compact')&&this.closest('[data-space-palette="volcanic"]')&&root.SotaNowPlaying?.active?.();
-        const audio=active?.kind==='track'&&active.audio.id==='sota-now-audio'?active.audio:this._media||root.document.getElementById(this.getAttribute('for'));
+        const active=this.hasAttribute('compact')&&root.SotaNowPlaying?.active?.();
+        const audio=active?.kind==='track'&&!active.audio.paused&&!active.audio.ended&&active.audio.id==='sota-now-audio'?active.audio:this._media||root.document.getElementById(this.getAttribute('for'));
         if(this.audio===audio&&this.bindingActive)return;this.analysisController?.abort();this.prepareRun++;this.unbind?.();this.audio=audio;this.bindingActive=!!audio;if(!audio)return;
         const wake=()=>this.wake();const play=()=>{this.wake();if(this.enabled)this.analyse();};
         const names=['pause','ended','emptied','loadedmetadata','error','playing','waiting','stalled'];names.forEach(n=>audio.addEventListener(n,wake));audio.addEventListener('play',play);
@@ -405,6 +453,10 @@ async function finalizeWebmDuration(blob, durationSeconds, { signal } = {}) {
         this.stop();if(this.audio?.paused||this.audio?.ended)this.analysisController?.abort();
         this.render();const data=this.liveData();this.lastLive=!!data;const active=this.enabled&&!this.motion?.matches&&!root.document.hidden&&this.visible&&this.getClientRects().length>0&&!this.blockedByModal()&&!!this.ctx;
         this.$('.state').textContent=this.motion?.matches?'Reduced motion':!this.enabled?'Motion paused':data?'LIVE AUDIO':'Preview';
+        const playing=this.audio&&!this.audio.paused&&!this.audio.ended;
+        const current=root.SotaNowPlaying?.active?.();
+        const title=playing&&(current?.audio===this.audio?current.title:this.audio.id==='sota-playlist-audio'?root.SotaPlaylist?.trackTitle?.():this.audio.getAttribute('data-now-title'));
+        this.$('.heading strong').textContent=title||'Music visualiser';
         this.note(this.motion?.matches?'Static preview · your reduced-motion setting is respected.':!this.enabled?'Visuals paused. Music keeps playing.':data?'Following the sound from this player.':'Animated preview. Play a song to follow your music.');
         if(active)this.frame=root.requestAnimationFrame(t=>this.tick(t));
       }
