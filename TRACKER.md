@@ -1,3 +1,7 @@
+## 2026-11-28 — Record deck and equaliser
+
+The default visualiser shows a rotating vinyl record, tonearm and 24 frequency bands. The feed follows the active wall song, displays its title and restores the playlist source after it pauses. Verified the 316-pixel render and 51 focused checks.
+
 ## 2026-11-28 — Aurora music visualiser
 
 The waveform draws a luminous, twisting ribbon on a dark stage. Playback uses the shared audio analyser and the silent preview uses synthetic motion. Checked the canvas at 316 and 1100 pixels and ran 49 visualiser, first-paint and offline checks.

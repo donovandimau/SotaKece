@@ -386,6 +386,6 @@ b.dataset.playlistBound='true';b.setAttribute('aria-haspopup','dialog');b.setAtt
 // Shared song / music links open the player; the add-on picks the song.
 if(root.location&&/[?&](?:song|music)=/.test(root.location.search||''))root.addEventListener?.('load',()=>root.setTimeout(open,600),{once:true});
 if(root.document)root.document.addEventListener('play',event=>{if(event.target.tagName==='AUDIO'&&event.target!==audio)pause();},true);
-return {validateCatalog,describe,mount,open,pause,extend,showInline,hideInline,prepareVisual,detachInline:hideInline,isInline:()=>!!inlineHost&&!!dialog?.open&&inlineHost.isConnected};
+return {trackTitle:()=>(tracks[current]||selectedTrack)?.title||'',validateCatalog,describe,mount,open,pause,extend,showInline,hideInline,prepareVisual,detachInline:hideInline,isInline:()=>!!inlineHost&&!!dialog?.open&&inlineHost.isConnected};
 });
 
