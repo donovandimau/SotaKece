@@ -47,7 +47,7 @@ async function ring(env,auth,call,fetcher=fetch,sender=webpush.send){
   const video=info.mode==='video';
   const message={
     title:clean(info.from,60)+' is calling',
-    body:clean(info.group,60)+' · '+(video?'video':'audio')+' call',
+    body:clean(info.group==='your Koro'?'your Village':info.group,60)+' · '+(video?'video':'audio')+' call',
     tag:call,url:'/communications.html?view=calls',call,mode:video?'video':'audio'
   };
   let sent=0,failed=0;const gone=[];

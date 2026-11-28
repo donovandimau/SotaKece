@@ -1,5 +1,5 @@
 'use strict';
-// People bubbles (12 Nov 2026): "Say bula to" in the starter Koro card as a cluster of people and hub anchors.
+// People bubbles (12 Nov 2026): "Say bula to" in the starter Village card as a cluster of people and hub anchors.
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -62,7 +62,7 @@ test('tapping a person shows Visit room and Ask; asking goes through the card co
   const h=boot();await h.w.SotaHubs.fill(h.w.document);await flush();
   h.all('.pb-person')[0].click();
   assert.match(h.q('.pb-detail').textContent,/Mere/);
-  assert.match(h.q('.pb-detail').textContent,/in your Suva Koro/);
+  assert.match(h.q('.pb-detail').textContent,/in your Suva Village/);
   h.q('[data-pb="room"]').click();assert.deepEqual(h.rooms,['mere']);
   h.q('[data-pb="ask"]').click();await flush();
   assert.equal(JSON.stringify(h.inserts),JSON.stringify([{requester:'me',addressee:'u1'}]));
@@ -71,12 +71,12 @@ test('tapping a person shows Visit room and Ask; asking goes through the card co
   h.all('.pb-person')[0].click();assert.equal(h.q('.pb-detail').textContent,'','tapping again lets go');
 });
 
-test('tapping a hub offers Join or Open Koro, and joining redraws the card with fresh bubbles',dom,async()=>{
+test('tapping a hub offers Join or Open Village, and joining redraws the card with fresh bubbles',dom,async()=>{
   const h=boot();await h.w.SotaHubs.fill(h.w.document);await flush();
   const suva=h.all('.pb-hub').find(b=>/Suva/.test(b.getAttribute('aria-label')));
   suva.click();h.q('[data-pb="open"]').click();assert.deepEqual(h.koro,[1]);
   const west=h.all('.pb-hub').find(b=>/Nadi/.test(b.getAttribute('aria-label')));
-  west.click();assert.match(h.q('.pb-detail').textContent,/Open Koro/);
+  west.click();assert.match(h.q('.pb-detail').textContent,/Open Village/);
   h.q('[data-pb="join"]').click();await flush();
   assert.ok(h.calls.some(c=>c[0]==='bv_hub_join'&&c[1].p_slug==='west'));
   assert.equal(h.all('.pb-wrap').length,1,'one cluster after the card repaints');

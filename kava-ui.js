@@ -11,41 +11,41 @@
     try{await fn();}catch(err){error(err);}finally{busy=false;if(button?.isConnected)button.disabled=false;}
   }
   const hero=()=>`<section class="glass kava-hero" aria-labelledby="kc-lobby-title"><div class="kava-eyebrow">Talanoa • Stories • Music • Wisdom</div>
-    <h1 id="kc-lobby-title">Our Talanoa Circle</h1><p>Good stories. Familiar voices. A place to bring your Koro together, share what you know and make space for each other.</p>
+    <h1 id="kc-lobby-title">Our Talanoa Circle</h1><p>Good stories. Familiar voices. A place to bring your Village together, share what you know and make space for each other.</p>
     <div class="kava-hero-values"><span>Take turns</span><span>Listen generously</span><span>Everyone belongs</span></div></section>`;
   const lobby=content=>`<div class="kava-room kava-lobby">${hero()}${content}</div>`;
   function landingState(setup){
     return `<section class="glass card kava-setup ${setup?'':'kava-connection'}" aria-labelledby="kc-setup-title"><div class="kava-setup-copy">
       <span class="kava-setup-badge">${setup?'Explore the layout':'Connection interrupted'}</span>
       <h2 id="kc-setup-title">${setup?'Come in. Take a look around.':'Let’s reconnect.'}</h2>
-      <p>${setup?'See the speaker seats, discover the conversation space and get a feel for your circle.':'Your circles could not load. Try again to reconnect with your Koro.'}</p>
+      <p>${setup?'See the speaker seats, discover the conversation space and get a feel for your circle.':'Your circles could not load. Try again to reconnect with your Village.'}</p>
       <button class="btn" id="kc-retry">${setup?'Explore circle layout <span aria-hidden="true">↗</span>':'Try again'}</button>
       <p class="kava-setup-status">${setup?'Live circles and comments are not available yet. This tour is a preview, with no live people, audio or payments.':'Your saved circles have not been changed.'}</p>
       <p id="kava-error" class="kava-error" role="alert" ${setup?'hidden':''}></p></div>
       ${setup?`<div class="kava-circle-illustration" aria-hidden="true"><div class="kava-seat-ring">${Array.from({length:6},(_,i)=>`<span class="kava-ring-seat ${i===0?'is-host':''}">${i===0?'✦':'+'}</span>`).join('')}<div class="kava-ring-centre"><span class="kava-mini-bowl"></span><b>TALANOA</b><small>A space for every voice</small></div></div><span class="kava-illustration-caption">One host. Four to six speaker seats.</span></div>`:''}</section>
-      ${setup?`<section class="kava-lobby-features" aria-label="Inside a circle"><article><span aria-hidden="true">01</span><h3>Your Koro, together</h3><p>An invite-only space for your people.</p></article><article><span aria-hidden="true">02</span><h3>A seat for your story</h3><p>The host makes room for each speaker.</p></article><article><span aria-hidden="true">03</span><h3>More than listening</h3><p>Questions and stories keep the talanoa going.</p></article></section>`:''}`;
+      ${setup?`<section class="kava-lobby-features" aria-label="Inside a circle"><article><span aria-hidden="true">01</span><h3>Your Village, together</h3><p>An invite-only space for your people.</p></article><article><span aria-hidden="true">02</span><h3>A seat for your story</h3><p>The host makes room for each speaker.</p></article><article><span aria-hidden="true">03</span><h3>More than listening</h3><p>Questions and stories keep the talanoa going.</p></article></section>`:''}`;
   }
   function init(context){ctx=context;service=core().api(ctx.client);}
   async function view(){
     stop();guest=false;current=null;snapshot=null;
-    ctx.shell(lobby(`<div class="kava-state" role="status">Loading your Koro circles…</div>`));
+    ctx.shell(lobby(`<div class="kava-state" role="status">Loading your Village circles…</div>`));
     const run=epoch;
     try{
       const [crews,circles]=await Promise.all([root.SotaCircles?root.SotaCircles.list():service.crews(),service.list()]);if(run!==epoch||ctx.state.tab!=='circles')return;
       const names=Object.fromEntries(crews.map(c=>[c.id,c.name]));
       ctx.shell(lobby(`<div class="kava-columns"><section class="glass card"><h2 style="font-size:20px">Your circles</h2>
-        <p class="sub">Invite-only through your Koro. Listed newest first.</p><div class="kava-list">${circles.length?circles.map(c=>`
-        <button type="button" data-circle="${e(c.id)}"><strong>${e(c.title)}</strong><span>${e(names[c.crew_id]||'Your Koro')} · ${c.capacity} speaker seats · ${e(c.status==='open'?'Comments open':c.status==='ended'?'Ended':'Planned')}</span></button>`).join(''):
-        '<p class="kava-notice">There are no circles yet. Start one with your Koro.</p>'}</div>
+        <p class="sub">Invite-only through your Village. Listed newest first.</p><div class="kava-list">${circles.length?circles.map(c=>`
+        <button type="button" data-circle="${e(c.id)}"><strong>${e(c.title)}</strong><span>${e(names[c.crew_id]||'Your Village')} · ${c.capacity} speaker seats · ${e(c.status==='open'?'Comments open':c.status==='ended'?'Ended':'Planned')}</span></button>`).join(''):
+        '<p class="kava-notice">There are no circles yet. Start one with your Village.</p>'}</div>
         <div class="kava-state">Video is awaiting setup. You can plan a circle and open its written conversation today.</div></section>
         <section class="glass card"><h2 style="font-size:20px">Host a circle</h2>${crews.length?`
-        <form id="kava-create" class="kava-form"><label for="kc-koro" class="kava-label">Your Koro</label><select id="kc-koro" required>${crews.map(c=>`<option value="${c.id}">${e(c.name)}</option>`).join('')}</select>
+        <form id="kava-create" class="kava-form"><label for="kc-koro" class="kava-label">Your Village</label><select id="kc-koro" required>${crews.map(c=>`<option value="${c.id}">${e(c.name)}</option>`).join('')}</select>
         <label for="kc-title" class="kava-label">What shall we talk about?</label><input id="kc-title" maxlength="80" required placeholder="Stories that connect us">
         <label for="kc-topic" class="kava-label">Set the scene</label><textarea id="kc-topic" maxlength="500" placeholder="The questions, stories or knowledge you want to share"></textarea>
         <label for="kc-seats" class="kava-label">Speaker seats, including you</label><select id="kc-seats"><option value="6">6 seats</option><option value="5">5 seats</option><option value="4">4 seats</option></select>
-        <p class="kava-notice">You decide who takes a seat. Everyone in this Koro can read and comment when you open the circle.</p>
+        <p class="kava-notice">You decide who takes a seat. Everyone in this Village can read and comment when you open the circle.</p>
         <button class="btn" type="submit">Create my circle</button></form>`:
-        '<p class="kava-notice">Create or join a Koro first, then bring your people into a circle.</p><button class="btn" id="kc-gokoro">Go to Koro</button>'}
+        '<p class="kava-notice">Create or join a Village first, then bring your people into a circle.</p><button class="btn" id="kc-gokoro">Go to Village</button>'}
         <p id="kava-error" class="kava-error" role="alert" hidden></p></section></div>`));
       document.querySelectorAll('[data-circle]').forEach(b=>b.onclick=()=>action(b,()=>open(b.dataset.circle)));
       if(q('#kc-gokoro'))q('#kc-gokoro').onclick=()=>root.go('crews');
@@ -60,7 +60,7 @@
   }
   function frame(demo){
     return `<div class="kava-room" data-preview="${demo}"><div class="kava-room-toolbar"><button class="btn sm ghost kava-back" id="kc-back">← ${demo?'Back to sign in':'Your circles'}</button><span>Our Talanoa Circle</span><button type="button" id="kc-close" class="kava-panel-close" aria-label="Close Talanoa circle">×</button>${demo?'':'<button type="button" class="tc-button" id="kc-group-invite">Invite friends</button>'}</div><p id="kc-group-type" class="tc-session-kind" hidden></p>
-      <section class="glass kava-hero"><div class="kava-hero-top"><div class="kava-eyebrow">A place for proper talanoa</div><span class="kava-session-badge">${demo?'Layout preview · no live session':'Your Koro · circle room'}</span></div>
+      <section class="glass kava-hero"><div class="kava-hero-top"><div class="kava-eyebrow">A place for proper talanoa</div><span class="kava-session-badge">${demo?'Layout preview · no live session':'Your Village · circle room'}</span></div>
       <h1 id="kc-heading"></h1><p id="kc-topic-text" class="kava-topic"></p><div class="kava-hero-values"><span>Listen generously</span><span>Make space for each other</span></div><div id="kc-host-actions" class="kava-actions"></div></section>
       <div class="kava-columns"><div class="stack"><section class="glass card kava-stage-card"><div class="kava-close"><h2 style="font-size:18px">Around the bowl</h2><span id="kc-capacity" class="pill"></span></div>
       <div id="kc-stage" class="kava-stage"></div><div class="kava-state"><span class="kava-status-dot" aria-hidden="true"></span><div><strong>Video & audio are not connected</strong><p>These seats show the layout. No camera or microphone is on.</p></div></div>
@@ -118,7 +118,7 @@
   }
   function paint(){
     const {circle,people,comments,profiles}=snapshot,user=ctx.state.user?.id,isHost=!guest&&circle.host===user,mine=people.find(p=>p.member===user),ended=circle.status==='ended';
-    const person=id=>profiles[id]||{display_name:guest?'Preview host':'Koro member',avatar_emoji:'🌺'};
+    const person=id=>profiles[id]||{display_name:guest?'Preview host':'Village member',avatar_emoji:'🌺'};
     q('#kc-heading').textContent=circle.title;q('#kc-topic-text').textContent=circle.topic;
     q('#kc-capacity').textContent=`${circle.capacity} speaker seats`;
     q('#kc-stage').innerHTML=core().seats(circle,people).map(({number,person:p})=>`<div class="kava-seat ${number===1?'host':''} ${p?'occupied':'available'}"><small>${number===1?'Host':'Seat '+number}</small><span class="kava-face" aria-hidden="true">${p?e(person(p.member).avatar_emoji):'+'}</span><b>${p?e(person(p.member).display_name):'Open seat'}</b><small>${p?'Video not connected':'Offered by the host'}</small>${p?`<button type="button" class="btn sm ghost" data-support="${e(p.member)}">${guest?'Preview support':'Support speaker'}</button>`:''}</div>`).join('');
@@ -136,7 +136,7 @@
     const enabled=!guest&&!ended&&circle.status==='open'&&mine&&!mine.comments_paused;
     q('#kc-comment').disabled=!enabled;q('#kc-comment-form button').disabled=!enabled;
     q('#kc-comment').placeholder=guest?'Comments are available in an open circle.':'Ask a question or share something useful';
-    const markup=comments.length?comments.map(c=>`<article class="kava-comment"><small>${e(person(c.author).avatar_emoji)} ${e(person(c.author).display_name)}</small><p>${e(c.body)}</p>${!guest&&(isHost||c.author===user)?`<button class="btn sm ghost" type="button" data-remove="${e(c.id)}">Remove comment</button>`:''}</article>`).join(''):`<div class="kava-empty-conversation"><span aria-hidden="true">“</span><h3>The conversation starts here</h3><p>${guest?'A question. A story. A little wisdom. This is where your Koro joins in.':'There are no comments yet. Make the first one thoughtful.'}</p></div>`;
+    const markup=comments.length?comments.map(c=>`<article class="kava-comment"><small>${e(person(c.author).avatar_emoji)} ${e(person(c.author).display_name)}</small><p>${e(c.body)}</p>${!guest&&(isHost||c.author===user)?`<button class="btn sm ghost" type="button" data-remove="${e(c.id)}">Remove comment</button>`:''}</article>`).join(''):`<div class="kava-empty-conversation"><span aria-hidden="true">“</span><h3>The conversation starts here</h3><p>${guest?'A question. A story. A little wisdom. This is where your Village joins in.':'There are no comments yet. Make the first one thoughtful.'}</p></div>`;
     // Avoid rebuilding the live region when no comments have changed.
     if(q('#kc-comments').innerHTML!==markup)q('#kc-comments').innerHTML=markup;
     document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(!root.confirm('Remove this comment? This cannot be undone.'))return;action(b,async()=>{await service.removeComment(b.dataset.remove);await refresh(epoch);});});

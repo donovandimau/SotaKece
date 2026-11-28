@@ -82,13 +82,13 @@ function changedHarness(){
  const context=vm.createContext({S,$:selector=>nodes[selector],window:{SotaCircleTypes:types,BulaSkins:skins,SotaCircles:{applyGroupSkin:group=>calls.skins.push(group),mountGroupGraph:(...args)=>calls.graphs.push(args),stop:()=>assert.fail('Appearance updates must not stop the active room')},SotaKavaUI:{updateGroupAppearance:group=>calls.kava.push(group),stop:()=>assert.fail('Appearance updates must not stop a circle')}},render:()=>assert.fail('Appearance update must not render the room again'),shell:()=>assert.fail('Appearance update must not replace the room DOM')});
  vm.runInContext(changedSource,context,{filename:'actual-circle-group-changed.js'});return {context,S,calls,nodes,composer,graph};
 }
-test('Koro settings update the group skin, label and graph without replacing an unsent composer',()=>{
+test('Village settings update the group skin, label and graph without replacing an unsent composer',()=>{
  const h=changedHarness(),group={id:42,name:'Our people',circle_type:'lotu'},before=JSON.stringify(h.S.me);Object.freeze(h.S.me);h.context.circleGroupChanged(group);
  assert.match(h.nodes['#crew-type-label'].textContent,/Lotu Circle.*White Masi/);assert.equal(h.nodes['#crew-avatar'].textContent,types.get('lotu').emoji);assert.equal(h.nodes['#crew-avatar'].style.background,types.get('lotu').displayAccent+'22');
  assert.deepEqual(h.calls.skins,[group]);assert.equal(h.calls.graphs.length,1);assert.equal(h.calls.graphs[0][0],h.graph);assert.equal(h.calls.graphs[0][1],group);assert.equal(h.nodes['#cm'],h.composer);assert.equal(h.composer.value,'An unsent message');assert.equal(JSON.stringify(h.S.me),before);
 });
 
-test('group settings for another Koro do nothing, while Talanoa updates delegate without rendering or stopping',()=>{
+test('group settings for another Village do nothing, while Talanoa updates delegate without rendering or stopping',()=>{
  const h=changedHarness(),group={id:99,circle_type:'kava'};h.context.circleGroupChanged(group);assert.equal(h.calls.skins.length,0);assert.equal(h.calls.graphs.length,0);
  h.S.tab='circles';h.context.circleGroupChanged(group);assert.deepEqual(h.calls.kava,[group]);assert.equal(h.calls.skins.length,0);assert.equal(h.composer.value,'An unsent message');
 });

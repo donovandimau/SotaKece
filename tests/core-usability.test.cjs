@@ -33,12 +33,12 @@ check('late Moments responses cannot replace a newer view or a newer request',as
   assert.equal(ctx.screen,'Friends screen');
 });
 
-check('Moments and Koro failures expose a retry instead of a false empty state',async()=>{
+check('Moments and Village failures expose a retry instead of a false empty state',async()=>{
   const ctx=harness({sb:{rpc:async()=>({data:null,error:{message:'offline'}})}});
   load(ctx,'async function viewMoments()','async function postMoment()');
   await ctx.viewMoments();assert.match(ctx.screen,/Connection interrupted/);assert.match(ctx.screen,/onclick="viewMoments\(\)"/);assert(!ctx.screen.includes('Nothing yet'));
   ctx.S.tab='crews';load(ctx,'async function circleGroupsResult()','function circleGroupChanged(');load(ctx,'async function viewCrews()','async function makeCrew()');await ctx.viewCrews();
-  assert.match(ctx.screen,/onclick="viewCrews\(\)"/);assert(!ctx.screen.includes('No Koro yet'));
+  assert.match(ctx.screen,/onclick="viewCrews\(\)"/);assert(!ctx.screen.includes('No Village yet'));
   ctx.sb.rpc=async()=>{throw new Error('Connection lost');};await ctx.viewCrews();assert.match(ctx.screen,/Connection interrupted/);
 });
 
@@ -66,7 +66,7 @@ check('search ignores stale queries and late results after leaving Friends',asyn
   assert.match(results.innerHTML,/Search could not load/);assert(!results.innerHTML.includes('Nobody with that handle'));
 });
 
-check('Koro sends retain a failed draft, allow retry, and suppress duplicate taps',async()=>{
+check('Village sends retain a failed draft, allow retry, and suppress duplicate taps',async()=>{
   const input={value:'Please keep this message',disabled:false},button={disabled:false},errorBox={hidden:true,textContent:''};
   let request=deferred(),inserts=0,renders=0;
   const ctx=harness({$:selector=>({'#cm':input,'#cm-send':button,'#cm-error':errorBox}[selector]),
@@ -79,7 +79,7 @@ check('Koro sends retain a failed draft, allow retry, and suppress duplicate tap
   assert.equal(inserts,2);assert.equal(input.value,'');assert.equal(renders,1);
 });
 
-check('a completed Koro send cannot rerender a different route',async()=>{
+check('a completed Village send cannot rerender a different route',async()=>{
   const request=deferred(),input={value:'Hello'},button={},errorBox={};let renders=0;
   const ctx=harness({$:selector=>({'#cm':input,'#cm-send':button,'#cm-error':errorBox}[selector]),sb:{from:()=>({insert:()=>request.promise})},render:()=>renders++});
   ctx.S.tab='crews';ctx.S.crew=42;ctx.viewRun();load(ctx,'async function sendMsg(cid)','/* ================= FRIENDS');
@@ -93,7 +93,7 @@ check('an old owner send cannot unlock the new owner pending send',async()=>{
     sb:{from:()=>({insert:()=>requests[inserts++].promise})},render:()=>renders++});
   ctx.S.tab='crews';ctx.S.crew=42;ctx.viewRun();load(ctx,'async function sendMsg(cid)','/* ================= FRIENDS');
   const oldSend=ctx.sendMsg(42);
-  // Owner cleanup releases the old UI lock, then the new owner opens their Koro.
+  // Owner cleanup releases the old UI lock, then the new owner opens their Village.
   ctx.S.sendingMessage=false;ctx.S.user={id:'new-owner'};ctx.viewRun();
   input={value:'New owner message'};button={};errorBox={};
   const newSend=ctx.sendMsg(42),newToken=ctx.S.sendingMessage;

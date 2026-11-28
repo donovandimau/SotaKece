@@ -11,7 +11,7 @@
     if(!title||title.length>80)throw new Error('Give your circle a title of 1–80 characters.');
     if(topic.length>500)throw new Error('Keep the topic within 500 characters.');
     if(!Number.isInteger(capacity)||capacity<4||capacity>6)throw new Error('Choose four, five or six speaker seats.');
-    if(!Number.isSafeInteger(Number(input.crew))||Number(input.crew)<1)throw new Error('Choose a Koro for your circle.');
+    if(!Number.isSafeInteger(Number(input.crew))||Number(input.crew)<1)throw new Error('Choose a Village for your circle.');
     return {p_crew:Number(input.crew),p_title:title,p_topic:topic,p_capacity:capacity};
   }
   function seats(circle,people){
@@ -34,7 +34,7 @@
       create:async input=>check(await client.rpc('bv_circle_create',draft(input))),
       load:async id=>{
         const circle=check(await client.from('bv_circles').select('*').eq('id',id).maybeSingle());
-        if(!circle)throw new Error('This circle is unavailable. Check your Koro membership.');
+        if(!circle)throw new Error('This circle is unavailable. Check your Village membership.');
         const people=check(await client.from('bv_circle_people').select('*').eq('circle_id',id).order('joined_at'))||[];
         const comments=check(await client.from('bv_circle_comments').select('*').eq('circle_id',id).order('created_at',{ascending:false}).limit(60))||[];
         const ids=[...new Set([circle.host,...people.map(p=>p.member),...comments.map(p=>p.author)])];

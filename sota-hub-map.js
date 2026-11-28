@@ -1,5 +1,5 @@
 /* Sota Kece hub map (12 November 2026).
-   The starter Koro on a real map of Fiji: the Copernicus Sentinel-2 mosaic already kept in the Dimau
+   The starter Village on a real map of Fiji: the Copernicus Sentinel-2 mosaic already kept in the Dimau
    basemap bucket (zoom 6-14, land tiles only; index.json lists which exist). Suva and Nadi & Lautoka
    are pins; UK & overseas sits as a chip, because the imagery only covers Fiji.
    Zoom adds detail: a pin shows its name, then its member count, then the blurb with Join / Open.
@@ -12,7 +12,7 @@
   var TILES = 'https://xnxmumbvgtmlpenutlii.supabase.co/storage/v1/object/public/basemap/fiji-s2/';
   var CREDIT = 'Imagery: contains modified Copernicus Sentinel data 2024–2026';
   var ZMIN = 6.5, ZMAX = 13, TILE = 256;
-  // Where each starter Koro sits. `diaspora` has no place on a map of Fiji, so it is shown as a chip.
+  // Where each starter Village sits. `diaspora` has no place on a map of Fiji, so it is shown as a chip.
   var PLACES = { suva: { lat: -18.1416, lon: 178.4419 }, west: { lat: -17.70, lon: 177.44 } };
   var HOME = { lat: -17.62, lon: 178.65 };   // the middle of the main islands
   var MAIN = { n: -15.9, w: 177.0, s: -19.3, e: 180.3 };   // Viti Levu, Vanua Levu and Taveuni
@@ -58,7 +58,7 @@
   function has(z, x, y) { var col = index && index[z] && index[z][x]; return !!(col && col.indexOf(y) !== -1); }
   function num(v) { var n = Number(v); return Number.isSafeInteger(n) && n >= 0 ? n : 0; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function members(h) { var n = num(h.members); return n ? n + (n === 1 ? ' member' : ' members') : 'Open Koro'; }
+  function members(h) { var n = num(h.members); return n ? n + (n === 1 ? ' member' : ' members') : 'Open Village'; }
 
   /* ----------------------------------------------------------- drawing */
   function size() { return { w: view.clientWidth || 360, h: view.clientHeight || 480 }; }
@@ -103,7 +103,7 @@
     });
     drawPins(s);
     var d = detail(cam.z);
-    hint.textContent = d === 1 ? 'Zoom in on a hub to see who is there.' : d === 2 ? 'Closer still to join.' : 'Tap a hub to join or open its Koro.';
+    hint.textContent = d === 1 ? 'Zoom in on a hub to see who is there.' : d === 2 ? 'Closer still to join.' : 'Tap a hub to join or open its Village.';
   }
   function schedule() { if (!raf) raf = requestAnimationFrame(draw); }
 
@@ -113,7 +113,7 @@
       '<span class="hm-text"><b>' + esc(h.name) + '</b>' +
       (d >= 2 ? '<small>' + esc(h.joined ? 'You are in · ' + members(h) : members(h)) + '</small>' : '') +
       (d >= 3 && h.blurb ? '<small class="hm-blurb">' + esc(h.blurb) + '</small>' : '') + '</span>' +
-      (d >= 3 ? '<button type="button" class="hm-go" data-hm="' + go + '" data-slug="' + esc(h.slug) + '">' + (h.joined ? 'Open Koro' : 'Join') + '</button>' : '');
+      (d >= 3 ? '<button type="button" class="hm-go" data-hm="' + go + '" data-slug="' + esc(h.slug) + '">' + (h.joined ? 'Open Village' : 'Join') + '</button>' : '');
   }
   function drawPins(s) {
     var d = detail(cam.z), c = project(cam.lat, cam.lon, cam.z), labels = '', dots = '', chips = '';
@@ -244,7 +244,7 @@
     root.className = 'hm-root'; root.hidden = true;
     root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'hm-title');
     root.innerHTML =
-      '<header class="hm-head"><div><h2 id="hm-title">Where Sota Kece gathers</h2><p>The starter Koro on a satellite map of Fiji.</p></div>' +
+      '<header class="hm-head"><div><h2 id="hm-title">Where Sota Kece gathers</h2><p>The starter Villages on a satellite map of Fiji.</p></div>' +
       '<button type="button" class="hm-close" data-hm="close" aria-label="Close the map">✕</button></header>' +
       '<div class="hm-view" tabindex="0" aria-label="Map of Fiji. Arrow keys move, plus and minus zoom.">' +
       '<div class="hm-layer" aria-hidden="true"></div><div class="hm-pins"></div></div>' +
@@ -280,7 +280,7 @@
     try { if (lastFocus && lastFocus.isConnected) lastFocus.focus({ preventScroll: true }); } catch (_) {}
   }
 
-  // The "See them on the map" button lives in the starter Koro card (sota-hubs.js adds it when this file is loaded).
+  // The "See them on the map" button lives in the starter Village card (sota-hubs.js adds it when this file is loaded).
   document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-hubmap]'); if (b) { e.preventDefault(); open(); } });
 
   window.SotaHubMap = {

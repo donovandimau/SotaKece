@@ -28,7 +28,7 @@ test('member list accepts only bounded known metadata and strips unneeded server
   assert.deepEqual(h.calls.map(call=>call.name),['bv_circle_groups']);
   h.api.stop();
 });
-test('only a missing new RPC falls back to a private legacy Koro with unknown owner',async()=>{
+test('only a missing new RPC falls back to a private legacy Village with unknown owner',async()=>{
   const h=plainHarness({responses:{bv_circle_groups:{data:null,error:{code:'PGRST202'}},bv_my_crews:{data:[{id:42,name:'Legacy',join_code:'LEGACY_CODE',owner:own,graph_visibility:'public',show_on_graph:true}],error:null}}});
   const [row]=await h.api.list();assert.equal(row.legacy,true);assert.equal(row.owner,null);assert.equal(row.graph_visibility,'private');assert.equal(row.show_on_graph,false);assert.equal(row.skin_id,'village');
   assert.deepEqual(h.calls.map(call=>call.name),['bv_circle_groups','bv_my_crews']);h.api.stop();
@@ -107,8 +107,8 @@ domTest('joining an invitation is explicit, unchecked by default, and navigates 
 });
 domTest('owner preview changes never mislabel the saved invitation before successful settings save',async()=>{
   const saved=group(),h=harness({responses:{bv_circle_groups:{data:[saved],error:null},bv_circle_update_group:args=>({data:{id:42,circle_type:args.p_type,skin_id:catalogue.get(args.p_type).skin,graph_visibility:args.p_graph_visibility},error:null})}});try{
-    await h.api.openInvite(saved);h.q('[data-tc-owner-type]').value='kava';h.q('[data-tc-owner-type]').dispatchEvent(new h.w.Event('change'));assert(h.q('[data-tc-pending-preview]').textContent.includes('Digital Kava Session'));assert(h.q('[data-tc-invitation-kind]').textContent.includes('Koro Circle'));
-    h.q('[data-tc-copy]').click();await flush();assert(h.copied[0].includes('Koro Circle'));assert(!h.copied[0].includes('Digital Kava Session'));assert(h.copied[0].includes('https://sotakece.com/#circle-invite=INVITE_1234'));
+    await h.api.openInvite(saved);h.q('[data-tc-owner-type]').value='kava';h.q('[data-tc-owner-type]').dispatchEvent(new h.w.Event('change'));assert(h.q('[data-tc-pending-preview]').textContent.includes('Digital Kava Session'));assert(h.q('[data-tc-invitation-kind]').textContent.includes('Village Circle'));
+    h.q('[data-tc-copy]').click();await flush();assert(h.copied[0].includes('Village Circle'));assert(!h.copied[0].includes('Digital Kava Session'));assert(h.copied[0].includes('https://sotakece.com/#circle-invite=INVITE_1234'));
     h.submit('[data-tc-owner-form]');await flush();assert.equal(h.calls.find(call=>call.name==='bv_circle_update_group').args.p_expected_owner,own);assert.equal(saved.circle_type,'kava');assert.equal(saved.skin_id,'grog');assert(h.q('[data-tc-invitation-kind]').textContent.includes('Digital Kava Session'));assert.equal(h.rendered.length,1);
   }finally{h.close();}
 });
@@ -220,9 +220,9 @@ domTest('a confirmed create is not reported as failed when its navigation callba
     h.host.innerHTML=h.api.createHTML();h.api.mountCreate(h.host,()=>{throw Error('Navigation failed');});h.q('[data-tc-name]').value='Friends';h.submit('[data-tc-create]');await flush();assert(h.q('[data-tc-status]').textContent.startsWith('Circle created.'));assert(!h.q('[data-tc-status]').textContent.includes('could not be created'));assert.equal(h.calls.filter(call=>call.name==='bv_circle_create_group').length,1);
   }finally{h.close();}
 });
-domTest('legacy Koro still shares its actual stored invitation while new owner and graph settings stay unavailable',async()=>{
-  const h=harness({responses:{bv_circle_groups:{data:null,error:{code:'PGRST202'}},bv_my_crews:{data:[{id:42,name:'Our old Koro',join_code:'ACTUAL_LEGACY_CODE',owner:own}],error:null}}});try{
-    await h.api.openInvite({id:42});assert.equal(h.q('[data-tc-owner-form]'),null);assert.equal(h.q('[data-tc-choice-form]'),null);assert(h.dialog.textContent.includes('remains private'));h.q('[data-tc-copy]').click();await flush();assert.equal(h.copied.length,1);assert(h.copied[0].includes('#circle-invite=ACTUAL_LEGACY_CODE'));assert(h.copied[0].includes('Koro Circle'));assert(!h.calls.some(call=>['bv_circle_update_group','bv_circle_graph_choice'].includes(call.name)));
+domTest('legacy Village still shares its actual stored invitation while new owner and graph settings stay unavailable',async()=>{
+  const h=harness({responses:{bv_circle_groups:{data:null,error:{code:'PGRST202'}},bv_my_crews:{data:[{id:42,name:'Our old Village',join_code:'ACTUAL_LEGACY_CODE',owner:own}],error:null}}});try{
+    await h.api.openInvite({id:42});assert.equal(h.q('[data-tc-owner-form]'),null);assert.equal(h.q('[data-tc-choice-form]'),null);assert(h.dialog.textContent.includes('remains private'));h.q('[data-tc-copy]').click();await flush();assert.equal(h.copied.length,1);assert(h.copied[0].includes('#circle-invite=ACTUAL_LEGACY_CODE'));assert(h.copied[0].includes('Village Circle'));assert(!h.calls.some(call=>['bv_circle_update_group','bv_circle_graph_choice'].includes(call.name)));
   }finally{h.close();}
 });
 domTest('mounting a replacement widget prunes the disconnected member graph and its polling timer',async()=>{

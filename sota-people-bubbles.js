@@ -1,8 +1,8 @@
 /* Sota Kece people bubbles (12 November 2026).
-   In the starter Koro card, "Say bula to" becomes a small living cluster: people to meet are the large
-   bubbles, the starter Koro are smaller anchors, and a line joins a person to the hub you share.
+   In the starter Village card, "Say bula to" becomes a small living cluster: people to meet are the large
+   bubbles, the starter Villages are smaller anchors, and a line joins a person to the hub you share.
    Bubbles push each other apart, can be dragged, and settle; tapping one brings it forward and opens a
-   panel with the same actions the card already has (Visit room, Ask to be friends, Join / Open Koro).
+   panel with the same actions the card already has (Visit room, Ask to be friends, Join / Open Village).
    Data and actions come from sota-hubs.js (peopleToMeet, askFriend, visitRoom, joinHub, openHub).
    If there is nobody to show, or this file is missing, the card's own list stays exactly as it was. */
 (function () {
@@ -89,11 +89,11 @@
         b.className = 'pb-b pb-person';
         b.style.setProperty('--pb-ring', colour(p.accent));
         b.innerHTML = '<span class="pb-face" aria-hidden="true">' + esc(p.avatar_emoji || '🌺') + '</span><span class="pb-name">' + esc(p.display_name || p.handle) + '</span>';
-        b.setAttribute('aria-label', (p.display_name || p.handle) + (p.hub ? ', in your ' + p.hub + ' Koro' : ''));
+        b.setAttribute('aria-label', (p.display_name || p.handle) + (p.hub ? ', in your ' + p.hub + ' Village' : ''));
       } else {
         b.className = 'pb-b pb-hub' + (n.data.joined ? ' on' : '');
         b.innerHTML = '<span class="pb-face" aria-hidden="true">' + esc(n.data.emoji || '🪸') + '</span>';
-        b.setAttribute('aria-label', n.data.name + ' Koro, ' + num(n.data.members) + ' members');
+        b.setAttribute('aria-label', n.data.name + ' Village, ' + num(n.data.members) + ' members');
         b.title = n.data.name;
       }
       n.el = b; stage.appendChild(b);
@@ -148,13 +148,13 @@
         var asked = H.hasAsked && H.hasAsked(d.id);
         html = '<div class="pb-card"><span class="pb-face" aria-hidden="true">' + esc(d.avatar_emoji || '🌺') + '</span>' +
           '<span class="pb-who"><b>' + esc(d.display_name || d.handle) + '</b><small>@' + esc(d.handle) +
-          (d.hub ? ' · in your ' + esc(d.hub) + ' Koro' : num(d.posts) ? ' · on the wall this month' : '') + '</small></span>' +
+          (d.hub ? ' · in your ' + esc(d.hub) + ' Village' : num(d.posts) ? ' · on the wall this month' : '') + '</small></span>' +
           '<span class="pb-acts"><button type="button" class="btn sm ghost" data-pb="room">Visit room</button>' +
           '<button type="button" class="btn sm' + (asked ? ' ghost' : '') + '" data-pb="ask"' + (asked ? ' disabled' : '') + '>' + (asked ? 'Asked' : 'Ask to be friends') + '</button></span></div>';
       } else {
         html = '<div class="pb-card"><span class="pb-face" aria-hidden="true">' + esc(d.emoji || '🪸') + '</span>' +
-          '<span class="pb-who"><b>' + esc(d.name) + '</b><small>' + (num(d.members) ? num(d.members) + (num(d.members) === 1 ? ' member' : ' members') : 'Open Koro') + (d.joined ? ' · you are in' : '') + '</small></span>' +
-          '<span class="pb-acts"><button type="button" class="btn sm" data-pb="' + (d.joined ? 'open' : 'join') + '">' + (d.joined ? 'Open Koro' : 'Join') + '</button></span></div>';
+          '<span class="pb-who"><b>' + esc(d.name) + '</b><small>' + (num(d.members) ? num(d.members) + (num(d.members) === 1 ? ' member' : ' members') : 'Open Village') + (d.joined ? ' · you are in' : '') + '</small></span>' +
+          '<span class="pb-acts"><button type="button" class="btn sm" data-pb="' + (d.joined ? 'open' : 'join') + '">' + (d.joined ? 'Open Village' : 'Join') + '</button></span></div>';
       }
       detail.innerHTML = html;
     }
@@ -172,7 +172,7 @@
     self.nodes = nodes; self.select = select; self.wrap = wrap;
   }
 
-  // ------------------------------------------------------------------ attach to every drawn starter Koro card
+  // ------------------------------------------------------------------ attach to every drawn starter Village card
   var pending = typeof WeakMap === 'function' ? new WeakMap() : null;
   async function mount(host) {
     var H = window.SotaHubs;

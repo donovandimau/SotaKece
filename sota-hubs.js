@@ -1,5 +1,5 @@
-/* Sota Kece — starter Koro ("hubs") and people to meet.
-   A new member has no friends and no Koro. This card gives one tap into an open Koro for their
+/* Sota Kece — starter Village ("hubs") and people to meet.
+   A new member has no friends and no Village. This card gives one tap into an open Village for their
    side of Viti (Suva, Nadi & Lautoka, UK & overseas) and up to three members to say bula to.
    Rules live in supabase/migrations/20261110120000_sota_hubs.sql (bv_hubs, bv_hub_join,
    bv_people_to_meet). If those are not in the database yet the card removes itself, so the page
@@ -9,7 +9,7 @@
 
   var client, S, toast, esc, openRoom, openKoro;
   var cache = null, loading = null, people = null, asked = {}, wired = false, missing = false;
-  var SAY = { NOT_SIGNED_IN: 'Sign in first.', NO_SUCH_HUB: 'That Koro is not open yet.', NO_ROOM: 'Finish making your room first.' };
+  var SAY = { NOT_SIGNED_IN: 'Sign in first.', NO_SUCH_HUB: 'That Village is not open yet.', NO_ROOM: 'Finish making your room first.' };
 
   function say(err) {
     var m = (err && err.message) || '';
@@ -52,9 +52,9 @@
   function pill(h) {
     var n = num(h.members);
     return '<button type="button" class="hub-pill' + (h.joined ? ' on' : '') + '" data-hub="' + (h.joined ? 'open' : 'join') + '" data-slug="' + esc(h.slug) + '"' +
-      (h.crew_id ? ' data-crew="' + num(h.crew_id) + '"' : '') + ' aria-label="' + esc((h.joined ? 'Open ' : 'Join ') + h.name + ' Koro') + '">' +
+      (h.crew_id ? ' data-crew="' + num(h.crew_id) + '"' : '') + ' aria-label="' + esc((h.joined ? 'Open ' : 'Join ') + h.name + ' Village') + '">' +
       '<span class="hub-emoji" aria-hidden="true">' + esc(h.emoji || '🪸') + '</span>' +
-      '<span class="hub-name"><b>' + esc(h.name) + '</b><small>' + (h.joined ? 'You are in · open' : n ? n + (n === 1 ? ' member' : ' members') + ' · join' : 'Open Koro · join') + '</small></span></button>';
+      '<span class="hub-name"><b>' + esc(h.name) + '</b><small>' + (h.joined ? 'You are in · open' : n ? n + (n === 1 ? ' member' : ' members') + ' · join' : 'Open Village · join') + '</small></span></button>';
   }
   function person(p) {
     var done = asked[p.id];
@@ -71,8 +71,8 @@
   function body(context, hubs, list) {
     var mates = context === 'mates';
     return '<header class="hub-head"><span class="hub-kicker">' + (mates ? 'TOP MATES START HERE' : 'FIND YOUR PEOPLE') + '</span>' +
-      '<h2>Where are your people?</h2><p>One tap puts you in an open Koro. Your own Koro stay invite-only.</p></header>' +
-      '<div class="hub-pills" role="group" aria-label="Starter Koro">' + hubs.map(pill).join('') + '</div>' +
+      '<h2>Where are your people?</h2><p>One tap puts you in an open Village. Your own Villages stay invite-only.</p></header>' +
+      '<div class="hub-pills" role="group" aria-label="Starter Village">' + hubs.map(pill).join('') + '</div>' +
       (typeof window !== 'undefined' && window.SotaHubMap ? '<button type="button" class="btn sm ghost hub-map-btn" data-hubmap>See them on the map</button>' : '') +
       peopleBlock(list);
   }

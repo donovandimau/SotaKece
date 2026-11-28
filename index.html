@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="sota-release" content="sota-kece-shell-20261127-v224-page-scenes">
+<meta name="sota-release" content="sota-kece-shell-20261128-v225-village">
 <title>Sota Kece — alive together</title>
 <meta name="description" content="Sota Kece: a Pacific-first home for your people. Top Mates 16, Talanoa, personal skins, profile music and Our Talanoa Circle. Low data by default.">
 <meta name="theme-color" content="#87CEEB">
@@ -535,7 +535,7 @@ function shell(body){
   </header>
   <main id="view" tabindex="-1">${body}</main>
   <nav class="bottom glass" aria-label="Main navigation">
-    ${[["pulse","🌊","Pulse"],["moments","🐚","Moments"],["room","🏝","My room"],["circles","🥥","Circles"],["crews","🪸","Koro"],["friends","🤝","Friends"]]
+    ${[["pulse","🌊","Pulse"],["moments","🐚","Moments"],["room","🏝","My room"],["circles","🥥","Circles"],["crews","🪸","Village"],["friends","🤝","Friends"]]
       .map(([k,i,l])=>`<button class="${S.tab===k?'on':''}" data-tab="${k}" aria-current="${S.tab===k?'page':'false'}" onclick="go('${k}')" style="position:relative">
         <em aria-hidden="true">${i}</em>${l}${k==='friends'&&p?`<span class="badge" aria-label="${p} pending friend requests">${p}</span>`:''}</button>`).join("")}
   </nav>`;
@@ -701,7 +701,7 @@ function mountPulseSocial(){
   // Talanoa (post box and feed) sits at the foot of Home, under every other panel (owner, 15 Nov 2026).
   const wall=view.querySelector(':scope > .tw-wrap');if(wall)view.appendChild(wall);
 }
-/* Starter Koro and people to meet (sota-hubs.js). On Home it takes the place of the empty Top Mates
+/* Starter Villages and people to meet (sota-hubs.js). On Home it takes the place of the empty Top Mates
    panel while the member has no accepted friends; if the database is not ready the panel comes back. */
 function mountHubs(anchor,context){
   if(!window.SotaHubs||!S.user||!S.me||!anchor||(context==='mates'&&(S.friends.length||S.metaErrors?.friends)))return;
@@ -1024,23 +1024,23 @@ async function viewCrews(){
   shell(`<div class="empty glass card" role="status"><em>🪸</em>Loading…</div>`);
   const {data:crews,error}=await circleGroupsResult();
   if(!currentView(run))return;
-  if(error)return viewError('your Koro','viewCrews()');
+  if(error)return viewError('your Village','viewCrews()');
   shell(`<div class="koro-page">
-    <section class="koro-hero" aria-labelledby="koro-title"><div class="koro-hero-top"><span class="koro-eyebrow">YOUR COMMUNITY, CLOSE BY</span><span class="koro-private"><span aria-hidden="true">◇</span> Your Koro are invite-only</span></div><h1 id="koro-title">Your people. Your Koro.</h1><p>A small, private place for friends, family or your community. Start a Koro or join one with an invitation.</p></section>
+    <section class="koro-hero" aria-labelledby="koro-title"><div class="koro-hero-top"><span class="koro-eyebrow">YOUR COMMUNITY, CLOSE BY</span><span class="koro-private"><span aria-hidden="true">◇</span> Your Villages are invite-only</span></div><h1 id="koro-title">Your people. Your Village.</h1><p>A small, private place for friends, family or your community. Start a Village or join one with an invitation.</p></section>
     <div class="koro-layout"><section class="glass card koro-communities" aria-labelledby="koro-list-title">
-      <div class="koro-section-head"><div><span class="koro-section-kicker">A PLACE TO BELONG</span><h2 id="koro-list-title">Your Koro</h2></div>${(crews||[]).length?`<span class="koro-count">${crews.length} Koro</span>`:''}</div>
+      <div class="koro-section-head"><div><span class="koro-section-kicker">A PLACE TO BELONG</span><h2 id="koro-list-title">Your Villages</h2></div>${(crews||[]).length?`<span class="koro-count">${crews.length} ${crews.length===1?'Village':'Villages'}</span>`:''}</div>
       ${(crews||[]).length? `<div class="koro-list">${crews.map(c=>`
-        <button type="button" class="pulse-item" onclick="S.crew=${c.id};render()" aria-label="Open ${esc(c.name)} Koro">
+        <button type="button" class="pulse-item" onclick="S.crew=${c.id};render()" aria-label="Open ${esc(c.name)} Village">
           <div class="av" style="background:${esc(window.SotaCircleTypes?.get(c.circle_type)?.displayAccent||c.accent)}22">${esc(c.emoji)}</div>
           <div style="flex:1;min-width:0"><div class="name">${esc(c.name)}</div>
             <div class="handle">${c.members} member${c.members==1?'':'s'}${c.last_at?' · '+ago(c.last_at):''}</div></div><span class="koro-open-arrow" aria-hidden="true">↗</span>
-        </button>`).join("")}</div>` : `<div class="koro-empty"><div class="koro-empty-art" aria-hidden="true"><span>🪸</span></div><h3>Your Koro starts with you.</h3><p>Bring your people into one private space.<br>Create your first Koro, or join with a code shared with you.</p><div class="koro-empty-actions"><button type="button" class="btn" onclick="$('#koro-create input').focus()">Start your first Koro <span aria-hidden="true">↗</span></button><button type="button" class="koro-text-button" onclick="$('#c-code').focus()">I have an invite code</button></div></div>`}
+        </button>`).join("")}</div>` : `<div class="koro-empty"><div class="koro-empty-art" aria-hidden="true"><span>🪸</span></div><h3>Your Village starts with you.</h3><p>Bring your people into one private space.<br>Create your first Village, or join with a code shared with you.</p><div class="koro-empty-actions"><button type="button" class="btn" onclick="$('#koro-create input').focus()">Start your first Village <span aria-hidden="true">↗</span></button><button type="button" class="koro-text-button" onclick="$('#c-code').focus()">I have an invite code</button></div></div>`}
       <div class="koro-tools" aria-label="More ways to connect"><button type="button" class="btn sm ghost" onclick="go('connections')">See my connections <span aria-hidden="true">↗</span></button><a class="btn sm ghost" href="/communications.html?app=sota-kece">Chat, discussions & calls <span aria-hidden="true">↗</span></a></div>
-      <p class="koro-privacy-note"><span aria-hidden="true">◇</span> A Koro you start stays invite-only. The three starter Koro are open to every member. You choose whether the graph is public.</p>
+      <p class="koro-privacy-note"><span aria-hidden="true">◇</span> A Village you start stays invite-only. The three starter Villages are open to every member. You choose whether the graph is public.</p>
     </section>
-    <aside class="koro-forms" aria-label="Create or join a Koro">
+    <aside class="koro-forms" aria-label="Create or join a Village">
       <section class="glass card koro-form-card" id="koro-create" aria-label="Start a circle">${window.SotaCircles.createHTML()}</section>
-      <section class="glass card koro-form-card koro-join-card" aria-labelledby="koro-join-title"><span class="koro-form-icon" aria-hidden="true">↗</span><h2 id="koro-join-title">Join with a code</h2><p>Already invited? Your place is waiting.</p><label for="c-code">Koro join code</label><input id="c-code" aria-label="Koro join code" placeholder="Paste your invite code" autocapitalize="off"><button type="button" class="btn ghost koro-submit" onclick="joinCrew()">Join Koro <span aria-hidden="true">↗</span></button><small>Use the code shared with you.</small></section>
+      <section class="glass card koro-form-card koro-join-card" aria-labelledby="koro-join-title"><span class="koro-form-icon" aria-hidden="true">↗</span><h2 id="koro-join-title">Join with a code</h2><p>Already invited? Your place is waiting.</p><label for="c-code">Village join code</label><input id="c-code" aria-label="Village join code" placeholder="Paste your invite code" autocapitalize="off"><button type="button" class="btn ghost koro-submit" onclick="joinCrew()">Join Village <span aria-hidden="true">↗</span></button><small>Use the code shared with you.</small></section>
     </aside></div></div>`);
   window.SotaCircles.mountCreate($('#koro-create'),group=>{if(currentView(run)){S.crew=group.id;render();}});
   const koroLayout=window.SotaHubs?$('#view .koro-layout'):null;if(koroLayout){koroLayout.insertAdjacentHTML('beforebegin','<span data-hubs-anchor hidden></span>');mountHubs(koroLayout.previousElementSibling,'koro');}
@@ -1064,19 +1064,19 @@ async function joinCrew(){
 }
 async function viewCrewRoom(){
   const run=viewRun();
-  shell(`<div class="empty glass card" role="status"><em>🪸</em>Opening your Koro…</div>`);
+  shell(`<div class="empty glass card" role="status"><em>🪸</em>Opening your Village…</div>`);
   const {data:cs,error:crewError}=await circleGroupsResult();
   if(!currentView(run))return;
-  if(crewError)return viewError('this Koro','viewCrewRoom()');
+  if(crewError)return viewError('this Village','viewCrewRoom()');
   const c=(cs||[]).find(x=>String(x.id)===String(S.crew));
   if(!c){ S.crew=null; return render(); }
   /* newest first - latest at the top, no scrolling back up */
   const {data:roomData,error:roomError}=await requestResult(window.SotaPlus?window.SotaPlus.koroReadCompat(sb,c.id):sb.rpc("bv_crew_messages2",{p_crew:c.id,lim:80}));
   if(!currentView(run))return;
-  if(roomError)return viewError('your Koro messages','viewCrewRoom()');
+  if(roomError)return viewError('your Village messages','viewCrewRoom()');
   const room=roomData||{};
   shell(`<div class="glass card">
-    <div class="row"><button class="btn sm ghost" aria-label="Back to your Koro" onclick="S.crew=null;render()">←</button>
+    <div class="row"><button class="btn sm ghost" aria-label="Back to your Village" onclick="S.crew=null;render()">←</button>
       <div class="av" id="crew-avatar" style="background:${esc(window.SotaCircleTypes?.get(c.circle_type)?.displayAccent||c.accent)}22">${esc(c.emoji)}</div>
       <div style="flex:1;min-width:0"><div class="name">${esc(c.name)}</div>
         <div class="handle">${c.members} member${c.members==1?'':'s'}</div></div>
@@ -1086,7 +1086,7 @@ async function viewCrewRoom(){
     <details class="tc-group-graph"><summary>Circle graph & visibility</summary><div id="crew-graph"></div></details>
     ${window.SotaPlus?.koroHeader(c.id,room)||''}
     ${window.SotaPlus?.koroReplyBar()||''}
-    ${room.settings&&room.settings.can_post===false?window.SotaPlus.koroComposerNote(room):`<div class="row" style="margin-bottom:12px"><input id="cm" aria-label="Message your Koro" aria-describedby="cm-error" placeholder="Message…" maxlength="900">
+    ${room.settings&&room.settings.can_post===false?window.SotaPlus.koroComposerNote(room):`<div class="row" style="margin-bottom:12px"><input id="cm" aria-label="Message your Village" aria-describedby="cm-error" placeholder="Message…" maxlength="900">
       <button class="btn sm" id="cm-send" onclick="sendMsg(${c.id})">Send</button></div>`}
     <p id="cm-error" role="alert" hidden></p>
     <div class="msgs" id="msgs">
@@ -1130,7 +1130,7 @@ async function viewFriends(){
         <button class="btn sm" onclick="respond(${r.friendship_id},'accepted')">Accept</button>
         <button class="btn sm ghost" onclick="respond(${r.friendship_id},'reject')">No</button>
       </div>`).join("")}</div>`:''}
-    <div class="glass card"><h3>Your connections</h3><p class="sub">See your accepted friends and Koro together.</p><button class="btn" style="margin-top:12px" onclick="go('connections')">See my connections</button></div>
+    <div class="glass card"><h3>Your connections</h3><p class="sub">See your accepted friends and Villages together.</p><button class="btn" style="margin-top:12px" onclick="go('connections')">See my connections</button></div>
     <div class="glass card"><h3>Your friends</h3>
       ${S.metaErrors?.friends?`<p role="alert">Your friends could not load. <button type="button" class="btn sm" onclick="render()">Try again</button></p>`:`<div class="sub" style="margin-bottom:10px">${S.friends.length} ${S.friends.length===1?'person':'people'}. Mutual, always.</div>
       ${S.friends.length? S.friends.map(f=>`
@@ -1143,7 +1143,7 @@ async function viewFriends(){
     </div></div>
     <div class="stack">
       <div class="glass card"><h3>Find someone</h3>
-        <div class="sub" style="margin-bottom:11px">By handle. Or join a starter Koro and meet the people there.</div>
+        <div class="sub" style="margin-bottom:11px">By handle. Or join a starter Village and meet the people there.</div>
         <div class="row"><input id="s-q" aria-label="Find a friend by handle" placeholder="handle" autocapitalize="off">
           <button class="btn sm" onclick="search()">Find</button></div>
         <div id="s-res" role="status" aria-live="polite" style="margin-top:12px"></div>

@@ -41,7 +41,7 @@ function fixture({ signedIn = true } = {}) {
     },
     async rpc(name) {
       calls.push(name);
-      assert.equal(name, 'bv_my_friends', 'inline life map must not discover Koro members');
+      assert.equal(name, 'bv_my_friends', 'inline life map must not discover Village members');
       return { data: [{ id: 'ana', handle: 'ana', display_name: 'Ana' }, { id: 'owner', handle: 'owner' }] };
     },
     from() { throw Error('Known accepted friends need no profile or membership queries'); }
@@ -79,7 +79,7 @@ test('guest gets an interactive life map without account or social data reads', 
 test('owner feed validates identity and supplies accepted people, excluding self and groups', async () => {
   const f = fixture(); f.connections.mountEntry(); const feed = f.watches[0];
   const result = await feed.options.read();
-  result.graph.nodes.push({ id: 'group:private', type: 'group', label: 'Private Koro' });
+  result.graph.nodes.push({ id: 'group:private', type: 'group', label: 'Private Village' });
   feed.options.onData(result); feed.options.onStatus('current');
   assert.deepEqual(f.calls, ['getUser', 'bv_my_friends']);
   assert.equal(f.maps[0].options.owner, 'owner'); assert.equal(f.maps[0].updates.length, 1);

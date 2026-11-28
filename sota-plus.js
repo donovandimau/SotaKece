@@ -20,7 +20,7 @@
     NOT_SIGNED_IN: 'Sign in first.', NOT_VISIBLE: 'Only friends can do that.', NOT_FRIENDS: 'Close friends have to be friends first.',
     EDIT_WINDOW_CLOSED: 'Edits are only possible for an hour after posting.', EDIT_LIMIT: 'Five edits is the limit for one moment.',
     ALREADY_REPOSTED: 'You already reposted this.', POLL_CLOSED: 'This poll has closed.', NOT_YOURS: 'That is not yours to change.',
-    NOT_IN_CREW: 'You are not in that Koro.', EMPTY: 'Write something first.'
+    NOT_IN_CREW: 'You are not in that Village.', EMPTY: 'Write something first.'
   };
   var UNDO_SECONDS = 8, DRAFT_KEY = 'sp-draft-moment';
 
@@ -411,7 +411,7 @@
           return '<div class="sp-event ' + (e.cancelled ? 'off' : '') + '" data-eid="' + e.id + '">' +
             '<div class="sp-event-date"><b>' + new Date(e.starts_at).getDate() + '</b><small>' + new Date(e.starts_at).toLocaleDateString(undefined, { month: 'short' }) + '</small></div>' +
             '<div style="flex:1;min-width:0"><div class="name">' + esc(e.title) + (e.cancelled ? ' <span class="sub">(cancelled)</span>' : '') + '</div>' +
-              '<div class="handle">' + when(e.starts_at) + (e.place ? ' · ' + esc(e.place) : '') + ' · by @' + esc(e.host_handle) + (e.audience === 'crew' ? ' · 🪸 Koro' : e.audience === 'close' ? ' · 🟢 close friends' : '') + '</div>' +
+              '<div class="handle">' + when(e.starts_at) + (e.place ? ' · ' + esc(e.place) : '') + ' · by @' + esc(e.host_handle) + (e.audience === 'crew' ? ' · 🪸 Village' : e.audience === 'close' ? ' · 🟢 close friends' : '') + '</div>' +
               (e.about ? '<div class="body" style="margin-top:6px">' + rich(e.about) + '</div>' : '') +
               '<div class="row wrap" style="gap:6px;margin-top:8px">' +
                 ['going', 'maybe', 'no'].map(function (s) { return '<button type="button" class="btn sm ' + (e.mine === s ? '' : 'ghost') + '" data-sp="rsvp" data-status="' + s + '" ' + (e.cancelled ? 'disabled' : '') + '>' + ({ going: '✅ Going', maybe: '🤔 Maybe', no: '✖ Can\'t' })[s] + '</button>'; }).join('') +
@@ -462,7 +462,7 @@
   }
 
 
-  /* ---------------------------------------------------------------- Koro room: vanish mode, broadcast, replies, reactions, pin */
+  /* ---------------------------------------------------------------- Village room: vanish mode, broadcast, replies, reactions, pin */
   var VANISH = [[null, 'Off'], [3600, '1 hour'], [86400, '24 hours'], [604800, '7 days']];
   function vanishLabel(sec) { for (var i = 0; i < VANISH.length; i++) if (VANISH[i][0] === sec) return VANISH[i][1]; return Math.round(sec / 3600) + ' h'; }
   function koroRead(crewId) { return rpc('bv_crew_messages2', { p_crew: crewId, lim: 80 }); }
@@ -472,10 +472,10 @@
     if (st.compat) return '';
     if (st.broadcast) out += '<span class="pill">📣 Broadcast — only the owner posts</span> ';
     if (st.vanish_seconds) out += '<span class="pill">⏳ Vanish: ' + esc(vanishLabel(st.vanish_seconds)) + '</span> ';
-    if (st.is_owner) out += '<button type="button" class="btn sm ghost" data-sp="koro-settings" data-crew="' + crewId + '">⚙️ Koro settings</button>';
+    if (st.is_owner) out += '<button type="button" class="btn sm ghost" data-sp="koro-settings" data-crew="' + crewId + '">⚙️ Village settings</button>';
     var panel = st.is_owner ? '<form class="sp-koro-settings" data-sp="koro-settings-form" data-crew="' + crewId + '" hidden>' +
       '<label class="sp-seg"><span>Messages vanish after</span><select name="vanish">' + VANISH.map(function (v) { return '<option value="' + (v[0] === null ? '' : v[0]) + '" ' + (st.vanish_seconds === v[0] ? 'selected' : '') + '>' + v[1] + '</option>'; }).join('') + '</select></label>' +
-      '<label class="sp-seg"><input type="checkbox" name="broadcast" ' + (st.broadcast ? 'checked' : '') + '> Broadcast Koro — only I post, everyone reacts</label>' +
+      '<label class="sp-seg"><input type="checkbox" name="broadcast" ' + (st.broadcast ? 'checked' : '') + '> Broadcast Village — only I post, everyone reacts</label>' +
       '<div class="row"><div class="spacer"></div><button class="btn sm" type="submit">Save</button></div></form>' : '';
     var pinned = d.pinned ? '<div class="sp-pinned"><span>📌</span><div style="flex:1;min-width:0"><b>@' + esc(d.pinned.handle) + '</b> ' + rich(d.pinned.body) + '</div>' +
       (st.is_owner ? '<button type="button" class="sp-link" data-sp="koro-unpin" data-crew="' + crewId + '">unpin</button>' : '') + '</div>' : '';
@@ -486,7 +486,7 @@
     var st = d.settings || {}, list = d.messages || [];
     if (!list.length) return '<div class="empty"><em>🪸</em>Say something first.</div>';
     return list.map(function (m) {
-      if (m.kind === 'system') return '<div class="sp-sys">' + esc(m.body || '') + '</div>';
+      if (m.kind === 'system') return '<div class="sp-sys">' + esc(m.body === 'This is now a broadcast Koro. Only the owner posts; everyone can react.' ? 'This is now a broadcast Village. Only the owner posts; everyone can react.' : (m.body || '')) + '</div>';
       if (st.compat) return '<div class="msg sp-msg ' + (m.author === S.user.id ? 'mine' : '') + '">' + (m.author !== S.user.id ? '<span class="who">' + esc(m.avatar_emoji || '🌺') + ' ' + esc(m.display_name || m.handle || '') + '</span>' : '') + rich((window.DimauCommsCore && window.DimauCommsCore.summary(m.body)) || m.body) + '</div>';
       var mine = m.author === S.user.id, canDelete = mine || st.is_owner;
       var text = m.deleted ? '<i class="sub">message removed</i>' : rich((window.DimauCommsCore && window.DimauCommsCore.summary(m.body)) || m.body);
@@ -508,7 +508,7 @@
   function koroReplyBar() { var r = S.koroReply; return '<div id="sp-reply-to" class="sp-reply-to" ' + (r ? 'data-mid="' + r.mid + '"' : 'hidden') + '><span>' + (r ? 'Replying to @' + esc(r.handle) : '') + '</span><button type="button" class="sp-link" data-sp="koro-reply-clear">✕</button></div>'; }
   function koroReplyId() { return S.koroReply ? Number(S.koroReply.mid) : null; }
   function koroReplyClear() { S.koroReply = null; var b = document.getElementById('sp-reply-to'); if (b) { b.hidden = true; b.removeAttribute('data-mid'); } }
-  function koroComposerNote(d) { var st = d.settings || {}; return st.can_post === false ? '<p class="sub">📣 Only the owner posts in this Koro. You can react to any message.</p>' : ''; }
+  function koroComposerNote(d) { var st = d.settings || {}; return st.can_post === false ? '<p class="sub">📣 Only the owner posts in this Village. You can react to any message.</p>' : ''; }
 
 
   /* ---------------------------------------------------------------- compatibility: work before the migrations are applied
@@ -651,7 +651,7 @@
       if (f.dataset.sp === 'koro-settings-form') {
         var v = f.vanish.value ? Number(f.vanish.value) : null;
         await rpc('bv_crew_settings', { p_crew: Number(f.dataset.crew), p_vanish_seconds: v, p_broadcast: f.broadcast.checked });
-        toast('Koro settings saved.'); return render();
+        toast('Village settings saved.'); return render();
       }
       if (f.dataset.sp === 'event-form') {
         var aud = f.audience.value, crew = null; if (aud.indexOf('crew:') === 0) { crew = Number(aud.slice(5)); aud = 'crew'; }

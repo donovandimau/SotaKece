@@ -1,5 +1,5 @@
 'use strict';
-// Hub zoom map (12 Nov 2026): the starter Koro on the Sentinel-2 mosaic of Fiji, with detail that grows as you zoom.
+// Hub zoom map (12 Nov 2026): the starter Village on the Sentinel-2 mosaic of Fiji, with detail that grows as you zoom.
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -46,14 +46,14 @@ test('opening shows the two Fiji hubs as pins and UK & overseas as a chip',dom,a
   assert.deepEqual(h.all('.hm-dot').map(b=>b.dataset.slug),['suva','west']);
   assert.match(h.q('.hm-chips').textContent,/UK & overseas/);
   assert.match(h.q('.hm-chips').textContent,/23 members/);
-  assert.ok(h.q('.hm-chips [data-hm="open"]'),'a joined hub offers Open Koro');
+  assert.ok(h.q('.hm-chips [data-hm="open"]'),'a joined hub offers Open Village');
   assert.match(h.q('.hm-credit').textContent,/Copernicus Sentinel/);
   assert.equal(h.w.document.activeElement,h.q('.hm-close'));
   assert.ok(h.w.SotaHubMap.camera().z<8.5,'it opens on all of the main islands');
   assert.equal(h.all('.hm-label .hm-go').length,0,'far out, pins show names only');
 });
 
-test('zooming in adds members, then the blurb and a Join button; joining turns it into Open Koro',dom,async()=>{
+test('zooming in adds members, then the blurb and a Join button; joining turns it into Open Village',dom,async()=>{
   const h=boot();await h.w.SotaHubMap.open();
   h.q('[data-hm="fly"][data-slug="suva"]').click();await wait(30);
   assert.ok(h.w.SotaHubMap.camera().z>10);
@@ -62,10 +62,10 @@ test('zooming in adds members, then the blurb and a Join button; joining turns i
   assert.match(suva.textContent,/The capital and the Central side/);
   h.q('.hm-label [data-hm="join"][data-slug="suva"]').click();await wait(30);
   assert.deepEqual(h.joined,['suva']);
-  assert.ok(h.q('.hm-label [data-hm="open"][data-slug="suva"]'),'after joining the button opens the Koro');
+  assert.ok(h.q('.hm-label [data-hm="open"][data-slug="suva"]'),'after joining the button opens the Village');
   h.q('.hm-label [data-hm="open"][data-slug="suva"]').click();
   assert.deepEqual(h.opened,[9]);
-  assert.equal(h.w.SotaHubMap.isOpen(),false,'opening the Koro closes the map');
+  assert.equal(h.w.SotaHubMap.isOpen(),false,'opening the Village closes the map');
 });
 
 test('keys move and zoom the map, Esc closes it and focus goes back',dom,async()=>{
@@ -124,7 +124,7 @@ test('no hubs, no map',dom,async()=>{
   assert.equal(h.q('.hm-root'),null);
 });
 
-test('the starter Koro card offers the map only when the map is loaded, and the map joins through the card code',dom,async()=>{
+test('the starter Village card offers the map only when the map is loaded, and the map joins through the card code',dom,async()=>{
   const d=new JSDOM('<!doctype html><body></body>',{runScripts:'outside-only',url:'https://sotakece.com/'});const w=d.window;windows.push(w);
   w.eval(read('sota-hubs.js'));
   const hubs=[{slug:'suva',name:'Suva',emoji:'🌴',members:1,joined:false,crew_id:1}];

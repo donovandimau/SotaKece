@@ -1,3 +1,7 @@
+## 2026-11-28 — Village naming
+
+Renamed the community feature across navigation, invitations, starter groups, maps, chat, calls, notifications, skins and privacy text. Existing group IDs, invitation codes and links remain compatible.
+
 ## 2026-11-27 — Photography across Sota Kece
 
 Added 17 page-specific scenes with responsive WebP sizes, including a wide Settings composition. Guest first paint and Home use the same source. Member Koro and circle headings retain their controls. Verified stylesheet bundles and 21 first-paint and navigation checks.
