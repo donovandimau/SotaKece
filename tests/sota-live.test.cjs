@@ -43,7 +43,7 @@ test('the Village quick-switch sits under People, opens the chosen Village and t
   const rows=[...box.querySelectorAll('[data-live-koro]')];
   assert.deepEqual(rows.map(b=>b.dataset.liveKoro),['3','1','20','21','22','all'],'five Village at most, then the link to all of them');
   assert.equal(rows[0].querySelector('.sl-koro-name').textContent,'Rugby <b>lads</b>');assert.equal(box.querySelector('b b'),null);assert.equal(box.querySelectorAll('.sl-koro-name b').length,0);
-  assert.equal(rows.at(-1).textContent,'All 8 Village ↗');
+  assert.equal(rows.at(-1).textContent,'All 8 Villages ↗');
   rows[1].click();assert.deepEqual(opened,[1]);rows.at(-1).click();assert.deepEqual(went,['crews']);
   assert.equal(calls.filter(n=>n==='bv_my_crews').length,1,'the list is read once, not on every page change');
   S.tab='crews';S.crew=3;api.refresh();await new Promise(r=>w.setTimeout(r,30));
