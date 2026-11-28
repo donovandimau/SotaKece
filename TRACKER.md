@@ -115,6 +115,7 @@ Added TRACKER.md merge=union while preserving other Git attributes. Git attribut
 ## In progress — claim a task here BEFORE you start it
 | Started | AI | Task | Branch / PR |
 |---|---|---|---|
+| 2026-11-28 | Codex | Rename Koro to Village throughout the site | codex/village-wording |
 | 2026-11-22 | Claude | Song Scratch (Ops task 1428): new page song-scratch.html, scratch a photo away to reveal a playing Island Mix song card, save as story video or picture, plus a story editor (text, stickers, drawing, filters, card styles, move/pinch/turn, bin, undo) and the bigger editor (video clips, photo layouts, crop/zoom/turn, moving stickers, animated text, own stickers, templates, backgrounds, scratch on/off, drafts on the phone). Built, waiting for merge | agent/claude/song-scratch-story-scratch-a-photo-away-to-reveal-a-song-card/1 |
 | 2026-11-18 | Claude | Keys rebuilt off Vercel: no service key on the Worker (sota-server edge function), fresh SERE_SECRET — built, waiting for Donovan to merge | claude/rebuild-keys-20261118 |
 | 2026-11-18 | Claude | App-store shell: Capacitor 8 in `mobile/` (com.sotakece.app) loading sotakece.com, Android + iOS projects, icons, camera/mic permissions, docs/APP_STORES.md. Not built or uploaded: needs Android Studio, a Mac for iOS, store accounts | claude/capacitor-app-stores |
